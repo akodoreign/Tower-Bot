@@ -460,7 +460,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
         if random.random() < 0.05:
             event = "resurrection"
         else:
-            return None
+            return None, None
 
     else:
         event = random.choices(NPC_EVENTS, weights=EVENT_WEIGHTS, k=1)[0]
@@ -663,7 +663,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
         if new_secret:
             npc["secret"] = new_secret
             npc["history"].append(f"[{today}] New secret acquired.")
-        return None  # no public announcement
+        return None, "new_secret"  # no public announcement
 
     elif event == "public_incident":
         announcement = await _generate(
@@ -707,7 +707,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
     if npc.get("status") == "dead":
         _move_to_graveyard(npc, all_npcs)
 
-    return announcement
+    return announcement, event
 
 
 # ---------------------------------------------------------------------------
@@ -857,17 +857,48 @@ async def run_daily_lifecycle(channel) -> None:
                 except Exception:
                     pass
 
-        announcement = await apply_npc_event(npc, npcs)
+        announcement, event_type = await apply_npc_event(npc, npcs)
         _save_npcs(npcs)
 
         if announcement and channel:
-            is_dead = npc.get("status") == "dead"
+            # Event-specific embed colors — each event type is visually distinct
+            _EVENT_COLORS = {
+                "promotion":        0x55AA44,  # green-gold — good news
+                "demotion":         0xBB6622,  # dark orange — bad career move
+                "faction_defection": 0x9944CC, # purple — dramatic shift
+                "revelation":       0xCCAA33,  # amber/gold — secrets exposed
+                "death":            0x992222,  # dark red — death
+                "injury_recovery":  0x55BB77,  # soft green — healing
+                "injury_death":     0x992222,  # dark red — death from injury
+                "resurrection":     0xAA33CC,  # violet — supernatural return
+                "alliance":         0x3366BB,  # blue — political
+                "betrayal":         0xCC3344,  # crimson — treachery
+                "public_incident":  0x667788,  # slate grey — city news
+                "daily_generated":  0x338899,  # teal — daily event
+            }
+            _EVENT_EMOJI = {
+                "promotion":        "📈",
+                "demotion":         "📉",
+                "faction_defection": "🔄",
+                "revelation":       "👁",
+                "death":            "💀",
+                "injury_recovery":  "💪",
+                "injury_death":     "💀",
+                "resurrection":     "✨",
+                "alliance":         "🤝",
+                "betrayal":         "🗡",
+                "public_incident":  "📰",
+                "daily_generated":  "🧬",
+            }
+            evt = event_type or "public_incident"
+            color = _EVENT_COLORS.get(evt, 0x667788)
+            emoji = _EVENT_EMOJI.get(evt, "📰")
             embed = discord.Embed(
                 description=announcement,
-                color=discord.Color.dark_red() if is_dead else discord.Color.blurple()
+                color=color
             )
             embed.set_footer(
-                text=f"{'💀' if is_dead else '📰'} {npc['name']} · {npc.get('faction','?')} · {npc.get('rank','?')}"
+                text=f"{emoji} {npc['name']} · {npc.get('faction','?')} · {npc.get('rank','?')}"
             )
             await channel.send(embed=embed)
 

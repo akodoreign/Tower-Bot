@@ -1,6 +1,9 @@
 # Generated image files
 images/
 
+# Reference images for iterative A1111 generation (large PNGs)
+campaign_docs/image_refs/
+
 # Generated mission modules (large .docx + .json intermediates)
 generated_modules/
 

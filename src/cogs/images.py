@@ -83,6 +83,10 @@ def setup(client):
                 pass
 
         from src.news_feed import a1111_lock, _a1111_lock
+        from src.image_ref import (
+            get_best_ref_for_scene, to_img2img_payload,
+            detect_and_save_refs,
+        )
 
         if _a1111_lock.locked():
             await interaction.followup.send(
@@ -91,20 +95,36 @@ def setup(client):
             )
             return
 
+        # Check for reference images to use as img2img base
+        ref_bytes, denoise, ref_source = get_best_ref_for_scene(prompt)
+        if ref_bytes:
+            api_payload = to_img2img_payload(payload, ref_bytes, denoise)
+            endpoint = f"{a1111_url}/sdapi/v1/img2img"
+            logger.info(f"\U0001f3a8 /draw using img2img ref: {ref_source} (denoise={denoise})")
+        else:
+            api_payload = payload
+            endpoint = f"{a1111_url}/sdapi/v1/txt2img"
+
         async with a1111_lock:
             try:
                 async with httpx.AsyncClient(timeout=600.0) as http:
-                    resp = await http.post(f"{a1111_url}/sdapi/v1/txt2img", json=payload)
+                    resp = await http.post(endpoint, json=api_payload)
                     resp.raise_for_status()
                     data = resp.json()
 
                 img_bytes = base64.b64decode(data["images"][0])
+
+                # Auto-save as reference for detected NPCs/locations
+                detect_and_save_refs(prompt, img_bytes)
+
                 file = discord.File(io.BytesIO(img_bytes), filename="undercity.png")
 
                 embed = discord.Embed(
                     title="\U0001f3a8 Undercity Vision",
                     color=discord.Color.dark_grey(),
                 )
+                if ref_source:
+                    embed.set_footer(text=f"\U0001f504 Built on ref: {ref_source}")
                 embed.set_image(url="attachment://undercity.png")
 
                 await interaction.followup.send(embed=embed, file=file)
@@ -265,14 +285,30 @@ def setup(client):
             "restore_faces": False, "tiling": False,
         }
 
+        # Check for reference images to use as img2img base
+        from src.image_ref import (
+            get_best_ref_for_scene, to_img2img_payload,
+            detect_and_save_refs, SCENE_DENOISE,
+        )
+        ref_bytes, denoise, ref_source = get_best_ref_for_scene(scene)
+        if ref_bytes:
+            api_payload = to_img2img_payload(payload, ref_bytes, denoise)
+            endpoint = f"{A1111_URL}/sdapi/v1/img2img"
+            ref_note = f" (img2img ref: {ref_source})"
+            logger.info(f"\U0001f3a8 /drawscene using img2img ref: {ref_source} (denoise={denoise})")
+        else:
+            api_payload = payload
+            endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
+            ref_note = ""
+
         await interaction.followup.send(
-            f"⏳ Generating scene image... (this takes ~30-60s)", ephemeral=True
+            f"⏳ Generating scene image...{ref_note} (this takes ~30-60s)", ephemeral=True
         )
 
         async with a1111_lock:
             try:
                 async with _httpx.AsyncClient(timeout=900.0) as http:
-                    r = await http.post(f"{A1111_URL}/sdapi/v1/txt2img", json=payload)
+                    r = await http.post(endpoint, json=api_payload)
                     r.raise_for_status()
                     result = r.json()
                 img_bytes = _base64.b64decode(result["images"][0])
@@ -290,6 +326,9 @@ def setup(client):
             except Exception as _ge:
                 await interaction.followup.send(f"❌ Generation failed: {_ge}", ephemeral=True)
                 return
+
+        # Auto-save as reference for detected NPCs/locations
+        detect_and_save_refs(scene, img_bytes)
 
         channel = client.get_channel(int(channel_id_str))
         if channel:
@@ -393,3 +432,140 @@ def setup(client):
                     pass
 
         asyncio.get_event_loop().create_task(_run())
+
+    # ---- /pin (DM only) — pin last generated image as canonical reference ----
+
+    @client.tree.command(
+        name="pin",
+        description="[DM only] Pin the last generated image as canonical ref for an NPC or location.",
+    )
+    @app_commands.describe(
+        category="What to pin — NPC portrait or location scene",
+        name="NPC name or location key (e.g. 'Serrik Dhal' or 'markets_infinite')",
+    )
+    @app_commands.choices(category=[
+        app_commands.Choice(name="NPC",      value="npc"),
+        app_commands.Choice(name="Location", value="location"),
+    ])
+    async def pin_command(
+        interaction: discord.Interaction,
+        category: str,
+        name: str,
+    ):
+        dm_user_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_user_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        from src.image_ref import (
+            pin_npc_ref, pin_location_ref,
+            get_npc_ref, get_location_ref,
+            has_npc_ref, has_location_ref,
+        )
+
+        # Strategy: look for the most recent image attachment in the channel
+        # (the last /draw or /drawscene output)
+        img_bytes = None
+        try:
+            async for msg in interaction.channel.history(limit=20):
+                if msg.attachments:
+                    for att in msg.attachments:
+                        if att.filename.endswith((".png", ".jpg", ".jpeg", ".webp")):
+                            img_bytes = await att.read()
+                            break
+                if msg.embeds:
+                    for embed in msg.embeds:
+                        if embed.image and embed.image.url:
+                            import httpx
+                            async with httpx.AsyncClient(timeout=30.0) as http:
+                                r = await http.get(embed.image.url)
+                                if r.status_code == 200:
+                                    img_bytes = r.content
+                                    break
+                if img_bytes:
+                    break
+        except Exception as e:
+            await interaction.followup.send(f"\u274c Could not find a recent image: {e}", ephemeral=True)
+            return
+
+        if not img_bytes:
+            await interaction.followup.send(
+                "\u274c No recent image found in the last 20 messages. "
+                "Use `/draw` or `/drawscene` first, then `/pin`.",
+                ephemeral=True,
+            )
+            return
+
+        if category == "npc":
+            pin_npc_ref(name, img_bytes)
+            await interaction.followup.send(
+                f"\U0001f4cc **Pinned** canonical NPC reference for **{name}** "
+                f"({len(img_bytes):,} bytes). Future `/draw` and `/drawscene` "
+                f"commands will use this as the img2img base.",
+                ephemeral=True,
+            )
+        else:
+            pin_location_ref(name, img_bytes)
+            await interaction.followup.send(
+                f"\U0001f4cc **Pinned** canonical location reference for **{name}** "
+                f"({len(img_bytes):,} bytes). Future scene generations in this "
+                f"location will use this as the img2img base.",
+                ephemeral=True,
+            )
+
+    # ---- /refstats (DM only) — show reference image inventory ----
+
+    @client.tree.command(
+        name="refstats",
+        description="[DM only] Show how many reference images are stored for NPCs and locations.",
+    )
+    async def refstats_command(interaction: discord.Interaction):
+        dm_user_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_user_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        from src.image_ref import get_ref_stats, NPC_REFS, LOC_REFS
+
+        stats = get_ref_stats()
+        npc_details = []
+        for d in sorted(NPC_REFS.iterdir()):
+            if d.is_dir():
+                pinned = "\U0001f4cc" if (d / "pinned.png").exists() else "  "
+                refs = sum(1 for i in range(1, 4) if (d / f"ref_{i:03d}.png").exists())
+                npc_details.append(f"{pinned} {d.name} ({refs} refs)")
+
+        loc_details = []
+        for d in sorted(LOC_REFS.iterdir()):
+            if d.is_dir():
+                pinned = "\U0001f4cc" if (d / "pinned.png").exists() else "  "
+                refs = sum(1 for i in range(1, 4) if (d / f"ref_{i:03d}.png").exists())
+                loc_details.append(f"{pinned} {d.name} ({refs} refs)")
+
+        npc_list = "\n".join(npc_details[:25]) if npc_details else "*None yet*"
+        loc_list = "\n".join(loc_details[:15]) if loc_details else "*None yet*"
+
+        embed = discord.Embed(
+            title="\U0001f5bc\ufe0f Image Reference Stats",
+            color=discord.Color.dark_grey(),
+        )
+        embed.add_field(
+            name=f"NPCs ({stats['npc_refs']} total, {stats['npc_pinned']} pinned)",
+            value=f"```\n{npc_list}\n```",
+            inline=False,
+        )
+        embed.add_field(
+            name=f"Locations ({stats['location_refs']} total, {stats['location_pinned']} pinned)",
+            value=f"```\n{loc_list}\n```",
+            inline=False,
+        )
+        embed.set_footer(
+            text="\U0001f4cc = pinned canonical ref. Use /pin to lock a good generation."
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)

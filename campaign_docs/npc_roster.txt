@@ -1,7 +1,7 @@
 # NPC ROSTER — TOWER OF LAST CHANCE
 # Auto-generated from npc_lifecycle system. Do not edit manually.
-# Last updated: 2026-03-19 14:36
-# Active NPCs: 65
+# Last updated: 2026-03-19 15:04
+# Active NPCs: 66
 
 ---NPC---
 NAME: Sera Voss
@@ -73,7 +73,7 @@ HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-11] Injured. |
 
 ---NPC---
 NAME: Yuna Saltis
-STATUS: injured
+STATUS: alive
 FACTION: Obsidian Lotus
 RANK: Memory Architect (specialist — designs and performs memory erasure contracts)
 SPECIES: Tiefling
@@ -85,7 +85,7 @@ ROLE: Performs high-value memory erasure contracts. Advises The Widow on complex
 SECRET: She has retained a copy of every memory she has ever erased — stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.
 RELATIONSHIPS: Professional respect from The Widow (rare). Tolerated by the rest of the Lotus — her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically — Yuna found this annoying and flattering in equal measure.
 ORACLE NOTES: The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?
-HISTORY: [2026-03-11] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-19] Injured.
+HISTORY: [2026-03-12] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -158,7 +158,7 @@ HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-17] Injured. | [2026-0
 
 ---NPC---
 NAME: Gorgon Gizzick
-STATUS: alive
+STATUS: injured
 FACTION: Brother Thane's Cult
 RANK: Speaker
 SPECIES: Goblin
@@ -170,7 +170,7 @@ ROLE: Gorgon leads the goblin members of the Cult in their daily rituals, guidin
 SECRET: Beneath his devout exterior, Gorgon secretly worships the deity of the Forgotten, a god once banished by Brother Thane himself. This covert allegiance could jeopardize his position within the Cult if discovered.
 RELATIONSHIPS: Gorgon maintains a close bond with the goblin members, but keeps a wary distance from the leaders of the Cult, especially Brother Thane. | Alliance with Corvin Thale (Wardens of Ash).
 ORACLE NOTES: The Oracle senses a strong aura of deception emanating from Gorgon, yet also detects an unwavering dedication to his beliefs.
-HISTORY: [2026-03-05] Introduced to the Undercity roster. | [2026-03-11] Formed alliance with Corvin Thale (Wardens of Ash). | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries.
+HISTORY: [2026-03-05] Introduced to the Undercity roster. | [2026-03-11] Formed alliance with Corvin Thale (Wardens of Ash). | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-19] Injured.
 ---END NPC---
 
 ---NPC---
@@ -1105,5 +1105,22 @@ ROLE: She leads covert operations against the Iron Fang Consortium, gathering in
 SECRET: Thalia is actually a former member of the Iron Fang Consortium, forced to leave after her family was betrayed.
 RELATIONSHIPS: She maintains a tense truce with the Argent Blades, occasionally seeking their aid when the situation requires it.
 ORACLE NOTES: The Oracle senses a deep, hidden anger that could erupt into a storm of retribution.
+HISTORY: [2026-03-19] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Thyra Scalescar
+STATUS: alive
+FACTION: Serpent Choir
+RANK: Petitioner
+SPECIES: Dragonborn
+AGE: 40s
+APPEARANCE: Thyra is a burly, scarred dragonborn with a missing eye, a patch of scales replaced by a leather eye-cover. She has a menacing scar running down her left cheek.
+LOCATION: The Pit — a district notorious for gambling and violence
+MOTIVATION: Thyra seeks to climb the ranks of the Serpent Choir to gain power and influence, using her cunning and brutal tactics to do so.
+ROLE: Thyra serves as a ruthless enforcer for the Serpent Choir, collecting debts and maintaining order in The Pit.
+SECRET: Thyra is secretly loyal to the Argent Blades, feeding them information about the Serpent Choir's activities.
+RELATIONSHIPS: She has a tense but professional relationship with Gideon Steelforge, a blacksmith known for his allegiance to the Wardens of Ash.
+ORACLE NOTES: The Oracle senses a deep division within Thyra, a struggle between loyalty and ambition.
 HISTORY: [2026-03-19] Introduced to the Undercity roster.
 ---END NPC---

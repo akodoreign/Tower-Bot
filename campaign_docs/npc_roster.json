@@ -109,7 +109,7 @@
     "secret": "She has retained a copy of every memory she has ever erased \u2014 stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
     "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus \u2014 her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically \u2014 Yuna found this annoying and flattering in equal measure.",
     "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?",
-    "status": "injured",
+    "status": "alive",
     "revealed_secrets": [],
     "history": [
       "[2026-03-05] Entered roster from static file.",
@@ -117,10 +117,11 @@
       "[2026-03-12] Recovered from injuries.",
       "[2026-03-13] Injured.",
       "[2026-03-14] Recovered from injuries.",
-      "[2026-03-19] Injured."
+      "[2026-03-19] Injured.",
+      "[2026-03-19] Recovered from injuries."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-19T14:36:08.217098"
+    "last_event_at": "2026-03-19T15:04:18.407855"
   },
   {
     "name": "Pol Greaves",
@@ -238,16 +239,17 @@
     "secret": "Beneath his devout exterior, Gorgon secretly worships the deity of the Forgotten, a god once banished by Brother Thane himself. This covert allegiance could jeopardize his position within the Cult if discovered.",
     "relationships": "Gorgon maintains a close bond with the goblin members, but keeps a wary distance from the leaders of the Cult, especially Brother Thane. | Alliance with Corvin Thale (Wardens of Ash).",
     "oracle_notes": "The Oracle senses a strong aura of deception emanating from Gorgon, yet also detects an unwavering dedication to his beliefs.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
       "[2026-03-05] Introduced to the Undercity roster.",
       "[2026-03-11] Formed alliance with Corvin Thale (Wardens of Ash).",
       "[2026-03-12] Injured.",
-      "[2026-03-12] Recovered from injuries."
+      "[2026-03-12] Recovered from injuries.",
+      "[2026-03-19] Injured."
     ],
     "created_at": "2026-03-05T13:00:22.789318",
-    "last_event_at": "2026-03-12T14:26:48.990001"
+    "last_event_at": "2026-03-19T15:04:23.665028"
   },
   {
     "name": "Groz Krax",
@@ -1490,5 +1492,26 @@
     ],
     "created_at": "2026-03-19T14:35:50.531510",
     "last_event_at": "2026-03-19T14:35:50.531510"
+  },
+  {
+    "name": "Thyra Scalescar",
+    "faction": "Serpent Choir",
+    "rank": "Petitioner",
+    "species": "Dragonborn",
+    "age": "40s",
+    "appearance": "Thyra is a burly, scarred dragonborn with a missing eye, a patch of scales replaced by a leather eye-cover. She has a menacing scar running down her left cheek.",
+    "location": "The Pit \u2014 a district notorious for gambling and violence",
+    "motivation": "Thyra seeks to climb the ranks of the Serpent Choir to gain power and influence, using her cunning and brutal tactics to do so.",
+    "role": "Thyra serves as a ruthless enforcer for the Serpent Choir, collecting debts and maintaining order in The Pit.",
+    "secret": "Thyra is secretly loyal to the Argent Blades, feeding them information about the Serpent Choir's activities.",
+    "relationships": "She has a tense but professional relationship with Gideon Steelforge, a blacksmith known for his allegiance to the Wardens of Ash.",
+    "oracle_notes": "The Oracle senses a deep division within Thyra, a struggle between loyalty and ambition.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-19] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-03-19T15:04:12.575389",
+    "last_event_at": "2026-03-19T15:04:12.575389"
   }
 ]

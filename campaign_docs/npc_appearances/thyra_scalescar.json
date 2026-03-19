@@ -1,0 +1,28 @@
+{
+  "name": "Thyra Scalescar",
+  "species": "Dragonborn",
+  "faction": "Serpent Choir",
+  "rank": "Petitioner",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A burly, towering dragonborn stands in the dimly lit Undercity alleyway, her scaled humanoid form imposing against the gritty cobblestones. Thyra Scalescar, a scarred beast with a patch of black leather replacing a missing eye and a menacing scar running down her left cheek, dons jade green and black divine silk robes adorned with coiled serpent motifs and contract seals as pendants. Her muscular frame is armored in chain mail or scale mail, and she wields both a warhammer and a crossbow, each piece of equipment telling a tale of past contracts. The single, flickering torchlight casts eerie shadows on her draconic tail and the worn leather patches of her outfit, illuminating her intimidating presence.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

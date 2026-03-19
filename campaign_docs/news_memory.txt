@@ -1,12 +1,3 @@
-[2026-03-19 06:23 │ Tower: 19 Mar 2036, 06:23]
-The Undercity's Dark Heart Flares Up The Night Pits, the Warrens' infamous fighting den, roars with an unnatural fire tonight. Flames consume the once-popular arena. The pit boss, Sable, is missing, leaving the city to speculate about the culprit - the Obsidian Lotus or a rival faction. Meanwhile, the Patchwork Saints scramble to protect the Warrens' residents, the echo of the city's bloodlust hanging heavy in the smoke-filled air.
----ENTRY---
-[2026-03-19 06:29 │ Tower: 19 Mar 2036, 06:29]
-The Tower's Grip Tightens: Mira Kessan's Unveiled Betrayal Grand Forum, Adventurer's Inn As the Tower's watchful gaze sets on the city, whispers ripple through the crowd in the Adventurer's Inn. Mira Kessan, the city's most trusted info broker, stands accused of feeding the FTA sanitized intel. Her eyes, usually bright with knowledge, are cast down, betraying a hidden shame. The city wonders: how long has this been happening, and who can she be trusted to confide in now?.
----ENTRY---
-[2026-03-19 06:32 │ Tower: 19 Mar 2036, 06:32]
-The Wardens' Blade Dances with the Iron Fang's Hand Crimson Alley, Markets Infinite The night's chill can't quell the heat of a fierce confrontation between Lt-Inspector Corvin Thale of the Wardens and Sera Voss, Senior Agent of the Iron Fang Consortium. The cobblestones echo with their raised voices, their fists, and their broken promises. Bystanders scatter, their eyes wide as they watch the battle of wills unfold. The city whispers, wondering who will bend first.
----ENTRY---
 [2026-03-19 06:35 │ Tower: 19 Mar 2036, 06:35]
 Taste of Worlds, Markets Infinite In the heart of Markets Infinite, a vendor named Zara hawks her wares with a weary voice. Her cart, overflowing with exotic spices, stands tall amidst the cacophony of the bazaar. "Twice the price for half the fire!" she calls out, her eyes heavy with the weight of her disappointment. As the crowd moves on, the echoes of her lament hang in the air, a bitter reminder of the Undercity's ever-changing economy. Spice prices soaring, Kessan & Mira's silence deafening.
 ---ENTRY---
@@ -117,3 +108,12 @@ Guildmaster Serrik Dhal's absence echoes in Neon Row's neon glow, whispers circu
 ---ENTRY---
 [2026-03-19 14:31 │ Tower: 19 Mar 2036, 14:31]
 Rumors abound of a new shipment arriving from the shadows of the Mists, hidden in the heart of The Warrens. A rare offering from the Obsidian Lotus: Memory Eraser Elixir, a potent concoction that promises a clean slate, for a steep price of 75 EC. Beware the whispers of the Widow's dealings, as the elixir is said to carry a dangerous side effect — a taste of Veha's silence. Elune's Apothecary, Warrens — the Widow's secret meeting place? The Widow's eyes sparkle with a chilling gleam, as she pours a crimson vial into a pot of herbal brew. A mysterious figure approaches, a silent exchange made in the shadows. The Undercity whispers in anticipation, as the city's secrets are bought and sold.
+---ENTRY---
+[2026-03-19 14:55 │ Tower: 19 Mar 2036, 14:55]
+_In the dimly lit corners of Shantytown Heights. and pay the price." A shiver runs through the crowd, as they exchange knowing glances, the city's heartbeat echoing with whispered fear._.
+---ENTRY---
+[2026-03-19 14:57 │ Tower: 19 Mar 2036, 14:57]
+Rumblings in the Floating Bazaar: Iron Fang Consortium's hidden relic ignites power struggle In the chaotic maze of the Floating Bazaar, the neon glow flickers as whispers of a hidden relic found by Sera Voss, the Consortium's skimming agent, cause a stir. Beneath the glimmer of a rare artifact, Guildmaster Serrik Dhal and Lady Cerys Valemont clash in a power play that echoes through the cobbled alleys of the Undercity. the whispers of a divided Iron Fang Consortium grow stronger, as they vie for control of the mysterious relic, hidden in the heart of the Floating Bazaar.
+---ENTRY---
+[2026-03-19 14:59 │ Tower: 19 Mar 2036, 14:59]
+In the dimly lit cobblestone alleyways of Scrapworks, The Whispering Twins — Elune and Kiva — huddle over their shared table of wares. Offering their handcrafted goods, herbal remedies, amulets, and trinkets, to the city's denizens, they maintain a cheerful demeanor amidst the Undercity's shadows. With Elune's Apothecary shuttered due to a recent rift incident, the sisters struggle to make ends meet. Kiva, the eldest, has a keen eye for the arcane and a knack for healing, while her younger sister Elune is known for her potent concoctions and unwavering spirit. As the night wears on, the sisters share a quiet laugh, their eyes glinting with determination. Despite the odds, they refuse to let the Undercity swallow them whole. Elune reaches for a small vial, her fingers brushing against a worn photograph of their mother. With a determined nod to her sister, she pours the contents into a mortar, her heart echoing with the promise of a better tomorrow.

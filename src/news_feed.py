@@ -2483,11 +2483,27 @@ async def generate_story_image() -> tuple:
         "tiling": False,
     }
 
+    # Check for reference images to use as img2img base
+    from src.image_ref import (
+        get_best_ref_for_scene, to_img2img_payload,
+        detect_and_save_refs, SCENE_DENOISE,
+    )
+    ref_bytes, denoise, ref_source = get_best_ref_for_scene(
+        chosen_bulletin if chosen_bulletin else image_prompt
+    )
+    if ref_bytes:
+        api_payload = to_img2img_payload(payload, ref_bytes, denoise)
+        endpoint = f"{A1111_URL}/sdapi/v1/img2img"
+        logger.info(f"🖼️ Story image using img2img ref: {ref_source} (denoise={denoise})")
+    else:
+        api_payload = payload
+        endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
+
     async with a1111_lock:
         for attempt in range(3):
             try:
                 async with httpx.AsyncClient(timeout=900.0) as client:
-                    r = await client.post(f"{A1111_URL}/sdapi/v1/txt2img", json=payload)
+                    r = await client.post(endpoint, json=api_payload)
                     r.raise_for_status()
                     result = r.json()
 
@@ -2508,6 +2524,10 @@ async def generate_story_image() -> tuple:
                     logger.info(f"🖼️ Cropped {crop_px}px watermark strip ({len(img_bytes)//1024}KB)")
                 except Exception as _crop_err:
                     logger.warning(f"🖼️ Watermark crop failed: {_crop_err} — using uncropped image")
+
+                # Auto-save as reference for detected NPCs/locations
+                scene_text = chosen_bulletin if chosen_bulletin else image_prompt
+                detect_and_save_refs(scene_text, img_bytes)
 
                 logger.info(f"🖼️ A1111 image generated successfully ({len(img_bytes)//1024}KB)")
                 return img_bytes, image_prompt, caption
