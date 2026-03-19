@@ -1,0 +1,35 @@
+{
+  "name": "Siltwatch Company",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile team known for their ability to navigate the ever-shifting rifts, providing access to otherwise inaccessible locations and resources.",
+  "members": [
+    {
+      "name": "Eira Thornwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her eyes glow a eerie green in low light, a remnant of her past as a rift-walker."
+    },
+    {
+      "name": "Varnus Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His battle scars tell tales of battles fought within the rifts, some still bleeding when they first appear."
+    },
+    {
+      "name": "Jynx Siltwhisper",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Despite her felineness, she has a sharp, almost reptilian grace that makes her stand out in the crowd."
+    }
+  ],
+  "visual": "Dressed in leather and steel, they move with a practiced ease, their gear adorned with intricate patterns and glowing runes. Their distinctive mark, a stylized watchtower, is tattooed on their forearms.",
+  "reputation_note": "Whispers speak of their uncanny ability to navigate the rifts, while some warn that they're too close to the dangerous forces that lie beneath.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

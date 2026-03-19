@@ -1,0 +1,29 @@
+{
+  "name": "Nullpoint Advance",
+  "affiliation": "Argent Blades",
+  "specialty": "Specializing in complex, high-stakes undercity heists and sabotage, Nullpoint Advance has earned a reputation for their meticulous planning and ability to navigate the treacherous politics of the Undercity with ease.",
+  "members": [
+    {
+      "name": "Elara Vornis",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her icy blue eyes are a chilling reminder of the icy dome that keeps the Undercity sealed, a constant reminder of the life she's chosen"
+    },
+    {
+      "name": "Zavok Grimstone",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "The scars on his knuckles tell tales of countless battles, a testament to his unwavering loyalty to the Argent Blades"
+    }
+  ],
+  "visual": "Clad in black leather and silver armor, Nullpoint Advance is a sight to behold. Elara, with her short silver hair and Zavok, a towering figure with a thick, unkempt beard, exude an aura of professionalism and deadly efficiency. They are often seen together, a silent and deadly combination.",
+  "reputation_note": "Whispers echo through the Undercity, warning of the Argent Blades' enforcers, Nullpoint Advance. Hired for the toughest jobs and feared by the weak, they are a force to be reckoned with",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

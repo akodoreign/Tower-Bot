@@ -1,0 +1,42 @@
+{
+  "name": "The Borrowed Hours",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Specializing in infiltration and extraction, The Borrowed Hours are known for their exceptional ability to slip through rifts unnoticed and complete missions without leaving a trace.",
+  "members": [
+    {
+      "name": "Aria Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Aria, a ruthless and calculating strategist, wears a silver eyepatch over her left eye, a reminder of a failed mission that left her blind in that eye."
+    },
+    {
+      "name": "Thorne Ironfang",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Thorne's thick, curled beard hides a small, intricate silver tattoo that marks him as an initiate of the Obsidian Lotus."
+    },
+    {
+      "name": "Zephyr Windwhisper",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Zephyr, a master of the arcane, is easily recognized by the large, feathered cloak that billows behind him as he moves through the Undercity."
+    },
+    {
+      "name": "Reaver Grimstone",
+      "role": "Muscle",
+      "species": "Half-Orc",
+      "note": "Reaver, the group's enforcer, has a distinct scar running down the left side of his face, earned in a brutal bar brawl that left him without a permanent home."
+    }
+  ],
+  "visual": "Clad in black leather armor and hooded cloaks, they move through the Undercity as a shadowy collective, their weapons hidden under their cloaks. A small, glowing obsidian symbol on their left wrists serves as their identifying mark.",
+  "reputation_note": "Whispers in the Undercity speak of a crew that works for the Obsidian Lotus, completing missions others dare not touch. But be warned, they do not take kindly to those who cross them.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a inter-guild-tier contract. Rank: Unknown (+2/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 2,
+  "generated": true
+}

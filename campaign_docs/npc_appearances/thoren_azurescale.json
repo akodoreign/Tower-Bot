@@ -1,0 +1,28 @@
+{
+  "name": "Thoren Azurescale",
+  "species": "Dragonborn",
+  "faction": "Adventurers Guild",
+  "rank": "F-Rank",
+  "role": "mercenary",
+  "home_district": "adventurers guild",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Dragonborn adventurer, Thoren Azurescale, towers over a cobblestone alleyway under the Dome's soft glow. His deep-blue scales shimmer iridescently, reflecting the glow from the enchanted plate chest piece emblazoned with the Adventurers Guild badge. A warhammer, its hilt wrapped in worn leather, hangs from his belt, while a crossbow slung over his shoulder bears the scars of past contracts. His violet eyes, filled with a melancholic depth, scan the shadows, a clear indication of his relentless pursuit for the Guild's respect and the safety of his fellow citizens.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

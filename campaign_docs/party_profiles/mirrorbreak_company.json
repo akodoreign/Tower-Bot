@@ -1,0 +1,29 @@
+{
+  "name": "Mirrorbreak Company",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Specializing in complex puzzles and intricate traps, the Mirrorbreak Company has a reputation for solving the unsolvable and escaping the impossible.",
+  "members": [
+    {
+      "name": "Thaddeus 'Mystic' Kestrel",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The loss of his left arm to a rift-beast has left him with an uncanny knack for sensing rifts before they tear open."
+    },
+    {
+      "name": "Zara 'Raven' Whisperwind",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her distinctive white-feathered raven companion, Crow, is as much a part of the team as any member."
+    }
+  ],
+  "visual": "The Mirrorbreak Company stands out in the Undercity with their distinctive red and gold attire, adorned with mirrored symbols to ward off rift-beasts. They carry an air of quiet professionalism, their eyes always scanning for potential threats.",
+  "reputation_note": "Whispers in the Undercity tell tales of the Mirrorbreak Company's uncanny ability to navigate the city's ever-shifting reality. A warning: don't cross them, for they are said to have mirrors that reflect your darkest secrets.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

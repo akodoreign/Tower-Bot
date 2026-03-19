@@ -1,0 +1,36 @@
+{
+  "name": "Frostgate Company",
+  "affiliation": "Argent Blades",
+  "specialty": "Specializing in infiltration and stealth operations, the Frostgate Company is renowned for their ability to navigate the labyrinthine Undercity undetected, often retrieving valuable information or artifacts others deem impossible to reach.",
+  "members": [
+    {
+      "name": "Isolde Grimsden",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her icy blue eyes betray no emotion, a chilling reminder of her unyielding determination."
+    },
+    {
+      "name": "Kaelen Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His left arm is a steel prosthetic, a testament to the battles he's survived within the Undercity."
+    },
+    {
+      "name": "Elara Whisperwind",
+      "role": "Face",
+      "species": "Elf",
+      "note": "Her ethereal beauty belies her sharp wit and cunning ability to charm or intimidate anyone."
+    }
+  ],
+  "visual": "Clad in black leather armors adorned with silver Argent Blades insignia, they move with a stealthy grace, their eyes scanning their surroundings warily. A hooded, silver-lined cloak hangs from each member's shoulder, marking them as part of the Frostgate Company.",
+  "reputation_note": "Rumored to have ties to the Argent Blades' highest echelons, the Frostgate Company is a name both feared and respected among the Undercity's denizens.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a local-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

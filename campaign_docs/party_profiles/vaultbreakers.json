@@ -1,0 +1,35 @@
+{
+  "name": "Vaultbreakers",
+  "affiliation": "Serpent Choir",
+  "specialty": "Cunning thieves known for their ability to bypass any security and retrieve the most elusive treasures from deep within the city's vaults",
+  "members": [
+    {
+      "name": "Zara Valtor",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A master of disguise, her face changes as often as her gowns"
+    },
+    {
+      "name": "Krak'thos",
+      "role": "Muscle",
+      "species": "Dragonborn",
+      "note": "A former member of the Iron Fang Consortium, he defected to the Serpent Choir after a personal betrayal"
+    },
+    {
+      "name": "Gideon Stonefoot",
+      "role": "Face",
+      "species": "Dwarf",
+      "note": "Has a knack for talking his way out of tight situations, but his past with the Wardens of Ash is a constant tension"
+    }
+  ],
+  "visual": "Clad in black leather and hooded cloaks, they move with a silent grace through the crowded streets, their eyes constantly scanning for opportunities. A small, intricate serpent symbol is tattooed on each member's wrist.",
+  "reputation_note": "Whispers echo through the Undercity: 'Don't cross the Vaultbreakers, or they'll break into your vault'.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

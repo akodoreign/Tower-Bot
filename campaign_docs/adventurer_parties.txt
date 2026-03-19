@@ -1,0 +1,115 @@
+# ADVENTURER PARTIES — TOWER OF LAST CHANCE
+# One party name per line. The mission board draws from this list when a mission gets claimed.
+# AI will generate additional names if this list runs low (fewer than 5 remaining unused).
+# Lines starting with # are comments and are ignored.
+# Add or remove names freely — the bot reloads this file automatically.
+
+The Iron Verdict
+Ashen Hollow
+Stormline Company
+The Pale Contract
+Cindermark Guild
+Vaultbreakers
+The Lapsed Saints
+Hollow Crown Expedition
+Six Feet Forward
+The Unmarked
+Duskwatch Company
+Rattlebone & Associates
+The Second Sunrise
+Chains of Fortune
+The Quiet Majority
+Thornfield Crew
+Nullpoint Advance
+The Gilded Fracture
+Ember Court
+Last Rites Collective
+The Severed Road
+Flickering Standard
+Dead Reckoning Co.
+The Fortunate Doomed
+Ironveil Syndicate
+Gravelight Company
+The Open Account
+Saltmarch Wanderers
+Faultline Seven
+The Borrowed Hours
+Sootmark Brigade
+The Cracked Seal
+Bonedust Collective
+Warden's Folly
+The Unfinished War
+Mirrorbreak Company
+Threshold Nine
+The Leaden Wing
+Ember and Salt
+Coldwatch Advance
+The Grieving Oath
+Rust and Radiance
+Silvertongue Accord
+The Long Wager
+Ashgate Runners
+Fracture Line Co.
+The Drifting Verdict
+Nockfall Company
+Remnant Clause
+The Brass Vigil
+Stoneletter Guild
+The Fallen Standard
+Dawnchaser Compact
+Hollow March
+The Patient Knife
+Gravel Court
+Ironmere Expedition
+The Slow Burn
+Crestfall Company
+The Waning Pact
+Dustline Seven
+Ashveil Collective
+The Marked Hour
+Saltborn Advance
+The Dim Accord
+Frostgate Company
+The Scoured Path
+Ember Writ
+The Unnamed Majority
+Coldbrook Syndicate
+The Long Exhale
+Shattered Compact
+The Pale Advance
+Thorngate Crew
+The Weighted Oath
+Cinder and Clause
+The Deliberate Few
+Ironshade Company
+The Last Petition
+Dustmere Brigade
+The Slow Verdict
+Fallmark Collective
+The Borrowed Standard
+Siltwatch Company
+The Crumbling Accord
+Ashborn Seven
+The Patient Majority
+Grim Clause Co.
+The Echoing Pact
+Saltveil Expedition
+The Unmarked Hours
+Ironfall Company
+The Waning Collective
+Crestmark Advance
+The Dim Petition
+Dustgate Syndicate
+The Long Standard
+Ember March
+The Scoured Majority
+Coldline Company
+The Weighted Verdict
+Ashmark Brigade
+The Deliberate Hours
+Fracture Compact
+The Pale Majority
+Thornveil Crew
+The Slow Petition
+Irongate Collective
+The Patient Accord

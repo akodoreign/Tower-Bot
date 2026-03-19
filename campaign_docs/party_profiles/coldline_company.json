@@ -1,0 +1,41 @@
+{
+  "name": "Coldline Company",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Specializing in hazardous expeditions through the rifts, Coldline Company's unique ability to navigate and survive in unstable dimensions sets them apart from other guilds.",
+  "members": [
+    {
+      "name": "Thaddeus 'Icefist' Vorenus",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former Tower Authority enforcer with a scarred face and a reputation for cold-blooded efficiency."
+    },
+    {
+      "name": "Zephyr Kinslayer",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A taciturn elf known for his keen senses and uncanny ability to find anything, even in the heart of the Undercity."
+    },
+    {
+      "name": "Gideon 'Dwarf-Hammer' Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A battle-hardened dwarf with a prosthetic arm, earning his nickname by crushing opponents like a hammer."
+    },
+    {
+      "name": "Eira Frostwing",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "A sleek and seductive tabaxi, known for her silver tongue and charm that can disarm even the toughest of foes."
+    }
+  ],
+  "visual": "Dressed in sturdy leather armor, they carry an assortment of exotic weapons and tools. A cold-blue line of light emanates from their foreheads, marking them as a united and formidable force.",
+  "reputation_note": "Rumored to have made a pact with a powerful entity from the rifts, Coldline Company is feared and respected by all in the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

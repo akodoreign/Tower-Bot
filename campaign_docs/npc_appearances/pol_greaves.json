@@ -1,0 +1,27 @@
+{
+  "name": "Pol Greaves",
+  "species": "Dwarf",
+  "faction": "Patchwork Saints",
+  "rank": "Field Captain (informal — Saints don't use formal ranks)",
+  "role": "field captain",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "CON 15",
+      "WIS 13"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "battle axe, heavy crossbow",
+    "armour": "patchwork plate — heavily repaired, still effective"
+  },
+  "sd_appearance": "Stout, rugged dwarf of approximately 4.5 feet, aged and weathered from years of battle, stands within the dimly lit Undercity streets. His skin, weathered and lined, bears the scars of countless skirmishes. Short, unkempt grey hair sprouts from his battle-worn helmet, and his eyes – a piercing shade of ice blue – are set deep within his weathered face. Clad in a patchwork suit of various fabrics, emblazoned with the faction's red armband, he wears well-loved, worn-out boots. A battle-axe and heavy crossbow hang from his shoulders, while a medicinal pouch is slung across his chest. One distinctive detail stands out among the worn and repaired armor: a red armband, the only consistent mark, signifying his rank as a Field Captain among the Patchwork Saints.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "repaired many times with love, red armband the only consistent mark"
+}

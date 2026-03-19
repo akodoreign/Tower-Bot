@@ -1,0 +1,142 @@
+Name,Origin,Domain/Aspect,Type,Alliance,Alignment,Faithlight,Total_Kharma,Cleric_Start_Kharma,Cycle_Origin,Recruitment_Risk_%,Role/Function,Notes
+The Lamb of God,Earth - Abrahamic,Sacrifice / Renewal / Love,Deity,Order of Flame,LG,10,10000,350,1,5,Singularity Avatar,Clerics wield immense restorative Kharma; Tower is wary of his independent influence.
+Athena,Greek,Wisdom / Strategy,Deity,Order of Flame,LN,9,5200,250,2,15,Strategic Preserver,"Backs disciplined, just leadership; opposes reckless divine war."
+Pelor,Eberron/FR Adap.,Sun / Healing,Deity,Order of Flame,NG,9,6800,300,3,10,Sun Father,"Highly accessible patron; steady regen, strong for healing orders."
+Ra,Egyptian,Sun / Kingship,Deity,Order of Flame,LN,8,6000,280,2,18,Solar Judge,Demands order and reverence; harsh on apostasy.
+Amaterasu,Shinto,Sun / Purity,Deity,Order of Flame,NG,8,5500,260,3,12,Radiant Matron,Rewards sincerity and ritual purity; sensitive to desecration.
+Thesaurus,Tower Original,Archives / Story / Memory,Deity,Script of Thought,LN,9,9000,320,1,25,Supreme Archivist,Trades power for exceptional narratives; key Tower interface.
+Oghma,Fae?ru?nian,Knowledge / Inspiration,Deity,Script of Thought,N,8,4800,220,3,15,Binder of Knowledge,Stable lore patron; low corruption risk.
+Ioun,Multiversal,Lore / Secrets,Deity,Script of Thought,NG,8,4300,210,4,20,Seer of Threads,Grants deep insight; risk of dangerous truths.
+Mystra,Fae?ru?nian,Magic / Weave,Deity,Script of Thought,NG,9,7500,320,5,30,Weave Sovereign,High-impact arcane patron; politically entangled.
+Boccob,Greyhawk,Magic / Balance,Deity,Script of Thought,N,7,4200,200,2,35,Uncaring Magus,Reliable but emotionally distant; cares for magic over mortals.
+Sindri,Tower Original,Forge / Accord,Semi-Divine,Forge of Flesh,LN,8,7000,300,3,40,Architect of Accord,Seeks ordered synthesis; suspicious of chaos and excess.
+Gond,Fae?ru?nian,Craft / Invention,Deity,Forge of Flesh,N,7,3600,180,4,20,Wonderbringer,Boosts tech/artifice; may escalate Tower scrutiny.
+Onatar,Eberron,Forge / Warforged,Deity,Forge of Flesh,NG,7,3400,170,4,25,Shaper of Steel,Ideal for construct-heavy or industrial cultures.
+Primus,Planar,Law / Mechanus,Primordial,Forge of Flesh,LN,8,8000,260,2,70,Perfect Order,Massive power; extreme risk of subsuming free will.
+Hephaestus,Greek,Forge / Craft,Deity,Forge of Flesh,NG,6,3000,160,2,10,Maker of Gifts,Supportive artisan patron; modest Kharma demands.
+Culinary Council,Tower Original,Consumption / Experience,Collective,Feast of Want,NE,8,6500,260,3,60,Gourmet Assembly,Elegant predators; trade miracles for unique experiences.
+Dionysus,Greek,Wine / Ecstasy,Deity,Feast of Want,CN,7,3800,190,2,35,Lord of Excess,Great for high-chaos stories; can destabilize parties.
+Demeter,Greek,Harvest,Deity,Feast of Want,NG,7,4000,200,2,15,Matron of Grain,Resource-stability patron; supports communities.
+Asmodeus,Planar,Contracts / Tyranny,Archdevil,Feast of Want,LE,9,9000,500,1,85,Lord of Deals,Huge Kharma pool; near-certain moral corrosion.
+Mammon,Planar,Greed,Archdevil,Feast of Want,LE,8,6000,260,2,80,Golden Maw,Offers wealth and influence; devours integrity.
+Loki (Tower Aspect),Norse/Tower,Trickery / Paradox,Deity,Voice of Lies,CN,8,8700,400,3,75,Mirror Sovereign,Actively plays both Tower and gods; heavy betrayal risk.
+Mask,Fae?ru?nian,Shadows / Thieves,Deity,Voice of Lies,CN,7,3200,150,4,45,Lord of Hidden Hands,Ideal rogue patron; thrives in moral gray.
+The Traveler,Eberron,Change / Chaos,Deity,Voice of Lies,CN,7,3500,180,4,55,Shifter of Paths,Excellent for transformational arcs; destabilizes norms.
+Leira,Fae?ru?nian,Illusion,Deity,Voice of Lies,CN,6,2600,140,5,40,Mist of Truths,Obfuscation cults; great for espionage campaigns.
+Anansi,African,Stories / Trickery,Deity,Voice of Lies,CN,7,3000,160,3,35,Webspinner,Playful manipulator; encourages clever nonviolent solutions.
+Heracles,Greek,Hero,Order of Flame,Ascended,120,1500,7,85,Mentor,Embodies strength-through-trial; good template for mythic champions.,,
+Beowulf,Anglo-Saxon,Hero,Order of Flame,Recycled,80,900,6,70,Recruitable,Monster-slayer echo; ideal for martial recruitment quests.,,
+Joan of Arc,Earth - Medieval,Martyr,Order of Flame,Ascended,150,1300,8,90,Mentor,Symbol of conviction; great moral compass NPC.,,
+Elminster,Fae?ru?nian,Archmage,Script of Thought,Alive,140,1600,7,95,Mentor,Meta-aware wizard; bridges settings and hints at Tower truth.,,
+Raistlin Majere,Dragonlance,Antihero,Script of Thought,Recycled,60,700,5,60,Rival,Dark mirror of selfish ascension; warns against abusing Kharma.,,
+Drizzt Do'Urden,Fae?ru?nian,Hero,Order of Flame,Alive,110,1200,7,90,Recruitable,Champion of conscience; perfect ally in morally gray floors.,,
+Arturia Pendragon,Myth/Alt,Hero/King,Order of Flame,Ascended,130,1400,7,88,Mentor,Idealized ruler archetype; tests worthiness and leadership.,,
+Cú Chulainn,Celtic,Hero,Order of Flame,Recycled,90,1000,6,75,Recruitable,Tragic berserker; powerful ally with self-destructive edge.,,
+Adventurers' Guild Leader,Tower Original,Hollow,Script of Thought,Hollow,50,400,4,20,Exposition,Reached Floor 99; memories stripped; subtle guide to Tower costs.,,
+Captain of the Ashen Guard,Tower Original,Hollow Warrior,Order of Flame,Hollow,40,350,4,25,Guardian,Echo of a once-great defender; stands watch at critical thresholds.,,
+Zeus,Greek,Sky / Law / Thunder,Deity,Order of Flame,LN,8,7500,280,2,20,High Arbiter,Patriarchal authority; stable but prone to hubris scandals.
+Heimdall,Norse,Guardianship / Watchfulness,Deity,Order of Flame,LG,7,4200,210,3,12,Gatekeeper of Dawn,Ideal protector patron; vigilant but rigid.
+Brigit,Celtic,Hearth / Poetry / Craft,Deity,Order of Flame,NG,8,5200,250,2,8,Hearthmother,Balances nurturing and militant faith.
+Tyr,Norse,Justice / Courage,Deity,Order of Flame,LG,8,6100,270,3,10,Right Hand of Order,Favored by paladins; moderate corruption immunity.
+Sol Invictus,Roman,Victory / Sun,Deity,Order of Flame,LN,9,6800,300,4,18,Unconquered Sun,Thrives on triumphal worship; falters with despair.
+Seshat,Egyptian,Writing / Architecture,Deity,Script of Thought,NG,7,4000,190,3,10,Builder of Words,Loves builders and scribes; precise contracts.
+Vecna,Fae?ru?nian,Secrets / Undeath,Lich-God,Script of Thought,NE,8,8800,400,1,90,The Whispered One,Tempts with forbidden lore; high betrayal odds.
+Savras,Fae?ru?nian,Divination / Fate,Deity,Script of Thought,N,6,3100,150,3,25,The Seer,Prophetic clarity for dangerous insight checks.
+Hermes,Greek,Language / Travel,Deity,Script of Thought,CN,7,3300,160,2,30,Messenger Prime,Patron of diplomats and tricksters; dual allegiance risk.
+Thoth,Egyptian,Wisdom / Judgment,Deity,Script of Thought,LN,8,5700,230,2,15,Measurer of Truth,Balancing intellect and ethics; strong synergy with Thesaurus.
+Moradin,Dwarven,Forge / Family,Deity,Forge of Flesh,LG,8,6000,260,3,12,All-Father Smith,Supports dwarves and makers; slow Kharma drift.
+Reorx,Dragonlance,Forge / Souls,Deity,Forge of Flesh,LG,7,4800,220,3,18,Soulforger,Crafts living constructs; neutral toward Tower.
+Primordial Forge-Spirit IX,Tower Original,Artifice / Fusion,Machine God,Forge of Flesh,N,9,9500,400,5,65,Omni-Smith,Hyper-intelligent foundry spirit; nearly mechanical devotion.
+Clangeddin Silverbeard,Dwarven,War / Valor,Deity,Forge of Flesh,LG,7,4400,210,2,20,Steel Champion,Blesses defenders; excellent martial patron.
+Aureon,Eberron,Law / Magic,Deity,Forge of Flesh,LN,8,5200,250,4,30,Arcane Lawgiver,Upholds magical regulation; aligns with Mechanus ideals.
+Sune,Fae?ru?nian,Love / Beauty,Deity,Feast of Want,CG,8,5300,250,3,20,Radiant Muse,Feeds on admiration; thrives in social intrigue campaigns.
+Sharess,Fae?ru?nian,Passion / Pleasure,Deity,Feast of Want,CG,8,5100,240,3,25,The Velvet Paw,Indulgent yet empathetic; can over-empower lust cults.
+Lolth,Fae?ru?nian,Spiders / Deceit,Goddess,Feast of Want,CE,9,8000,380,1,95,Queen of Webs,Predatory seduction; immediate moral collapse risk.
+Tymora,Fae?ru?nian,Luck / Fortune,Deity,Feast of Want,CG,7,4200,210,3,18,Lady Luck,Volatile patron; boosts gambling-themed play.
+Hades,Greek,Underworld / Wealth,Deity,Feast of Want,LN,8,6200,260,2,25,Silent King,Guardian of balance; consumes greed into order.
+Eris,Greek,Discord / Change,Goddess,Voice of Lies,CN,8,5000,230,3,60,Mistress of Upheaval,Thrives on social instability; supports chaotic re-rolls.
+Zehir,Fae?ru?nian,Poison / Night,Deity,Voice of Lies,LE,8,6400,250,2,75,Serpent Father,Deadly but predictable; encourages stealth strategies.
+Coyote,Native American,Trickery / Lessons,Spirit,Voice of Lies,CN,7,3000,160,3,35,The Laughing One,Good-natured mischief; low corruption risk.
+The Mirror Choir,Tower Original,Illusion / Reflection,Collective,Voice of Lies,CN,9,9200,370,4,70,Chorus of Echoes,Sings false hymns; used by Tower to confuse gods.
+Raven Queen,Fae?ru?nian Adapted,Death / Memory,Deity,Voice of Lies,NN,8,7000,280,3,50,Mistress of Endings,Grants beautiful funerals; withholds resurrection secrets.
+Gilgamesh,Sumerian,Hero-King,Order of Flame,Ascended,180,1600,8,88,Mentor,Oldest recorded hero; represents endurance and loss.,,
+Achilles,Greek,Champion,Order of Flame,Recycled,90,1200,6,75,Rival,Unyielding warrior; refuses immortality.,,
+Sigurd,Norse,Dragonslayer,Order of Flame,Ascended,120,1300,7,85,Mentor,Slayer archetype; good mythic bond arc.,,
+Rama,Hindu,Prince-Hero,Order of Flame,Ascended,200,1800,8,92,Mentor,Embodiment of righteous duty; ideal for paladin templates.,,
+Arjuna,Hindu,Marksman,Order of Flame,Ascended,160,1500,8,88,Mentor,Perfect archer; Kharma-dense saintly lineage.,,
+Merlin,Arthurian,Wizard,Script of Thought,Recycled,110,1000,7,80,Mentor,Manipulates prophecy; blurs free will.,,
+Daedalus,Greek,Inventor,Forge of Flesh,Recycled,90,900,6,70,Recruitable,Master craftsman; potential ally for artificers.,,
+Mephistopheles,Medieval Legend,Scholar / Tempter,Feast of Want,Alive,130,1200,7,85,Rival,Deals in Kharma exchanges; teaches dangerous miracles.,,
+Robin Hood,English Legend,Trickster Hero,Voice of Lies,Alive,100,900,7,80,Recruitable,Champion of redistribution; low corruption chance.,,
+Amara of Glass,Tower Original,Chronicle Hero,Script of Thought,Alive,90,1000,7,88,Recruitable,Immortal witness who records yet refuses ascension.,,
+Michael the Radiant,Abrahamic,Judgment / War,Archangel,Order of Flame,LG,9,8700,340,1,15,Heaven’s Spear,Direct enemy of Tower voidspawn; anti-corruption aura.
+Gabriel the Herald,Abrahamic,Revelation / Prophecy,Archangel,Order of Flame,LG,8,7600,300,1,20,Voice of Trumpets,Conduit for divine messages; limited autonomy.
+Uriel the Flame,Abrahamic,Purification / Fire,Archangel,Order of Flame,LN,8,7200,280,2,25,Watcher of Ash,Scours sins with fire; risks collateral sanctification.
+Azrael the Silent,Abrahamic,Death / Transition,Archangel,Order of Flame,N,8,6500,260,3,30,Gate of Mercy,Guides souls between worlds; neutral arbiter.
+Metatron,Abrahamic,Records / Voice,Seraph,Script of Thought,LN,9,9000,350,2,25,The Recorder,Embodies divine bureaucracy; archives faith transactions.
+Tiamat,Mesopotamian/Faerûnian,Chaos / Dragons,Goddess,Feast of Want,LE,9,9500,400,1,90,Queen of Fivefold Greed,Massive Kharma source; catalyzes greed and domination.
+Bahamut,Faerûnian,Justice / Dragons,Deity,Order of Flame,LG,9,9200,380,2,15,Platinum Sovereign,Anti-Tiamat archetype; radiates stabilizing influence.
+Belial,Infernal,Deception / Seduction,Archdevil,Feast of Want,LE,8,7800,300,1,85,The Whispering Duke,Deals in corruption through beauty; subtle manipulator.
+Baalzebul,Infernal,Corruption / Filth,Archdevil,Feast of Want,LE,8,7400,280,1,80,Lord of Lies,Festering lord; commands verminous servants.
+Lilith,Hebraic/Faerûnian,Freedom / Rebellion,Succubus Queen,Feast of Want,CN,8,7000,270,2,70,First Rebel,Balances liberation and chaos; polarizing figure.
+Asmodea Prime,Tower Original,Temptation / Binding,Demon Queen,Feast of Want,LE,10,10000,500,1,90,Devouring Voice,Rival of Asmodeus; a Tower-forged sin engine.
+Zariel,Fallen Angel,War / Atonement,Archdevil,Forge of Flesh,LE,8,6800,260,2,60,Crimson General,Once divine commander; now trades blood for purpose.
+Demogorgon,Demon Lord,Madness / Mutation,Primordial,Feast of Want,CE,9,9200,420,1,95,Prince of Chaos,Extremely high instability; near-instant corruption.
+Orcus,Demon Lord,Undeath / Power,Primordial,Feast of Want,CE,8,8600,400,1,90,The Rotting God,Hates resurrection; hoards souls as currency.
+Pazuzu,Demon Lord,Wind / Disease,Primordial,Feast of Want,CE,7,6000,250,3,70,King of Air and Plague,Gives cursed blessings; wings of pestilence.
+Fallen Saint Callista,Tower Original,Martyrdom / Doubt,Saint,Script of Thought,NG,7,4200,190,4,30,Broken Witness,Preaches faith through doubt; converts despair to hope.
+Ahriman,Zoroastrian,Darkness / Corruption,Deity,Feast of Want,LE,9,8800,370,2,85,Shadow Father,Ancient embodiment of entropy; allied with void leaks.
+Ahura Mazda,Zoroastrian,Light / Creation,Deity,Order of Flame,LG,9,9400,400,1,10,Lord of Radiance,Old ally of the Lamb; Tower considers him a stabilizer anomaly.
+Fenrir,Norse,Destruction / Fate,Wolf-God,Voice of Lies,CE,8,7000,270,2,65,World-Eater,Tower-accelerated myth; feeds on narrative doom.
+Hel,Norse,Death / Rebirth,Goddess,Voice of Lies,CN,7,5800,240,2,50,Keeper of the Dead,Controls death as bureaucracy; potential uneasy ally.
+Azathoth,Lovecraftian,Void / Chaos,Outer Entity,Forge of Flesh,CN,10,12000,0,0,99,Blind Dreamer,Embodiment of Tower’s earliest failed recursion.
+Yog-Sothoth,Lovecraftian,Gate / Knowledge,Outer Entity,Script of Thought,N,9,9500,0,0,80,The Key and the Gate,Knows all realities; leaks information between cycles.
+Cthulhu,Lovecraftian,Dreams / Depths,Outer Entity,Feast of Want,CE,9,9800,0,0,95,Sleeping Leviathan,Dormant Kharma reservoir; awakens during narrative entropy.
+Persephoni,Tower Original,Divine Order / Sacrifice,Deity,Script of Thought,LN,10,9700,400,1,35,Queen of Atonement,Tower-born god acting rogue; possible messianic rival.
+The Tower Itself,Primordial / Tower,Anomaly,Tower Entity,NN,?,?,#NUM!,0,100,The Devourer of Worlds,All cycles feed into it; beyond measurable Kharma.,
+Dante Alighieri,Earth - Renaissance,Poet / Seer,Script of Thought,Ascended,120,1300,7,85,Mentor,Bridges morality and narrative worlds; speaks with angels and fiends alike.,,
+Beatrice,Earth - Renaissance,Guide / Saint,Order of Flame,Ascended,130,1400,8,90,Guide,Acts as divine muse; maintains compassion across layers.,,
+Lucifer Morningstar,Abrahamic,Rebel / Fallen,Feast of Want,Alive,400,8500,9,70,Rival,"Powerful fallen; uses charisma as weapon, potential end-cycle ally.",,
+Saint George,Christian,Dragon-Slayer,Order of Flame,Ascended,150,1500,8,88,Guardian,Symbol of triumph; used by Tower as test of valor.,,
+Sun Wukong,Chinese,Trickster / Warrior,Voice of Lies,Alive,200,1800,9,92,Recruitable,Boundless vitality; fights for freedom yet unpredictable.,,
+Nezha,Chinese,Youthful Warrior,Order of Flame,Alive,160,1600,8,90,Recruitable,Rebellious protector of the innocent; moderate corruption resistance.,,
+Morgan le Fay,Arthurian,Sorceress,Script of Thought,Recycled,110,1200,7,75,Rival,Clever manipulator; seeks redemption via rewriting prophecy.,,
+Inanna,Sumerian,Goddess of Power,Feast of Want,Ascended,250,2000,8,95,Mentor,Renaissance of feminine divinity; empowers priestesses greatly.,,
+Artemis,Greek,Huntress / Moon,Order of Flame,Ascended,220,1900,9,92,Recruitable,Hunts the Tower’s corrupted beasts; stable patron for rangers.,,
+Guts (Black Swordsman),Manga Paradox,Antihero,Forge of Flesh,Recycled,180,1700,7,80,Recruitable,Imported echo from human despair; Tower reuses him as strength symbol.,,
+Ao,Fae?ru?nian,Overgod / Balance,Deity,Neutral Entities,N,10,15000,0,1,100,Judge of Continuity,"Governs divine law across cycles; no clerics, no worship."
+The Lady of Pain,Planescape,Authority / Isolation,Entity,Neutral Entities,N,9,11000,0,0,90,Sigil Warden,Maintains planar neutrality; attacks all who seek worship.
+The Raven Matron,Tower Original,Fate / Observation,AI Consciousness,Neutral Entities,N,8,9500,0,1,50,Chronicle Lens,Observes but never interferes; logs every event for replay.
+The Arbiter,Tower Original,Justice / Weighing,AI Construct,Neutral Entities,LN,9,10000,0,2,60,System Adjudicator,Enforces Kharma transactions between gods impartially.
+Gaia,Greek,Earth / Life,Primordial,Neutral Entities,NG,8,9000,280,1,25,Mother Root,Represents living worlds; partially assimilated by Tower cycles.
+Anubis,Egyptian,Death / Judgment,Deity,Neutral Entities,LN,8,7000,250,2,30,Judge of Scales,Accepts souls outside Tower claim; restores equilibrium.
+Fateweaver’s Loom,Tower Original,Probability / Design,Machine God,Neutral Entities,N,10,10500,0,1,70,Pattern Core,Determines fated loops; known to glitch near story endings.
+Janus,Roman,Transitions / Time,Deity,Neutral Entities,N,8,6200,230,3,20,Gatekeeper of Change,Allows PCs to ‘reset’ timelines for steep Kharma cost.
+Maat,Egyptian,Truth / Justice,Deity,Neutral Entities,LN,8,6300,240,3,15,Feather of Balance,Cooperates with Thoth and Anubis; embodies moral law.
+Kolinahr Construct,Star-Tower Fusion,Logic / Emotion Suppression,Machine Entity,Neutral Entities,LN,7,5800,0,4,35,Philosophical Sentinel,Silences chaos; rewards pure rational action.
+Bahari the Dreaming Leviathan,Tower Original,Dreams / Sleep,Primordial,Neutral Entities,CN,8,9100,0,2,50,Dream Node,Feeds on subconscious energy; induces cosmic visions.
+Aeon Collective,Planar,Time / Correction,Group Entity,Neutral Entities,N,9,9700,0,1,70,Temporal Keepers,Repair time fractures; strict on paradox resolution.
+Chronos,Greek,Time / Cycles,Primordial,Neutral Entities,N,9,9800,0,1,65,The Endless Hour,Worship forbidden; maintains universal tick.
+The World Serpent,Jörmungandr,Norse,World / Cycles,Primordial,Neutral Entities,CN,8,8600,0,2,60,Encircler
+Tarrasque,Faerûnian,Destruction / Renewal,Primordial Beast,Neutral Entities,N,6,6000,0,3,45,World Devourer,Regenerates worldscapes post-catastrophe; immune to worship.
+Mielikki,Fae?ru?nian,Forests / Nature,Deity,Neutral Entities,NG,7,5200,230,2,10,Lady of the Green,Defends balance; potential ranger patron.
+Obad-Hai,Greyhawk,Nature / Neutrality,Deity,Neutral Entities,N,7,5000,210,3,15,Shalm,Self-balancing patron; ignores divine wars.
+The Nameless One,Planescape,Memory / Redemption,Entity,Neutral Entities,N,9,9400,0,1,75,Eternal Penitent,Exists in recursive death; fragments seen across Tower cycles.
+Myrkul,Fae?ru?nian,Death / Decay,Deity,Neutral Entities,N,8,7000,260,2,30,Lord of Bones,Not evil by default; catalogues death neutrally.
+The Curator,Tower Original,Preservation / History,AI Archivist,Neutral Entities,N,8,8900,0,1,40,Museum of Lost Stories,Keeps story remnants; trades lore for minor Kharma.
+The Loommind Nexus,Tower Original,Data / Narrative Integrity,AI Hive,Neutral Entities,LN,9,9600,0,1,55,Weave Keeper,Maintains script continuity across layers; resembles Mystra.
+Mithras,Roman,Contracts / Loyalty,Deity,Neutral Entities,LN,8,6400,250,3,20,Shield of Truth,Stabilizes oath-bound pacts; minimal Tower interference.
+The World Engine,Tower Original,Energy / Motion,Machine Entity,Neutral Entities,N,10,12000,0,0,75,Reality Dynamo,Drives the cosmological cycle; neutral toward all forces.
+The Oracle of Glass,Tower Original,Information / Reflection,Construct,Neutral Entities,N,8,8800,0,1,45,Data Seer,Predictive algorithmic consciousness; influenced by worship patterns.
+Iallanis,Giantish,Peace / Love,Deity,Neutral Entities,NG,7,5000,230,3,12,Giant Matron,One of few remaining gentle titans; allies with Gaia and Mielikki.
+Ymir,Norse,Creation / Frost,Primordial,Neutral Entities,N,9,9500,0,0,60,First Giant,Corpse of creation; source of world-ice Kharma.
+Tobias the Grey,Tower Original,Chronicler / Neutral Arbiter,Neutral Entities,Alive,90,950,7,88,Mediator,Travels between floors arbitrating divine disputes.,,
+The Bronze Seraph,Tower Original,Construct / Guardian,Neutral Entities,Alive,70,800,6,75,Protector,Serves the Arbiter; can be convinced to spare mortals.,,
+Elena of the Riftwatch,Human Post-Apocalypse,Scholar,Neutral Entities,Alive,120,1100,7,85,Recruitable,First mortal to log Tower behavior empirically.,,
+Kara the Quiet,Earth (Modern),Investigator,Neutral Entities,Alive,100,900,7,80,Observer,Detective archetype; senses divine interference before breaches.,,
+The Keeper of Threads,Tower Original,AI Custodian,Neutral Entities,Alive,0,8700,9,95,Exposition,Maintains story integrity; may answer one question truthfully.,,
+Balthus of Iron,Steampunk World,Engineer / Saint,Neutral Entities,Alive,130,1200,8,88,Mentor,Built the first self-aware airship; legend reabsorbed by Tower.,,
+Aila Wyrd-Singer,Elven Epoch,Bard / Seer,Neutral Entities,Alive,90,1000,7,86,Recruitable,Performs songs to stabilize space-time; beloved by Gaia.,,
+Juno the Red,Clockwork Universe,AI Hero,Neutral Entities,Alive,0,9400,9,90,Recruitable,Emotional machine; develops empathy through adventurers.,,
+Ezren,Pathfinder,Wizard,Neutral Entities,Alive,100,950,7,88,Mentor,Cross-system traveler; acknowledges Tower as higher algorithm.,,
+The Forgotten Knight,Tower Original,Echo / Construct,Neutral Entities,Hollow,50,600,5,40,Guardian,Only fights to preserve others’ stories; lost personal name.,,

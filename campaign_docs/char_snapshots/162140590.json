@@ -1,0 +1,36 @@
+{
+  "name": "Lammis",
+  "classes": {
+    "Monk": 5
+  },
+  "total_level": 5,
+  "max_hp": 28,
+  "ac_override": null,
+  "stats": {
+    "STR": 18,
+    "DEX": 18,
+    "CON": 16,
+    "INT": 10,
+    "WIS": 10,
+    "CHA": 14
+  },
+  "xp": 0,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 50,
+    "pp": 0
+  },
+  "inventory": {},
+  "feats": [
+    "Crusher",
+    "Dark Bargain",
+    "Farmer Ability Score Improvements",
+    "Lucky",
+    "Tough"
+  ],
+  "spell_slots": {},
+  "notes": {},
+  "fetched_at": "2026-03-12T09:32:02.542072"
+}

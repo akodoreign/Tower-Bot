@@ -1,0 +1,35 @@
+{
+  "name": "Fracture Compact",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "A renowned team of demolition experts, known for their precision and ability to dismantle even the most fortified structures without causing unnecessary collateral damage.",
+  "members": [
+    {
+      "name": "Lyra Ironclad",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her missing left hand is replaced with a mechanical prosthetic, a constant reminder of the battle she barely survived."
+    },
+    {
+      "name": "Thoren Stonebreaker",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "His beard, dyed blue, is a distinctive mark that makes him easily recognizable in the crowded streets of the Undercity."
+    },
+    {
+      "name": "Zephyr Fissure",
+      "role": "Muscle",
+      "species": "Half-Orc",
+      "note": "He is always seen wearing a torn leather vest and a bandolier full of dynamite, giving him an intimidating yet chaotic appearance."
+    }
+  ],
+  "visual": "The group is often seen dressed in black, matching leather armor and hoods concealing their faces. They carry an assortment of explosives, ranging from small sticks of dynamite to large barrels, and move with a calculated, measured stride, hinting at their professionalism.",
+  "reputation_note": "Whispers follow them wherever they go, warning others to stay clear of their explosive trade, but also acknowledging their skill and precision.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

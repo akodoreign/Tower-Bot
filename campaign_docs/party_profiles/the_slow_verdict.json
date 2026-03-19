@@ -1,0 +1,35 @@
+{
+  "name": "The Slow Verdict",
+  "affiliation": "Wardens of Ash",
+  "specialty": "Their expertise lies in tracking and neutralizing fire-based threats, a skill honed through years of experience and a shared heritage.",
+  "members": [
+    {
+      "name": "Kaelen Firewhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "His scarred face is a testament to the fires he's survived, and his cold demeanor often masks a deep empathy."
+    },
+    {
+      "name": "Ashara Blazechaser",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her piercing green eyes glow with an eerie light when she uses her unique fire-sensing ability."
+    },
+    {
+      "name": "Zephyr Ashstorm",
+      "role": "Muscle",
+      "species": "Tiefling",
+      "note": "With his wings folded behind him, he appears more human than demon, but the scent of smoke always lingers."
+    }
+  ],
+  "visual": "They wear dark, ash-colored robes emblazoned with the symbol of the Wardens of Ash. Their faces are masked, save for Zephyr, who carries himself with a stoic confidence. A faint smell of smoke follows them wherever they go.",
+  "reputation_note": "Whispers of a fearsome crew who can extinguish the fiercest flames and leave their mark on those who threaten the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

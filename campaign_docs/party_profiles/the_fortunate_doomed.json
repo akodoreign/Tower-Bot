@@ -1,0 +1,41 @@
+{
+  "name": "The Fortunate Doomed",
+  "affiliation": "Wardens of Ash",
+  "specialty": "A skilled and ruthless fire-based combat team, known for their strategic use of pyrotechnics and unyielding resolve in the heat of battle",
+  "members": [
+    {
+      "name": "Lysander Ashwind",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A man with a scarred face, he lost his family in a rift explosion and seeks to prevent others from suffering the same fate"
+    },
+    {
+      "name": "Sylphia Blazeheart",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "Her fur is singed from countless battles, and she has a habit of leaving a trail of burned paper scraps as a warning to those who cross her"
+    },
+    {
+      "name": "Thorgrim Ironfire",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "He lost his hand in a rift explosion, replaced with a mechanical one, and carries a heavy grudge against the rifts that took his limb"
+    },
+    {
+      "name": "Zara Flamewing",
+      "role": "Face",
+      "species": "Dragonborn",
+      "note": "She wears a mask to hide her identity, and has a tense relationship with the other Wardens due to her past as a rift-runner"
+    }
+  ],
+  "visual": "They wear leather armor dyed red, with hoods that cover their faces when in public. Each member carries a flintlock pistol and a flame-tipped spear, and they move with a fierce, disciplined grace",
+  "reputation_note": "The Fortunate Doomed are feared and respected by both citizens and criminals alike. Their reputation for ruthless efficiency in combat and unyielding loyalty to the Wardens of Ash makes them a force to be reckoned with in the Undercity",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

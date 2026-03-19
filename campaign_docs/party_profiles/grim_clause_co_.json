@@ -1,0 +1,29 @@
+{
+  "name": "Grim Clause Co.",
+  "affiliation": "Glass Sigil",
+  "specialty": "Expert negotiators with a knack for handling delicate matters and navigating the Undercity's complex politics, setting them apart from other Glass Sigil crews",
+  "members": [
+    {
+      "name": "Vexa Vendetta",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running down her left cheek from a past encounter, a constant reminder of her past failures"
+    },
+    {
+      "name": "Jax Slate",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His eyes, a piercing silver, are said to see through lies and deception"
+    }
+  ],
+  "visual": "Vexa and Jax wear tailored, dark leather coats, concealing their weapons beneath. They carry themselves with an air of authority, their heads held high despite the grimy surroundings. A crystal pendant, emblem of the Glass Sigil, is visible around Vexa's neck.",
+  "reputation_note": "Whispers in the Undercity claim they've turned down bribes from the Wardens of Ash and the Iron Fang Consortium, refusing to be swayed by anyone but their clients. Be cautious when dealing with them, for they're known to be ruthless when crossed.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

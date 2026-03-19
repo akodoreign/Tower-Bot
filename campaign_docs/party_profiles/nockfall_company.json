@@ -1,0 +1,35 @@
+{
+  "name": "Nockfall Company",
+  "affiliation": "Wardens of Ash",
+  "specialty": "A seasoned and skilled fire-wielding team, specializing in combat and fire-related rifts, known for their ability to manipulate and control flames with precision.",
+  "members": [
+    {
+      "name": "Thoren Ashwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face, reminding everyone of the day he lost his crew during a failed mission."
+    },
+    {
+      "name": "Elysia Blazeheart",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A former member of the Argent Blades, seeking redemption for past mistakes."
+    },
+    {
+      "name": "Grim Nockfall",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his massive warhammer, adorned with the skull of a fallen foe."
+    }
+  ],
+  "visual": "They wear their Wardens of Ash emblem on their left shoulder, cloaked in dark robes stitched with the glow of embers. Their eyes are perpetually weary, but a fierce determination lingers on their faces.",
+  "reputation_note": "Rumored to have survived a rift that swallowed an entire team, they are both feared and respected among the Undercity's denizens.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

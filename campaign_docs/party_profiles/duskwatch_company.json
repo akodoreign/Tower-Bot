@@ -1,0 +1,35 @@
+{
+  "name": "Duskwatch Company",
+  "affiliation": "Wardens of Ash",
+  "specialty": "Known for their relentless pursuit and strategic dismantling of rogue factions within the Undercity, the Duskwatch Company has carved a niche as a formidable force in enforcing the Wardens of Ash's interests.",
+  "members": [
+    {
+      "name": "Tirion Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A tall, muscular man with a stern visage and piercing silver eyes, Tirion is rumored to have once been a captain in the city watch before joining the Wardens of Ash."
+    },
+    {
+      "name": "Aria Embersong",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Aria, with her fiery red hair and ethereal green eyes, is feared for her uncanny ability to track and anticipate the movements of their targets."
+    },
+    {
+      "name": "Kragor Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Kragor, with his thick, scarred physique and intimidating presence, is a fierce combatant and serves as the enforcer of the group."
+    }
+  ],
+  "visual": "Clad in black ash leather armor and hooded cloaks with the symbol of the Wardens of Ash emblazoned on their chests, the Duskwatch Company carries themselves with a steely determination that speaks volumes of their reputation.",
+  "reputation_note": "Whispers echo through the Undercity: 'Cross them, and you'll pay dearly.' Few dare to challenge the Duskwatch Company, for they are swift and ruthless in their pursuit of justice.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

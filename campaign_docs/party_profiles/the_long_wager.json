@@ -1,0 +1,29 @@
+{
+  "name": "The Long Wager",
+  "affiliation": "Argent Blades",
+  "specialty": "Adept at navigating the complex political landscape of the Undercity, often taking on jobs that require delicate diplomacy and covert operations.",
+  "members": [
+    {
+      "name": "Elias Drake",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Known for his piercing green eyes that never seem to blink, a constant reminder of his unwavering focus."
+    },
+    {
+      "name": "Zara Sylph",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A tattoo of a feathered raven adorns her left cheek, symbolizing her exceptional ability to follow trails in the most unlikely of places."
+    }
+  ],
+  "visual": "Clad in black leather armor and matching cloaks, they move with a calculated grace, their faces hidden beneath wide-brimmed hats. Their eyes always seem to be scanning the crowd, ever watchful.",
+  "reputation_note": "Whispers of a team that can get things done, no questions asked, echo through the Undercity. But they're also rumored to have a price, and those who cross them often regret it.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

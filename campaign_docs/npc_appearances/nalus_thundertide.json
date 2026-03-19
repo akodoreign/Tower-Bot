@@ -1,0 +1,28 @@
+{
+  "name": "Nalus Thundertide",
+  "species": "Dragonborn",
+  "faction": "Glass Sigil",
+  "rank": "Senior Archivist",
+  "role": "archivist",
+  "home_district": "glass sigil",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "Dragonborn standing over 6 feet, obsidian-shimmering scales, tall scholar robes of pale blue, brass instrument clips, glass-lens goggles perched on nose, ink-stained hands holding a book of forbidden knowledge, reinforced elbows visible, multiple scroll cases attached to robes, one distinctive visual detail: a silver-inlaid dragon skull pendant hanging from a leather thong around his neck.",
+  "faction_visual": "pale blue scholar robes, brass instrument clips, glass-lens goggles, ink-stained hands",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

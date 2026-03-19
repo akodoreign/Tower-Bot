@@ -1,0 +1,36 @@
+{
+  "name": "Last Rites Collective",
+  "affiliation": "Argent Blades",
+  "specialty": "Specialists in solving complex cases involving supernatural threats, their keen instincts and unique blend of mysticism and tactical prowess sets them apart from other adventurers",
+  "members": [
+    {
+      "name": "Elysia Thornwhisper",
+      "role": "Leader",
+      "species": "Elf",
+      "note": "Her eyes glow an eerie silver, a remnant of a pact with a spectral entity"
+    },
+    {
+      "name": "Kaelin Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Scarred face from countless battles against the city's dark forces"
+    },
+    {
+      "name": "Zephyr Silverclaw",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Known for his slick-talking, he wears a silver collar, a trophy from a successful heist"
+    }
+  ],
+  "visual": "Clad in dark leather armor with silver accents, they move with a purposeful, calculated stride, giving off an aura of professionalism and danger. A silver raven perched on Elysia's shoulder serves as their calling card",
+  "reputation_note": "Whispers in the Undercity claim that they are more than mere adventurers; they are enforcers of the Argent Blades, striking fear into the hearts of the city's darkest creatures",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a standard-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

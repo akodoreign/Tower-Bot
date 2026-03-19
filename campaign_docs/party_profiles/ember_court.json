@@ -1,0 +1,41 @@
+{
+  "name": "Ember Court",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile crew of specialists, known for their ability to adapt to any situation, making them the go-to team for jobs requiring a diverse skill set.",
+  "members": [
+    {
+      "name": "Rynn Tavish",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A battle-scarred veteran with a silver eyepatch, he's earned his reputation through cunning and sheer force of will."
+    },
+    {
+      "name": "Seraphina Serrano",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her keen senses and unyielding focus make her an asset in navigating the treacherous Undercity."
+    },
+    {
+      "name": "Baelor Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his imposing size and fearsome reputation, he's a force to be reckoned with when it comes to physical combat."
+    },
+    {
+      "name": "Kaelan Flameheart",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "His charm and silver tongue have earned him many favors, but his past with the Argent Blades remains a mystery."
+    }
+  ],
+  "visual": "Clad in leather and chain mail, they move with an air of seasoned professionals. Each member wears a red bandana tied around their forearm, a symbol of their allegiance to the Ember Court.",
+  "reputation_note": "Ember Court is a name whispered in both fear and respect. They're known for their ability to tackle jobs no one else dares to touch, and their successes often come with a hefty price tag.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

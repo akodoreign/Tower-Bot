@@ -1,0 +1,27 @@
+{
+  "name": "Tessaly Orin",
+  "species": "Half-Elf",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Archivist Second Class (junior to Eir Velan, senior to Dova)",
+  "role": "archivist",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "In the dimly lit labyrinth of the Undercity, amidst the ash-white robes of the Guild of Ashen Scrolls, a slender, graceful figure with pointed ears stands, hunched over a desk adorned with multiple sealed scroll cases and fate-reading tools. Her skin is a warm, earthy tone, contrasting sharply with her stark white attire. Long, dark hair, forever in a state of being-just-put-up-or-just-taken-down, frames a face framed by reading lenses on a chain, and ink-stained hands, a testament to her tireless work. A staff or dagger, a last resort, is visible at her side, while multiple scroll cases and reinforced elbows, a sign of her role as an Archivist Second Class, complete her scholarly appearance. A single, distinctive visual detail stands out: a persistent aura of determination, burning in her eyes, as she meticulously records the fate of each adventurer in her quest to answer the question that has eluded many.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

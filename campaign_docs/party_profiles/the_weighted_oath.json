@@ -1,0 +1,41 @@
+{
+  "name": "The Weighted Oath",
+  "affiliation": "Guild of Ashen Scrolls",
+  "specialty": "Specializing in deciphering ancient texts and relics for clues about the Tower of Last Chance, setting them apart as the go-to team for scholars and academics in the Undercity.",
+  "members": [
+    {
+      "name": "Vaelra Elmsden",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A stern woman with a scar running down her left cheek, rumored to have once been a member of the Argent Blades before leaving due to a disagreement"
+    },
+    {
+      "name": "Thoren Blackstone",
+      "role": "Arcanist",
+      "species": "Dwarf",
+      "note": "Known for his signature goggles and a peculiar habit of constantly whistling, Thoren is an expert in magical anomalies related to the rifts"
+    },
+    {
+      "name": "Sylara Swiftwind",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Sylara's agility and cat-like reflexes are legendary among the Wardens of Ash, but her past with the Iron Fang Consortium is a touchy subject"
+    },
+    {
+      "name": "Zephyr Geargrinder",
+      "role": "Muscle",
+      "species": "Warforged",
+      "note": "A towering, clockwork-powered warrior, Zephyr is often the silent strength that holds the group together, but he's known to have a mysterious connection to the Obsidian Lotus"
+    }
+  ],
+  "visual": "The four stand out in a crowd, dressed in dark cloaks with the Guild of Ashen Scrolls insignia on their shoulders. They carry themselves with an air of authority, moving with a quiet determination that speaks volumes about their professionalism.",
+  "reputation_note": "The Weighted Oath is a team feared and respected in equal measure. Their services come at a high price, but those who can afford them know that their investment is likely to bring success.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

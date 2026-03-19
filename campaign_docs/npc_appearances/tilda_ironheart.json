@@ -1,0 +1,27 @@
+{
+  "name": "Tilda Ironheart",
+  "species": "Human",
+  "faction": "Iron Fang Consortium",
+  "rank": "Street Runner",
+  "role": "street runner",
+  "stats": {
+    "primary": [
+      "DEX 16",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "WIS 10",
+      "STR 9"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "daggers, sling",
+    "armour": "leather coat"
+  },
+  "sd_appearance": "A muscular human woman of average height, her eyes always sharp and focused, stands in the dimly lit Lower Dockyards. A scar running down her left cheek lends a rugged edge to her otherwise unremarkable visage. She wears a battered, deep burgundy leather coat, subtly emblazoned with the Iron Fang mark on the lapel. Her hair, a dark shade like smoked iron, is pulled back into a tight braid. On her person, she carries a customized iron mace and various daggers, their handles wrapped in worn leather. A sling slung over one shoulder suggests she's prepared for quick and deadly action. One distinctive visual detail - the cold glow of her silver-eye, a relic from a devoured world, illuminates the Undercity's shadows.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "practical street clothes, nothing that slows movement, worn boots"
+}

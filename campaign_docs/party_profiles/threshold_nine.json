@@ -1,0 +1,29 @@
+{
+  "name": "Threshold Nine",
+  "affiliation": "Glass Sigil",
+  "specialty": "Expert thieves specializing in retrieval of valuable artifacts and documents, known for their unparalleled stealth and ability to bypass any security system",
+  "members": [
+    {
+      "name": "Cadence Blackthorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Cadence bears the telltale signs of a former member of the Argent Blades, a fact that creates tension among her current team"
+    },
+    {
+      "name": "Elysia Ironwing",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Elysia's eyes glow a soft blue in the dark, a result of her unique elven heritage and a trait that often helps the team navigate the treacherous Undercity"
+    }
+  ],
+  "visual": "Dressed in fitted, dark leather coats that blend seamlessly with the city's shadows, the pair carries a distinct air of professionalism and danger. Both women wear a single black feather in their hair, symbolizing their affiliation with the Glass Sigil",
+  "reputation_note": "Threshold Nine is a name whispered in awe and fear among the Undercity's criminal underworld. They're not to be trifled with, and their services come at a high price",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

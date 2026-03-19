@@ -1,0 +1,27 @@
+{
+  "name": "Snake-Eyes Snigar",
+  "species": "Goblin",
+  "faction": "Serpent Choir",
+  "rank": "Acolyte",
+  "role": "acolyte",
+  "stats": {
+    "primary": [
+      "WIS 14",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 9"
+    ],
+    "hp_range": "25–35"
+  },
+  "equipment": {
+    "weapons": "mace, holy symbol",
+    "armour": "vestments, light padding"
+  },
+  "sd_appearance": "A wiry, hunchbacked goblin of approximately 3 feet in height, Snake-Eyes Snigar, stands tall amidst a crowd. His skin, a dusky green hue, is adorned with intricate tattoos of coiling serpents. His large, bat-like ears twitch as he listens intently, eyes that glow a startling yellow surveying the scene. He wears jade green and black divine silk robes with a coiled serpent motif, a pendant of a contract seal hanging around his neck. A mace and a holy symbol rest at his side, vestments light and padding visible beneath his robes. A glint from a small, concealed dagger catches the light, a reminder that even the most peaceful of beings can carry a hidden edge.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "faction's divine colours, symbol prominently displayed"
+}

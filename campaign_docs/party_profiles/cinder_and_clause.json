@@ -1,0 +1,29 @@
+{
+  "name": "Cinder and Clause",
+  "affiliation": "No Affiliation",
+  "specialty": "Cinder and Clause are renowned for their expertise in navigating the volatile rifts, offering a unique service in transporting valuable artifacts and individuals across the fractured realms.",
+  "members": [
+    {
+      "name": "Cinder Valtor",
+      "role": "Leader, Rift Navigator",
+      "species": "Human",
+      "note": "Bearing the scars of countless rift journeys, Cinder's eyes glow an eerie yellow, a remnant of a past rift incident."
+    },
+    {
+      "name": "Clause Kerval",
+      "role": "Muscle, Protector",
+      "species": "Dwarf",
+      "note": "Despite his stout physique, Clause is known for his uncanny agility, a trait that often leaves clients questioning his species."
+    }
+  ],
+  "visual": "Cinder and Clause are a spectacle in the Undercity. Cinder, always clad in a leather trench coat, wears a silver rift-navigator device around her neck that hums softly. Clause, on the other hand, carries a massive war hammer, adorned with a skull, slung casually over his shoulder. Their stoic demeanor and silent confidence make them an intimidating yet respected presence.",
+  "reputation_note": "Whispers echo in the Undercity - they're the only crew that can guarantee safe passage through the rifts, but beware, they don't come cheap.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

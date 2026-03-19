@@ -1,0 +1,36 @@
+{
+  "name": "Ember Writ",
+  "affiliation": "Argent Blades",
+  "specialty": "Masterful fire mages, known for their precision and destructive power, setting them apart in the dangerous world of the Undercity.",
+  "members": [
+    {
+      "name": "Elysia Nimbuswhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar runs down her left cheek, a remnant of a failed mission that left her team and her old life behind"
+    },
+    {
+      "name": "Thorin Ironflame",
+      "role": "Mage",
+      "species": "Dwarf",
+      "note": "His eyes glow a fiery red when he channels his magical powers, a sight that instills fear in their enemies"
+    },
+    {
+      "name": "Jaxx Fyrebringer",
+      "role": "Muscle",
+      "species": "Tiefling",
+      "note": "His horns are dyed a bright red and curled into the shape of flames, a mark of his devotion to the Argent Blades"
+    }
+  ],
+  "visual": "They wear black leather armors adorned with silver flames, carrying staffs topped with crystal fireballs. They move with a sense of unity, their bodies a flurry of fluid motion in public.",
+  "reputation_note": "Whispers of a powerful and deadly group loyal to the Argent Blades spread throughout the Undercity, a warning to potential enemies",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a inter-guild-tier contract. Rank: Unknown (+2/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 2,
+  "generated": true
+}

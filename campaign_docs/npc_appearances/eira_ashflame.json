@@ -1,0 +1,28 @@
+{
+  "name": "Eira Ashflame",
+  "species": "Genasi",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Archivist Second Class",
+  "role": "archivist",
+  "home_district": "ashen scrolls tower",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "In the heart of the Undercity's Guild of Ashen Scrolls, Eira Ashflame stands, her imposing build and towering height a testament to her genasi heritage. Her fiery red hair cascades down her waist, framing a face with smoky eyes that burn like embers. She is clad in ash-white archival robes, adorned with multiple sealed scroll cases, and a scholar's robe that reveals ink-stained hands, reading lenses, and reinforced elbows. A dagger, a last resort, is sheathed at her side, while multiple scroll cases dot her person. A single, distinctive visual detail — an intricate silver pentagram pendant hanging around her neck — sets her apart among the scholars of the Guild.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

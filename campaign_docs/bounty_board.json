@@ -1,0 +1,24 @@
+[
+  {
+    "id": "bounty_1772756476",
+    "body": "\ud83c\udfaf **WANTED \u2014 Zephyria the Silent Scribe**\n*Issued by: Grand Forum Authority*\n\n**Last known location:** The Archivist's Sanctum, The Sunken Library\n**Description:** A lithe rogue with a glass-tipped quill and eyes that never blink, known for her stealthy movements and cryptic notes.\n**Alleged offence:** Leaking classified Rift data to outside parties.\n\n**Reward:** 46,296 EC  \u00b7  *Dead or alive. The issuing authority has stopped caring which.*\n\n*A cunning archivist who moves as silent as the shadows she writes in, making her a formidable adversary to apprehend.*\n\n\u23f3 *Bounty active for 47 days. 21 Apr 2026.*",
+    "issuer": "Grand Forum Authority",
+    "proxy_faction": null,
+    "reward": 46296,
+    "posted_at": "2026-03-05T18:21:16.551240",
+    "expires_at": "2026-04-21T18:21:00.014313",
+    "resolved": false,
+    "message_id": 1479272812777570426
+  },
+  {
+    "id": "bounty_1773449343",
+    "body": "\ud83c\udfaf **WANTED \u2014 Vespera the Venomous**\n*Issued by: FTA / Tower Authority*\n\n**Last known location:** The Spined Hive, Market Infinite\n**Description:** A slim woman with long, silver hair and piercing green eyes. Often seen cloaked and masked, concealing her identity. Known to carry a small, ornate vial.\n**Alleged offence:** Contamination of the food supply in Market Infinite, causing widespread sickness.\n\n**Reward:** 75,038 EC  \u00b7  *Alive preferred. Reward reduced 40% for non-viable delivery.*\n\n*Her venomous concoctions are lethal, making her a dangerous adversary to apprehend.*\n\n\u23f3 *Bounty active for 27 days. 09 Apr 2026.*",
+    "issuer": "FTA / Tower Authority",
+    "proxy_faction": null,
+    "reward": 75038,
+    "posted_at": "2026-03-13T19:49:03.669212",
+    "expires_at": "2026-04-09T19:48:45.841466",
+    "resolved": false,
+    "message_id": 1482178717756428319
+  }
+]

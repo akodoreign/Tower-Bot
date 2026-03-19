@@ -1,0 +1,35 @@
+{
+  "name": "The Brass Vigil",
+  "affiliation": "Patchwork Saints",
+  "specialty": "The Brass Vigil are renowned for their unmatched expertise in navigating the treacherous rifts of the Undercity, often called upon for missions that require intricate knowledge of the city's ever-shifting layout.",
+  "members": [
+    {
+      "name": "Lysandra Ironheart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran rift navigator with a mechanical prosthetic arm, a constant reminder of her narrow escape from the Tower's recent collapse."
+    },
+    {
+      "name": "Gavrik Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A burly, battle-hardened dwarf who always carries a maul adorned with the symbols of the Patchwork Saints, a testament to his unwavering loyalty."
+    },
+    {
+      "name": "Zephyr Silverwind",
+      "role": "Face",
+      "species": "Elf",
+      "note": "A silver-tongued diplomat with a penchant for enigmatic riddles, his piercing gaze often leaves those he encounters unsettled."
+    }
+  ],
+  "visual": "Clad in leather armor and equipped with an array of unique, custom-made tools, they move with a practiced fluidity through the Undercity's labyrinthine streets, their identities hidden beneath stylized masks emblazoned with the symbol of the Brass Vigil.",
+  "reputation_note": "Whispers circulate that the Brass Vigil's mysterious leader, Lysandra Ironheart, once worked for the Tower Authority, lending them an air of authority and a network of connections that few in the Undercity can match.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Alaric Stonemason",
+  "species": "Human",
+  "faction": "Argent Blades",
+  "rank": "Blade",
+  "role": "senior blade",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A lean, battle-hardened human of average height, his skin weathered from years of patrolling the Undercity, stands amidst the city's vibrant chaos. His short, spiky silver hair contrasts sharply with his coal-black eyes that gleam with determination. Clad in silver and white armor adorned with blue accents, an Argent Blades medal pinned to his chest, he wears polished scale mail or plate. A longsword and shield emblazoned with the Argent Blades emblem rest at his side, while a distinctive scar running down his left cheek, a testament to his past, catches the eye.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Kyrus Ironscale",
+  "species": "Dragonborn",
+  "faction": "Iron Fang Consortium",
+  "rank": "Acquisition Agent",
+  "role": "senior acquisitions agent",
+  "home_district": "iron fang",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "DEX 14",
+      "INT 13"
+    ],
+    "secondary": [
+      "WIS 12",
+      "CON 11",
+      "STR 9"
+    ],
+    "hp_range": "35–50"
+  },
+  "equipment": {
+    "weapons": "concealed blade, crossbow",
+    "armour": "fine coat over leather"
+  },
+  "sd_appearance": "A towering Dragonborn clad in deep burgundy and gunmetal, Kyrus Ironscale, stands amidst the Undercity's marketplace. His crimson scales glisten under the dim Dome light, a scar running down his left cheek adding an air of mystery to his imposing figure. Wearing a fine coat over leather armor, he carries a concealed blade at his waist and a crossbow slung across his back, the Iron Fang mark subtle on his lapel. One distinctive visual detail stands out - a black feather, a token of a past deal, tucked into the belt at his waist.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "mercantile-military — expensive but practical, always armed, never obviously so"
+}

@@ -1,0 +1,40 @@
+{
+  "name": "Boxxo",
+  "classes": {
+    "Sorcerer": 6
+  },
+  "total_level": 6,
+  "max_hp": 26,
+  "ac_override": null,
+  "stats": {
+    "STR": 15,
+    "DEX": 12,
+    "CON": 16,
+    "INT": 13,
+    "WIS": 13,
+    "CHA": 14
+  },
+  "xp": 6500,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 100,
+    "pp": 0
+  },
+  "inventory": {
+    "Holy Water (flask)": 3
+  },
+  "feats": [
+    "Ability Score Improvement",
+    "Acolyte Ability Score Improvements",
+    "Boxxo's Limited Vocabulary",
+    "Dark Bargain",
+    "Immobile",
+    "Magic Initiate (Cleric)",
+    "Vending Machine"
+  ],
+  "spell_slots": {},
+  "notes": {},
+  "fetched_at": "2026-03-11T11:55:25.662899"
+}

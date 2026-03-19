@@ -1,0 +1,27 @@
+{
+  "name": "Nimue Silverpaw",
+  "species": "Tabaxi",
+  "faction": "Adventurers Guild",
+  "rank": "F-Rank",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A slender, agile Tabaxi woman, with a height reminiscent of a lithe human, stands amidst the gloom of the Undercity. Her coat, shimmering like moonlight on water, complements her piercing green eyes. Wearing chain mail, adorned with the insignia of the Adventurers Guild, she exudes quiet confidence. A short sword and a warhammer, both worn with a sense of battle-hardened history, are visible at her side. A distinctive silver paw print, intricately tattooed on her neck, adds a touch of mystique to her appearance.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

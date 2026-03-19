@@ -1,0 +1,36 @@
+{
+  "name": "The Second Sunrise",
+  "affiliation": "No Affiliation",
+  "specialty": "A team of skilled scavengers, known for their ability to navigate the dangerous rifts and retrieve valuable artifacts from the other realms, setting them apart as the city's most reliable recovery crew.",
+  "members": [
+    {
+      "name": "Lysander Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A man with an iron will and a past shrouded in mystery, his eyes hold the weight of countless battles and lost comrades."
+    },
+    {
+      "name": "Ria Ironshield",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Her battle-scarred face is a testament to her strength and resilience, with a steel gauntlet always on display, a reminder of her lost clan."
+    },
+    {
+      "name": "Jaxx the Cunning",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "A smooth-talking cat-man with a silver tongue and a sharp mind, he's known for his ability to charm his way out of even the most difficult situations."
+    }
+  ],
+  "visual": "The trio moves through the Undercity with a sense of purpose, wearing rugged leather and chainmail armor, their weapons well-maintained and ready for action. They carry themselves with a quiet confidence, their eyes always scanning for potential threats and opportunities.",
+  "reputation_note": "The Second Sunrise is a name whispered in awe by the citizens of the Undercity, a team of brave adventurers who dare to venture into the unknown, bringing back treasures and stories of other realms.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a high-stakes-tier contract. Rank: Unknown (+2/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 2,
+  "generated": true
+}

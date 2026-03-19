@@ -1,0 +1,35 @@
+{
+  "name": "The Unmarked",
+  "affiliation": "Glass Sigil",
+  "specialty": "An elite team known for their unparalleled proficiency in deciphering and exploiting the city's arcane rifts, The Unmarked are a coveted asset within the Glass Sigil.",
+  "members": [
+    {
+      "name": "Narissa Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "With her silver-streaked raven hair and piercing green eyes, Narissa exudes an aura of authority that commands respect."
+    },
+    {
+      "name": "Jorick Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "The scars crisscrossing Jorick's battle-worn face are reminders of his countless victories and unyielding determination."
+    },
+    {
+      "name": "Leon Valerian",
+      "role": "Face",
+      "species": "Elf",
+      "note": "His silver tongue and suave demeanor hide a cunning mind that can talk his way out of any situation."
+    }
+  ],
+  "visual": "The trio is easily recognized in the crowded streets, dressed in black leather and cloaks adorned with the Glass Sigil insignia. They carry themselves with an air of professionalism, always on the lookout for their next assignment.",
+  "reputation_note": "The Undercity whispers about them with a mix of fear and respect. They are a force to be reckoned with, but they're not to be trifled with either.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

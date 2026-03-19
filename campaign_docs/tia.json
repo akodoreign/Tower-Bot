@@ -1,0 +1,54 @@
+{
+  "sectors": {
+    "relic": {
+      "name": "Relic & Antiquities",
+      "value": 195.31,
+      "prev_value": 195.25,
+      "change_pct": 0.03
+    },
+    "essence": {
+      "name": "Essence Coin Exchange",
+      "value": 112.2,
+      "prev_value": 113.92,
+      "change_pct": -1.51
+    },
+    "adventurer": {
+      "name": "Adventurer Contracts",
+      "value": 101.75,
+      "prev_value": 100.18,
+      "change_pct": 1.57
+    },
+    "divine": {
+      "name": "Divine Services & Kharma",
+      "value": 103.19,
+      "prev_value": 103.64,
+      "change_pct": -0.43
+    },
+    "smuggling": {
+      "name": "Grey Market Logistics",
+      "value": 102.83,
+      "prev_value": 101.24,
+      "change_pct": 1.57
+    },
+    "memory": {
+      "name": "Memory & Information",
+      "value": 353.37,
+      "prev_value": 349.97,
+      "change_pct": 0.97
+    },
+    "security": {
+      "name": "Security & Enforcement",
+      "value": 101.51,
+      "prev_value": 100,
+      "change_pct": 1.51
+    },
+    "rift_tech": {
+      "name": "Rift Technology",
+      "value": 2444311177.41,
+      "prev_value": 2413286649.97,
+      "change_pct": 1.29
+    }
+  },
+  "last_updated": "2026-03-19T13:46:58.220363",
+  "last_event": "Cult activity spooks security investors; information brokers see uptick in intel demand"
+}

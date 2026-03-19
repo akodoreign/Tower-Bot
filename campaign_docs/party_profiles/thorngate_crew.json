@@ -1,0 +1,41 @@
+{
+  "name": "Thorngate Crew",
+  "affiliation": "Glass Sigil",
+  "specialty": "Expert negotiators and diplomats, known for their ability to navigate the complex web of the Undercity's politics and extract favorable deals from even the most hardened adversaries.",
+  "members": [
+    {
+      "name": "Eldon Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "His left eye is a cold, silver orb, a mark of the Glass Sigil and a symbol of his unwavering loyalty."
+    },
+    {
+      "name": "Vexil Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "She always wears a cloak with a raven emblem, a tribute to her lost family."
+    },
+    {
+      "name": "Grim Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His massive hammer, forged from a shard of the Undercity itself, is both his weapon and his status symbol."
+    },
+    {
+      "name": "Zephyr Whisperwind",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "His silver tongue and charm have won him many friends, but also many enemies in the Undercity."
+    }
+  ],
+  "visual": "The Thorngate Crew are easily recognizable by their matching glass sigils embroidered on their coats and the air of confidence and professionalism they carry. They are always well-armed, yet dressed for business, giving an impression of wealth and power.",
+  "reputation_note": "They are both feared and respected, a force to be reckoned with in the Undercity. Word on the street is they have ties to the Tower Authority and can move like shadows when they want something done.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

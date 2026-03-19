@@ -1,0 +1,27 @@
+{
+  "name": "Arin Obsidianwhisper",
+  "species": "Human",
+  "faction": "Wardens of Ash",
+  "rank": "Recruit",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Human male, tall and lean, with weathered face, deep-set sorrowful eyes, and ash grey chainmail. Warden badge on left chest. Mark of ash on left cheek. Warhammer and crossbow at belt, worn leather and chainmail attire, telling stories of past contracts. Distinctive visual detail: left hand bearing an intricate, faded tattoo of an ashen tree, symbolizing his redemption quest.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

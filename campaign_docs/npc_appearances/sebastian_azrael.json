@@ -1,0 +1,28 @@
+{
+  "name": "Sebastian Azrael",
+  "species": "Tiefling",
+  "faction": "Adventurers Guild",
+  "rank": "F-Rank",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering, muscular tiefling with spiraled horns, crimson eyes blazing with determination, clads in frayed leather and weathered chainmail, adorned with the Adventurers Guild badge. His violet-grey skin is marred with deep scars, each a testament to past battles. A warhammer rests at his side, while a crossbow hangs from his shoulder, both bearing the signs of use and age. A single, elaborate silver ring adorns his left hand, its design a swirling maelstrom of shimmering colors, a unique mark of his fervent ambition within the guild.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

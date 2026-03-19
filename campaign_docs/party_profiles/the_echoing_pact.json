@@ -1,0 +1,36 @@
+{
+  "name": "The Echoing Pact",
+  "affiliation": "Serpent Choir",
+  "specialty": "A formidable group with a knack for navigating the unstable rifts of the Undercity, often retrieving artifacts or creatures from alternate dimensions that few others dare to venture.",
+  "members": [
+    {
+      "name": "Seraphina Serpentwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her eyes, a chilling shade of violet, are said to have the ability to peer into the soul, a trait that unnerves even the hardest criminals."
+    },
+    {
+      "name": "Kael Thornscale",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "His left arm, replaced with a mechanical limb after a close encounter with a rift beast, is equipped with a set of intricate tools for navigating the chaotic rifts."
+    },
+    {
+      "name": "Vesper Shadowdance",
+      "role": "Muscle",
+      "species": "Tabaxi",
+      "note": "Her lithe form belies her strength, earning her the nickname 'The Whispering Storm'. Her agility and ferocity in combat are legendary in the Undercity."
+    }
+  ],
+  "visual": "They wear dark, hooded cloaks that shimmer with a serpentine pattern, a symbol of their affiliation with the Serpent Choir. Their eyes are always covered, giving them an air of mystery and danger as they move through the crowded streets of the Undercity.",
+  "reputation_note": "Whispers of a powerful and secretive group that navigates the city's most dangerous rifts. A warning: don't cross them, lest you find yourself on the wrong side of the serpent's tail.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a escort-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

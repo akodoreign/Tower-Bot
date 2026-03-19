@@ -1,0 +1,29 @@
+{
+  "name": "Ashveil Collective",
+  "affiliation": "Serpent Choir",
+  "specialty": "Experts in infiltration and data retrieval, their uncanny ability to navigate the labyrinthine Undercity and decipher encrypted information sets them apart from other Serpent Choir operatives.",
+  "members": [
+    {
+      "name": "Vexis Vorenus",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran of the Iron War, his battle-scarred visage and stoic demeanor serve as constant reminders of the horrors he's witnessed."
+    },
+    {
+      "name": "Elysia Cinder",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her agility and keen senses are unmatched in the Undercity, but whispers suggest her loyalty may be divided."
+    }
+  ],
+  "visual": "Clad in dark, form-fitting leather armor and donning Serpent Choir insignia, the Ashveil Collective moves through the city with silent precision. Vexis, the older of the two, carries a battered, silver-hilted sword, while Elysia, the younger, wears a hooded cape that conceals her features.",
+  "reputation_note": "Rumored to have connections within the Argent Blades and the Tower Authority, their allegiances remain a mystery, and their presence in the Undercity is a warning to potential rivals.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

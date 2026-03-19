@@ -1,0 +1,36 @@
+{
+  "name": "Six Feet Forward",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in navigating the city's rifts, Six Feet Forward is known for their ability to secure rare and valuable artifacts from the other realms.",
+  "members": [
+    {
+      "name": "Eira Ironsteel",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The scar on her left cheek is a constant reminder of a failed mission, giving her a stoic demeanor"
+    },
+    {
+      "name": "Thorn Silverwing",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His eyes, glowing like embers, are said to see through the shadows of the Undercity"
+    },
+    {
+      "name": "Cogwork Sam",
+      "role": "Muscle",
+      "species": "Warforged",
+      "note": "The gears on his back hum softly as he moves, a reminder of his mechanical origins"
+    }
+  ],
+  "visual": "Dressed in leather and steel, they move with purpose, their eyes scanning the crowded streets for potential work. A glowing rune on Eira's wrist marks them as a group that dares to enter the rifts.",
+  "reputation_note": "Whispers in the taverns speak of a crew that can get what you need, no questions asked. But they're also rumored to have a debt with the Tower Authority, making them a dangerous ally or enemy.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a local-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

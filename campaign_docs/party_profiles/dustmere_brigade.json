@@ -1,0 +1,35 @@
+{
+  "name": "Dustmere Brigade",
+  "affiliation": "Tower Authority",
+  "specialty": "Expert negotiators and peacekeepers in the chaotic Undercity, known for their ability to navigate the city's faction politics and broker deals that others cannot.",
+  "members": [
+    {
+      "name": "Eira Valtor",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Once a high-ranking officer in the Tower Authority, she was demoted and sent to the Undercity after a controversial decision led to a civil uprising."
+    },
+    {
+      "name": "Thoren Thundershield",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A former gladiator turned peacekeeper, Thoren is a feared figure in the Undercity, his battle scars a constant reminder of his past."
+    },
+    {
+      "name": "Nimue Nightshade",
+      "role": "Face",
+      "species": "Elf",
+      "note": "A skilled diplomat with a silver tongue, Nimue is feared and respected by both the Undercity's factions and the Tower Authority."
+    }
+  ],
+  "visual": "Clad in the black and gold of the Tower Authority, they carry themselves with a quiet authority. Eira's eyes are always watchful, Thoren towers over the others, and Nimue's delicate features contrast sharply with her commanding presence.",
+  "reputation_note": "Whispers in the Undercity claim that the Dustmere Brigade is a secret weapon of the Tower Authority, used to maintain order and broker peace in the chaotic city.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

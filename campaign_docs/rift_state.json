@@ -1,0 +1,44 @@
+[
+  {
+    "id": "rift_1772869044",
+    "location": "Collapsed Plaza",
+    "loc_type": "warrens",
+    "stage": "critical",
+    "stage_entered_at": "2026-03-14T22:47:57.666883",
+    "resolved": true,
+    "spawned_at": "2026-03-07T01:37:24.968284",
+    "last_bulletin_stage": "critical",
+    "outcome": "disaster"
+  },
+  {
+    "id": "rift_1772952991",
+    "location": "Brother Thane's Cult House area",
+    "loc_type": "warrens",
+    "stage": "critical",
+    "stage_entered_at": "2026-03-16T19:06:55.272620",
+    "resolved": true,
+    "spawned_at": "2026-03-08T00:56:31.725218",
+    "last_bulletin_stage": "critical",
+    "outcome": "disaster"
+  },
+  {
+    "id": "rift_1773743147",
+    "location": "Echo Alley",
+    "loc_type": "warrens",
+    "stage": "tremor",
+    "stage_entered_at": "2026-03-19T12:50:32.321415",
+    "resolved": false,
+    "spawned_at": "2026-03-17T05:25:47.353675",
+    "last_bulletin_stage": "tremor"
+  },
+  {
+    "id": "rift_1773810382",
+    "location": "Shantytown Heights",
+    "loc_type": "warrens",
+    "stage": "whisper",
+    "stage_entered_at": "2026-03-18T00:06:22.371517",
+    "resolved": false,
+    "spawned_at": "2026-03-18T00:06:22.371517",
+    "last_bulletin_stage": "whisper"
+  }
+]

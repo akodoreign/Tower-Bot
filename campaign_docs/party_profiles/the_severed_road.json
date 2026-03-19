@@ -1,0 +1,41 @@
+{
+  "name": "The Severed Road",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Specializing in exploring and mapping the rifts, they've earned a reputation for returning with rare artifacts and intact from the perilous tears in reality.",
+  "members": [
+    {
+      "name": "Zavian Nightshade",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "A scar runs down his left cheek, a reminder of a past rift encounter that cost him an eye"
+    },
+    {
+      "name": "Elysia Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Wears a gauntlet embedded with a glowing crystal, rumored to have been gifted by a fallen goddess"
+    },
+    {
+      "name": "Kyrus Thunderspire",
+      "role": "Tracker",
+      "species": "Human",
+      "note": "Always carries a quiver of arrows dipped in a peculiar, luminescent substance"
+    },
+    {
+      "name": "Rivka Silverwhisper",
+      "role": "Face",
+      "species": "Half-Elf",
+      "note": "Her enchanting smile hides a sharp tongue and an uncanny ability to charm even the most guarded of targets"
+    }
+  ],
+  "visual": "They wear leather armor and carry a mix of modern and ancient weapons, identifiable by their unique emblem of a broken road on their chest plates. In public, they exude an air of discipline and determination.",
+  "reputation_note": "Rumored to have ties with the Obsidian Lotus, but their allegiances remain unclear. Whispers suggest they are bound by a mysterious pact",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

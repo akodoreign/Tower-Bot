@@ -1,0 +1,29 @@
+{
+  "name": "Ember and Salt",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in unconventional extraction jobs, Ember and Salt have a reputation for navigating the treacherous rifts with an uncanny precision that sets them apart.",
+  "members": [
+    {
+      "name": "Aela Ironwhisper",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "Aela wears a silver circlet, a gift from her late father, on her brow, a reminder of her noble lineage."
+    },
+    {
+      "name": "Kael Saltwind",
+      "role": "Tracker",
+      "species": "Human",
+      "note": "Kael carries a set of obsidian tracking knives, a grim memento from his time with the Wardens of Ash."
+    }
+  ],
+  "visual": "Aela, with her elven grace, leads the way through the Undercity in a cloak of midnight-blue silk, her silver circlet glinting under the dim light. Kael, a hardened man, follows, his lean frame wrapped in a leather jacket and a wide-brimmed hat, obscuring his features.",
+  "reputation_note": "While some whisper of their mysterious past, all agree that Ember and Salt are a force to be reckoned with, their names striking fear in the hearts of criminals and respect in the hearts of those in need.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

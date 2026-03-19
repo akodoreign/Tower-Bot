@@ -1,0 +1,28 @@
+{
+  "name": "Voris Ironhammer",
+  "species": "Warforged",
+  "faction": "Wardens of Ash",
+  "rank": "Sergeant",
+  "role": "warden",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "A towering 7-foot Warforged, Voris Ironhammer, stands in the dimly lit Undercity market. His polished steel frame gleams under the flickering torchlight, and his glowing red eyes pierce the darkness. He wears a suit of ash grey chainmail, adorned with the Wardens of Ash insignia. An ash-mark etched into his left cheek, marking him as an officer, catches the eye. A spear, crossbow, and handaxe, his utilitarian-military equipment, rest on his back and hip. A hood covers his head, but his metallic visor remains raised, revealing a faint glow from within, hinting at his perpetual vigilance.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

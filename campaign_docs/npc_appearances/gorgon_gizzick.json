@@ -1,0 +1,27 @@
+{
+  "name": "Gorgon Gizzick",
+  "species": "Goblin",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "Goblin, hunched and wiry, barely 3 feet tall, with large bat-like ears and wide eyes burning like embers, cloaked in tattered robes of the Cult. The grey wrappings, adorned with a makeshift metal-banded staff, are frayed at the edges. A hidden dagger, a glint of steel, peeks from beneath the worn fabric. A single fiery eye stands out against the gloom, a beacon of determination, as he navigates the labyrinthine Undercity, leading his kin with unwavering conviction.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

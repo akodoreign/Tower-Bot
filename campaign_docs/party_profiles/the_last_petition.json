@@ -1,0 +1,41 @@
+{
+  "name": "The Last Petition",
+  "affiliation": "No Affiliation",
+  "specialty": "Experts in navigating the unpredictable rifts, offering a unique ability to traverse them swiftly and safely.",
+  "members": [
+    {
+      "name": "Elijah Vorenus",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running down his left cheek, remnant of a close call with a Rift beast"
+    },
+    {
+      "name": "Zara Thorne",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "Known for her keen senses and ability to track targets through the maze-like Undercity"
+    },
+    {
+      "name": "Thorgrim Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Carries a hammer adorned with the sigil of the Wardens of Ash, symbolizing his former affiliation"
+    },
+    {
+      "name": "Aria Nightshade",
+      "role": "Face",
+      "species": "Elf",
+      "note": "Her cool demeanor and sharp negotiating skills often disarm even the toughest adversaries"
+    }
+  ],
+  "visual": "Clad in leather and studded armor, they move with a purpose, each bearing a lantern that flickers with an ethereal glow. Their faces are obscured by broad-brimmed hats, a common practice in the Undercity to maintain anonymity.",
+  "reputation_note": "The Last Petition is a crew of seasoned professionals known for their ability to navigate the Rifts and their unrivaled survivability in the dangerous Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

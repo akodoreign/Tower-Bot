@@ -1,0 +1,28 @@
+{
+  "name": "Arthur Fyreclaw",
+  "species": "Human",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "Middle-aged human with a gaunt, emaciated frame, piercing green eyes that glow in the dark, and a scar running down his left cheek, clad in tattered cult robes of grey wrappings and sporting a makeshift metal-banded staff. A hidden dagger peeks from beneath his robes, while his distinctive visual detail, a pendant of a glowing flame, hangs around his neck, casting an eerie glow in the dimly lit Undercity.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

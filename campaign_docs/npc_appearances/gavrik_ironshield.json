@@ -1,0 +1,28 @@
+{
+  "name": "Gavrik Ironshield",
+  "species": "Warforged",
+  "faction": "Iron Fang Consortium",
+  "rank": "Street Runner",
+  "role": "street runner",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "DEX 16",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "WIS 10",
+      "STR 9"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "daggers, sling",
+    "armour": "leather coat"
+  },
+  "sd_appearance": "Standing tall at 8 feet, a Warforged named Gavrik Ironshield strides through the dimly lit streets of the Undercity. His body, though mechanical, carries an unnerving resemblance to a human, hinting at a complex origin. Gunmetal armor covers his muscular form, worn but expertly maintained, gleaming faintly under the flickering gas lamps. Twin red gems nestled in his helmet cast a soft, eerie glow. He wears a deep burgundy and gunmetal coat, the subtle Iron Fang mark etched on the lapel. Two daggers hang from his waist, a sling slung over one shoulder, and he dons a practical leather coat. A distinctive visual detail is the intricate mechanical wristwatch, its hands ticking away relentlessly, a reminder of his relentless pursuit for redemption as a loyal member of the Iron Fang Consortium.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "practical street clothes, nothing that slows movement, worn boots"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Gravelight Company",
+  "affiliation": "Argent Blades",
+  "specialty": "Gravelight Company specializes in retrieving artifacts from the volatile rifts that tear the fabric of reality, a task requiring both bravery and expertise in rift navigation that sets them apart from other adventurers.",
+  "members": [
+    {
+      "name": "Elara Ironhands",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran rift-runner with a cybernetic left arm, she's known for her unyielding resolve and strategic prowess."
+    },
+    {
+      "name": "Vorrik the Swift",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "With his keen senses and agility, he's the first to spot threats and the last to leave a job undone."
+    },
+    {
+      "name": "Zephyr Duskchaser",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "A scholar of the arcane, he wields his spells with precision and discretion, a contrast to his flamboyant personality."
+    },
+    {
+      "name": "Thorgrim Bonesmith",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A stout and fearsome fighter, his reputation precedes him as a reliable defender and a formidable adversary."
+    }
+  ],
+  "visual": "Dressed in leather armor and cloaks adorned with silver Argent Blades emblems, they carry a variety of weapons and magical trinkets. Their demeanor is serious and focused, but they never shy away from a drink at the local tavern.",
+  "reputation_note": "Rumored to be the Argent Blades' elite rift-running squad, Gravelight Company's name is whispered with both awe and caution in the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

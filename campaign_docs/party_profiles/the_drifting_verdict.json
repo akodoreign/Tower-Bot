@@ -1,0 +1,36 @@
+{
+  "name": "The Drifting Verdict",
+  "affiliation": "Guild of Ashen Scrolls",
+  "specialty": "Expertise in deciphering and manipulating ancient texts, known for solving complex puzzles that baffle others",
+  "members": [
+    {
+      "name": "Arin Alistair",
+      "role": "Arcanist",
+      "species": "Human",
+      "note": "Sporting a missing eye, a reminder of a near-fatal rift encounter"
+    },
+    {
+      "name": "Zara Ironroot",
+      "role": "Face",
+      "species": "Dwarf",
+      "note": "Known for her intimidating presence, often softened by a wry smile"
+    },
+    {
+      "name": "Elias Whisperwing",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Rumored to have an exceptional connection to the city's shadows, often disappearing without a trace"
+    }
+  ],
+  "visual": "Clad in cloaks of muted gray and crimson, they are often seen with scrolls and ancient tomes, carrying themselves with an air of quiet authority and mystery.",
+  "reputation_note": "Whispers of a team that can uncover hidden truths and navigate the city's darkest secrets have made them both feared and respected in the Undercity",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-16] Completed a investigation-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

@@ -1,0 +1,35 @@
+{
+  "name": "The Long Exhale",
+  "affiliation": "Wardens of Ash",
+  "specialty": "A formidable team of fire wielders, renowned for their ability to manipulate and control the flames, setting them apart in the chaotic world of the Undercity",
+  "members": [
+    {
+      "name": "Kaela Suntouched",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "Scarred from years of battling the rifts, her eyes are always shrouded behind a veil, hinting at the secrets she carries"
+    },
+    {
+      "name": "Thoren Stonebreaker",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "A former member of the Iron Fang Consortium, his past loyalties often create tension within the group"
+    },
+    {
+      "name": "Zephyr Ravenwing",
+      "role": "Muscle",
+      "species": "Human",
+      "note": "His physical prowess is matched only by his fierce loyalty to the Wardens of Ash, making him a formidable ally and an intimidating adversary"
+    }
+  ],
+  "visual": "Clad in armor made from repurposed rift metal, they move with a grace born of years of working in the treacherous Undercity. Each wears a mask to protect against the city's dust and a unique crest denoting their affiliation with the Wardens of Ash",
+  "reputation_note": "Whispers echo through the Undercity of their unwavering dedication to the Wardens of Ash and their fearsome skill in harnessing the city's ever-present flames",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

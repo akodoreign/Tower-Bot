@@ -1,0 +1,27 @@
+{
+  "name": "Calix Drenn",
+  "species": "Human",
+  "faction": "Tower Authority / FTA",
+  "rank": "Field Compliance Officer (enforces FTA regulations at street level)",
+  "role": "officer",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "CHA 12",
+      "DEX 11",
+      "INT 10"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "longsword, heavy crossbow",
+    "armour": "plate armour, officer's insignia"
+  },
+  "sd_appearance": "Human, average height and build, moving with a youthful intensity. Skin pale from years in the Undercity's shadows, short black hair slicked back, eyes a piercing blue. Wearing a pristine Field Compliance Officer uniform of the Tower Authority, emblazoned with insignia and adorned with plate armor. A longsword and heavy crossbow holstered, a badge of the Faction visible on the chest. Distinctive visual detail: a silver feather pin, a symbol of his junior intake program, pinned to the collar of his uniform.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "armour maintained to standard, rank markings clearly displayed"
+}

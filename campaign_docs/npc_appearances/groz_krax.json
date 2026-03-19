@@ -1,0 +1,27 @@
+{
+  "name": "Groz Krax",
+  "species": "Half-Orc",
+  "faction": "Argent Blades",
+  "rank": "Senior Blade",
+  "role": "senior blade",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A towering half-orc with tusks and greenish skin, Groz Krax stands in the dimly lit Spire district. His heavily scarred face is framed by short, shaggy hair, and piercing green eyes reflect the glow of the arena lights above. Clad in silver and white armor with blue accents, he bears the Argent Blades emblem on his shield and wears a longsword at his side. A medallion from past victories gleams on his chest, and a distinctive silver helmet with a winged crest adorns his head, signaling his senior rank as a Blade.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

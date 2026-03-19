@@ -1,0 +1,28 @@
+{
+  "name": "Edwyn Shadowmantle",
+  "species": "Human",
+  "faction": "Brother Thane's Cult",
+  "rank": "Follower",
+  "role": "mercenary",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A gaunt, tall human with piercing blue eyes and a long, greasy beard fiddles with his tattered robes adorned with cryptic symbols, standing within the dimly lit chamber of the eclectic Undercity. His worn leather and chainmail attire, replete with the remnants of past contracts, houses a warhammer and a crossbow. A distinctive, glowing rune etched onto the warhammer's pommel catches the flickering light, hinting at the power contained within.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

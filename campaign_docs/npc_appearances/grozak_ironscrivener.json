@@ -1,0 +1,27 @@
+{
+  "name": "Grozak Ironscrivener",
+  "species": "Orc",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Scribe",
+  "role": "contract scribe",
+  "stats": {
+    "primary": [
+      "INT 16",
+      "CHA 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "22–35"
+  },
+  "equipment": {
+    "weapons": "quill as a weapon (metaphorically), dagger",
+    "armour": "tattered coat over threadbare robe"
+  },
+  "sd_appearance": "A colossal orc, Grozak Ironscrivener, towers over his colleagues, his deep green eyes focused intently on the crumbling parchment before him. His massive frame, adorned in an ash-white robe of the Guild of Ashen Scrolls, is worn thin at the elbows and knees, fraying at the edges from years of handling ancient manuscripts. A tattered coat, draped casually over his tattered robe, conceals multiple sealed scroll cases. A quill, his metaphorical weapon, rests precariously between his gnarled fingers, while a dagger is tucked into his waistband. A distinct forked tongue flickers, wetting his cracked lips as he deciphers cryptic symbols, a testament to his relentless pursuit of knowledge.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "coat over robe, always quill and parchment, forked tongue flickering"
+}

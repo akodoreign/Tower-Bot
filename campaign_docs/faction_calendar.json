@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ev_1772746889_672",
+    "faction": "Iron Fang Consortium",
+    "type": "Sealed Relic Auction",
+    "emoji": "\ud83d\udd28",
+    "description": "Private auction of confiscated and acquired relics. Invitation only. Bidding starts at 50,000 EC.",
+    "event_date": "2026-06-03T15:41:29.933459",
+    "announced": false,
+    "resolved": false,
+    "created_at": "2026-03-05T15:41:29.933459"
+  },
+  {
+    "id": "ev_1772746889_631",
+    "faction": "Wardens of Ash",
+    "type": "After-Action Review",
+    "emoji": "\ud83d\udcca",
+    "description": "Internal assessment of recent Rift incidents. Not public. Lieutenant Varen is presenting. Corvin Thale is attending uninvited.",
+    "event_date": "2026-05-10T15:41:29.933459",
+    "announced": false,
+    "resolved": false,
+    "created_at": "2026-03-05T15:41:29.933459"
+  },
+  {
+    "id": "ev_1772746889_157",
+    "faction": "Serpent Choir",
+    "type": "Open Contract Day",
+    "emoji": "\ud83d\udcdc",
+    "description": "Serpent Choir opens divine contract negotiations to walk-ins. Read the terms before you sign. Read them again.",
+    "event_date": "2026-05-16T15:41:29.933459",
+    "announced": false,
+    "resolved": false,
+    "created_at": "2026-03-05T15:41:29.933459"
+  },
+  {
+    "id": "ev_1772746889_185",
+    "faction": "Iron Fang Consortium",
+    "type": "Surplus Clearance Sale",
+    "emoji": "\ud83c\udff7\ufe0f",
+    "description": "Overstock moved through Crimson Alley. First come, first priced.",
+    "event_date": "2026-06-03T15:41:29.933459",
+    "announced": false,
+    "resolved": false,
+    "created_at": "2026-03-05T15:41:29.933459"
+  }
+]

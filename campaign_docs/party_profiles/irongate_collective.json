@@ -1,0 +1,35 @@
+{
+  "name": "Irongate Collective",
+  "affiliation": "No Affiliation",
+  "specialty": "A trio of experts known for their ability to navigate the treacherous rifts of the Undercity, offering their services to those willing to pay the high cost of survival",
+  "members": [
+    {
+      "name": "Vexis Veldorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A stoic man with a metal prosthetic arm, lost in the rifts years ago"
+    },
+    {
+      "name": "Thorn Ly'arien",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A tall and graceful elf, known for her distinctive silver tattoos covering her face"
+    },
+    {
+      "name": "Gruum Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A burly dwarf, feared for his unyielding resolve and stone-carved facial scars"
+    }
+  ],
+  "visual": "Clad in leather armor and armed with a mix of old and makeshift weapons, they move with a sense of purpose, their eyes always scanning the city for danger",
+  "reputation_note": "The Irongate Collective is both respected and feared, a symbol of survival in the heart of the Undercity's chaos",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

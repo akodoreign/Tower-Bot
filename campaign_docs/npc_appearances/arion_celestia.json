@@ -1,0 +1,28 @@
+{
+  "name": "Arion Celestia",
+  "species": "Aasimar",
+  "faction": "Glass Sigil",
+  "rank": "Junior Archivist",
+  "role": "archivist",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "A tall, slender Aasimar with radiant golden hair cascading down to her waist and celestial blue eyes that seem to hold a hint of eternal wisdom, Arion is clad in pale blue scholar robes adorned with brass instrument clips and equipped with glass-lens goggles. Ink-stained hands and elbows reinforce her commitment to her role as Junior Archivist within the Glass Sigil. A staff rests on her shoulder, while multiple scroll cases and reading lenses are a testament to her ongoing pursuit of knowledge. A peculiar silver halo, a remnant of her celestial lineage, glimmers faintly, casting an ethereal light upon the countless forbidden texts she diligently studies.",
+  "faction_visual": "pale blue scholar robes, brass instrument clips, glass-lens goggles, ink-stained hands",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

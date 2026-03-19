@@ -1,0 +1,27 @@
+{
+  "name": "Kyra Noxfire",
+  "species": "Tiefling",
+  "faction": "Wardens of Ash",
+  "rank": "Warden",
+  "role": "warden",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "A towering, imposing tiefling with skin in shades of red, violet, and grey, adorned in a leather jacket charred with ash and adorned with symbols, stands tall amidst the dark cityscape. Her long, curled horns resemble serpent fangs, and her eyes glow a fiery red. Equipped with a spear, crossbow, and handaxe, she wears chain mail bearing the emblem of the Wardens of Ash. An ash-mark is etched on her left cheek, marking her as an officer, her very presence a testament to her relentless pursuit of redemption. A single, glowing ember nestled in the band around her braid is the only hint of the chaotic powers she wields.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

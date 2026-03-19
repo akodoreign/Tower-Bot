@@ -1,0 +1,27 @@
+{
+  "name": "Eira Filigree",
+  "species": "Gnome",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Archivist Second Class",
+  "role": "archivist",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "A diminutive gnome, silver-haired and compact, stands amidst a sea of ash-white archival robes and scroll cases in the Undercity's Guild of Ashen Scrolls. Her skin, weathered yet unmarked, contrasts sharply with the silver strands that frame her almond-shaped eyes, always alert, always focused. Ink-stained hands clutch a scholar's tome, while a slender staff leans against a nearby stack of ancient tomes, its surface adorned with intricate runes. A single, distinctive visual detail sets her apart - a pair of delicate, silver-framed spectacles perched precariously atop her slight nose.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

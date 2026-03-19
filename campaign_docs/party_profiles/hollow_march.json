@@ -1,0 +1,29 @@
+{
+  "name": "Hollow March",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Hollow March are renowned for their stealth and infiltration skills, able to slip through the most heavily guarded areas of the Undercity undetected.",
+  "members": [
+    {
+      "name": "Alec Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Alec, once a high-ranking member of the Iron Fang Consortium, bears a permanent scar across his face, a reminder of his betrayal."
+    },
+    {
+      "name": "Elara Stonefist",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Elara is known for her keen senses and unmatched tracking skills, but whispers suggest she has a secret alliance with the Wardens of Ash."
+    }
+  ],
+  "visual": "Alec and Elara dress in dark, utilitarian clothing, often blending into the shadows. Both wear distinctive silver eye-patches, a symbol of their allegiance to the Obsidian Lotus. They carry themselves with a quiet confidence, always watchful and ready for danger.",
+  "reputation_note": "Hollow March is a name that strikes fear into the hearts of the Undercity's criminals. Their reputation precedes them, a warning to all that they are not to be trifiled with.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

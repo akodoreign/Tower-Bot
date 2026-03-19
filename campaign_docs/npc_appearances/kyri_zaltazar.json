@@ -1,0 +1,27 @@
+{
+  "name": "Kyri Zaltazar",
+  "species": "Kobold",
+  "faction": "Serpent Choir",
+  "rank": "Contract Scribe",
+  "role": "contract scribe",
+  "stats": {
+    "primary": [
+      "INT 16",
+      "CHA 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "22–35"
+  },
+  "equipment": {
+    "weapons": "quill as a weapon (metaphorically), dagger",
+    "armour": "tattered coat over threadbare robe"
+  },
+  "sd_appearance": "A short, wiry kobold with scaly green skin, sharp yellow eyes, and a long, flickering forked tongue, Kyri Zaltazar is clad in a tattered coat of jade green and black divine silk over a threadbare robe, the Serpent Choir's coiled serpent motif evident on both. He carries a quill like a weapon, a parchment always tucked under his arm, and a hidden dagger at his waist. His long, forked tongue continually darts out, suggesting a mind always plotting and scheming.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "coat over robe, always quill and parchment, forked tongue flickering"
+}

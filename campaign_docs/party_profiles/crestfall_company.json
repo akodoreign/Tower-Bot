@@ -1,0 +1,41 @@
+{
+  "name": "Crestfall Company",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "Experts in demolitions and fortification breaches, known for their unparalleled precision and efficiency in navigating the Undercity's ever-shifting landscape",
+  "members": [
+    {
+      "name": "Axel Crestfall",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Axel, the eldest of the Crestfall siblings, carries the weight of his family's legacy and the scars from countless battles"
+    },
+    {
+      "name": "Evelyn Crestfall",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Evelyn's uncanny ability to locate rifts and the eerie glow from her cat-like eyes are a common sight in the Undercity"
+    },
+    {
+      "name": "Thorgrim Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Thorgrim, a veteran of the Iron Fang Consortium, is known for his imposing stature and the ominous sound of his battle-hammer"
+    },
+    {
+      "name": "Bronwyn Stonebreaker",
+      "role": "Arcanist",
+      "species": "Half-Elf",
+      "note": "Bronwyn, with her peculiar combination of elven grace and half-dwarven strength, is renowned for her arcane prowess and enigmatic aura"
+    }
+  ],
+  "visual": "Clad in reinforced leather and steel, they move with a unified purpose, their faces hidden behind masks bearing the emblem of the Iron Fang Consortium. The Crestfall Company is a sight that strikes fear into the hearts of their foes and respect from their peers",
+  "reputation_note": "Rumored to have a secret pact with the Iron Fang Consortium, the Crestfall Company's actions are whispered about in hushed tones, a warning to those who cross their path",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

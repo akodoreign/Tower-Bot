@@ -1,0 +1,27 @@
+{
+  "name": "Zara Forgemender",
+  "species": "Warforged",
+  "faction": "Brother Thane's Cult",
+  "rank": "Follower",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Warforged Zara Forgemender, a towering figure with intricate gears etched across her metallic form, moves with a rhythmic creak in the dimly lit Undercity cathedral. Her deep, haunting blue eyes, a stark contrast to her cold exterior, hold a fierce determination as they scan the forge. Wearing a suit of worn leather and chainmail, adorned with the scars of past contracts, she carries a warhammer and crossbow slung over her shoulder. A single, glowing ember nestled in her chestplate serves as a testament to her devotion to Brother Thane's Cult, casting an eerie, pulsating light upon her imposing silhouette.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

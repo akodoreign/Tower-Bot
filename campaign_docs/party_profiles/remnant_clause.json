@@ -1,0 +1,41 @@
+{
+  "name": "Remnant Clause",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Skilled in navigating the chaotic rifts, offering a unique ability to traverse and salvage valuable relics from the tears in reality",
+  "members": [
+    {
+      "name": "Serafina Vale",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A stern woman with a scarred face, rumored to have once been a high-ranking member of the Iron Fang Consortium before turning rogue"
+    },
+    {
+      "name": "Thorne Stonebreaker",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A burly dwarf with a missing eye, known for his brutal efficiency in combat and his reluctance to talk about his past"
+    },
+    {
+      "name": "Elara Windsong",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "A slender elf with a mystical aura, whispered to have made a pact with the Serpent Choir, providing her with otherworldly powers"
+    },
+    {
+      "name": "Kyra Swiftfoot",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "A cunning cat-woman, she's known for her silver tongue and her ability to charm even the toughest targets, despite her young age"
+    }
+  ],
+  "visual": "Clad in leather armor and armed with a mix of exotic weapons, they move through the Undercity with a purposeful stride, their eyes always scanning for potential opportunities or threats",
+  "reputation_note": "Despite their affiliation with the Adventurers Guild, the Remnant Clause is a crew that's shrouded in mystery and intrigue, earning them both respect and fear from the denizens of the Undercity",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

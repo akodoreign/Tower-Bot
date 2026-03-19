@@ -1,0 +1,35 @@
+{
+  "name": "The Leaden Wing",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "Specializing in covert infiltration and tactical sabotage, The Leaden Wing's reputation for subtle and efficient elimination of threats sets them apart from other Iron Fang Consortium teams.",
+  "members": [
+    {
+      "name": "Arin Half-Elven",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "A stern and unflinching leader, he bears a scar down his left cheek from a past confrontation with a rogue warlord."
+    },
+    {
+      "name": "Korin Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his imposing size and temper, Korin hides a tender heart beneath his gruff exterior."
+    },
+    {
+      "name": "Vex Bronzeclaw",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "With her silver eyes and eloquent tongue, Vex navigates the treacherous web of Undercity politics with ease, but her past with the Argent Blades still haunts her."
+    }
+  ],
+  "visual": "Dressed in black leather and steel, The Leaden Wing moves through the Undercity like a shadow. Their armor bears the insignia of the Iron Fang Consortium, a wing made of lead. They carry themselves with a quiet confidence, always ready for action.",
+  "reputation_note": "Whispers in the Undercity claim that The Leaden Wing's methods are both brutal and effective, earning them both fear and respect.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

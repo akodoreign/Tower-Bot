@@ -1,0 +1,27 @@
+{
+  "name": "Brother Aldric",
+  "species": "Human (post-Rift exposure — minor reality scarring visible on skin)",
+  "faction": "Brother Thane's Cult (The Returned)",
+  "rank": "Second — Thane's enforcer and doctrinal interpreter",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Human, tall and lean, post-Rift exposure reveals frozen ripples on forearms. Grey wrappings cloak his average build, a warhammer and crossbow rest at his side. Chain mail and scale mail, worn and battle-scarred, attest to past contracts. One eye too still, gaze unwavering. A peculiar, shimmering amulet, shaped like a key, glimmers around his neck, hinting at a secret belonging to Brother Aldric, enforcer of Brother Thane's Cult.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

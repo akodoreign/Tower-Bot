@@ -1,0 +1,36 @@
+{
+  "name": "The Scoured Majority",
+  "affiliation": "Adventurers Guild",
+  "specialty": "A group of specialists renowned for their ability to navigate the ever-changing Undercity terrain, using their knowledge of rift patterns to secure high-risk salvage missions that others deem impossible.",
+  "members": [
+    {
+      "name": "Elysia Blackthorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her cold, calculating demeanor hides a fierce loyalty to her crew, and a haunting past involving the loss of her family in the Dome collapse."
+    },
+    {
+      "name": "Thoren Ironshield",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A former member of the Iron Fang Consortium, he carries the weight of his betrayal and the resulting bounty on his head, always vigilant for signs of traitors."
+    },
+    {
+      "name": "Zephyr Silverwind",
+      "role": "Face",
+      "species": "Elf",
+      "note": "His silver tongue is as deadly as his bow, but his true talent lies in reading people, which he uses to negotiate with the city's factions and keep the crew safe."
+    }
+  ],
+  "visual": "They wear a mix of leather and chain armor, adorned with the sigil of the Adventurers Guild. Their faces are weathered from years of hard work, but there is an air of determination and resilience that sets them apart in the Undercity.",
+  "reputation_note": "Whispers of a cursed crew that seems to find fortune where others fail, and tales of a leader who is as ruthless as she is resourceful.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a escort-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

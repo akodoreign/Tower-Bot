@@ -1,0 +1,42 @@
+{
+  "name": "The Dim Petition",
+  "affiliation": "No Affiliation",
+  "specialty": "A team of specialists renowned for their ability to navigate and exploit the ever-shifting rifts, often tackling tasks that others deem too dangerous or impossible.",
+  "members": [
+    {
+      "name": "Aldric Tallowthorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former ward of the Tower Authority with a cryptic tattoo marking his past."
+    },
+    {
+      "name": "Rhysarra Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Notorious for his brutal efficiency and a thick steel gauntlet that leaves a trail of sparks."
+    },
+    {
+      "name": "Xyra Nightshade",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Known for her enigmatic demeanor and the mysterious glowing mark on her forehead."
+    },
+    {
+      "name": "Zephyr Silverwing",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "A smooth-talking cat-person with a silver bell collar and a shadowy past with the Argent Blades."
+    }
+  ],
+  "visual": "A motley crew dressed in a mixture of practical gear, leather armor, and cloaks, adorned with the remnants of their past jobs. They move with a practiced, efficient grace, yet their eyes betray a constant vigilance and wariness.",
+  "reputation_note": "While they may not be heroes, the Dim Petition is a name that strikes a chord of both awe and unease among the denizens of the Undercity, a group that seemingly defies the city's ever-present danger.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a escort-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

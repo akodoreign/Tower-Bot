@@ -1,0 +1,23 @@
+{
+  "name": "Thrain Ironwound",
+  "species": "Dwarf",
+  "faction": "Argent Blades",
+  "rank": "Prospect",
+  "role": "freelance",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "A burly, 4.5-foot-tall dwarf with a chiseled, weather-beaten face and a braided beard intricately patterned like the winding tunnels of the Undercity. His left cheek bears a deep, ragged scar that seems to tell a story of hardship and resilience. Clad in silver and white armor with blue accents, adorned with arena medals, he stands with a theatrical presence that commands attention. On his person, he carries practical adventuring gear, including a shortsword and a quiver of arrows. One distinctive visual detail: his eyes, a piercing ice blue, hold a determined glint that speaks volumes about his unwavering resolve.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

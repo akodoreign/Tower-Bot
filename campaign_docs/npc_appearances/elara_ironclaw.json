@@ -1,0 +1,27 @@
+{
+  "name": "Elara Ironclaw",
+  "species": "Elf",
+  "faction": "Iron Fang Consortium",
+  "rank": "Street Runner",
+  "role": "street runner",
+  "stats": {
+    "primary": [
+      "DEX 16",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "WIS 10",
+      "STR 9"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "daggers, sling",
+    "armour": "leather coat"
+  },
+  "sd_appearance": "Elara Ironclaw, a lithe and agile elf of towering height, moves stealthily through the Undercity's shadows. Her skin is a weathered canvas, marked by the passage of time and the elements. Her raven-black hair is pulled back into a tight braid, and her eyes—a piercing silver-gray—glint dangerously in the dim light. She is clad in a deep burgundy leather coat, the subtle Iron Fang insignia embroidered on the lapel. A pair of daggers and a sling are slung across her back, ready for action. Her most striking feature, however, is a silver-threaded leather armband adorning her forearm—a memento of her vengeful quest against the Wardens of Ash.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "practical street clothes, nothing that slows movement, worn boots"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Elysia Thornshadow",
+  "species": "Half-Elf",
+  "faction": "Wardens of Ash",
+  "rank": "Sergeant",
+  "role": "warden",
+  "home_district": "scrapworks",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "Half-elf Sergeant Elysia Thornshadow, standing tall at a height slightly surpassing humans, with raven-black hair cascading down her back, piercing emerald eyes, and a prominent scar running down her left cheek, dons a utilitarian-military outfit of ash grey chainmail. Her Warden badge, a symbol of her faction, is pinned prominently on her chest. A spear, crossbow, and handaxe are visible on her person, ready for action. Her left cheek bears the distinctive ash-mark, a symbol of her high rank within the Wardens of Ash.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

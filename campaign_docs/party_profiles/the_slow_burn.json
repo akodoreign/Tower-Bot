@@ -1,0 +1,35 @@
+{
+  "name": "The Slow Burn",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "Specializing in tactical reconnaissance and discreet retrieval of sensitive information, The Slow Burn's unparalleled ability to infiltrate enemy ranks without raising suspicion sets them apart.",
+  "members": [
+    {
+      "name": "Rhessa Valdin",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her left eye replaced by a glowing orb, a relic from a failed mission that left her with a deep scar and a sixth sense."
+    },
+    {
+      "name": "Zinnia Ironshield",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Known for her distinctive tattoos, each marking a victorious hunt, she carries a bone-handled axe that echoes with her battle cries."
+    },
+    {
+      "name": "Kael Tyrion",
+      "role": "Muscle",
+      "species": "Tiefling",
+      "note": "His charcoal-colored wings are a rare feature among Tieflings, earning him both respect and suspicion. His temper is as fierce as his strength."
+    }
+  ],
+  "visual": "Dressed in black leather, they move with a quiet menace through the Undercity streets. Rhessa's glowing orb eye, Zinnia's tattooed arms, and Kael's wings are identifying marks that strike fear into the hearts of enemies.",
+  "reputation_note": "Whispers of betrayal, of a deal struck with the devil, follow The Slow Burn, yet their successes have earned them a begrudging respect from the Iron Fang Consortium.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

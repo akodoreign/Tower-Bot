@@ -1,0 +1,41 @@
+{
+  "name": "Stoneletter Guild",
+  "affiliation": "Patchwork Saints",
+  "specialty": "An elite team of Patchwork Saints known for their unparalleled ability to navigate the chaotic rifts, recovering valuable artifacts and resources from the shattered realms.",
+  "members": [
+    {
+      "name": "Elysia Stonehollow",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face, a reminder of past battles that only hardens her resolve"
+    },
+    {
+      "name": "Jax Argentshroud",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Always carries a white fox named Luna, a gift from the Patchwork Saints"
+    },
+    {
+      "name": "Thorgrim Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Twin hammers, one made from a rare metallic alloy, the other from stone"
+    },
+    {
+      "name": "Mira Shatteredwing",
+      "role": "Medic",
+      "species": "Tabaxi",
+      "note": "In possession of a mysterious healing potion rumored to resurrect the dead"
+    }
+  ],
+  "visual": "Clad in patched, leather armor, their gear is a mishmash of salvaged materials and unique relics from other worlds. They carry themselves with a quiet determination, often seen discussing strategy at the city's edge before venturing into the rifts.",
+  "reputation_note": "Whispers of their success have made them both respected and feared throughout the Undercity. A rumor persists that they are seeking a legendary artifact said to grant immense power to the one who wields it.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

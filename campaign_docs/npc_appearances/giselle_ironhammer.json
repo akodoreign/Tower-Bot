@@ -1,0 +1,28 @@
+{
+  "name": "Giselle Ironhammer",
+  "species": "Warforged",
+  "faction": "Tower Authority",
+  "rank": "Compliance Intern",
+  "role": "compliance officer",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 15",
+      "WIS 13",
+      "CHA 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 9"
+    ],
+    "hp_range": "28–38"
+  },
+  "equipment": {
+    "weapons": "short sword, FTA badge",
+    "armour": "FTA uniform over light armour"
+  },
+  "sd_appearance": "A towering Warforged, Giselle Ironhammer, stands with a disciplined posture, her polished steel exterior glistening in the dim Undercity light. Her glowing red eyes, a stark contrast to her metallic form, survey the crowded marketplace. Clad in the FTA uniform, she is an embodiment of young, earnest determination, the fabric kept immaculate despite the bustling environment. The short sword at her side and the FTA badge pinned to her chest are visible reminders of her role as a Compliance Intern for the Tower Authority. A distinctive visual detail is the intricate mechanical gears etched into her forearm, a testament to her warforged heritage and unwavering commitment to upholding justice.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "FTA uniform kept immaculate — young, earnest, slightly too eager"
+}

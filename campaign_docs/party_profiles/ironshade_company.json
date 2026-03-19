@@ -1,0 +1,35 @@
+{
+  "name": "Ironshade Company",
+  "affiliation": "Glass Sigil",
+  "specialty": "Specializing in high-stakes heists and infiltrations, their meticulous planning and ability to adapt to the ever-shifting reality tears of the Undercity sets them apart.",
+  "members": [
+    {
+      "name": "Valtor Ironshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face and missing right eye, a reminder of past battles and a constant reminder to his crew to stay vigilant"
+    },
+    {
+      "name": "Zara Glassheart",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Known for her keen senses and her ability to navigate the labyrinthine Warrens, her earring shaped like a shard of obsidian is a symbol of her Glass Sigil allegiance"
+    },
+    {
+      "name": "Thorne Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His imposing stature and stone-hard fists have earned him a fearsome reputation, his battle-scarred warhammer is his constant companion"
+    }
+  ],
+  "visual": "Clad in dark leather and steel, they move with a purposeful stride through the Undercity, their Glass Sigil tattoos visible under the dim light of the city. Their gear is functional yet menacing, a clear warning to potential threats.",
+  "reputation_note": "Whispers echo through the Undercity: 'Don't cross the Ironshade Company, they'll find you and they won't ask questions.' ",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

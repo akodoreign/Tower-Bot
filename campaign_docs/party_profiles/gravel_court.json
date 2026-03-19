@@ -1,0 +1,35 @@
+{
+  "name": "Gravel Court",
+  "affiliation": "Tower Authority",
+  "specialty": "Specializing in complex rift navigation and hazardous exploration, they've earned a reputation for retrieving artifacts other crews would deem impossible.",
+  "members": [
+    {
+      "name": "Eira Ironheart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A seasoned veteran with a scarred face and a cold, calculating demeanor, her past remains a mystery."
+    },
+    {
+      "name": "Thorn Whisperwind",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A former member of the Argent Blades, he's known for his keen senses and unmatched ability to navigate the Undercity's labyrinthine streets."
+    },
+    {
+      "name": "Ruckus Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Despite his intimidating size and gruff exterior, he's surprisingly agile and possesses an uncanny knack for disarming traps."
+    }
+  ],
+  "visual": "Clad in durable leather armor and armed with modified rift-resistant weaponry, they move with a disciplined grace, their eyes always scanning the environment for potential dangers.",
+  "reputation_note": "They are a feared and respected crew, known to take on the most dangerous jobs and return with surprising success. But they are not to be trifled with, for their loyalty lies only with the Tower Authority.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

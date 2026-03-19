@@ -1,0 +1,29 @@
+{
+  "name": "Fallmark Collective",
+  "affiliation": "No Affiliation",
+  "specialty": "Elite rift navigators, known for their exceptional ability to traverse the chaotic tears in reality with minimal casualties",
+  "members": [
+    {
+      "name": "Elysia Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running down her left cheek, a remnant from a close encounter with a rift beast"
+    },
+    {
+      "name": "Kael Stryker",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Known for his uncanny ability to follow trails in the most treacherous of terrains"
+    }
+  ],
+  "visual": "Elysia and Kael are dressed in durable leather armors, adorned with intricate symbols representing their successful rift traversals. They carry a variety of specialized tools and weapons that are a testament to their profession. They move with a calm and measured air, emanating an aura of experienced professionals.",
+  "reputation_note": "Rumored to have navigated the most dangerous rifts in the Undercity without loss, the Fallmark Collective is a name whispered with both fear and respect among the city's inhabitants",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

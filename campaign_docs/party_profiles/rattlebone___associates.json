@@ -1,0 +1,36 @@
+{
+  "name": "Rattlebone & Associates",
+  "affiliation": "Serpent Choir",
+  "specialty": "Specializing in covert infiltrations and information retrieval, Rattlebone & Associates have a reputation for unearthing secrets that others cannot reach.",
+  "members": [
+    {
+      "name": "Vesper Rattlebone",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The eldest of the trio, his body bears the scars of a lifetime spent in the Undercity's shadows."
+    },
+    {
+      "name": "Sylas Shadowtread",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "With his keen senses and agility, Sylas is the group's silent watcher, always one step ahead."
+    },
+    {
+      "name": "Brona Ironclaw",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Brona's battle-hardened frame and imposing presence make her an intimidating force in the Undercity."
+    }
+  ],
+  "visual": "The trio can often be found dressed in dark, practical attire, their faces obscured by hoods and masks. They move with a calculated grace, always aware of their surroundings.",
+  "reputation_note": "Whispers in the Undercity claim that Rattlebone & Associates are no ordinary adventurers – they are Serpent Choir operatives, working in the shadows for their own mysterious ends.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-11] Completed a investigation-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

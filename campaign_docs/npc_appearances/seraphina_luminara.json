@@ -1,0 +1,28 @@
+{
+  "name": "Seraphina Luminara",
+  "species": "Aasimar",
+  "faction": "Brother Thane's Cult",
+  "rank": "Follower",
+  "role": "mercenary",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A slender Aasimar woman, standing tall with silver hair that cascades down her back, steps into the dimly lit sanctum. Her radiant skin catches the flickering candlelight, casting an odd glow that reflects her ethereal silver wings. Her eyes, burning like embers, survey the room before she moves towards a wounded cult member, her chainmail armor and warhammer adorned with symbols of Brother Thane's Cult, hinting at a history of past contracts. A distinctive silver locket, hanging around her neck, catches the light, its intricate design whispering of secrets and redemption.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

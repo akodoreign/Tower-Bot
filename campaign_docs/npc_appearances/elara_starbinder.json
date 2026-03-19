@@ -1,0 +1,27 @@
+{
+  "name": "Elara Starbinder",
+  "species": "Aasimar",
+  "faction": "Glass Sigil",
+  "rank": "Junior Archivist",
+  "role": "archivist",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "A slender Aasimar with radiant golden hair, piercing celestial eyes, and skin that catches light oddly, stands in the dimly lit Glass Sigil Library. She wears a pale blue scholar's robe, the fabric adorned with brass instrument clips and fastened by a belt with glass-lens goggles hanging from it. Her hands, stained with ink from countless hours of work, clasp a staff in one hand, and a quiver of scroll cases rests on her back. A distinctive pair of thick, rimless reading lenses perched on her nose, casting an intriguing glow as they reflect the flickering candlelight from the surrounding bookshelves.",
+  "faction_visual": "pale blue scholar robes, brass instrument clips, glass-lens goggles, ink-stained hands",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

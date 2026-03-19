@@ -1,0 +1,29 @@
+{
+  "name": "Ashborn Seven",
+  "affiliation": "No Affiliation",
+  "specialty": "A tight-knit group of specialists known for their ability to navigate the treacherous rifts of the Undercity, retrieving valuable relics and artifacts that others dare not touch.",
+  "members": [
+    {
+      "name": "Thaddeus Vos",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran of the Iron Fang Consortium who left after a bitter falling-out, carrying the weight of his past with him in the form of a heavy, scratched metal gauntlet."
+    },
+    {
+      "name": "Ria Elara",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A former Wardens of Ash scout who defected after witnessing the corruption that had taken root within the organization, her keen eyes always scanning for potential threats."
+    }
+  ],
+  "visual": "The Ashborn Seven wear simple, utilitarian clothing that blends with the shadows, their gear including sturdy leather vests and boots, each adorned with a small, glowing ember symbolizing their bond. In public, they move with purpose and an air of quiet confidence.",
+  "reputation_note": "Rumored to have connections within multiple factions, the Ashborn Seven are a force to be reckoned with, their names whispered with a mix of awe and caution in the dark alleys of the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

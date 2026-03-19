@@ -1,0 +1,27 @@
+{
+  "name": "Mira Kessan",
+  "species": "Human",
+  "faction": "Independent (twin to Kessan — both operate as info brokers)",
+  "rank": "Senior Information Broker, Grand Forum",
+  "role": "information broker",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "INT 15",
+      "DEX 14"
+    ],
+    "secondary": [
+      "WIS 13",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "hidden dagger",
+    "armour": "elegant street clothes with hidden pockets"
+  },
+  "sd_appearance": "Human woman of average height and build, clad in a layered ensemble of deep burgundy and indigo silks, her long black hair woven with silver threads, and eyes as dark as a moonless night. Hidden dagger at her waist, a silver feather quill tucked behind her ear, and a single silver eye-patch covering her right eye. Her outfit, while stylish and elegant, is adorned with a multitude of hidden pockets, suggesting a chameleon-like ability to blend into any crowd.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "always different outfit — never the same twice, always appropriate to the situation"
+}

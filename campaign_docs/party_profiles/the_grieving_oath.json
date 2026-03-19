@@ -1,0 +1,29 @@
+{
+  "name": "The Grieving Oath",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Specializing in covert infiltration and extraction missions, they are known for their ability to slip through the most fortified security measures undetected.",
+  "members": [
+    {
+      "name": "Thalia Ironheart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The scar running down her left cheek from her brow to her jaw is a constant reminder of a past mission gone wrong"
+    },
+    {
+      "name": "Elias Ashwind",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His piercing green eyes are said to see beyond the veil, sensing the presence of others even in the faintest of traces"
+    }
+  ],
+  "visual": "Thalia and Elias wear black cloaks with the Obsidian Lotus emblem hidden within the lining, and are always seen moving in the shadows, their faces concealed by hoods. They carry themselves with a sense of quiet intensity, striking fear into the hearts of their enemies.",
+  "reputation_note": "Whispers echo throughout the Undercity: 'Don't cross the Grieving Oath, they don't forget and they don't forgive.' ",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

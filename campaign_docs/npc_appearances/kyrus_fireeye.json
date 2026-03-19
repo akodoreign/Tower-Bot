@@ -1,0 +1,27 @@
+{
+  "name": "Kyrus Fireeye",
+  "species": "Tiefling",
+  "faction": "Glass Sigil",
+  "rank": "Junior Archivist",
+  "role": "archivist",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "A tall, slender Tiefling with skin hues of fiery red and deep violet stands in the dimly lit archive of the Glass Sigil. His long, polished horns glint like mirrors, reflecting the soft blue light emanating from brass instrument clips on his scholar robe. Kyrus Fireeye's eyes, a brilliant red, scan the pages of a scroll he clutches, his hands ink-stained and calloused from hours spent deciphering cryptic texts. A dagger, a last resort, is sheathed at his waist, while multiple scroll cases adorn his reinforced elbows. One distinctive visual detail: a pair of glass-lens goggles, perched atop his horns, magnifying his intense focus.",
+  "faction_visual": "pale blue scholar robes, brass instrument clips, glass-lens goggles, ink-stained hands",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

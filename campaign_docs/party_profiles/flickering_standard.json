@@ -1,0 +1,35 @@
+{
+  "name": "Flickering Standard",
+  "affiliation": "Wardens of Ash",
+  "specialty": "Specializes in extinguishing rifts before they can tear apart the city, employing a unique blend of arcane knowledge and physical prowess.",
+  "members": [
+    {
+      "name": "Zephyra Vosk",
+      "role": "Leader",
+      "species": "Elf",
+      "note": "Her eyes glow with a soft, flickering light, a constant reminder of her time spent within the rifts."
+    },
+    {
+      "name": "Gavrik Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His left arm is a mechanical replacement, a gruesome testament to a past battle with a rift creature."
+    },
+    {
+      "name": "Lysandra Stonefoot",
+      "role": "Tracker",
+      "species": "Half-Elf",
+      "note": "She moves with a silent grace, her ears attuned to the heartbeat of the city, making her an invaluable asset in the Undercity."
+    }
+  ],
+  "visual": "Clad in black cloaks, they carry shields adorned with a symbol of a flickering flame. Their faces are covered by masks, only their eyes visible, reflecting the dim light of the Undercity.",
+  "reputation_note": "The Flickering Standard is feared for their skill and determination, yet whispered about for their mysterious connection to the rifts.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

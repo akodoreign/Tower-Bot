@@ -1,0 +1,41 @@
+{
+  "name": "Coldwatch Advance",
+  "affiliation": "No Affiliation",
+  "specialty": "Coldwatch Advance specializes in high-risk salvage operations in the rift-torn sectors of the Undercity, recovering valuable relics and artifacts with their extensive knowledge of the city's hidden paths and unique abilities.",
+  "members": [
+    {
+      "name": "Eira Arintha",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Eira, once a Wardens of Ash enforcer, bears the physical scars of her past life in the form of intricate, ritualistic tattoos."
+    },
+    {
+      "name": "Talon Swiftshadow",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "A former Serpent Choir infiltrator, Talon's agility and keen senses make him invaluable for navigating the labyrinthine Undercity."
+    },
+    {
+      "name": "Thoren Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Ex-Argent Blade, Thoren is a seasoned fighter, renowned for his battle-hardened resolve and indomitable spirit."
+    },
+    {
+      "name": "Leon Zephyrion",
+      "role": "Face",
+      "species": "Elf",
+      "note": "Formerly of the Patchwork Saints, Leon's charm and cunning have allowed him to deceive even the most vigilant of the Tower Authority."
+    }
+  ],
+  "visual": "Coldwatch Advance can often be spotted in matching black leather coats with silver insignia, adorned with various trinkets and charms. They carry an air of quiet professionalism, always prepared for the unexpected.",
+  "reputation_note": "Rumored to be ex-faction agents, the group is known for their ruthless efficiency and the mysterious aura that follows them through the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

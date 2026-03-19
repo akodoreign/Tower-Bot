@@ -1,0 +1,27 @@
+{
+  "name": "Eamon Hawthorne",
+  "species": "Human",
+  "faction": "Argent Blades",
+  "rank": "Blade",
+  "role": "senior blade",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "Human male, Eamon Hawthorne, stands tall in the dimly lit Undercity arena. His sharp angular features, piercing green eyes, and weathered silver armor with blue accents gleam under the flickering torchlight. His polished scale mail and plate armor, emblazoned with the Argent Blades' emblem, complements his longsword and shield. A theatrical presence, he carries an air of relentless determination, his unwavering gaze locked onto the enemy, the silver armor now etched with battle scars that echo his dedication to justice. A single blue feather, a memento from a fallen comrade, sits atop his helmet, a stark contrast against the silver and white of his attire.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

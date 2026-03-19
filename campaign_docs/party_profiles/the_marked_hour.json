@@ -1,0 +1,29 @@
+{
+  "name": "The Marked Hour",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "The Marked Hour, a pair of skilled infiltrators, are known for their stealth and precision, often tackling high-risk missions that others deem impossible.",
+  "members": [
+    {
+      "name": "Thalia Vestige",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face from countless battles, always seen with a silver mask covering her disfigured features"
+    },
+    {
+      "name": "Kael Vex",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "His fur is a unique shade of purple, a mark of his connection to the Obsidian Lotus, and a constant reminder of his allegiance"
+    }
+  ],
+  "visual": "Clad in dark, form-fitting armor, both members are adorned with obsidian jewelry and carry a pair of hidden daggers. They move with a quiet confidence, their every step a testament to their professionalism.",
+  "reputation_note": "The Marked Hour, while feared by their enemies, are respected by their peers. Their reputation as unyielding and loyal members of the Obsidian Lotus precedes them in the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

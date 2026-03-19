@@ -1,0 +1,41 @@
+{
+  "name": "Crestmark Advance",
+  "affiliation": "Glass Sigil",
+  "specialty": "Expert negotiators known for their ability to navigate complex political landscapes and secure advantageous deals, often when others cannot.",
+  "members": [
+    {
+      "name": "Thaddeus Valtorian",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A tall, lean man with a scarred face and piercing blue eyes, known for his cold demeanor and ruthless negotiating tactics."
+    },
+    {
+      "name": "Eira Nightshadow",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A lithe, agile woman with long, dark hair and green eyes, rumored to have an uncanny ability to find anyone or anything."
+    },
+    {
+      "name": "Zephyr Rivenoak",
+      "role": "Arcanist",
+      "species": "Half-Elf",
+      "note": "A scholar with short, silver hair and piercing grey eyes, known for his extensive knowledge of ancient magics and the rifts."
+    },
+    {
+      "name": "Orlandus Hammerfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A burly, bearded dwarf with a reputation for his formidable strength and unyielding loyalty to his crew."
+    }
+  ],
+  "visual": "They dress in simple but well-made leather armor and wear the distinctive blue and gold insignia of the Glass Sigil. Their bearing is confident, their eyes alert, and they move with the precision of a well-oiled machine.",
+  "reputation_note": "Crestmark Advance is a feared and respected group in the Undercity. Their word is as good as gold, and their skills are unmatched. However, they are known to be ruthless when it comes to their business, and few would willingly cross them.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

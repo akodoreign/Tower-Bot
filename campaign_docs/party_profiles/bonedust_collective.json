@@ -1,0 +1,41 @@
+{
+  "name": "Bonedust Collective",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Experts in stealth and infiltration, known for their ability to navigate the treacherous rifts and bypass security in the Undercity's key locations",
+  "members": [
+    {
+      "name": "Rynn Vesh",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former member of the Iron Fang Consortium, her past allegiance often raises eyebrows among peers"
+    },
+    {
+      "name": "Zephyr Lyth",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His unnatural agility and keen senses make him the perfect scout, but his mysterious origins remain a topic of debate"
+    },
+    {
+      "name": "Thoren Stonebreaker",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A veteran of the Wardens of Ash, his battle-scarred face is a testament to countless skirmishes, and his loyalty is unquestionable"
+    },
+    {
+      "name": "Nevra Shadowdancer",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Her silver eyes and fluid movements make her a formidable negotiator, but her history with the Serpent Choir leaves some wary"
+    }
+  ],
+  "visual": "The Bonedust Collective wear all black, with a distinctive Obsidian Lotus symbol emblazoned on their chests. They move with a purpose, rarely raising their voices in public, preferring the art of subtlety over brute force.",
+  "reputation_note": "Rumored to have ties with the Obsidian Lotus, the Bonedust Collective is a crew to be wary of. Yet, their reputation for getting the job done, no matter the odds, ensures they remain in high demand",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

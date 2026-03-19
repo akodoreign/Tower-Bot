@@ -1,0 +1,35 @@
+{
+  "name": "Ashmark Brigade",
+  "affiliation": "No Affiliation",
+  "specialty": "Adept at navigating the treacherous rifts, securing rare artifacts and completing high-stakes missions that others dare not touch.",
+  "members": [
+    {
+      "name": "Talon Ashmark",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face from years of rift-traversing; always carries a mysterious, ancient tome"
+    },
+    {
+      "name": "Zephyr Firewhisper",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "Born in the Undercity, her keen senses and agility make her invaluable in the chaotic city"
+    },
+    {
+      "name": "Thorgrim Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Formerly a member of the Iron Fang Consortium, he defected after a mission gone wrong"
+    }
+  ],
+  "visual": "Dressed in utilitarian leather armor and armed with a mix of modern and ancient weapons, they stand out with their distinctive ash-mark brand on their left shoulder. They carry themselves with a quiet confidence, eyes always scanning the shadows for danger.",
+  "reputation_note": "Rumored to be the most feared and respected unaligned crew in the Undercity, capable of completing seemingly impossible tasks. Yet whispers suggest a mysterious benefactor pulling their strings",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

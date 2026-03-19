@@ -1,0 +1,30 @@
+{
+  "name": "chatgpt-discord-bot",
+  "version": "1.0.0",
+  "description": "> ### Build your own Discord bot with multiple AI providers",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akodoreign/tower-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/akodoreign/tower-bot/issues"
+  },
+  "homepage": "https://github.com/akodoreign/tower-bot#readme",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1",
+    "openai": "^6.32.0",
+    "undici": "^7.24.4"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Sootmark Brigade",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile team renowned for their ability to navigate the chaotic rifts, offering a unique blend of combat prowess and stealthy infiltration.",
+  "members": [
+    {
+      "name": "Eira Ironshield",
+      "role": "Leader",
+      "species": "Dwarf",
+      "note": "Scarred from numerous encounters with otherworldly creatures, her steel-blue eyes are cold, yet her resilience is unparalleled."
+    },
+    {
+      "name": "Thoren Blacksmoke",
+      "role": "Tracker",
+      "species": "Half-Elf",
+      "note": "His keen senses allow him to detect even the subtlest of rifts, often making him the first line of defense for the group."
+    }
+  ],
+  "visual": "Clad in weathered leather and wielding an assortment of crude yet effective weapons, the Sootmark Brigade is easily recognized by their distinctive black soot-stained markings, symbolizing their expertise in navigating the rifts of the Undercity.",
+  "reputation_note": "Whispers among the Undercity's denizens speak of a team that can get you in and out of the most dangerous places, though they are rumored to always demand a hefty price for their services.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

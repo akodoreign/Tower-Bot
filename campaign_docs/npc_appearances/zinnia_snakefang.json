@@ -1,0 +1,28 @@
+{
+  "name": "Zinnia Snakefang",
+  "species": "Kobold",
+  "faction": "Independent",
+  "rank": "Street Level",
+  "role": "mercenary",
+  "home_district": "crimson alley",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Kobold Zinnia, standing at approximately 2.5 feet tall, has a slender build and a scaled, shaved head intricately adorned with tattoos snaking up her arms. Her outfit is a leather jacket patched with remnants of various magical artifacts, giving her an air of both menace and resourcefulness. She wears chainmail beneath her jacket and carries a warhammer and crossbow at her side. A distinctive visual detail is the warhammer's hilt, adorned with a talon-shaped grip, a reminder of her vengeful pursuit against the Wardens of Ash.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

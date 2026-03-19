@@ -1,0 +1,27 @@
+{
+  "name": "Gromm Ironhand",
+  "species": "Half-Orc",
+  "faction": "Patchwork Saints",
+  "rank": "Saint",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering half-orc with tusks, greenish skin, and a mane of wild, braided black hair stands at the heart of the Undercity's forge. His muscular build exudes raw power, clad in a patchwork robe emblazoned with symbols of the Patchwork Saints. A heavy, metal-plated belt encircles his waist, while a pair of spiked knuckles rests casually in his hands. A distinctive red armband, a symbol of his rank as a Saint, adorns his forearm. A worn-but-loved pair of boots and a medicinal pouch hanging from his belt complete his appearance. Nearby, a workbench brims with weapons half-forged, each one telling a story of past contracts.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

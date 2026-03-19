@@ -1,0 +1,35 @@
+{
+  "name": "The Pale Contract",
+  "affiliation": "No Affiliation",
+  "specialty": "A formidable trio known for their expertise in navigating the volatile rifts, offering unique services to clients seeking passage to other realms.",
+  "members": [
+    {
+      "name": "Sylas Thornwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A taciturn man with a scar running down his left cheek, a remnant from a near-fatal rift encounter."
+    },
+    {
+      "name": "Eira Ironshield",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Her battle-scarred forearms bear the sigil of the defunct Iron Fang Consortium, a constant reminder of her past."
+    },
+    {
+      "name": "Zephyr Nightshade",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "His iridescent fur shimmers like moonlight, and he's often seen wearing a black leather trench coat, a gift from the Argent Blades."
+    }
+  ],
+  "visual": "Clad in weathered leather armor and carrying an assortment of peculiar tools, they move with a purposeful stride through the Undercity. Their distinct clothing and the Tabaxi's ethereal glow make them stand out in the grimy cityscape.",
+  "reputation_note": "Whispers of their success in traversing the rifts have made them a sought-after crew, but their unaligned status sparks caution among the Undercity's factions.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

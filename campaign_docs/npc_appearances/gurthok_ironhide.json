@@ -1,0 +1,23 @@
+{
+  "name": "Gurthok Ironhide",
+  "species": "Orc",
+  "faction": "Independent",
+  "rank": "Respected Freelance",
+  "role": "freelance",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "A massive, muscular Orc towers over the cobblestone streets, his deep green-grey skin and prominent tusks giving him an imposing presence. His battle-hardened eyes, hidden beneath a tattered leather jacket, survey the bustling Undercity with a calculating intensity. Chainmail armor peeks from beneath the jacket, a warhammer strapped to his back, its hammerhead adorned with intricate carvings of various creatures and symbols. A silver band with a single ruby encircles his left arm, a family heirloom that glimmers in the dim light, a testament to his unwavering loyalty to his hidden family within the Lower Undercity.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

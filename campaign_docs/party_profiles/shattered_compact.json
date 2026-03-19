@@ -1,0 +1,35 @@
+{
+  "name": "Shattered Compact",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile group known for their unorthodox approach to problem-solving, specializing in high-stakes infiltration and retrieval missions that other teams deem impossible.",
+  "members": [
+    {
+      "name": "Vexil Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Once a high-ranking member of the Argent Blades, she was expelled for defying orders that led to the successful rescue of a colleague."
+    },
+    {
+      "name": "Kegan Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A former member of the Iron Fang Consortium, he defected after refusing to participate in an illegal contract, leaving behind a trail of broken limbs as a warning."
+    },
+    {
+      "name": "Aria Sparkswift",
+      "role": "Face",
+      "species": "Elf",
+      "note": "Once an operative for the Guild of Ashen Scrolls, she was disavowed for her role in exposing their involvement in a major scandal."
+    }
+  ],
+  "visual": "They wear matching black leather jackets adorned with a silver compass emblem, a symbol of their shared history and the name 'Shattered Compact'. Their gear is a blend of practical and unassuming, with an air of mystery and danger that follows them wherever they go.",
+  "reputation_note": "Whispers in the Undercity speak of a group with unyielding morals, willing to challenge the city's powerful factions to uphold justice. Some call them troublemakers, while others regard them as heroes.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

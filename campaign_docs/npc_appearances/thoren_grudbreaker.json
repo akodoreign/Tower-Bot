@@ -1,0 +1,24 @@
+{
+  "name": "Thoren Grudbreaker",
+  "species": "Half-Orc",
+  "faction": "Argent Blades",
+  "rank": "Prospect",
+  "role": "freelance",
+  "home_district": "argent blades",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "A towering half-orc with tusks, greenish skin, and piercing silver eyes, clad in silver and white armor adorned with blue accents and medals from past victories, stands imposingly in the dimly lit Undercity arena. His practical adventuring gear, a collection of eclectic items chosen for their effectiveness rather than factional allegiance, is visible on his muscular frame. A distinctive blue war hammer, a symbol of his aspirations within the Argent Blades, hangs at his side, its polished surface reflecting the flickering torchlight.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

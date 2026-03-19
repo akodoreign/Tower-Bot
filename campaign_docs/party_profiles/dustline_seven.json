@@ -1,0 +1,41 @@
+{
+  "name": "Dustline Seven",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Specializing in tracking down and eliminating rogue magical entities that threaten the stability of the Undercity, Dustline Seven's reputation for ruthless efficiency sets them apart.",
+  "members": [
+    {
+      "name": "Thorne Ashwood",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars crisscross his face from countless battles, a stark reminder of his past"
+    },
+    {
+      "name": "Vexil Ironshield",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Equipped with an enchanted warhammer, his heavy footsteps echo through the Undercity"
+    },
+    {
+      "name": "Eira Nightshade",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Known for her ethereal glow and the mysterious crystals she carries"
+    },
+    {
+      "name": "Jax Stoneshaper",
+      "role": "Face",
+      "species": "Half-Elf",
+      "note": "His quick wit and charm have earned him many allies and a few enemies"
+    }
+  ],
+  "visual": "Clad in black and stone-grey, they move through the Undercity like shadows, their armor and weapons adorned with the Obsidian Lotus symbol. Their disciplined demeanor and unwavering focus make them a formidable presence.",
+  "reputation_note": "Whispers of Dustline Seven speak of a team that never fails, but also one that asks no questions and takes no prisoners",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

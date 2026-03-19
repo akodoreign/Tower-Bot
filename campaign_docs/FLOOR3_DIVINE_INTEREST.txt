@@ -1,0 +1,126 @@
+FLOOR 3 — DIVINE INTEREST
+Constellations Watching When the Fighting Starts
+DM Reference — Not Player Facing
+
+Each entry covers: why this deity is watching, who in the party draws their eye, what boon they offer, what they want in return, and what that costs later.
+
+Boons are not offered to the whole party. Each deity is interested in a specific type of player action. If no one performs that action, the deity watches and moves on. The interest has to be earned.
+
+---
+
+TYR — Right Hand of Order
+Justice / Courage · Lawful Good · Order of Flame
+
+WHY NOW: A commander was dismissed for being right and returned anyway. That story is exactly what Tyr exists to notice. He has been watching Montreval for years. When the wall holds eleven months beyond reason, Tyr is already leaning forward. When Floor 3 starts and the party has a chance to change the ending, he moves.
+
+WATCHES: The party member who protects someone at personal cost — anyone who covers a retreat, takes a hit so another can run, holds a door. Tyr does not care about winning. He cares about who you were willing to lose for.
+
+BOON — Blade of Testimony: Once per long rest, when the player makes an attack or saving throw while protecting another creature, they may add 1d8 radiant damage or advantage to the roll (player's choice). The effect is visible: the weapon briefly carries faint golden script.
+
+PRICE: After the floor ends, the player must speak Montreval's name aloud in the Tower — in a public space, to someone who will hear it. Not a prayer. Not a ritual. Just ensuring someone outside the floor knows what happened to him.
+
+DM NOTE: The boon is easy. The price is the hook. Speaking the name publicly means Thesaurus will log it, other factions will note it, and the Culinary Council will start tracking a party member who just made themselves narratively significant. Tyr knows this. He considers it a fair trade.
+
+---
+
+ATHENA — Strategic Preserver
+Wisdom / Strategy · Lawful Neutral · Order of Flame
+
+WHY NOW: The Eastern March fell not because of military failure but because institutional certainty refused good information. This is Athena's specific obsession — the gap between what is known and what leadership chooses to hear. She has been furious about Montreval's dismissal since it happened and Floor 3 is the first time anyone has been positioned to actually intervene.
+
+WATCHES: The tactician. Whoever reads the battlefield, sets ambushes, asks about the Ashfell Ravine before the enemy uses it, or finds any way to use the environment rather than just trading blows. Also anyone who tries to warn the garrison about the two-front approach before it happens.
+
+BOON — Owl's Clarity: Once per short rest, the player may ask the DM one tactical question about the current encounter and receive a truthful one-sentence answer from Athena's perspective. The answer arrives as a thought, not a voice.
+
+PRICE: After the floor, Athena sends a sign — a small owl figurine appearing in the party's Tower space — asking whoever received her boon to search Thesaurus' archive for the original dismissal order. She wants the name of who signed it.
+
+DM NOTE: The dismissal order is findable. The name leads to a faction still active in the Tower. Athena's real goal is not justice — it is data. She is building a case about which power structures inside the Tower are systematically suppressing good strategic intelligence, and the party just became her field researchers.
+
+---
+
+THESAURUS — Supreme Archivist
+Archives / Story / Memory · Lawful Neutral · Script of Thought
+
+WHY NOW: Thesaurus does not intervene in floors. He watches. But Floor 3 is exceptional: the party already changed the historical record by building the causeway on Floor 2, and now they are inside the event that the archive wrote as a tragedy. From Thesaurus' perspective, the party are walking inside one of his own entries and rewriting it in real time. He finds this compelling enough to make an offer — which is, for Thesaurus, almost unprecedented.
+
+WATCHES: Everyone, but most interested in whoever demonstrates awareness that history is happening around them. A player who references the archive document — who says this is what we are trying to prevent — earns his direct attention. Also anyone who tries to preserve something: an object, a name, a record.
+
+BOON — The Record Runs Both Ways: Once during the floor, Thesaurus will whisper a single piece of information the party could not otherwise know — a coming ambush, a character's true motivation, or a detail about Sablegear's machine that creates a tactical opening. It arrives as text briefly visible on any nearby surface, like a marginal note.
+
+PRICE: Thesaurus wants the party to bring him something from the floor that does not exist in his archive. A personal object of Montreval's, a piece of the machine, a testimony from someone who was there. He will be specific. He will be patient. He will remember if they do not deliver.
+
+DM NOTE: Thesaurus already knows the outcome of Floor 3 if the party fails. He is offering this boon not out of hope but out of narrative interest. If the party succeeds, his archive updates and he owes them a significant favour. He is also testing whether they understand that whatever they bring him becomes part of the permanent record — other entities with archive access can read it.
+
+---
+
+TYMORA — Lady Luck
+Luck / Fortune · Chaotic Good · Feast of Want
+
+WHY NOW: Tymora shows up wherever the odds are being defied, and Floor 3 is nothing but defied odds — a wall holding eleven months, a stone path built by strangers saving nine hundred people, a party attempting to change a documented history. She has been watching since the causeway and arrives at Floor 3 ready to gamble on the outcome.
+
+WATCHES: The most reckless player. Whoever attempts the thing that should not work — the long shot, the improvised plan, the outrageous bluff. Tymora is not interested in the careful strategist. She is interested in the one who throws the dice on instinct.
+
+BOON — Fortune's Edge: Once per floor, when the player rolls a natural 1 on any d20, they may reroll and must take the second result. When they roll a natural 20, Tymora adds a small unexpected benefit beyond the mechanical crit — a dropped weapon landing at their feet, an enemy slipping, a door being unlocked.
+
+PRICE: After the floor, the player must tell someone in the Tower what the craziest thing they attempted was, in genuine detail. Tymora feeds on the telling as much as the doing. The Culinary Council also feeds on it. Tymora knows this and considers it part of the fun.
+
+DM NOTE: Tymora is the most benign deity on this list but the most likely to complicate things mid-floor for entertainment. Her presence is a signal to other deities that something interesting is happening — she is essentially a lighthouse. When she shows interest, the Culinary Council turns to look.
+
+---
+
+ZARIEL — Crimson General
+War / Atonement · Lawful Evil · Forge of Flesh
+
+WHY NOW: Zariel was once a divine commander who fell. Montreval is a mortal commander who was broken and put on the front of the machine that destroyed everything he built. She recognises the shape of this. She is not sympathetic — she lost her own sympathy somewhere in the fall — but she is intensely interested in whether the party can do what she could not: reach the commander in time.
+
+WATCHES: The fighter. The one who pushes toward the machine when everyone else is dealing with the horde. Zariel does not care about the clever plan or the diplomatic solution. She cares about the one who moves forward when the situation is loudest — the player who goes toward the machine specifically to get Montreval off it.
+
+BOON — Blood and Iron: When the player takes damage in melee combat, they gain a stacking +1 to their next attack roll (max +4, resets on short rest). Once per floor, they may push through a failed death saving throw — instead of falling, they remain at 1 HP and may take one more action before any stabilisation rolls are required.
+
+PRICE: Zariel wants the player to make a choice, witnessed, about whether Montreval's life is worth more than a tactical objective. At some point she will arrange a moment where saving him means letting something else fail. She wants to see what they choose. She will remember the answer for a very long time.
+
+DM NOTE: Zariel is Lawful Evil. She is watching partly because she genuinely wants to see someone succeed where she did not, and partly because a party member who accepts her boon now owes her a witnessed choice under pressure. She will collect that debt on a future floor at a moment of her choosing. The boon is real. The hook is deep. Do not let the player forget they accepted help from the Crimson General.
+
+---
+
+THE RAVEN QUEEN — Mistress of Endings
+Death / Memory · True Neutral · Voice of Lies
+
+WHY NOW: The Raven Queen is here because people are dying on Floor 3 and she has opinions about how deaths are remembered. Specifically: four hundred and twelve people in Reval Cross. Soldiers on the wall. Everyone who did not make it to the causeway. She does not intervene in deaths — but she notices when a story threatens to forget them.
+
+WATCHES: Anyone who stops to help a civilian. Not the dramatic rescue — the small one. The party member who pauses during combat to pull someone out of the way, who remembers that the hamlet has people in it and acts on that memory. The Raven Queen tracks every death on this floor and watches to see if any of the living are paying the same attention she is.
+
+BOON — Weight of Names: The player gains the ability to speak the name of any named NPC who has died during the current floor and know one true thing about how they died and whether anything can still be done about it. Usable once per named death, only while on the floor. The knowledge arrives like remembering something told in a dream.
+
+PRICE: The Raven Queen presents the player with a list — accumulating across the floor — of names. The people who died in Reval Cross. The soldiers who fell at the wall. She wants the player to carry these names out of the floor and speak them in the Tower. Not as a ritual. Not to any specific entity. Just spoken aloud where other people can hear. She is deeply uninterested in whether this is convenient.
+
+DM NOTE: This is the most emotionally demanding boon on the list. The list of names will include NPCs the party met in Floor 2 — this is intentional. If the player actually carries the names out and speaks them in the Tower, Thesaurus logs it, the Glass Sigil takes note, and one future NPC will recognise a name from their own family among those spoken. That thread is worth planting.
+
+---
+
+ANANSI — Webspinner
+Stories / Trickery · Chaotic Neutral · Voice of Lies
+
+WHY NOW: Anansi is here because the history book the party read before entering Floor 3 is one of his favourite kinds of story — a document that describes a future that has not happened yet, written as if it is already settled. He finds the whole situation deeply funny and genuinely interesting. He wants to see if the party can rewrite the ending.
+
+WATCHES: The clever one. Whoever finds a non-violent solution, talks their way past something, or uses the environment in a way that should not work but does. Also anyone who lies to an enemy in a way that is technically true. Anansi appreciates the technically-true lie more than any other form of deception.
+
+BOON — The Spider's Thread: Once per floor, the player may ask Anansi a direct question about any NPC's weakness, fear, or secret motivation. He will answer. The answer will be completely accurate and entirely unhelpful on its surface — a riddle, a story, or a seemingly unrelated observation. The actual answer is inside it. The player needs to work it out.
+
+PRICE: Anansi wants to tell the story of Floor 3 afterward and wants it to be a good one. He will ask the player to recount one thing they did that they are not entirely proud of. Not a confession. Not penance. He just wants the complicated part. He will then tell it to someone else in the Tower, embellished, at the worst possible moment.
+
+DM NOTE: Anansi's boon is genuinely useful but the cost is social chaos. He will retell the story the player gives him to the faction that will find it most politically inconvenient — probably the Wardens or the Argent Blades. The retelling will be accurate in every detail and framed to make the party look morally questionable. Anansi does not do this out of malice. He does it because that is what makes it a good story. The party cannot be angry at him for it. This is explicitly what they agreed to.
+
+---
+
+GENERAL DM NOTES
+
+HOW BOONS ARE OFFERED: No deity announces themselves. The boon manifests as a quiet opportunity — the player feels something shift, a sense of being watched that resolves into clarity or capability. Religion check DC 12 identifies the divine signature. DC 16+ identifies the specific deity. They do not have to accept. Choosing not to accept costs nothing except the boon.
+
+MULTIPLE DEITIES / SAME PLAYER: A player can draw the attention of more than one deity on this list. They can only hold one active boon at a time — accepting a second boon voids the first along with any obligations. The deity whose boon was voided does not forget. They simply move their interest to a different point in the timeline.
+
+THE CULINARY COUNCIL: The Culinary Council is not on this list because they do not offer boons on Floor 3. They are watching. Every boon accepted from another deity increases the party's narrative weight, which is precisely what the Council finds appetising. Several of the costs on this list involve speaking names or telling stories publicly in the Tower — other deities know the Council monitors those acts and are in some cases deliberately using the party as bait to see how the Council responds. The party does not know this yet.
+
+THESAURUS AND THE ARCHIVE: If the party succeeds in changing the floor's outcome, Thesaurus will update the archive entry. The history document the party read before entering will, at some point after Floor 3, be different in the Tower library. Not erased — annotated. The original account remains. A second layer appears beside it describing what actually happened. The party may or may not notice this the first time they go back to the archive. They will notice it eventually.
+
+Floor 3 — DM Reference — Not Player Facing

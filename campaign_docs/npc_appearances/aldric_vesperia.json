@@ -1,0 +1,27 @@
+{
+  "name": "Aldric Vesperia",
+  "species": "Human",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Initiate",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Human, tall, lean build. Weathered skin beneath the Dome, piercing blue eyes with a hint of sadness. Long, tattered coat, symbol of the Guild of Ashen Scrolls. Archival robes of ash-white, multiple sealed scroll cases. Fate-reading tools adorn his person. Worn leather and chainmail equipment visible, story of past contracts etched into every piece. Distinctive visual detail: a warhammer and crossbow slung over his shoulders, both bearing the faded mark of the Guild.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

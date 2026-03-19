@@ -1,0 +1,27 @@
+{
+  "name": "Grothor Grimclaw",
+  "species": "Orc",
+  "faction": "Argent Blades",
+  "rank": "Senior Blade",
+  "role": "senior blade",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A towering orc, Grothor Grimclaw, stands before the crowd in the Undercity's grand arena. His deep green skin, weathered by battle scars, contrasts against his polished silver and white armor adorned with blue accents. Prominent tusks jut from his massive frame, and beneath a dark hood, eyes hidden burn with an unquenchable fire. The Argent Blades' emblem, emblazoned on his shield, gleams as he raises it high. A longsword rests on his shoulder, and his armor, adorned with arena medals, shines under the arena lights. A single, distinctive visual detail: a blue tattoo of a clawed paw, symbolizing his senior rank, winds around his muscular bicep.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

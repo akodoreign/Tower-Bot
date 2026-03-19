@@ -1,0 +1,29 @@
+{
+  "name": "Saltveil Expedition",
+  "affiliation": "Adventurers Guild",
+  "specialty": "A tenacious duo known for their unorthodox approaches to dismantling rifts, utilizing a blend of arcane knowledge and physical prowess.",
+  "members": [
+    {
+      "name": "Kaelis Winterwhisper",
+      "role": "Leader",
+      "species": "Elf",
+      "note": "Scarred from numerous rift encounters, he carries a mysterious, ancient-looking dagger."
+    },
+    {
+      "name": "Vexa Saltveil",
+      "role": "Tracker",
+      "species": "Half-Elf",
+      "note": "Her keen senses and uncanny ability to navigate the Undercity's labyrinthine streets make her invaluable."
+    }
+  ],
+  "visual": "Clad in leather and chain armor, they move with purpose, carrying a variety of enchanted weapons and tools. A salt-stained emblem, symbolizing their guild, adorns their chests.",
+  "reputation_note": "Rumored to have survived encounters that would've destroyed less experienced teams, their names are whispered with both awe and caution in the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

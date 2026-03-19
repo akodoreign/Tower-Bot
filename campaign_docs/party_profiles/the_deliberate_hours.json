@@ -1,0 +1,29 @@
+{
+  "name": "The Deliberate Hours",
+  "affiliation": "Tower Authority",
+  "specialty": "Expert rift navigators, known for their precision in mapping and clearing the unstable passages of the Undercity.",
+  "members": [
+    {
+      "name": "Theron Driftsilver",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A man with an eyepatch, his missing eye replaced by a finely crafted mechanical orb."
+    },
+    {
+      "name": "Lira Shattershield",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Her thick leather coat, adorned with intricate runes, is rumored to have been forged from the metal of rift-torn realities."
+    }
+  ],
+  "visual": "Clad in practical, reinforced leathers and armed with rift-resistant equipment, they move with a cautious yet deliberate grace that sets them apart from other adventurers.",
+  "reputation_note": "Whispers echo through the Undercity - The Deliberate Hours are a crew to be reckoned with, their precision and efficiency in navigating the city's rifts unmatched, but their mysterious past leaves many wondering who they truly serve.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

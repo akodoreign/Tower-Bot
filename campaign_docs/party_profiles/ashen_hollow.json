@@ -1,0 +1,41 @@
+{
+  "name": "Ashen Hollow",
+  "affiliation": "Argent Blades",
+  "specialty": "A team of shadowy infiltrators known for their exceptional stealth and adaptability, capable of navigating the treacherous rifts of the Undercity with unparalleled precision.",
+  "members": [
+    {
+      "name": "Eira Thornwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Once a Tower Authority enforcer, she was betrayed and now seeks vengeance against her former colleagues"
+    },
+    {
+      "name": "Rhys Shadowstitch",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "His uncanny ability to trail any target across the Undercity's labyrinthine paths is legendary"
+    },
+    {
+      "name": "Thorgrim Icefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A former gladiator, his imposing presence and combat prowess strike fear in those who cross his path"
+    },
+    {
+      "name": "Zara Flameheart",
+      "role": "Face",
+      "species": "Half-Elf",
+      "note": "Her charm and wit have earned her a reputation as the most persuasive negotiator in the Undercity's shadows"
+    }
+  ],
+  "visual": "Clad in black leather armor, the group moves with purpose, their faces obscured by dark fabric masks. They carry a collection of deadly blades and a single, ominous banner bearing the symbol of the Argent Blades emblazoned upon it.",
+  "reputation_note": "Whispers spread throughout the Undercity of a cursed banner and four individuals who will stop at nothing to see their enemies fall",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

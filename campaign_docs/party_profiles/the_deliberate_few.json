@@ -1,0 +1,35 @@
+{
+  "name": "The Deliberate Few",
+  "affiliation": "No Affiliation",
+  "specialty": "A team of meticulous and versatile specialists who excel in navigating the unpredictable rifts, recovering valuable artifacts, and executing covert operations that others cannot.",
+  "members": [
+    {
+      "name": "Vasilisa Kovalenko",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face from years of facing the rifts, always keeps a cold, calculating demeanor."
+    },
+    {
+      "name": "Elara Ironbark",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Bears a notable limp from a past encounter, known for her uncanny ability to find a trail even in the most chaotic rifts."
+    },
+    {
+      "name": "Zoran Valtor",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "His hair is dyed blue to hide the distinctive silver, a remnant of his elven heritage. Famous for casting powerful spells to manipulate rifts."
+    }
+  ],
+  "visual": "Clad in leather armor and sturdy boots, they carry a variety of tools for rift navigation and survival. They wear protective goggles and gloves, and each member bears a black, intricately designed emblem on their chest.",
+  "reputation_note": "Whispers echo through the Undercity — the Deliberate Few, the enigmatic crew who bend reality itself to their will. But beware, for their services come at a high price.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

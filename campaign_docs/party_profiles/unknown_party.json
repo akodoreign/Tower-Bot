@@ -1,0 +1,33 @@
+{
+  "name": "Unknown Party",
+  "affiliation": "No Affiliation",
+  "specialty": "General contracts",
+  "members": [],
+  "visual": "",
+  "reputation_note": "",
+  "history": [
+    "[2026-03-14] Party first logged.",
+    "[2026-03-14] Failed a major-tier contract. Rank: Unknown (-2/5)",
+    "[2026-03-15] Completed a high-stakes-tier contract. Rank: Unknown (+0/5)",
+    "[2026-03-15] Completed a escort-tier contract. Rank: Unknown (+1/5)",
+    "[2026-03-15] Completed a investigation-tier contract. Rank: Unknown (+2/5)",
+    "[2026-03-15] Completed a escort-tier contract. Rank: Unknown (+3/5)",
+    "[2026-03-15] Completed a local-tier contract. Rank: Unknown (+4/5)",
+    "[2026-03-16] Completed a major-tier contract. Rank: Unknown → Recognized (+0/5)",
+    "[2026-03-16] Completed a investigation-tier contract. Rank: Recognized (+1/5)",
+    "[2026-03-16] Completed a epic-tier contract. Rank: Recognized (+4/5)",
+    "[2026-03-16] Completed a epic-tier contract. Rank: Recognized → Established (+0/5)",
+    "[2026-03-17] Completed a escort-tier contract. Rank: Established (+1/5)",
+    "[2026-03-17] Completed a escort-tier contract. Rank: Established (+2/5)",
+    "[2026-03-18] Completed a escort-tier contract. Rank: Established (+3/5)",
+    "[2026-03-18] Completed a local-tier contract. Rank: Established (+4/5)",
+    "[2026-03-18] Completed a rift-tier contract. Rank: Established → Respected (+0/5)",
+    "[2026-03-19] Completed a rift-tier contract. Rank: Respected (+3/5)",
+    "[2026-03-19] Failed a local-tier contract. Rank: Respected (+2/5)"
+  ],
+  "missions_completed": 15,
+  "missions_failed": 2,
+  "tier": "Respected",
+  "points": 2,
+  "generated": false
+}

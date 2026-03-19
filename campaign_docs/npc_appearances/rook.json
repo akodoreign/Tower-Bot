@@ -1,0 +1,27 @@
+{
+  "name": "Rook",
+  "species": "Unknown (passes as Human — something is slightly off)",
+  "faction": "Argent Blades (contract — not a member)",
+  "rank": "Unranked (refuses ranking system)",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering figure, taller than most humans, with an unremarkable face and forgettable features, clad in silver and white armor adorned with blue accents and arena medals. Their skin is a weathered shade of gray, their hair a dark, matted mass that hangs down to their shoulders, and their eyes a piercing ice-blue that stand out against their dark complexion. A warhammer and crossbow are visible on their person, worn with a worn leather and chainmail outfit that tells tales of past contracts. Their most distinctive visual detail is a peculiar, glowing aura that seems to emanate from their being, casting an eerie light around them, hinting at their unknown species.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

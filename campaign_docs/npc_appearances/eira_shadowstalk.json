@@ -1,0 +1,28 @@
+{
+  "name": "Eira Shadowstalk",
+  "species": "Tabaxi",
+  "faction": "Obsidian Lotus",
+  "rank": "Ghost",
+  "role": "mercenary",
+  "home_district": "obsidian lotus",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Tabaxi Ghost Eira Shadowstalk, standing tall at 2 feet and 6 inches, glides through the Undercity shadows with an eerie grace. Her deep-black fur, sleek and close-cropped, shimmers faintly as she moves. The black shadow-woven garments of the Obsidian Lotus, adorned with lotus flower motifs in black glass, encase her slender frame. A warhammer and crossbow rest on her back, secured by worn leather straps, while memory vials serve as jewelry on her belt, casting a soft, ethereal glow. One distinctive visual detail is her emerald-green eyes that seem to glow brightly, even in the Undercity's dim light, reflecting her burning desire for vengeance against the Iron Fang Consortium.",
+  "faction_visual": "black shadow-woven clothing, lotus flower motifs in black glass, memory vials as jewellery",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "The Quiet Majority",
+  "affiliation": "Wardens of Ash",
+  "specialty": "A group of skilled and silent infiltrators, specializing in covert operations and sabotage, earning their reputation through unmatched stealth and precision.",
+  "members": [
+    {
+      "name": "Eira Blackhart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her eyes are always hidden behind a veil, a constant reminder of her past as a high-ranking member of the Iron Fang Consortium before defecting to the Wardens."
+    },
+    {
+      "name": "Thorne Shadowstep",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His keen senses and uncanny ability to navigate the rift-riddled Undercity make him an invaluable asset to the group."
+    },
+    {
+      "name": "Gideon Stonebreaker",
+      "role": "Arcanist",
+      "species": "Dwarf",
+      "note": "His knowledge of ancient arcane texts and unwavering loyalty to the Wardens make him the team's resident magic expert."
+    },
+    {
+      "name": "Cinder Ashwhisper",
+      "role": "Muscle",
+      "species": "Tabaxi",
+      "note": "Her agility and combat prowess are matched only by her fiery spirit, making her a formidable force in the field."
+    }
+  ],
+  "visual": "Clad in black ash-stained leather armor, they move with a silent grace, their faces obscured by hoods and masks. A silver wolf emblem, symbolizing their Wardens of Ash allegiance, is etched on each of their weapons.",
+  "reputation_note": "Whispers echo through the Undercity, warning that they are not to be underestimated. They operate with a silent efficiency that leaves few witnesses and even fewer clues.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

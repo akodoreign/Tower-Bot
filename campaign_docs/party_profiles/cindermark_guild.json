@@ -1,0 +1,41 @@
+{
+  "name": "Cindermark Guild",
+  "affiliation": "Wardens of Ash",
+  "specialty": "Specializing in locating and neutralizing rogue sorcerers and rogue cults hidden in the Undercity's depths, Cindermark Guild's precision and efficiency in dealing with threats that others ignore sets them apart.",
+  "members": [
+    {
+      "name": "Elysia Cindermark",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scarred and stoic woman with a reputation for being relentless in her pursuit of justice."
+    },
+    {
+      "name": "Theron Stonebreaker",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "The burly dwarf's keen senses and ability to navigate the Undercity's maze-like streets make him invaluable."
+    },
+    {
+      "name": "Kaelan Firebrand",
+      "role": "Arcanist",
+      "species": "Tiefling",
+      "note": "A brooding and powerful sorcerer with a talent for uncovering the darkest secrets."
+    },
+    {
+      "name": "Zephyr Shadowstep",
+      "role": "Muscle",
+      "species": "Tabaxi",
+      "note": "A lithe and agile warrior, known for his speed and silent takedowns, making him the perfect enforcer."
+    }
+  ],
+  "visual": "The four members of Cindermark Guild are easily identified by their simple, black cloaks with burning embers sewn into the hoods, marking them as members of the Wardens of Ash. They carry themselves with a sense of purpose and wear their scars and injuries with pride.",
+  "reputation_note": "Whispers echo through the Undercity, warning of the swift and ruthless justice meted out by the Cindermark Guild. Those with secrets to hide fear their name, and those wronged seek them out.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

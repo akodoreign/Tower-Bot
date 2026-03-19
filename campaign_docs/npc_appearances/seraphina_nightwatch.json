@@ -1,0 +1,28 @@
+{
+  "name": "Seraphina Nightwatch",
+  "species": "Aasimar",
+  "faction": "Adventurers Guild",
+  "rank": "E-Rank",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A slender, towering Aasimar with radiant, subtly shimmering silver-gold skin, piercing blue eyes that glint like sapphires, and a cascade of white feathered wings, Seraphina Nightwatch stands in the dimly-lit tavern. Clad in a worn leather trench coat and chainmail, her Adventurers Guild badge prominently displayed, she exudes an air of stoic determination. A warhammer and crossbow rest against her shoulder, their weathered surfaces hinting at countless tales of past contracts. A single, golden feather quill tucked behind her ear serves as a striking, yet subtle reminder of her role as a scout and information gatherer.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

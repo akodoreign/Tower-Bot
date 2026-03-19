@@ -1,0 +1,35 @@
+{
+  "name": "The Waning Pact",
+  "affiliation": "Patchwork Saints",
+  "specialty": "A band of skilled assassins, known for their precision in neutralizing targets with minimal collateral damage.",
+  "members": [
+    {
+      "name": "Serafina Larkwood",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her eyes, two different colors, mark her as a child of a forbidden union."
+    },
+    {
+      "name": "Gideon Thorne",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "He carries a set of ancient, cursed arrows that seem to guide him to his targets."
+    },
+    {
+      "name": "Alaric Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His warhammer is enchanted with a rune that glows ominously when he's angered."
+    }
+  ],
+  "visual": "They wear plain, black leather armor adorned with white, stitched crosses, blending in the Undercity crowds. Each member carries a small, white feather tied to their clothing, a symbol of the Patchwork Saints.",
+  "reputation_note": "They are feared by criminals but respected by the citizens of the Undercity. Rumor has it that their contract is always fulfilled, and they never betray a client.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

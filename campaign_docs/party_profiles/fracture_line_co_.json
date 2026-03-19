@@ -1,0 +1,41 @@
+{
+  "name": "Fracture Line Co.",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "Specializing in rapid, efficient extraction of valuable artifacts from the ever-shifting rifts, Fracture Line Co. has earned a reputation for unmatched precision and speed.",
+  "members": [
+    {
+      "name": "Rhys Ironforge",
+      "role": "Leader",
+      "species": "Dwarf",
+      "note": "A battle-scarred veteran with a cybernetic arm, Rhys is a stern, no-nonsense leader who commands respect through his unwavering resolve and strategic acumen."
+    },
+    {
+      "name": "Vex Lyrion",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "With eerie green eyes that seem to glow in the dark, Vex is a master of navigation through the labyrinthine Undercity. Her cryptic demeanor has earned her a reputation as a woman to be reckoned with."
+    },
+    {
+      "name": "Zephyr Stoneheart",
+      "role": "Arcanist",
+      "species": "Half-Elf",
+      "note": "A mage with a penchant for fire magic, Zephyr's quick, powerful spells have saved the team on countless occasions. His charisma, however, often clashes with Rhys's authoritative style."
+    },
+    {
+      "name": "Thorne Ironshield",
+      "role": "Muscle",
+      "species": "Human",
+      "note": "Thorne's massive physique and imposing presence make him an intimidating figure. His loyalty to the group is unwavering, but his reckless nature sometimes puts the team in unnecessary danger."
+    }
+  ],
+  "visual": "Clad in reinforced leather armors and brandishing an array of advanced weaponry, Fracture Line Co. moves through the Undercity like a disciplined squad. Their distinctive black and silver insignia, a fracture line running through an iron fist, is emblazoned on their gear, setting them apart from other adventurer crews.",
+  "reputation_note": "Rumored to be heavily invested in the Iron Fang Consortium, Fracture Line Co. has earned a mix of respect and suspicion. Their rapid rise in the ranks of Undercity's elite has raised eyebrows, but their results speak for themselves.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

@@ -1,0 +1,30 @@
+{
+  "name": "The Cracked Seal",
+  "affiliation": "Guild of Ashen Scrolls",
+  "specialty": "Specializing in the acquisition of ancient, rare, and sometimes cursed tomes, their expertise lies in navigating the labyrinthine rift-torn libraries beneath the Undercity.",
+  "members": [
+    {
+      "name": "Sylas Ironheart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A battle-hardened warrior with a heavy scar that runs down his left cheek, a reminder of a past defeat that he still carries with him."
+    },
+    {
+      "name": "Kaelis Swiftleaf",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Rumored to have unearthed a forbidden grimoire from the depths of the Tower of Last Chance, his powers are both feared and respected throughout the Undercity."
+    }
+  ],
+  "visual": "The pair can often be seen clad in leather armor and armed with enchanted staffs, a book of ancient lore always at hand. They move with a practiced grace, their eyes scanning the bustling crowd for potential leads.",
+  "reputation_note": "Whispers follow them through the Undercity; tales of their daring exploits and unearthed treasures fill the taverns, while warnings of their unpredictable nature echo from the lips of those who have crossed them.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a patrol-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

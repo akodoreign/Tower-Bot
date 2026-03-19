@@ -1,0 +1,28 @@
+{
+  "name": "Lysandra Stardust",
+  "species": "Aasimar",
+  "faction": "Obsidian Lotus",
+  "rank": "Ghost",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A slender, towering Aasimar with silver hair cascading loose waves around her shoulders, Lysandra Stardust steps into the dimly lit Undercity tavern. Her wings, tinged with violet and gold, subtly shimmer beneath her long, flowing black coat adorned with black glass lotus motifs. A worn warhammer and crossbow rest on her back, while a collection of memory vials dangle from her belt like exotic pendants. Her radiant skin catches the flickering torchlight, casting an odd, ghostly glow that seems to shift between shades of gold and silver. A single, intricate silver feather quill, a symbol of her role as a spy and information broker, is tucked behind her ear.",
+  "faction_visual": "black shadow-woven clothing, lotus flower motifs in black glass, memory vials as jewellery",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

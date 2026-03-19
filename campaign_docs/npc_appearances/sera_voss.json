@@ -1,0 +1,27 @@
+{
+  "name": "Sera Voss",
+  "species": "Half-Elf",
+  "faction": "Iron Fang Consortium",
+  "rank": "Senior Acquisitions Agent (field rank — reports directly to Serrik Dhal)",
+  "role": "senior acquisitions agent",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "DEX 14",
+      "INT 13"
+    ],
+    "secondary": [
+      "WIS 12",
+      "CON 11",
+      "STR 9"
+    ],
+    "hp_range": "35–50"
+  },
+  "equipment": {
+    "weapons": "concealed blade, crossbow",
+    "armour": "fine coat over leather"
+  },
+  "sd_appearance": "A tall, slender figure with pointed ears and iron-grey hair, Sera Voss moves through the dimly-lit Undercity streets. She wears a deep burgundy and gunmetal coat with too many pockets, the Iron Fang Consortium mark subtle on the lapel. A hidden blade peeks from under her fine coat, a crossbow slung casually over her shoulder. Her left hand, missing two fingers, rests on the hilt of the blade, a stark reminder of her mysterious past.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "mercantile-military — expensive but practical, always armed, never obviously so"
+}

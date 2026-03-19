@@ -1,0 +1,35 @@
+{
+  "name": "Dustgate Syndicate",
+  "affiliation": "No Affiliation",
+  "specialty": "Specialists in navigating and exploiting the ever-changing rifts, offering unmatched access to the lost treasures and dangerous secrets buried within",
+  "members": [
+    {
+      "name": "Thaddeus Fellshadow",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A master manipulator with a mysterious past, rumored to have once served a powerful Undercity faction before breaking away"
+    },
+    {
+      "name": "Zara Ironhands",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Her gauntlet-enhanced fists are both a testament to her strength and a reminder of the family she lost to the rifts"
+    },
+    {
+      "name": "Kael Voidwind",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Haunted by visions of the rifts' origins, he's a recluse, but his arcane knowledge is unparalleled"
+    }
+  ],
+  "visual": "Clad in dark, layered robes with glowing runes that seem to shift with each rift they pass through, they move with a quiet confidence and grim determination, standing out among the chaos of the Undercity",
+  "reputation_note": "Their successes have earned them respect, but their lack of allegiance to any faction fuels whispers of deceit and treachery",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

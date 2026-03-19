@@ -1,0 +1,35 @@
+{
+  "name": "The Pale Advance",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "A formidable team with a knack for uncovering hidden truths and unraveling complex enigmas, setting them apart as the go-to investigators for the Undercity's most perplexing cases.",
+  "members": [
+    {
+      "name": "Kaelen Evershade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A stoic man with a perpetual pale expression, his face bears the scar of a past betrayal"
+    },
+    {
+      "name": "Seraphina Frostwhisper",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her keen eyes, hidden behind tinted spectacles, reveal a history of tracking down the city's most elusive fugitives"
+    },
+    {
+      "name": "Zephyr Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his indomitable spirit and his trademark warhammer, he exudes an aura of unyielding determination"
+    }
+  ],
+  "visual": "The Pale Advance are a trio of grim professionals, dressed in all-black attire, adorned with silver sigils of the Obsidian Lotus. They move with a purposeful stride, a sense of quiet intensity following them.",
+  "reputation_note": "Whispers circulate about their uncanny ability to solve the Undercity's most inscrutable mysteries, but some caution against trusting them too far",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

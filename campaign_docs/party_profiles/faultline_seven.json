@@ -1,0 +1,35 @@
+{
+  "name": "Faultline Seven",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile team, known for their ability to navigate the unpredictable rifts of the Undercity, exploiting them for personal gain, setting them apart as the go-to crew for dangerous, high-stakes missions.",
+  "members": [
+    {
+      "name": "Seraphina Ironhide",
+      "role": "Leader",
+      "species": "Dwarf",
+      "note": "A battle-hardened dwarf with a metal jaw replaced after a close encounter with a rift beast."
+    },
+    {
+      "name": "Thalia Skyrender",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A tall, slender elf with uncanny senses honed by years of navigating the treacherous Undercity."
+    },
+    {
+      "name": "Razak Ironfoot",
+      "role": "Muscle",
+      "species": "Half-Orc",
+      "note": "A massive half-orc with a scar running down his left cheek, a mark earned from a failed mission that left him the only survivor."
+    }
+  ],
+  "visual": "Clad in leather armor, the trio moves through the Undercity with an air of authority, each member sporting a unique insignia - a seven-pointed star emblazoned on their left shoulder. They carry an assortment of weapons, from swords to crossbows, a testament to their adaptability.",
+  "reputation_note": "The Undercity whispers about Faultline Seven, a crew to be wary of, but also one that can deliver on promises, provided the price is right.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

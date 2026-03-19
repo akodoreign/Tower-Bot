@@ -1,0 +1,41 @@
+{
+  "name": "The Unnamed Majority",
+  "affiliation": "No Affiliation",
+  "specialty": "Specialists in navigating and exploiting rifts, offering unrivaled access to rare resources",
+  "members": [
+    {
+      "name": "Kael Thornwhisper",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running across his left eye, remnant of a close encounter with a rift beast"
+    },
+    {
+      "name": "Grimm Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Missing right arm replaced with a gleaming obsidian prosthetic"
+    },
+    {
+      "name": "Eira Moonshadow",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Renowned for her unmatched senses, she never misses a trail"
+    },
+    {
+      "name": "Zephyr Swiftfoot",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Known for his silver tongue and quick wit, he smooths over any obstacle"
+    }
+  ],
+  "visual": "Clad in leather armor and cloaks, they move with a practiced ease through the Undercity's chaotic streets, a group of seasoned professionals with an air of mystery around them.",
+  "reputation_note": "Whispers of an unnamed crew who can deliver what no one else can find, but at a steep price",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

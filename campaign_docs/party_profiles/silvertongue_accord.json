@@ -1,0 +1,35 @@
+{
+  "name": "Silvertongue Accord",
+  "affiliation": "Glass Sigil",
+  "specialty": "A tactical team known for their ability to navigate the treacherous rifts and recover valuable artifacts that others cannot reach.",
+  "members": [
+    {
+      "name": "Thalion Kintara",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The eloquent and calm captain, who wears a silver tongue charm to soothe the nerves of his crew before each mission."
+    },
+    {
+      "name": "Vexx Ornstag",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "A stout and stoic dwarf with a scarred face and a keen eye, he's known to be the fastest navigator in the Undercity."
+    },
+    {
+      "name": "Riven Seraphos",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "A slender and mysterious elf, she carries an ancient glass orb that hums softly, revealing hidden paths through the city."
+    }
+  ],
+  "visual": "Clad in Glass Sigil's signature azure and gold armor, the trio moves with a practiced ease through the crowded districts, their gear glinting in the dim light.",
+  "reputation_note": "Whispers follow them in the Undercity: the Silvertongue Accord, a team that dares to venture where others fear to tread.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

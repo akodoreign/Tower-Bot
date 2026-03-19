@@ -1,0 +1,29 @@
+{
+  "name": "The Scoured Path",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in tracking and recovering lost artifacts from the rifts, their expertise lies in navigating the unstable dimensions and extraction of valuable relics.",
+  "members": [
+    {
+      "name": "Eira Blackshard",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her left arm is replaced with a gleaming obsidian prosthetic, a reminder of a battle lost but never forgotten"
+    },
+    {
+      "name": "Kael Stonewhisper",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Rumored to have an unnatural affinity for the rifts, his eyes glow eerily when he senses dimensional instability"
+    }
+  ],
+  "visual": "Clad in heavy leather armor and armed with an intricate wooden staff, they move with a quiet, predatory grace through the crowded streets of the Undercity. A distinctive white scar runs down the left side of Eira's face, while Kael's eyes seem to pierce through the darkness.",
+  "reputation_note": "The Scoured Path is known for their uncanny ability to retrieve lost artifacts and their mysterious, almost otherworldly, demeanor. Some whisper that they have made deals with forces better left unnamed",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Elara Celestian",
+  "species": "Aasimar",
+  "faction": "Argent Blades",
+  "rank": "Prospect",
+  "role": "freelance",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "A radiant, slender figure with fiery golden hair cascading to the waist, and celestial blue eyes that hold an intense gaze, stands tall. The Aasimar named Elara wears silver and white armor, adorned with blue accents and the medals she's earned in the Argent Blades arena. Her practical adventuring gear, eclectically chosen with no faction marks, hangs from her frame, while a glint of starlight in her silver belt buckle catches the eye.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

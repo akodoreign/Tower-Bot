@@ -1,0 +1,36 @@
+{
+  "name": "The Unfinished War",
+  "affiliation": "Argent Blades",
+  "specialty": "A tactically versatile team, known for their ability to quickly adapt to various mission demands, setting them apart as a valuable asset in the Argent Blades.",
+  "members": [
+    {
+      "name": "Eamon Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scarred veteran with a steel prosthetic arm, leading his crew with unyielding resolve."
+    },
+    {
+      "name": "Ria Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "The group's elusive scout, known for her keen senses and mysterious connection to the Undercity's shadows."
+    },
+    {
+      "name": "Grimm Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A stout and gruff fighter, renowned for his indomitable spirit and fortitude in the heat of battle."
+    }
+  ],
+  "visual": "Clad in black leather and steel, The Unfinished War present a formidable and disciplined image in public, each member adorned with an unfinished silver war hammer — a symbol of their unyielding resolve.",
+  "reputation_note": "Rumored to have completed missions that even the Argent Blades considered impossible, The Unfinished War have earned a reputation as a formidable force in the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a major-tier contract. Rank: Unknown (+2/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 2,
+  "generated": true
+}

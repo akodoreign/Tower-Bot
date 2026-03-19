@@ -1,0 +1,41 @@
+{
+  "name": "Ember March",
+  "affiliation": "Glass Sigil",
+  "specialty": "Renowned for their swift and silent infiltration techniques, the Ember March are a trusted crew for discrete jobs within the Undercity.",
+  "members": [
+    {
+      "name": "Gideon Blackwood",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former member of the Iron Fang Consortium, he carries a deep-seated grudge against them."
+    },
+    {
+      "name": "Elara Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Known for her keen senses, she often wears a mask to conceal her identity."
+    },
+    {
+      "name": "Vexil Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His battle-scarred visage and heavy warhammer are a constant reminder of his fearsome combat prowess."
+    },
+    {
+      "name": "Zephyr Thunderfoot",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "His silver-tipped tail and smooth-talking charm make negotiations seem effortless."
+    }
+  ],
+  "visual": "Clad in dark, form-fitting leather armor, they move with calculated precision through the crowded streets of the Undercity. Each member is easily identified by their unique markings: Gideon's scarred right cheek, Elara's mask, Vexil's battle scars, and Zephyr's silver tail.",
+  "reputation_note": "The Ember March is a name whispered with both admiration and caution, their skills and stealth earning them a reputation as the Undercity's most trusted - and feared - crew.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

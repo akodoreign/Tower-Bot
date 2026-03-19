@@ -1,0 +1,29 @@
+{
+  "name": "Ashgate Runners",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Expert navigators of the Undercity's labyrinthine Warrens, specializing in retrieval of rare artifacts and information",
+  "members": [
+    {
+      "name": "Vaelin Ashgate",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scarred veteran with a reputation for his unyielding resolve and uncanny sense of direction"
+    },
+    {
+      "name": "Nyx Silverclaw",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "A lithe and agile cat-woman known for her keen eyesight and her penchant for disappearing acts"
+    }
+  ],
+  "visual": "Clad in leather and heavy boots, they move with practiced ease through the Undercity's grime. Vaelin wears a worn fur coat, while Nyx's fur is neatly trimmed and dyed a striking silver. Both carry a set of lockpicks, and Nyx's eyes glow an eerie gold in the dark.",
+  "reputation_note": "The Ashgate Runners are a fearsome duo, known for their ability to find what others can't and their unwillingness to back down from a challenge",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

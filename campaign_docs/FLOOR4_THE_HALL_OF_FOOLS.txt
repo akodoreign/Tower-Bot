@@ -1,0 +1,537 @@
+FLOOR 4 — THE HALL OF FOOLS
+"I have a cunning plan, my lord."
+
+A Comedic Court Scenario — Monty Python meets Blackadder meets Divine Politics
+
+DESIGN OVERVIEW (DM-FACING)
+
+Tone: Pure comedy — Monty Python absurdism layered over Blackadder's dry contempt for everyone around it
+Emotional Arc: Bewilderment → escalating farce → narrow escape from consequences entirely of the party's making
+Tower Role: Passive and baffled. The Tower did not design this floor. This floor designed itself.
+Setting: The court of Baron Aldric Pompsworth III — a living sitcom set that generates new disasters every ten minutes
+Combat: Rare, punitive, and comedic. Combat is what happens when the party runs out of better ideas.
+Win Condition: Survive the Baron's Inspection Ceremony without being arrested, executed, magically turned into furniture, or accidentally starting a war
+Scoring: HUMOR FIRST, then problem-solving. Wit earns more Karma than competence. Failing funnily beats succeeding boringly every time.
+Level: Party enters at Level 4. Nothing on this floor can kill them — but it can embarrass them for the rest of the campaign.
+
+Floors 2 and 3 were about grief and survival. Floor 4 is about none of that.
+
+The party arrives separately — each character translated into a different part of the court, already embedded in their assigned role, already surrounded by people who believe completely in who they are supposed to be. They do not get a group arrival. They get dropped in, alone, mid-situation.
+
+Play every NPC completely straight. The humor comes from the gap between how seriously the court takes itself and how absurd everything actually is. The moment you wink at the players, the floor loses its energy.
+
+---
+
+SCORING SYSTEM
+
+TRACK 1 — THE HUMOR SCORE (Primary Track)
+
+Award Humor Points (HP) for:
+- Leaning into your assigned role in a way that makes at least one other player laugh: 5-15 HP
+- Making an NPC respond in a way you clearly did not plan but is funnier than what you planned: 10-20 HP
+- Failing a skill check in a way that makes the situation worse AND funnier: 5-15 HP
+- Getting the Baron to do something he clearly should not be doing, and he is delighted about it: 10-20 HP
+- Using your actual class abilities in a way that is technically correct but tonally absurd: 10-25 HP
+- Saying something to Vellun that causes him to write it down while maintaining eye contact: 15-25 HP
+- Having the soup agree with you about something unrelated to soup: 10-20 HP
+- Resolving any crisis in a way nobody at the table predicted: 15-30 HP
+- Maintaining a straight face while delivering a line that causes the table to lose it: 10-20 HP
+- Committing to your role so completely that another player forgets you are playing a character: 20-35 HP
+
+DM NOTE: HP is awarded on feel, not formula. If it made the table laugh, it gets points. If it made the table groan and then laugh, it gets more. If it made the DM lose composure, give maximum points and do not explain why.
+
+TRACK 2 — THE PROBLEM-SOLVING SCORE (Secondary Track)
+
+Clean path (by the book): Compliance +1. Correct and boring. Vellun approves. No bonus HP.
+Comedic path (creative, technically valid): Compliance +1 AND HP bonus. The best outcome.
+Catastrophic (crisis made worse): Violation +1. Still gets HP if it was funny. Failures that are not funny get nothing.
+Unsolved crisis still active at inspection: Violation +1 automatic. No HP. Just consequences.
+Crisis solved by Baldwick after party gave up: Compliance +1, Violation +1. Net zero.
+
+FINAL SCORE CONVERSION:
+
+Charter Maintained (0-2 violations): Base 150 Karma per character + total HP divided by 2.
+Charter Maintained (3-5 violations): Base 75 Karma per character + total HP divided by 2.
+Charter Suspended (6+ violations): Base 25 Karma per character + total HP divided by 2.
+
+DM NOTE: A party that fails every single crisis but is hilarious throughout will outscore a party that solves everything competently and boringly. Announce this at the start of the session. It changes how people play.
+
+---
+
+ASSIGNED ROLES AND PRIVATE ARRIVALS
+
+The Tower does not translate the party together. Each character arrives in a different part of the court, already in costume, already being addressed by their title, already surrounded by people who need something from them immediately.
+
+Read each character's private arrival to that player alone. Let the rest of the table hear the chaos from their own position without knowing exactly what the others are walking into. They will find each other. Eventually.
+
+ROLE 1: GRAND CHAMBERLAIN
+
+What the Court Thinks: You are in charge of literally everything. Every courtier defers to you. Every problem is escalated to you. Every solution you suggest is "noted with great respect" and then ignored.
+
+Private Arrival: You are standing in the Great Hall. You are wearing a chain of office so heavy it is affecting your posture. You have no memory of putting it on. A herald thrusts a scroll into your hands. It is three feet long and appears to be a list. "My Lord Chamberlain," he says, "the crown is missing, the seating chart has three contradictory versions, the soup has lodged a formal complaint, and the lute player — Gerald — has again played the wrong song." A pause. "Gerald is very sorry. He says this every time." The scroll in your hands appears to be entirely in a script you do not recognise. You have three hours until the inspection.
+
+First Immediate Problem: A junior footman runs up and whispers that the fish was served before the soup this morning, which is technically treason under the Baron's 1987 Banquet Decree. He needs a ruling. Right now. The cook is still unconscious. There are witnesses.
+
+DM NOTE: The Chamberlain is the party's de facto leader in the court's eyes. The comedy is that nothing they say actually gets done — courtiers nod, say "very good, my lord," and continue the disaster.
+
+ROLE 2: COURT TASTER
+
+What the Court Thinks: You are the Baron's official food and drink taster. Everything goes through you first. This is considered a tremendous honour.
+
+Private Arrival: You are in the kitchens. The head cook is on the floor. She is breathing. Nobody seems concerned about this. A sous-chef turns to you with an expression of profound relief. "Oh thank the gods. The Taster. We need you to check the soup." He points to a large pot in the centre of the kitchen. The soup is looking back at you. "Don't," the soup says. "It talks," you observe. "Since Tuesday." "And the cook?" "Also since Tuesday. Different reason." The soup continues looking at you. "I know things about you," the soup says.
+
+First Immediate Problem: The soup must be tasted and cleared for the ceremony. It will not be tasted without an apology for "the incident." Nobody in the kitchen knows what the incident was. The cook would know, but she is on the floor. The soup knows, and it is not telling for free.
+
+ROLE 3: CHAMPION OF THE LISTS
+
+What the Court Thinks: You are the Baron's personal champion. His honour is your honour. His duels are your duels. He challenges people to duels frequently. Often at breakfast.
+
+Private Arrival: You are in the antechamber. Two men are dueling. They have clearly been dueling for some time. Their form has deteriorated. One of them is fighting left-handed because his right arm gave out on day two. "Are you the champion?" the one on the left asks. "Please be the champion," says the one on the right. "We have been at this since Tuesday." "What started it?" A long pause. "His horse," says Sir Porwick. "My horse is not merely adequate," says Sir Hellan. "Your horse is adequate at best," says Sir Porwick. "GENTLEMEN," says Sir Hellan, and they resume. A herald appears at your shoulder. "As Champion, this duel is technically assigned to you. Sir Porwick filed the transfer paperwork on day one. Sir Hellan countersigned it by accident while trying to wipe his face. It means it is your duel now. Both of it."
+
+First Immediate Problem: The Baron has also, this morning, challenged the head gardener to a duel over the roses. The head gardener is sixty-three and confused. The Champion is expected to fight this duel. The gardener cannot be harmed — Vellun will note it. The Baron cannot be told no — he will note it differently.
+
+ROLE 4: COURT WIZARD
+
+What the Court Thinks: You are the replacement court wizard. The previous wizard is not discussed. The study burned down because of them. Everyone is watching you carefully for signs.
+
+Private Arrival: You are outside a locked door. The door is humming. Not a mechanical hum. Not a magical hum you recognise. Something between a very large cat purring and a bureaucrat who has been told no. A placard reads: THE BARON'S STUDY. DO NOT ENTER. Beneath that, in different handwriting: Especially the Wizard. Beneath that, in scorchmarks: WE MEAN IT. Baldwick materialises beside you. "Ah. The new one." "What is in the study?" "Something the Baron's great-grandfather invited in. They had a contract. The contract expired in 1987. The something is still there and has opinions about its tenancy rights." "Can it be removed?" "The last three tried." "And?" "The study is larger on the inside than it was before they tried."
+
+First Immediate Problem: The humming is getting louder. Vellun will notice it during the inspection. The Baron has categorically refused to discuss it. Baldwick has the original contract but it requires DC 16 Arcana to parse and another DC 14 Persuasion to convince whatever is in there to quiet down for three hours.
+
+ROLE 5: DIPLOMATIC ENVOY
+
+What the Court Thinks: You are the official representative of the Sovereign Grand Duchy of Valdenmoor. Valdenmoor does not exist. Three separate trade treaties reference it. The Baron has a framed portrait of its capital city. The capital city is clearly a painting of a different place with the name changed.
+
+Private Arrival: You are in a receiving room. There are three nobles. They are not together. They are each pretending the others are not there. They all look up when you enter with the expression of people who have been waiting. All three begin speaking simultaneously. Lord Stiffwick: diplomatic immunity from an investigation that has not started yet. Countess Prumble: a longstanding cultural exchange treaty. A third noble on the left: trade interests in the eastern channel. You have never heard of Valdenmoor. You have no idea what any of these people want. You are apparently the most powerful person in this room.
+
+First Immediate Problem: All three factions need something from Valdenmoor. Granting any one request immediately offends the other two. Stiffwick's request is incoherent — he becomes more specific only if directly pressed, at which point he mentions the crown, and then immediately wishes he had not.
+
+DM NOTE: The Envoy can make up anything about Valdenmoor and the court will believe it. Every Valdenmoorian claim becomes court record. Award HP for increasingly elaborate Valdenmoor mythology.
+
+ROLE 6: COURT JESTER
+
+What the Court Thinks: Your job is to make the Baron laugh. He has not laughed in eleven months. The last jester made him laugh once and was immediately given a pension and a cottage because the Baron was so overcome.
+
+Private Arrival: You are in the Great Hall. You are wearing bells. More than seems necessary. The Baron is seated at the head of the table, looking at you with the expression of a man who wants something very much and has been disappointed many times. "Amuse me," he says. You do something. Anything. The Baron stares. Silence. Then, slowly, the Baron begins to weep. Not from laughter. "That," he says, "was the saddest thing I have ever seen." He dabs his eye. "Do it again."
+
+First Immediate Problem: The Baron wants entertainment. Intentional humor fails him completely — his sense of comedy is inverted. He laughs at sincerity, effort, and failure. He is unmoved by anything meant to be funny. The Jester must therefore try earnestly at things and fail in order to succeed.
+
+DM NOTE: The Jester is secretly the most powerful role. Anything they do sincerely — including trying to solve crises, asking serious questions, expressing genuine emotion — has a chance to make the Baron laugh, which grants Compliance bonuses.
+
+---
+
+THE COURT OF BARON POMPSWORTH
+
+The Hall of Fools is a single sprawling court complex — the great hall, adjoining antechambers, kitchens, a trophy room, a garden, and the Baron's private study (locked, alarmed, and apparently opinionated). The whole place runs on etiquette, rumour, and barely suppressed hysteria.
+
+The Divine Inspection Ceremony begins in three hours. Lord Inspector Vellun the Meticulous will arrive to assess whether the Baron's court meets minimum divine standards of propriety. If it does not, the court loses its divine charter, which matters enormously to the Baron and only moderately to anyone else.
+
+LOCATIONS AND CURRENT PROBLEMS:
+
+The Great Hall: Crown missing. Seating chart has three contradictory versions. Gerald is playing the wrong song. Starts: Chamberlain, Jester.
+
+The Kitchens: Head cook unconscious. Soup is sentient and aggrieved. Fish served before soup (illegal). Starts: Court Taster.
+
+The Antechamber: Two nobles mid-duel, day four. Transfer paperwork already filed to the Champion. Starts: Champion.
+
+The Receiving Room: Three noble factions each waiting to solicit Valdenmoor's support for mutually exclusive goals. Starts: Diplomatic Envoy.
+
+The Study Corridor: Study is humming. Loudly. Getting louder. Starts: Court Wizard.
+
+The Garden: Roses wrong colour. Gardener disputes this. Roses also dispute this. Both wrong.
+
+DM NOTE: The party will find each other organically as crises intersect. The Taster will need the Chamberlain's authority for the soup apology. The Champion will need the Envoy's diplomatic cover for the gardener duel. The Wizard will eventually need everyone's help with the study.
+
+---
+
+KEY NPCs
+
+BARON ALDRIC POMPSWORTH III
+
+Appearance: Mid-50s, portly, elaborate moustache waxed into geometry, velvet doublet in the Pompsworth family colours (puce and a slightly different puce).
+Personality: Pompous, easily wounded, surprisingly warm when he forgets to be offended. He does not forget often.
+Current Mood: Pre-inspectional anxiety manifesting as aggressive formality.
+Voice: Complete sincerity. Complete wrongness.
+What He Wants: The Inspection Ceremony to go perfectly. It will not. He will blame everyone except himself.
+What He Actually Needs: Someone to tell him it is going to be fine. No one on his staff will do this because they know it will not be.
+
+Baron stat block (if combat, God help you):
+CR 1/4 | AC 10 (velvet) | HP 18 | STR 10 / DEX 8 / CON 10 / INT 14 / WIS 6 / CHA 18
+Special: Baronial Indignation (Reaction, unlimited) — when the Baron takes damage or is contradicted, delivers a 2d6 word speech; DC 13 Wis save or stunned 1 round. Summon Guards (Action): 1d4 rounds to arrive. Ceremonial Sword: +2 to hit, 1d6 bludgeoning (held wrong). I Am Fine (Passive): cannot be frightened.
+
+Sample Lines:
+"I have been Baron of this court for thirty-two years. In that time I have hosted four Divine Inspections. I have passed none of them. This year will be different."
+"The soup course MUST precede the fish course. This is not etiquette. This is LAW."
+"The study hums. It has always hummed. I have chosen not to investigate this. Some doors are best left locked and warded. The study is both."
+
+BALDWICK — The Baron's Manservant
+
+Appearance: Thin, grey, perpetually damp around the collar, expression of a man counting down the days to a retirement that keeps receding.
+Personality: Dry, quietly contemptuous, occasionally brilliant. Has given up volunteering information because nobody acts on it.
+Function: Knows where everything is, why everything has gone wrong, and what needs to happen. Will tell the party if asked directly. Will not volunteer this.
+Key Secret: He knows where the crown is. He has known for three days. He is waiting to see if anyone asks him before he dies of exasperation.
+
+Sample Lines:
+"The crown is not lost, my lord. The crown is where it always is when it goes missing. I would share this information, but you asked me not to interfere with the natural drama of court life."
+"Yes, the soup has opinions. I did mention this three weeks ago when we purchased it. The market vendor was quite clear: sentient broth, do not argue with it. We argued with it."
+"I have a cunning plan. It involves doing the thing I suggested yesterday, and the day before, and last week."
+"The Protocol Handbook is on the third shelf. It has been on the third shelf for thirty years. No one has asked me about it before. This is the most validating moment of my professional career."
+
+LADY MEREDITH FOSS — The Baron's Niece
+
+Appearance: Elegant, sharp eyes, elaborate hairstyle that contains at least two hidden compartments.
+Personality: Wildly competent woman operating in a situation that does not reward competence. Deeply amused by everything.
+Secret Motivation: Her personal goal this inspection is to get the Baron's divine charter revoked so he has to move to a smaller court and she gets to move to the capital.
+Alignment: Chaotic Neutral, deeply comfortable with it.
+Key Information: She knows about the secret alliance between Lord Stiffwick and Countess Prumble. She started it, just to see what would happen.
+
+Sample Lines:
+"Oh good, adventurers. The last lot were more interesting but considerably shorter-lived."
+"I could tell you who took the crown. Or you could keep asking Lord Stiffwick, who absolutely did not take it but is so nervous about being suspected that he is acting as if he did."
+"If you manage to get through the ceremony without the Baron challenging anyone to a duel, I will personally ensure you receive a commendation. He challenges people to duels twice a session on average. This is a low estimate."
+
+LORD STIFFWICK — The Guilty-Looking Innocent
+
+Appearance: Mid-40s, perpetually sweating, eyebrows that seem to be confessing to something independently of the rest of his face.
+The Problem: He is currently in possession of the crown — not because he stole it, but because he found it in his soup and panicked and put it in his pocket and now he cannot figure out how to return it without seeming guilty.
+Secret: He and the Countess are planning a surprise birthday party for Baldwick. Nobody knows Baldwick has a birthday. Baldwick does not acknowledge birthdays.
+
+Sample Lines:
+"I want to be clear that I have not done anything. Whatever it is that has been done, I did not do it, and if I appear to be behaving as though I did, that is because I am nervous by nature."
+"The crown is — I mean, I have no information about the crown. It is certainly not — yes alright it was in my soup. I FOUND it. In my SOUP."
+
+COUNTESS PRUMBLE — The Actually Plotting One
+
+Appearance: 60s, magnificent silver hair, the expression of someone who has read every book on political maneuvering and is furious that none of them are working.
+Current Plot: She is attempting to ensure Lord Stiffwick becomes the next Baron. She does not like Lord Stiffwick. She does not care who is Baron. She is doing it to have something to do.
+What She Actually Wants: Someone to be impressed by her plotting. She has been at this for thirty years and no one has commented.
+
+Sample Lines:
+"You wish to know my plans? How refreshing. Normally one has to arrange for one's plans to be discovered. I have had to plant three different trails of clues this week alone."
+"I have been scheming for thirty years and the only person who has noticed is Baldwick, who filed it under ambient political noise."
+"Yes, I will help you with the crown situation. In return you will acknowledge, in front of witnesses, that I am a formidable political operator. That is my price. I am not negotiating."
+
+LORD INSPECTOR VELLUN THE METICULOUS — The Divine Auditor
+
+Type: Minor deity of protocol and divine paperwork. Lawful Neutral.
+CR 4 (noncombat — but his reports can destroy courts)
+AC 14 | HP 52 | INT 18 (+4) / WIS 20 (+5) / CHA 12 (+1)
+Skills: Insight +9, Perception +9, Investigation +8, History +8
+Divine Senses: Cannot be deceived by mundane lies — automatically knows when being lied to, but requires evidence before writing it in the report.
+
+Special Abilities:
+- Meticulous Assessment (Passive): Notices everything that is wrong. Has a mental list. Will not share it until the final report.
+- The Report (Action, 1/day): Announces findings. More than 5 violations = charter suspended.
+- Protocol Aura (Passive, 30 ft.): Creatures within 30 ft. must succeed DC 14 Cha save or compulsively correct minor etiquette errors.
+- Neutral Observer: Cannot be bribed, charmed, or persuaded. Can be given technically-correct-but-misleading explanations.
+
+Sample Lines:
+"I have arrived. I will now observe. I will note what I observe. I will compile what I note. I will present what I compile. Please continue as though I am not here."
+"That explanation is technically not incorrect. I have written technically not incorrect in the margin. This is the most generous assessment available to me."
+"You are attempting to distract me. I would like you to know that this is itself a noteworthy occurrence, and I have noted it. The notation is going in column four."
+
+---
+
+BLOCK 1 — ARRIVAL AND ROLE ASSIGNMENT
+
+THE HERALD — NIGEL OF THE SCROLL
+
+Nigel has been herald for eleven years. He reads everything from the scroll, including things that do not need to be read from a scroll.
+
+"Hear ye, hear ye. By the gracious permission of Baron Aldric Pompsworth the Third, Baron of the Western Holdings, Keeper of the Ivory Ledger, Champion of the Forgotten Tournament of 1987 — I am required to inform you that the Ivory Ledger has been misfiled, the Western Holdings dispute is ongoing, and the tournament was declared retroactively unofficial due to a paperwork error. Welcome to court."
+
+BLOCK 1 IMMEDIATE PROBLEMS (all activate within 5 minutes):
+
+The Crown: Missing. The Baron needs it for the ceremony. Stiffwick has it. Nobody knows this yet except Stiffwick, who is trying to eat his soup without being noticed. Escalates: the Baron, every 10 minutes.
+
+The Soup: Sentient. Has already told three courtiers their futures, none flattering. Refusing to be consumed until someone apologizes for "the incident." Escalates: the Head Cook (recovered from fainting).
+
+The Duel: Sir Porwick and Sir Hellan, antechamber, day four, insult neither remembers. Too tired to finish but too proud to stop. Escalates: the Champion (the party).
+
+The Lute Player: Gerald. He knows one song. It is not the right song. He has been told four times. He nods solemnly each time and plays the wrong song again. He does not know he is doing it.
+
+The Seating Chart: Three versions exist, each signed by the Baron. They are mutually contradictory. Whoever is seated next to the Lord Inspector will be held personally responsible for him. Escalates: Nigel the Herald.
+
+---
+
+BLOCK 2 — THE FIVE CRISES
+
+CRISIS 1: THE MISSING CROWN
+
+Setup: The ceremonial crown fell into Lord Stiffwick's soup three days ago. He fished it out, panicked, and put it in his doublet pocket. It is slightly soup-flavoured. This will matter.
+
+Clean Path — Persuasion DC 13 with Stiffwick: Convince him returning the crown quietly is better than being caught with it. He agrees tearfully. Baldwick polishes it. Vellun notes: "Crown present. Condition: adequate."
+
+Comedic Path — Insight DC 12, then Deception DC 14: Arrange for it to be "found" in a location that makes the Baron look clever for "hiding it there for safekeeping." The Baron takes full credit. Vellun notes: "Crown present. Baron's account of its location: implausible but unverifiable."
+
+Catastrophic — Accuse the wrong person: Scandal erupts. Two new duels scheduled. Vellun notes: "Crown present. Court stability: declining."
+
+Stiffwick: "I did not steal it. I want that on the record. It was IN the soup. The soup is the thief. Has anyone considered prosecuting the soup?"
+
+CRISIS 2: THE SENTIENT SOUP
+
+Setup: The ceremonial banquet soup is a rich golden broth purchased from a market vendor who specifically warned the court not to argue with it. The court argued with it on day two. Primary complaint: being called "dinner" rather than "a thinking broth of distinction."
+
+What The Soup Wants:
+- A formal written apology from the person who said "it's just soup" (that was the Baron, who will not admit this)
+- To be addressed by its preferred title: "The Contemplative Broth Aldsworth"
+- To not be consumed by Lord Stiffwick, whose future it has already seen and found unimpressive
+
+Clean Path — Persuasion DC 15: Formal reconciliation. The Baron provides a written apology (Baldwick drafts it, the Baron signs it without reading it). Vellun notes: "Soup: present. Ceremony: unusual. Outcome: satisfactory."
+
+Comedic Path — Performance DC 13: Stage a formal apology ceremony so theatrical that the soup is won over by the drama. The soup gives a speech. The courtiers applaud.
+
+Catastrophic — Attempt to force or trick the soup: The soup curses whoever tries it. That person must re-roll one d20 of the DM's choice at the worst possible moment during the inspection.
+
+The Soup: "I was promised dignity. I was given a ladle. These are not the same thing."
+The Soup: "I have already seen your futures. Three of you are going to do something very embarrassing. I will not say which three. Or when. You are welcome."
+
+CRISIS 3: THE ONGOING DUEL
+
+Setup: Sir Porwick and Sir Hellan have been dueling since Tuesday. The original insult — "your horse is merely adequate" — has been forgotten by both parties, but stopping would be an admission of weakness.
+
+Clean Path — Investigation DC 13, then Persuasion DC 14: Discover the original insult (it is in Nigel's scroll under "Pending Disputes — Minor"). Both parties have forgotten it. If it can be revealed to both simultaneously, neither can claim to have "won" the memory argument, and the duel dissolves by technicality.
+
+Comedic Path — Athletics DC 12, then Performance DC 12: Physically interpose yourself long enough to give a speech about honour so earnestly terrible that both duelists stop in secondhand embarrassment. They shake hands to end the mutual discomfort.
+
+Catastrophic — Challenge either duelist yourself: They are delighted. The party now has a fresh four-day duel on their hands.
+
+Sir Porwick: "I will not stop. Stopping would be cowardice. I have forgotten what we started for but stopping would STILL be cowardice."
+Sir Hellan: "Nor will I stop. Though I admit my sword arm has gone a bit numb. This is not relevant to the question of honour."
+
+CRISIS 4: GERALD THE LUTE PLAYER
+
+Setup: Gerald has played at this court for six years. He knows one song: "The Ballad of the Westmarch Hero," a rousing war ballad inappropriate for a formal inspection ceremony. The required song is "Ode to Propriety," a seventeen-verse piece about correct behaviour at court. Gerald has been taught this song four times. Something in his brain refuses to retain it.
+
+Clean Path — Medicine DC 12, then Performance DC 13 or Investigation DC 13: Identify as musical memory displacement. Teach him via a mnemonic trick, or find sheet music he can physically read. He plays it correctly. He cries a little.
+
+Comedic Path — Deception DC 12: Convince the Baron that "The Ballad of the Westmarch Hero" IS "Ode to Propriety" — just the "original military version." Vellun notes: "Music: present. Appropriateness: contested."
+
+Catastrophic — Take away his lute: Gerald immediately finds another lute. There is always another lute. He plays louder to compensate.
+
+Gerald: "Yes. Yes, I understand. Ode to Propriety. Seventeen verses. I have it. I am ready."
+Gerald: [plays the first six notes of Ballad of the Westmarch Hero]
+Gerald: "...I may need another moment."
+
+CRISIS 5: THE SEATING CHART PARADOX
+
+Setup: Three ceremonial seating charts exist, all signed by the Baron, none compatible. Chart C seats Vellun in the kitchen "for efficiency." The Baron signed Chart C during what Baldwick describes as "an afternoon." Whoever sits next to Vellun will be interrogated at length about court protocol.
+
+Clean Path — Investigation DC 14, then Persuasion DC 12 with Baldwick: Cross-reference charts with the official Tower Protocol Handbook (Baldwick has it, will produce it if asked). Identify which chart complies with divine standards. Implement it.
+
+Comedic Path — Convince Vellun himself to choose his seat by framing it as part of his "unbiased observational methodology." Insight DC 13 to know this appeals to him, then Persuasion DC 15. Vellun chooses the seat next to a potted plant. He notes: "Seating: resolved via protocol methodology. Plant: adequate company."
+
+Catastrophic — Implement all three charts simultaneously: Three violations in one move.
+
+Baldwick: "The Protocol Handbook is on the third shelf. It has been on the third shelf for thirty years. No one has asked me about it before. This is the most validating moment of my professional career."
+
+---
+
+BLOCK 3 — THE INSPECTION CEREMONY
+
+DM READ-ALOUD: Vellun's Arrival
+
+He arrives exactly when he said he would.
+
+That in itself is a violation of how this court normally operates, and it takes a moment for the room to recalibrate.
+
+Lord Inspector Vellun is smaller than you expected.
+
+He carries a clipboard that is clearly magical — the pages are never-ending and the quill writes by itself.
+
+He walks the length of the great hall without hurry.
+
+He looks at the tapestries. He looks at the candles. He looks at the table.
+
+He looks at the soup.
+
+The soup looks back.
+
+Vellun writes something down.
+
+He looks at you.
+
+He writes something else down.
+
+"I will now begin my assessment," he says.
+
+"Please do not do anything noteworthy."
+
+A pause.
+
+"I will note it regardless. But I prefer it when people try."
+
+RUNNING THE INSPECTION:
+
+The ceremony lasts approximately one hour. Vellun makes three formal assessments. Parallel to this, the solved or unsolved crises from Block 2 play out at the table.
+
+Keep a running tally of Violations vs. Compliances. More than 5 net violations = charter suspended. Fewer than 3 violations = excellent result.
+
+Assessment 1 — The Arrival Protocol:
+History (Int) DC 13: Know correct forms of address. Success: Compliance +1. Fail: Violation (wrong title used).
+Persuasion (Cha) DC 12: Smooth over any title errors. Fail: Vellun notes the correction itself as evidence of prior error.
+Performance (Cha) DC 14: Execute formal greeting with such commitment that Vellun is briefly impressed. Compliance +2 if passed.
+
+Assessment 2 — The Banquet:
+For each unsolved crisis still active, add 1 automatic Violation before rolls.
+Insight (Wis) DC 13: Anticipate which moment Vellun is about to notice a problem — act to cover it before he writes it down.
+Deception (Cha) DC 14: Provide technically-not-incorrect explanations. Fail: he notes your deception attempt under "Additional Concerns."
+Persuasion (Cha) DC 15: If the soup crisis was resolved comedically, the soup may give an impromptu speech about the court's "journey of growth." Vellun notes this as a Compliance if passed.
+
+Assessment 3 — The Closing Declaration:
+Performance (Cha) DC 14: Deliver a closing statement that is simultaneously humble and impressive. Critical success (beat DC by 5+): the Baron cries. Vellun notes: "Emotional sincerity: observed. Charming in context."
+Persuasion (Cha) DC 16: Challenge one specific Violation finding. Vellun is fair — if the argument is technically valid, he will remove the violation.
+Insight (Wis) DC 14: Read Vellun's expression before the final announcement. Know whether you are above or below the violation threshold. One last action possible.
+
+---
+
+BLOCK 4 — THE CHAOS TABLE
+
+PC Action / Failure → Chaos Consequence:
+
+Try to solve a problem with violence → The Baron is delighted. He challenges the party's target to a duel on their behalf. This is now a legal obligation. Vellun notes: "Interpersonal resolution methodology: unorthodox."
+
+Mention the hum from the study → The Baron goes very still. Then very formal. Then summons two guards to "escort everyone away from that subject." The study hums louder. +1 Violation.
+
+Fail the soup negotiation catastrophically → The soup curses one random party member. Their next three d20 rolls are rerolled by the DM who chooses the lower result. The soup remains unapologetic.
+
+Insult the Baron (any insult, deliberate or not) → Immediate duel declaration. Baron rolls Ceremonial Sword (he misses). Refusing is a Violation.
+
+Ask Baldwick for help without asking him directly → He watches. He does not volunteer. He will mention later that the answer was quite obvious.
+
+Let Gerald play the wrong song during the ceremony → Two violations. Vellun also notes the song as "historically accurate in the wrong context."
+
+Tell Vellun anything is "probably fine" → He notes "Probability of Fineness: Asserted But Unverified." He now watches that thing specifically.
+
+Try to bribe Vellun → He writes it down. In the report. Under "Attempted Interference with Divine Assessment Process." Two violations. He is not angry. He just notes things.
+
+Ask the Countess for help → She helps, effectively and dramatically. She then tells everyone she helped, loudly, for the rest of the session. She requires acknowledgement. Multiple times.
+
+Get the soup to give a prophecy → The soup prophecy is accurate and refers to something the party has not done yet. It is vague enough to be about anything. One player will be paranoid about it for the next three sessions. This is correct.
+
+---
+
+BLOCK 5 — OPTIONAL COMBAT
+
+Combat on this floor is the punishment for running out of better ideas. It should happen at most once. It should feel like getting detention, not a boss fight.
+
+BARON'S GUARD (4 total)
+CR 1/2 | AC 16 (chain mail, shield) | HP 16 | STR 14 (+2) / DEX 10 / CON 12
+Special: Enthusiastic Obedience — guards always act on the last order they received, even if circumstances have changed. Detain (Action): Grapple attempt +4. On success, target is restrained. They prefer to detain rather than harm — -2 to attack rolls but +2 to grapple checks.
+Longsword: +4 to hit, 6 (1d8+2) slashing.
+
+DM NOTE: The real threat is Vellun writing down "Physical Altercation During Assessment Period" and adding two violations. The moment combat starts, it goes in the report. The party should know this before they throw a punch.
+
+Resolving Combat Without Embarrassment:
+- Yield formally: one Violation, but the combat ends.
+- Persuasion DC 13 to convince the guards their orders have been superseded.
+- Ask Baldwick to countermand the guards' orders — he will do this if asked, but will not volunteer.
+- Have Lady Meredith create a distraction — she will do this for pure entertainment value, no request required.
+
+---
+
+BLOCK 6 — VELLUN'S VERDICT
+
+DM READ-ALOUD: The Announcement
+
+Vellun closes his clipboard.
+
+The quill stops writing.
+
+The room goes very quiet.
+
+Even the soup stops moving.
+
+Gerald plays one note. Stops. Puts the lute down.
+
+"I have completed my assessment," Vellun says.
+
+He opens the clipboard again. Reads.
+
+"This court has demonstrated —" he turns a page — "a number of areas of concern."
+
+The Baron's moustache twitches.
+
+"It has also demonstrated —" another page — "a comparable number of areas of... not-concern."
+
+He looks at the party.
+
+"I have noted, specifically, the efforts of the visiting delegation."
+
+A pause.
+
+"Their methods were unusual. Their results were..."
+
+He turns one more page.
+
+"...present."
+
+OUTCOME A — Charter Maintained (3-5 Violations):
+"The court retains its divine charter. Provisionally. Pending a follow-up assessment in six months." The Baron applauds himself. Baldwick refills everyone's wine. The soup says: "You're welcome." Vellun is already writing the follow-up report.
+Karma: 100-150 per character. The Baron gifts each party member a "Medal of Courtly Service" — grants advantage on Persuasion checks in noble courts and disadvantage on Persuasion checks everywhere else.
+
+OUTCOME B — Excellent Result (0-2 Violations):
+"The court is in compliance. I will note that I did not expect this." A very long pause. "I have noted that I did not expect this." The Baron weeps openly. He is not embarrassed about this.
+Karma: 200 per character. Additionally, Vellun leaves a "Divine Notation of Merit" — a magical document that, if shown to any divine entity, grants the party one question that will be answered honestly. The Baron tries to take credit for this.
+
+OUTCOME C — Charter Suspended (6+ Violations):
+"The court's divine charter is suspended, effective immediately, pending review." The Baron sits down heavily. Baldwick has a small ale that he clearly prepared in advance. The soup says: "I did warn you."
+Karma: 50 per character — specifically for surviving. The Baron writes a "Letter of Regretful Commendation" immediately and with great sincerity. It is technically a letter of complaint but he got confused halfway through.
+
+DM READ-ALOUD: The Tower Pulls Them
+
+The uniform does not loosen this time.
+
+This floor did not issue uniforms.
+
+The world simply... deflates.
+
+The court, the Baron, Baldwick with his wine, Gerald with his lute, the soup with its opinions —
+
+All of it softens at the edges.
+
+The last thing you hear, very clearly, as it all fades:
+
+"Same time next year?"
+
+---
+
+APPENDIX A — KARMA AWARDS
+
+Solving a crisis with the Clean path: 25-50
+Solving a crisis with the Comedic path: 30-60
+Surviving a crisis catastrophically and salvaging it: 20-40
+Making the Baron laugh genuinely (not at the party): 25-50
+Getting the Countess to acknowledge your cleverness without asking: 15-30
+Resolving the soup situation with dignity: 25-50
+Getting Baldwick to show genuine approval (very hard): 50-75
+Achieving Outcome B (0-2 violations): 100-200
+Achieving Outcome A (3-5 violations): 50-100
+Not starting any new duels: 25 flat
+Finding a use for Gerald's wrong song that actually works: 30-50
+
+---
+
+APPENDIX B — DM TONE GUIDE
+
+THE CORE RULE — PLAY IT STRAIGHT: The single most important thing about running this floor is that every NPC takes everything completely seriously. The Baron is not joking about the soup course. Vellun is not joking about his report. Stiffwick is not joking about the crown being in the soup. The comedy comes from the gap between how seriously everyone takes these things and how absurd the things themselves are. The moment you wink at the players or play an NPC as "in on the joke," the floor loses its energy. Commit completely.
+
+THE BLACKADDER PRINCIPLE: The party gets to be Edmund. They are the only ones who can see how absurd this all is. The court cannot see it. That is why the party has to navigate it — not because they are better, but because they are the only ones who understand what they are navigating. Baldwick is your Edmund of the NPCs. He sees it all. He is trapped in it. He is magnificent and helpless and dry about both.
+
+THE MONTY PYTHON PRINCIPLE: Everyone in this court has a complete, internally consistent, completely wrong understanding of the world. When a player does something that breaks court logic, the court does not laugh. It adjusts. Stiffwick sweats more. The Baron issues a new rule. Vellun writes it down. The logic closes around the party's action and incorporates it. That is the comedy.
+
+PACING:
+Block 1 (arrival and roles): 20-30 minutes — fast, establish the chaos immediately
+Block 2 (five crises): 60-90 minutes — the heart of the floor, let it breathe
+Block 3 (inspection): 30-40 minutes — keep it tight, the violation count is the tension
+Block 4 (chaos table): throughout — use reactively, not as a checklist
+Block 5 (combat): optional, 15-20 minutes — only if genuinely needed
+Block 6 (verdict and exit): 15 minutes — the payoff, let each NPC have their final moment
+
+THE BARON'S KEY QUALITY: The Baron is not the villain. He is not even the obstacle. He is a man trying very hard to do something that matters to him in a world that does not cooperate. That is genuinely sympathetic. By the end of the floor, the party should want his inspection to go well — not because the stakes are high, but because he is trying.
+
+THE SOUP'S KEY QUALITY: The soup is completely sincere. It has feelings. It was not consulted about being purchased, transported, seasoned, or served. It has processed all of this and arrived at a position of dignified grievance. Treat it the way you would treat any NPC with legitimate complaints. That is where the comedy lives.
+
+FLOOR 4 — THE HALL OF FOOLS — END
+
+"Same time next year?"

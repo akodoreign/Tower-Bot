@@ -1,0 +1,29 @@
+{
+  "name": "Ironmere Expedition",
+  "affiliation": "Argent Blades",
+  "specialty": "A renowned duo specializing in swift, precise combat and tactical analysis, setting them apart as the go-to team for complex infiltrations and extraction missions.",
+  "members": [
+    {
+      "name": "Kael Ironfist",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran with a scarred face and a reputation for ruthless efficiency, earning him the nickname 'The Iron Gauntlet'."
+    },
+    {
+      "name": "Eira Silverstrike",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A cool, calculating woman with an uncanny ability to find even the most elusive targets, earning her the nickname 'The Silver Sentinel'."
+    }
+  ],
+  "visual": "The pair can often be seen in matching armor adorned with the Argent Blades insignia, carrying short swords and daggers with precision. Kael's armor bears a distinct, polished iron gauntlet, while Eira's is adorned with intricate silver filigree.",
+  "reputation_note": "Rumors swirl about their past, hinting at dark ties to the Argent Blades, though they are known to deliver results, regardless of the cost.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

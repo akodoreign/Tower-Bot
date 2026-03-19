@@ -1,0 +1,27 @@
+{
+  "name": "Grom Vulgarn",
+  "species": "Half-Orc",
+  "faction": "Argent Blades",
+  "rank": "Senior Blade",
+  "role": "senior blade",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "Taller than most humans, heavily muscled half-orc with greenish skin tone, tusks, and a crooked nose, Grom Vulgarn stands clad in silver and white armor with blue accents, arena medals adorning his chest. He wears polished scale mail or plate, armed with a longsword and a shield emblazoned with the Argent Blades emblem. Dark sunglasses hide his eyes, while a pair of brass knuckles, a silent reminder of his readiness, dangle from his belt. One distinctive visual detail: Grom's tusks glint like sharpened ivory in the dim light, a testament to his fierce determination.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

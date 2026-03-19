@@ -1,0 +1,28 @@
+{
+  "name": "Grimbush Gizzlethorn",
+  "species": "Goblin",
+  "faction": "Patchwork Saints",
+  "rank": "Volunteer",
+  "role": "mercenary",
+  "home_district": "patchwork saints",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A wiry, hunchbacked goblin of barely 3 feet stands against the dimly lit Undercity alley, his large bat-like ears twitching as he scans the shadows. His patchwork coat, a vibrant blend of fabrics from countless worlds, billows slightly in the cold breeze. A red armband, the mark of the Patchwork Saints, is visible on his forearm. He wears a worn-but-loved pair of boots, the soles worn thin from years of navigating the treacherous city. A chain mail vest and a crossbow rest easy on his lean frame, while a warhammer leans against the nearby wall. A single yellow eye gleams in the darkness, a testament to Grimbush's unwavering vigilance.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

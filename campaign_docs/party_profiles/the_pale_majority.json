@@ -1,0 +1,35 @@
+{
+  "name": "The Pale Majority",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in navigating the chaotic rifts, The Pale Majority is renowned for their unparalleled ability to traverse the tears in reality, often retrieving lost artifacts or escaping perilous situations.",
+  "members": [
+    {
+      "name": "Seraphina Moros",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The eldest of the trio, her eyes are a chilling pale blue, a constant reminder of the rifts she's witnessed"
+    },
+    {
+      "name": "Thaddeus Graven",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "His weathered face is marked with scars from countless battles, his keen nose able to trace even the faintest scent"
+    },
+    {
+      "name": "Silas Ashwind",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "His silvery hair is often obscured by a hood, concealing the scar that runs down his left cheek from a near-fatal rift encounter"
+    }
+  ],
+  "visual": "Dressed in dark leathers, they move with a practiced grace, their equipment including a rift-navigating device and a set of unique, enchanted blades. They carry themselves with a quiet confidence, rarely speaking but always aware.",
+  "reputation_note": "While they're not affiliated with any faction, they're known to be the only crew who can be relied upon for rift navigation, their name whispered in hushed tones among the Undercity's inhabitants",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

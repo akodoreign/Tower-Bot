@@ -1,0 +1,35 @@
+{
+  "name": "Chains of Fortune",
+  "affiliation": "Iron Fang Consortium",
+  "specialty": "Specializing in high-risk, high-reward heists and tactical infiltrations, they are known for their precision and efficiency in navigating the ever-changing landscape of the Undercity.",
+  "members": [
+    {
+      "name": "Vexar Ironbraid",
+      "role": "Leader",
+      "species": "Dwarf",
+      "note": "The scar running down his left cheek, a souvenir from a failed heist, serves as a constant reminder of past failures."
+    },
+    {
+      "name": "Elysia Silverwhisper",
+      "role": "Face",
+      "species": "Half-Elf",
+      "note": "Her silver tongue and keen intuition make her an invaluable asset when navigating the treacherous politics of the Undercity."
+    },
+    {
+      "name": "Thoren Geargrinder",
+      "role": "Muscle",
+      "species": "Human",
+      "note": "A former gladiator, Thoren's imposing stature and battle-hardened physique instill fear in opponents and respect in allies."
+    }
+  ],
+  "visual": "Clad in leather armor dyed a distinctive shade of iron-gray, they move with a purposeful stride through the crowded streets of the Undercity, their faces concealed by hoods adorned with a stylized chain emblem. Their gear, a mixture of practicality and style, speaks of their profession and their affiliation with the Iron Fang Consortium.",
+  "reputation_note": "Whispers echo through the Undercity, warning of the Chains of Fortune's ruthless efficiency and their unwavering loyalty to the Iron Fang Consortium. Their name strikes fear into the hearts of the city's criminal underworld, but also inspires a grudging respect among their peers.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

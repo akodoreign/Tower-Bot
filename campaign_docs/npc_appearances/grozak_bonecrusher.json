@@ -1,0 +1,27 @@
+{
+  "name": "Grozak Bonecrusher",
+  "species": "Orc",
+  "faction": "Wardens of Ash",
+  "rank": "Lieutenant",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering orc, Grozak Bonecrusher, stands sentinel in the Undercity's shadowy depths. His deep green-grey skin, pitted with the marks of a lifetime of battles, gleams in the dim light. His bald head, scarred by a long, jagged gash running down his left cheek, is shrouded in shadow. He wears the chainmail of the Wardens of Ash, the faction badge prominently displayed on his chest. His left cheek bears the same ash-mark as the rest of his squad, signifying his rank as lieutenant. A warhammer hangs at his side, its spiked head glinting menacingly, while a crossbow rests across his back. A worn leather scabbard, adorned with intricate symbols of past contracts, is slung over his shoulder. His posture is stern, a testament to his unwavering loyalty and relentless pursuit of revenge.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

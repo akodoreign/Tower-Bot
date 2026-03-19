@@ -1,0 +1,35 @@
+{
+  "name": "The Weighted Verdict",
+  "affiliation": "Serpent Choir",
+  "specialty": "Specializing in covert operations and infiltration, they have a reputation for leaving no trace of their presence.",
+  "members": [
+    {
+      "name": "Thalia Blackscale",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Known for her cold, calculating demeanor, and a scar running down her left cheek from a past encounter."
+    },
+    {
+      "name": "Elysia Serpentwhisper",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "Her stripes are a vibrant, almost neon green, and she is rumored to possess an uncanny ability to follow trails others can't."
+    },
+    {
+      "name": "Gideon Stonebinder",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Covered in tattoos of ancient runes, he carries a large, ornate warhammer that seems to radiate a sense of unyielding power."
+    }
+  ],
+  "visual": "Dressed in dark, form-fitting leather armor and low-profile weapons, they move with a quiet, predatory grace in public. Each member wears a serpent symbol, the emblem of the Serpent Choir, hidden somewhere on their person.",
+  "reputation_note": "Whispers of a group that delivers justice with a heavy hand, yet remains eerily untouchable by the city's law.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

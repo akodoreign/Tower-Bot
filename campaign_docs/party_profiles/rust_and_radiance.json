@@ -1,0 +1,36 @@
+{
+  "name": "Rust and Radiance",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Specializing in infiltration and sabotage, they are known for their adaptability and resourcefulness in navigating the labyrinthine Undercity.",
+  "members": [
+    {
+      "name": "Eira Ironhearts",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her cybernetic arm bears the mark of the Obsidian Lotus, a constant reminder of her allegiance."
+    },
+    {
+      "name": "Kael Silverlance",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His keen eyes, sharpened by years of service, can spot a rift in reality before it tears open."
+    },
+    {
+      "name": "Jax Ironhide",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "The giant warhammer he carries is a testament to his strength, yet the scars on his knuckles speak of many lost battles."
+    }
+  ],
+  "visual": "Dressed in a mix of worn leather and heavy armor, their clothing is patched with various scraps of fabric. They bear the distinctive black insignia of the Obsidian Lotus on their left shoulder. In public, they move with an air of quiet confidence, always watching, always listening.",
+  "reputation_note": "Rust and Radiance are a formidable crew, feared by rivals and respected by allies. They're known for taking on the toughest jobs and always delivering.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a epic-tier contract. Rank: Unknown (+3/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 3,
+  "generated": true
+}

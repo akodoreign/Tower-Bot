@@ -1,0 +1,27 @@
+{
+  "name": "Vesper",
+  "species": "Tiefling",
+  "faction": "Serpent Choir",
+  "rank": "Contract Mediator (negotiates divine contracts between petitioners and Choir-approved gods)",
+  "role": "contract mediator",
+  "stats": {
+    "primary": [
+      "CHA 17",
+      "WIS 15",
+      "INT 14"
+    ],
+    "secondary": [
+      "CON 12",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "none visible (contract seals are weapons enough)",
+    "armour": "formal divine robes"
+  },
+  "sd_appearance": "Tiefling Vesper, clad in formal jade green and black divine silk robes emblazoned with coiled serpent motifs, stands tall at 6 feet, her red, violet, and grey striped skin gleaming under the dim Undercity lights. A pair of small horns and a long tail, both adorned with delicate silver serpent coils, rise from her head. Her golden eyes, an anomaly among her kind, flicker with a sharp intelligence as she surveys the room, the contract seals hanging from her cuffs glinting menacingly.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "formal at all times, contract sigils embroidered at cuffs, no wasted movement"
+}

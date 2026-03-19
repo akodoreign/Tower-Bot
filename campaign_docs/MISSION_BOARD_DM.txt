@@ -1,0 +1,337 @@
+MISSION BOARD
+DM Reference — Full Mission Details
+
+Current Posting Period
+
+This document contains full DM-facing mission details for every contract on the current board. Each entry includes the true situation, key NPCs, complications, failure consequences, and hooks into longer faction arcs.
+
+Missions are organised by faction, then standing. Personal missions are clearly marked. No mission on this board represents an immediate or time-critical emergency — they are background jobs available between floors. If a Rift breakout or floor incursion occurs, the emergency board replaces these.
+
+DM Standing Rule: If the party falls below Neutral with any faction, that faction's missions become invisible to them until standing recovers. Do not announce this — the board simply will not have those contracts when they look.
+
+---
+
+THE GLASS SIGIL
+Standing: Friendly | Base: Sanctum Quarter / Grand Forum | Leader: Senior Archivist Pell
+
+The Glass Sigil are the Tower's unofficial archivists — arcanist scholars who catalogue Rift residue, relics, and magical anomalies that the major guilds do not consider worth tracking. They are precise, underfunded, and quietly indispensable. At Friendly standing, they treat the party as field partners rather than contract labour. Pell in particular has noted the party's Floor track record with interest.
+
+--- MISSION: Echoes in the Residue ---
+Type: Investigation / Recovery
+Reward: 80 EC + Sigil Ink Vial (identifies magical residue, 3 charges)
+Location: The Warrens — eastern alley cluster near the Collapsed Plaza
+Time Window: Available until end of posting period. Residue degrades over about 2 weeks.
+Contact: Junior Archivist Dova, stationed at the Warrens entrance
+
+Full Situation: A minor Rift sealed itself approximately six days ago in an alley off the Warrens. Dova noticed that the residue left behind has an unusual crystalline structure she has never seen in previous surveys. She flagged it to Pell, who authorised collection before Mara the Scrapper's crew finds it and melts it down for scrap coin.
+
+The residue itself is non-hostile but reactive. Strong emotional states within 10 feet of the crystals cause them to pulse faintly and emit a harmonic tone. The Sigil does not fully understand why. That is why they want the sample.
+
+Complications: Mara's crew already knows about the residue. Two of her scrappers have been seen in the area. This is not a combat situation — Mara has no particular beef with the party — but she will want a cut or an explanation if she catches them collecting from what she considers her territory.
+
+Additionally: the tone the crystals emit is not random. Dova suspects it is a frequency echo of whatever came through the Rift. She will pay a bonus (10 EC + note in their file) if the party can describe what emotion or action triggered the resonance during collection.
+
+DM NOTE: Low-stakes, flavour-rich mission that rewards careful roleplay. The crystals are a setup — the unusual Rift signature will resurface in a later posting or Rift event. Dova is a recurring NPC.
+
+HOOK: The crystal's resonance matches a harmonic that Dova has only seen in records of much larger Rift events — specifically, events that preceded major floor destabilisations. She does not tell the party this yet.
+
+--- MISSION: The Misfiled Relic ---
+Type: Retrieval / Social
+Reward: 60 EC + Favour Token (redeemable: one free archive query, no questions asked)
+Location: Adventurer's Inn, Grand Forum
+Time Window: Available. Wex has been here a week; he will not stay forever.
+Contact: Archivist Dova can brief on the item; Pell wants it handled quietly
+
+Full Situation: The item in question is a small iron disc engraved with a partial Rift map — low-tier, non-functional, but academically significant because it predates the current Tower epoch. Courier Wex was paid to deliver it to the Sigil. He did not deliver it. He has been drinking at the Adventurer's Inn for a week.
+
+Wex is not a villain. He opened the package, recognised that what was inside was probably worth more than his delivery fee, got frightened by that realisation, and has been paralysed by indecision ever since. He still has the disc. He does not want to be in trouble. He is in moderate trouble.
+
+Negotiation: Wex will not hand over the disc to anyone who seems there to punish him. He responds to honesty, sympathy, and practical assurances. Will the Sigil pursue action against him? No, if the disc is returned intact. Can he keep his courier licence? Yes, if he is discreet about what he saw. Is the disc dangerous? No — and this is true. If the party offers him 10 EC of their own coin as a good faith gesture, he hands it over immediately and buys them a drink.
+
+DM NOTE: Pure social mission. No combat. Wex is a recurring face if treated well — he is a courier with Warrens connections who now owes the party a mild favour.
+
+HOOK: The disc's Rift map matches part of a grid Dova has been trying to piece together for two months. She does not know the party has seen it yet — but when she finds out, she will ask to interview them.
+
+--- PERSONAL MISSION — Posted by: Senior Archivist Pell ---
+★ Catalogue Escort
+Type: Escort / Investigation (light)
+Reward: 100 EC + Standing Increase (Friendly to Trusted) + Private Archive Access: 1 query, any topic
+Location: Grand Forum to Sanctum Quarter route, approximately 40 minutes on foot
+Time Window: Pell is ready when the party confirms. She will not wait indefinitely.
+Contact: Pell herself — she will approach the party directly
+
+Full Situation: Pell is transporting three crates of catalogued relics — each fragile, each irreplaceable — from the Sigil's Grand Forum outpost to a secondary vault in the Sanctum Quarter. She has done this route six times before without incident. This time, she has noticed the same figure watching her from two different locations on two consecutive days. She cannot identify them. She does not know their affiliation. Pell is not prone to paranoia. If she says she is being watched, she is being watched.
+
+Who Is Watching Her: A freelance information broker named Cress, hired by an unnamed client to determine what the Sigil is transporting and where it is going. Cress is not violent and has no intention of stealing the crates — she is gathering intelligence. If confronted directly, she will run. If caught, she will negotiate: she will tell the party who hired her in exchange for not being reported to the Wardens. The client is a mid-tier Obsidian Lotus operative who believes one of the crates contains a relic they have been looking for. They are wrong — the relic they want was logged under a different name. But they do not know that yet.
+
+DM NOTE: This mission is about establishing trust with Pell specifically. She is a high-value recurring contact — private archive access opens future information hooks. The Lotus thread is a slow burn; do not resolve it this mission unless the party pushes hard.
+
+HOOK: The relic the Lotus is looking for is in a different Sigil vault entirely. If the party ever investigates further, they will find the Lotus has been quietly surveilling the Sigil for three months. The Sigil does not know. Pell will want to know.
+
+---
+
+WARDENS OF ASH
+Standing: Favorable | Base: Outer Wall and Gates | Leader: Captain Havel Korin
+
+The Wardens are the Tower's disciplined defenders — militarised, rule-bound, and deeply serious about the city's security. At Favorable standing, they treat the party as reliable contractors. Captain Korin specifically has filed a commendation for the party's Floor 3 conduct that circulated internally.
+
+--- MISSION: Sewer Sweep — Grid Seven ---
+Type: Patrol / Rift Clearance (light)
+Reward: 75 EC + Warden Supply Chit (redeemable: standard field kit, healing potion, or one repair service)
+Location: Sewer grid seven — accessible via Outer Wall maintenance tunnel B
+Time Window: Available. Readings climb slowly. No urgency yet — but "yet" is doing work there.
+Contact: Lieutenant Varen at Outer Wall post. She provides monitoring equipment and map.
+
+Full Situation: Rift residue monitors in grid seven have been showing elevated readings for four days. Consistent with a slow bleed — not a breach, not a creature, but an accumulation of raw Rift energy seeping through a crack in the tunnel infrastructure. Left alone for another week or two, it could become a minor breach. Mapped and reported now, the Wardens can seal it before that.
+
+The sweep is a two-person job with provided instruments. The party navigates approximately 200 metres of sewer tunnel, takes readings at six marked points, identifies the source location, and returns.
+
+Complications: The sewer also contains a small Obsidian Lotus dead-drop point in grid seven — specifically in junction D4. The party will find it if they are thorough. Inside: a sealed message container, currently full. The Lotus has been using it because the Wardens have always been too focused on the residue readings to notice the side tunnel. Options: report to Varen (Warden standing increase, Lotus standing decrease), take the message (illegal, risky, informative), ignore it (probably wise, definitely boring), or leave a note of their own inside (chaotic, interesting, may cause problems later).
+
+DM NOTE: Low combat risk. Medium investigation interest. Varen is a good recurring Warden contact: professional, precise, fair.
+
+HOOK: The residue accumulation in grid seven is connected to the same unusual Rift signature from the Glass Sigil's crystal mission. The party will not know this yet. Dova will figure it out eventually.
+
+--- PERSONAL MISSION — Posted by: Captain Havel Korin ---
+★ Find Recruit Aldric
+Type: Investigation / Personal
+Reward: 90 EC + Warden Field Kit (healing potion x2, rope, signal flare, rations) + Standing Increase
+Location: Last seen near Warrens entrance. Trail likely runs through Warrens interior.
+Time Window: Korin wants this resolved before he is forced to file officially. That is 3 days from board posting.
+Contact: Korin in person — he will brief privately, not at the duty station.
+
+Full Situation: Recruit Aldric Vess is nineteen, two months into his Warden service, doing well by all accounts. Not the type to desert. Korin knows his people, and he knows Aldric would not walk without a reason.
+
+The reason: Aldric's younger sister Mira is in the Warrens, and she was recruited by Brother Thane's cult three weeks ago. Aldric went looking for her on his own time, found her, tried to talk her out. She refused. He went back a second time. Thane noticed. On his third visit, Thane's people told him plainly that if he came back with anyone official, Mira would be "relocated to a place of deeper commitment." Aldric believes them. He has been hiding near the Cult House ever since, watching, not knowing what to do.
+
+He is not in danger. He is not defecting. He is a scared kid who got in over his head trying to protect his sister.
+
+Finding Aldric: Investigation DC 13 (street contacts, Warrens locals) identifies a young man in Warden-adjacent clothing sleeping rough near Shantytown Heights. He will bolt if approached by anyone in uniform. He will stay if the party approaches without Warden colours visible and makes clear they are not there to arrest him. Once found, he will tell them everything. He wants help — he just did not know how to ask. He will ask the party to help get Mira out. That is a separate job (see Patchwork Saints: Brother Thane Is Recruiting Again) but the threads connect.
+
+DM NOTE: This mission threads directly into the Patchwork Saints personal mission. Aldric is a recurring NPC if rescued well — he is loyal, capable, and will remember. Korin's investigation into Thane is a slow-burn consequence; it will not resolve this posting period but plants stakes for future ones.
+
+HOOK: Mira Vess is not a simple cult victim — she went to Thane voluntarily because she had a vision she believes was divine. Whether that vision was genuine, manufactured by Thane, or something else entirely is up to the DM.
+
+---
+
+PATCHWORK SAINTS
+Standing: Favorable | Base: The Warrens | Leader: (referred to as "the Leader")
+
+The Patchwork Saints are failed adventurers who chose to stay in the Warrens and protect the people there. They operate on pure principle and minimal resources. At Favorable standing, they treat the party as fellow travellers — not contractors. They ask for help because they trust you, not because they can pay well.
+
+--- MISSION: Supply Run — Shantytown Heights ---
+Type: Escort / Delivery
+Reward: 50 EC + Saints' Safe Passage Marker (once: the Warrens will leave you alone)
+Location: Elune's Apothecary to Shantytown Heights via Collapsed Plaza or alternate route
+Time Window: The medicine is time-sensitive (fever outbreak, three families affected). 5 days.
+Contact: Saints member Brek at Elune's picks up the shipment and can accompany if wanted.
+
+Full Situation: Shantytown Heights has a fever outbreak — three families, eight people total, one child critical. Elune has prepared the medication. Getting it there is the problem. The Collapsed Plaza, the direct route, has been "taxed" by three independent scavenger crews shaking down couriers for a week. The Saints do not have the numbers to clear the route and do not want a war with the scavengers.
+
+The scavenger leader, Garrett, is supporting about twelve dependents. He is aggressive but not stupid. He knows the Saints. He knows this is medicine. If the party explains clearly, he will let them through — he just needs to not lose face in front of his crew.
+
+Alternate Route: A longer path through Echo Alley that avoids the Plaza. Takes twice as long. The alley is acoustically haunted — old Rift sounds echo there permanently. No combat threat but Wisdom DC 12 saves to avoid mild disorientation. Safe, just unpleasant.
+
+DM NOTE: This mission is about judgment, not combat. If the party clears the scavengers violently, it creates a minor Warrens reputation hit. Getting through via negotiation earns more goodwill than any amount of fighting.
+
+HOOK: Garrett's crew have been taxing the route specifically because they intercepted a rumour that something valuable was moving through it soon. The rumour was planted — by whom and why is a future thread.
+
+--- MISSION: The Night Pits Debt ---
+Type: Investigation / Negotiation
+Reward: 65 EC + Patchwork Marker (Warrens passage)
+Location: The Night Pits, Warrens
+Time Window: Doss has four days before the pit boss sends collectors.
+Contact: Doss himself near the Warren Bazaar; Saints member Calla provides background.
+
+Full Situation: Doss is a 50-year-old former dockworker who placed a 30 EC bet on a pit fight based on insider information that turned out to be wrong. He owes 90 EC. He has 12. The pit boss, Sable, runs a clean-ish operation — she does not want to hurt Doss, but she cannot let the debt stand publicly or everyone will stop paying.
+
+Options: Negotiate a payment plan (Sable will accept 30 EC now, 30 EC in two weeks, 30 EC in a month — she is reasonable if approached respectfully). Offer the party's own labour as partial settlement (Sable always needs people she can trust for one-night security jobs). Find out who gave Doss the bad tip and bring that person to Sable. Or simply pay Doss's debt — he will repay slowly and loyally over several posting periods.
+
+Who Gave the Bad Tip: The inside information came from a Saints-adjacent figure who genuinely believed it was accurate. They got the information from someone at the Night Pits working a longer con — manipulating several bets simultaneously. That person has already left the Pits. Sable knows they were played too. If the party surfaces this, Sable's anger redirects entirely away from Doss.
+
+DM NOTE: Sable is a well-run minor antagonist — firm, fair, not evil. Treat her with respect. Doss as a grateful recurring NPC is worth more than the 65 EC reward long-term.
+
+--- PERSONAL MISSION — Posted by: The Patchwork Saints Leader ---
+★ Brother Thane Is Recruiting Again
+Type: Surveillance / Disruption
+Reward: 80 EC + Standing Increase (Favorable to Trusted) + Saints Voucher (call on Saints assistance once)
+Location: Brother Thane's Cult House, Warrens; street recruitment near Collapsed Plaza
+Time Window: Open. Thane has been running this for months. The Saints want it addressed before it gets worse.
+Contact: The Leader in person — will meet the party at the Warren Bazaar.
+
+Full Situation: Brother Thane has been pulling vulnerable people — mostly young, mostly desperate — from the Heights and the Collapsed Plaza district for three months. The Saints have lost at least six people they were watching over. They need outside help.
+
+The Leader wants two things: intelligence (who is going in, can they be reached, how many are still persuadable) and disruption (breaking up at least one recruitment session publicly, demonstrating that Thane does not own this street).
+
+Surveillance (Days 1-2): Stealth DC 12 to avoid being noticed by Thane's sentries. Investigation DC 14 over 4+ hours to build a useful picture of traffic in and out. The party will observe about 20 residents currently committed, another 10-15 who attend meetings but have not gone internal. Of the internal members, at least four came in under duress or manipulation and could be talked out under the right circumstances.
+
+Thane is aware of surveillance. He does not stop it — he uses it. Anyone watching for too long will be invited in. The invitation feels warm. It is not warm.
+
+The Disruption: Thane runs street recruitment sessions near the Collapsed Plaza at dusk, three times a week. Disrupting one session: Performance DC 14 or Persuasion DC 13 to pull at least three people away. Can expose one cultist as a known Thane operative (Investigation DC 13). Can simply stand there visibly and make the recruits uncomfortable enough to leave — Thane's people will not escalate in public because that would draw Warden attention.
+
+Thane's Response: If handled without violence, Thane does nothing immediately. He files it away. The party will start appearing in his dreams — which is unsettling, and which he finds theologically interesting. If the party is violent or causes a scene, Thane files a Warden complaint (legitimately — he has legal standing as a "religious community organization"). The Wardens will investigate the party, not Thane.
+
+DM NOTE: This mission threads directly into the Wardens "Find Recruit Aldric" mission — Aldric's sister Mira is in the Cult House. The party may find her during surveillance. Do not force the connection; let them discover it. Thane is a long-burn antagonist, not a boss fight. He should never be easy to dismiss or remove cleanly.
+
+HOOK: Thane's visions are real. Something is communicating through him. It is not the god he believes it is. He is genuinely devout and genuinely deceived. That makes him more dangerous, not less.
+
+---
+
+NEUTRAL FACTIONS
+
+The following factions are at Neutral standing. They post jobs. They do not extend personal missions. They are watching.
+
+IRON FANG CONSORTIUM
+Mercenary-trader cartel. Profit is proof of virtue. They like the party well enough to hire them.
+
+--- MISSION: Cargo Recovery — Neon Row ---
+Type: Retrieval / Light Combat
+Reward: 90 EC (no bonus, no standing change at Neutral)
+Location: Neon Row junction to Warrens (target crew believed to be in the Scrapworks area)
+Time Window: Available. The longer it waits, the more likely the contents get identified and sold.
+Contact: Fang logistics officer Marrus, at the Cobbleway Market stall.
+
+Full Situation: The missing crate contains three unidentified Rift-adjacent "appraisal samples" — partially processed residue in sealed glass containers. The Fang uses these to test the sensitivity of various black-market buyers before committing to larger sales. They are not illegal (barely) but their existence suggests the Fang is running a buyer-testing operation the Council has not approved.
+
+The looters are a three-person crew called the Bent Coins, working out of the Scrapworks. They have not opened the crate yet because it is warded. Investigation DC 13 (Warrens contacts) locates the crew within a few hours. They are not hardened fighters — they will negotiate before they will fight. Will trade the crate for 25 EC and a promise of non-pursuit. Would also trade it for information on a specific Fang supplier they have been trying to identify.
+
+DM NOTE: The "appraisal samples" are interesting. If the party examines them (Arcana DC 14), they will identify the residue as unusually concentrated — consistent with a large Rift, not the minor ones the Fang claims to source from. The Fang will not explain this if asked. File this for later.
+
+--- MISSION: Verify the Vendor ---
+Type: Investigation / Surveillance
+Reward: 55 EC
+Location: Floating Bazaar, Markets Infinite
+Time Window: The vendor has been there 8 days. May not stay long.
+Contact: Fang broker Issi.
+
+Full Situation: The stall in question is run by a slight woman who gives her name as "Voss" and claims her stock comes from "a reliable source outside city lines." She is selling Rift-adjacent materials at 40% below Fang prices, cash only, no records.
+
+Voss is actually a Sigil-adjacent independent researcher named Elara Mound who discovered a minor stable Rift seam outside the city that produces low-grade residue continuously. She has been harvesting it for two months, selling quietly to fund her actual research. She is not affiliated with any guild. She is not doing anything illegal under current Council law — but she is about to become very legally interesting to several factions simultaneously.
+
+Surveillance DC 12 (observe over 2 hours) confirms she is selling consistently low-grade material from a personal supply. Investigation DC 15 can trace her to a lodging in the Outer Wall district with unusual geological survey maps on her wall. She will give a false name if approached. She will give her real name if approached with genuine curiosity and no guild colours showing.
+
+DM NOTE: The Fang wants this information to either buy Elara out or report her to the Council as an unlicensed extractor. The party may find a third option more interesting. Elara is a potential long-term contact — she has information about the Rift seam relevant to the Rift survey threads in this same posting period.
+
+HOOK: Elara's stable Rift seam is the same class of anomaly as the residue in the Glass Sigil mission, the sewer readings from the Wardens job, and the Guild wall survey anomaly. She does not know the others exist. Neither does anyone else yet.
+
+---
+
+ARGENT BLADES
+Glory-driven adventurer guild. They would sponsor the party — if the party gave them the story rights.
+
+--- MISSION: The Missing Champion ---
+Type: Investigation
+Reward: 85 EC + Public Recognition (Minor — a Blades herald will name-drop the party at the next arena event)
+Location: Trail starts at the Guild Spires, runs through Markets Infinite
+Time Window: The arena bout is in 6 days. After that, the mission expires.
+Contact: Blades manager Darro, Guild Spires.
+
+Full Situation: Orro Senn is one of the Blades' mid-tier arena fighters — skilled, popular, solid earner. He disappeared four days before a bout that has significant coin riding on it. His sparring partner Tev saw two people approach Orro after practice three days ago. He did not hear the conversation. Orro went pale. He left with them.
+
+Orro is being held — not violently, but in the way that a very firm conversation about a very large debt creates a kind of voluntary captivity. He borrowed 200 EC from a Lotus-adjacent money lender six weeks ago to cover a private medical expense (his mother, illness, she is recovering). The lender is now demanding repayment via "services rendered" — specifically, throw the bout. Orro refuses. So he has been persuaded to stay in a room above a Markets Infinite tea house until he agrees. He is not chained. He is not guarded by soldiers. He is kept there by the knowledge that if he leaves, his debt gets reported to the Blades, who will strip his contract.
+
+Resolving It: Investigation DC 13 (Markets Infinite contacts) locates the crew within a few hours. Options: pay the debt (200 EC), expose the lender to Blades management — Darro will cover the debt in exchange for a public corruption story — or negotiate a fight-outcome arrangement that technically satisfies the lender without Orro throwing the bout (Deception DC 15, risky).
+
+DM NOTE: The Lotus thread here is deliberately minor — a freelance lender using Lotus-adjacent methods, not an official Lotus operation. The "public recognition" reward is genuinely useful — a Blades herald mentioning the party's name at the arena raises their profile in ways that compound over time.
+
+---
+
+OBSIDIAN LOTUS
+Black-market syndicate. They test new contractors with clean jobs. Watch how the party handles this.
+
+--- MISSION: Quiet Delivery ---
+Type: Courier / Stealth
+Reward: 70 EC (cash, no record)
+Location: Pickup: specified alley in Warrens. Delivery: Sanctum Quarter, contact confirms by signal.
+Time Window: Job window: 3 hours from confirmation. Lotus will confirm 30 minutes before.
+Contact: Lotus contact "Hess" — never seen in full light, leaves messages at Warren Bazaar.
+
+Full Situation: The Lotus is testing the party. This is their standard first contract for new contractors — a clean job with no obvious illegality, designed to see how the party handles instructions, discretion, and unexpected complications.
+
+The container holds: three sealed letters for a Serpent Choir deacon who has been quietly exchanging information with Lotus intermediaries. The letters contain financial records that the Choir does not want circulating. This is not illegal under Tower law. It is politically sensitive. The Choir knows the letters are moving — they commissioned the delivery themselves through a cutout, which the party does not know.
+
+The "unexpected complication": a Warden patrol crosses their path on the Sanctum Quarter approach. The patrol is routine; the Wardens have no interest in the party specifically. But the party does not know that. How they handle a potential confrontation while carrying a mysterious sealed container tells the Lotus something useful.
+
+If the Container Is Opened: The letters are in cipher. Decoding requires Arcana DC 16 or Intelligence DC 15 (takes 10 minutes, requires tools). If decoded, the party learns about the Choir-Lotus information exchange — useful intelligence that at least two factions would pay well for. Opening the container also voids the Lotus contract and starts a different kind of conversation with Hess.
+
+DM NOTE: The Lotus will not punish the party for opening the container — they will just note that this contractor does not follow instructions. Future Lotus missions will be more complex and better supervised. The Choir-Lotus exchange is a genuine political thread worth developing.
+
+HOOK: The Serpent Choir deacon who receives these letters is the same individual who authorised the Choir's missing tithe ledger mission. He has been playing both sides of a very uncomfortable fence for eight months.
+
+---
+
+SERPENT CHOIR
+Divine contract brokers. They do not advertise their problems. This one is bad enough that they had to.
+
+--- MISSION: Recover the Tithe Ledger ---
+Type: Retrieval / Investigation
+Reward: 80 EC + Choir Blessing (Minor, 1 use — advantage on one save, or +2 to one skill check, declared before rolling)
+Location: Trail starts at the Grand Forum, last known movement toward Markets Infinite
+Time Window: Six days since Sevas went missing. Financial records degrade in value daily.
+Contact: Choir Liaison Brother Enn, Grand Forum Choir office — formal, terse, will not answer questions about Sevas personally.
+
+Full Situation: Sevas was not a courier. She was a mid-tier Choir financial officer — technically a broker, practically a keeper of secrets. The ledger she was carrying does not just list tithe amounts; it records what specific donations were exchanged for in terms of divine favours, contract clauses, and memory transactions. It is, in a word, compromising.
+
+Sevas disappeared voluntarily. She is not dead, not kidnapped, and not in danger — she walked away and took the ledger with her. She is currently hiding in a rented room in the Floating Bazaar district, trying to decide what to do with what she knows.
+
+What she knows: the Choir has been running an undisclosed sub-operation that skims a percentage of divine favour transactions and redirects it to a fund that Brother Enn controls personally. Sevas found the records by accident three weeks ago. She took the ledger as insurance. She has not gone to anyone yet because she does not know who to trust.
+
+Finding Her: Investigation DC 14 (Grand Forum contacts, market district trail) locates Sevas within a day. She will see the party coming. First conversation: she is scared, defensive, and will deny having the ledger. She opens up if the party demonstrates they are not Choir-directed, or if they admit they were but express personal doubt about the mission.
+
+She wants the ledger to reach someone who can actually use it. She will hand it over willingly if the party agrees to deliver it to either the Ashen Scrolls Guild or Magister Liora at the Tower Authority — not the Choir. If they promise to return it to the Choir, she will refuse and disappear again.
+
+The Choice:
+- Return the ledger to the Choir as instructed: 80 EC, Choir blessing, Sevas is "handled" by the Choir, Brother Enn's operation continues.
+- Deliver it to the Scrolls or Liora as Sevas requests: no Choir payment, potential reward from Scrolls/Liora, Choir standing drops to Unfriendly, Brother Enn's operation unravels over the next several months.
+- Keep the ledger: very risky, very valuable, makes three parties unhappy simultaneously.
+
+DM NOTE: This is the most ethically complex mission on this board. Do not push the party toward any outcome — let them make the call. Brother Enn is the same deacon from the Lotus delivery hook. The Choir's internal corruption thread is long-burn; even if the party hands the ledger back, Sevas is still out there and still knows what she knows.
+
+HOOK: If the ledger reaches Magister Liora, she will open a Tower Authority investigation. This takes months. It will surface during a future posting period at the worst possible moment for the Choir — and for anyone who has made deals with them recently.
+
+---
+
+ADVENTURERS' GUILD
+The Guild tracks completion. These are maintenance contracts — routine, but the Guild remembers who handles them cleanly.
+
+--- MISSION: Rift Residue Survey — Outer Wall Quadrant C ---
+Type: Survey / Patrol
+Reward: 60 EC + Guild Log Entry (positive completion notes — compounds over time toward standing increase)
+Location: Outer Wall, Quadrant C — maintenance access via Gate Plaza
+Time Window: Standard 3-hour survey window, any day this posting period.
+Contact: Mari Fen, front desk — she provides the instruments and the survey form.
+
+Full Situation: The Tower experienced a minor Rift surge last week; standard protocol requires a post-surge residue survey of the affected wall quadrant. The Guild sends it to contractors because the Wardens' survey team is currently committed elsewhere.
+
+The survey instruments are simple — six readings at marked points, one atmospheric sample. No combat. The wall section is exposed and slightly cold. Takes about 90 minutes if done properly.
+
+However: reading point four will return an anomalous result. The instrument will register a spike that does not match the post-surge pattern — consistent with an active minor accumulation, not residue. This is not a threat. It is unusual. The survey form has a box for "anomalous readings (describe)." How thoroughly the party fills in that box determines whether the Guild flags it for follow-up.
+
+DM NOTE: The anomalous reading at point four is the same Rift signature thread appearing across this entire posting period — grid seven (Wardens), the crystal residue (Sigil), and Elara Mound's seam (Iron Fang). The party is collecting pieces. They will not have the full picture until someone synthesises it.
+
+--- MISSION: Settle the Tab ---
+Type: Negotiation / Recovery
+Reward: 45 EC
+Location: Adventurer's Inn and surrounds, Grand Forum
+Time Window: The innkeeper is patient for now. Her patience has about a week left.
+Contact: Innkeeper Gorra, directly; the three debtors are listed by name on the contract.
+
+Full Situation: The three adventurers — Brik, Yassa, and Tomm — are B-rank contractors who ran a job that went badly wrong. They spent their pay on healing after the job nearly killed all three of them. They left the inn without paying because they were ashamed, not because they are thieves. They are currently lying low in a rented room near the Scrapworks.
+
+The debt is 85 EC total. They have 30 EC between them. If the party explains the situation to Gorra honestly, she will accept a payment plan (30 now, 55 over two weeks). If the party covers the difference themselves (55 EC), Brik, Yassa, and Tomm owe them a sincere favour. They are decent fighters and reliable people who are currently in a hole.
+
+The "contract review" the Guild wants to conduct is a standard welfare check — the Guild wants to confirm the three are still alive and operational, not punish them. If the party explains this to Brik, Yassa, and Tomm, they will agree to the review voluntarily. The whole thing resolves in an afternoon.
+
+DM NOTE: Brik, Yassa, and Tomm are recurring NPCs if treated decently — a competent B-rank crew who now have reason to like the party.
+
+---
+
+DM THREADING NOTE
+
+This posting period contains a quiet through-line: an unusual Rift signature appearing in four separate missions — the Glass Sigil crystal residue, the Wardens' sewer grid, the Iron Fang vendor's seam, and the Guild's wall survey anomaly. None of these missions make the connection explicit. A party that completes multiple jobs may notice the pattern. If they surface it — to the Sigil, the Wardens, or Elara Mound — it becomes the seed of the next major event.
+
+Brother Thane and the cult thread also runs across two missions (Saints personal, Wardens personal) and will compound in future posting periods if not addressed. He is patient. He is building something. He does not need to be confronted this period.
+
+The Serpent Choir and Obsidian Lotus political thread surfaces through the tithe ledger job and the quiet delivery job. These two missions, run together, give the party significantly more information than either one alone. The party does not need to know this going in.
+
+— Tower Bless —

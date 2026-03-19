@@ -1,0 +1,29 @@
+{
+  "name": "Dawnchaser Compact",
+  "affiliation": "Glass Sigil",
+  "specialty": "Experts in stealth and infiltration, known for their ability to navigate the treacherous labyrinth of the Undercity undetected",
+  "members": [
+    {
+      "name": "Aelis Vetra",
+      "role": "Leader",
+      "species": "Human",
+      "note": "The scar running down her left cheek is a constant reminder of a close call with a Rift Beast"
+    },
+    {
+      "name": "Kyrus Thornshadow",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Whispers of his past life as an assassin in the city above linger, causing tension among his fellow Glass Sigil members"
+    }
+  ],
+  "visual": "Aelis and Kyrus wear black leather cloaks with the Glass Sigil symbol embroidered on the back, accompanied by a set of silent crossbows hidden under their coats. They move with a stealthy grace, always alert and aware of their surroundings",
+  "reputation_note": "Rumored to be the most efficient and discreet crew in the Undercity, the Dawnchaser Compact is a name synonymous with success and survival in the dangerous world beneath the Dome",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Thornveil Crew",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in stealth and ambush, Thornveil Crew is notorious for their ability to infiltrate even the most secure locations under the Dome.",
+  "members": [
+    {
+      "name": "Eira Ironfoot",
+      "role": "Leader",
+      "species": "Dwarf",
+      "note": "Her face bears a permanent grimace from years of grit and toil, but her eyes remain sharp as a hawk's."
+    },
+    {
+      "name": "Kaelen Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "His eyes glow like twilight, and his senses are said to be unmatched in the Undercity."
+    },
+    {
+      "name": "Rhyas Stonefist",
+      "role": "Muscle",
+      "species": "Half-Orc",
+      "note": "His massive physique and intimidating presence often precede him, striking fear into the hearts of those who cross paths with him."
+    },
+    {
+      "name": "Vexil Thornwhisper",
+      "role": "Face",
+      "species": "Half-Elf",
+      "note": "A charming charlatan with a silver tongue, he weaves his way through the Undercity's politics with ease."
+    }
+  ],
+  "visual": "The Thornveil Crew can be spotted in the shadows, cloaked in black and hooded, their faces hidden by masks adorned with thorn vines. They carry themselves with a quiet determination, always ready for the next job.",
+  "reputation_note": "They are not to be underestimated — the Thornveil Crew has a knack for turning the odds in their favor, no matter the cost.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a major-tier contract. Rank: Unknown (+2/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 2,
+  "generated": true
+}

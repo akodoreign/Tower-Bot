@@ -1,0 +1,30 @@
+{
+  "name": "The Iron Verdict",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in dangerous extraction missions and high-risk salvage operations, their technical prowess lies in their ability to navigate the ever-shifting rifts with minimal casualties.",
+  "members": [
+    {
+      "name": "Rhys Vorenus",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars mar his weathered face, remnants of past battles that have hardened him into a ruthless, calculating strategist."
+    },
+    {
+      "name": "Elysia Thorne",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "With an uncanny sense for finding hidden trails, she is the silent, deadly force that keeps the crew one step ahead of danger."
+    }
+  ],
+  "visual": "Clad in reinforced leather armor and equipped with an assortment of ancient weapons, they move with a grim determination through the Undercity. A symbol of a broken scale etched into each member's gear serves as a reminder of their unwavering pursuit of justice.",
+  "reputation_note": "The Iron Verdict is a name whispered with respect and fear in the Undercity, a crew that never backs down from a challenge and always delivers on their promises.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-13] Completed a investigation-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

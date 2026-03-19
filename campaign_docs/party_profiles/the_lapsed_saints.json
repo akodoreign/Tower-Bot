@@ -1,0 +1,29 @@
+{
+  "name": "The Lapsed Saints",
+  "affiliation": "No Affiliation",
+  "specialty": "A duo of skilled negotiators, navigating the treacherous Undercity with unparalleled finesse, often resolving conflicts that even the factions avoid.",
+  "members": [
+    {
+      "name": "Renata Blackthorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former Warden of Ash, her scarred face serves as a reminder of her past loyalty, fueling her determination to stay neutral in the Undercity's power struggles."
+    },
+    {
+      "name": "Eldric Ironfoot",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "A stout and silent member, Eldric is known for his impeccable instincts, honed by years spent navigating the labyrinthine Warrens."
+    }
+  ],
+  "visual": "The Lapsed Saints stand out in the crowded Undercity. Renata, with her short, silver hair and a cloak of faded red, commands attention with her confident stride. Eldric, dressed in his worn leather armor and sporting a neatly trimmed beard, moves silently by her side, always on alert.",
+  "reputation_note": "Though they're unaligned, The Lapsed Saints are respected by both the factions and the common folk of the Undercity. A word from Renata can bring peace where others fear to tread, while Eldric's tracking skills are unmatched.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

@@ -1,0 +1,29 @@
+{
+  "name": "The Patient Majority",
+  "affiliation": "No Affiliation",
+  "specialty": "Specializing in covert operations and manipulation, The Patient Majority are renowned for their ability to infiltrate even the most secure locations without raising suspicion.",
+  "members": [
+    {
+      "name": "Elysia Stonehollow",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Her quiet demeanor and piercing gaze make her a formidable negotiator, often leaving adversaries questioning their own decisions."
+    },
+    {
+      "name": "Varn Orreth",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Despite his missing left arm, Varn's keen senses and impressive tracking skills make him an invaluable member of the team."
+    }
+  ],
+  "visual": "Elysia and Varn often wear plain, dark attire that blends with the city's shadows. Elysia's long, wavy hair is a stark contrast to her otherwise somber appearance, while Varn's heavily scarred face is a constant reminder of his past battles.",
+  "reputation_note": "Whispers in the Undercity suggest that The Patient Majority are ex-members of the Iron Fang Consortium, now operating on their own terms. A word of caution is given to those who cross their path.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

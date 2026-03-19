@@ -1,0 +1,29 @@
+{
+  "name": "The Waning Collective",
+  "affiliation": "No Affiliation",
+  "specialty": "Adept investigators, specializing in solving complex mysteries hidden in the Undercity's labyrinthine districts.",
+  "members": [
+    {
+      "name": "Aramis Valtorian",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former Iron Fang Consortium enforcer, marked by the scars of his past and the cold, calculating precision of his every move."
+    },
+    {
+      "name": "Zara Vel'Shara",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A member of the Wardens of Ash, her eyes glow ominously with the power of the Rifts, hinting at an untold history."
+    }
+  ],
+  "visual": "Aramis and Zara are dressed in muted shades of gray, their clothing worn yet mended carefully. They wear concealed weapons and a silver insignia of a waning moon on their left forearm. In public, they carry themselves with a quiet intensity that makes others uneasy.",
+  "reputation_note": "Rumor has it that they can find anything, even if it's lost in the Rifts themselves, but crossing them may lead to unwanted attention from the Tower Authority.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

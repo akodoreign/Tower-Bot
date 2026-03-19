@@ -1,0 +1,59 @@
+TOWER BOT SESSION JOURNAL
+=========================
+
+--- SESSION: 2026-03-11 (march-2026-slash-commands-image-fix) ---
+
+ISSUES FIXED THIS SESSION:
+
+1. BOT CRASH — CommandAlreadyRegistered
+   - /generatenpcs and /npcprofile were defined twice in bot.py
+   - Second duplicate block (between /spell and /style) removed
+   - Root cause: previous session's edits inserted commands in two places
+
+2. NEWS FEED — EC rate appearing inside story bulletins
+   - AI was appending exchange rate table to story bulletins
+   - Fixed in news_feed.py _build_prompt(): economy_note now explicitly bans rate tables
+     by example with hard fail language
+   - Added post-generation regex filter in generate_bulletin() that strips rate-pattern
+     lines before posting (patterns: "new essence coin prices", "N kharma =", "`N kharma",
+     "kharma = N ec", "N ec = N kharma", "-# ...exchange rate")
+
+3. STORY IMAGE — now NPC-focused, not background-focused
+   - _build_image_prompt() in news_feed.py rewritten
+   - Scans last 6 bulletins (shuffled) for first one mentioning a known NPC
+   - Builds appearance block for up to 2 NPCs from that bulletin
+   - Prompt instructs Ollama: NPC is CENTRAL SUBJECT actively doing something from the story
+   - Location/atmosphere demoted to "2-3 words at the end only"
+   - Falls back to location-only prompt if no NPC-mentioning bulletin found in recent memory
+
+4. SLASH COMMANDS NOT APPEARING AFTER SYNC
+   - Root cause: sync was in on_ready (fires after bot connects); Discord needs commands
+     registered before bot appears online
+   - Fix: moved sync to setup_hook in aclient.py (fires once before gateway connection)
+   - aclient.py: self.tree created in __init__; setup_hook() does copy_global_to + tree.sync
+     using self._sync_guild_id; falls back to global sync if no guild ID set
+   - bot.py: on_ready no longer does guild sync loop; sets discordClient._sync_guild_id
+     from DISCORD_GUILD_ID env var before client.run()
+   - .env: added DISCORD_GUILD_ID=1133378983786971147
+   - Confirmed: logs show "setup_hook synced 21 commands to guild 1133378983786971147"
+     appearing BEFORE "TOWER BOT STARTED"
+
+5. CLEAR_COMMANDS UTILITY SCRIPT
+   - Created clear_commands.py in project root
+   - Logs in with bot token, clears all guild + global commands, exits
+   - Fixed unicode escape SyntaxError (Windows paths in triple-quoted docstrings)
+   - Usage: python clear_commands.py then Restart-Service TowerBotService
+
+FILES CHANGED:
+- src/bot.py        — removed duplicate /generatenpcs + /npcprofile, refactored sync out of on_ready
+- src/aclient.py    — tree in __init__, setup_hook added, _sync_guild_id added
+- src/news_feed.py  — stronger economy_note ban, post-gen rate filter, NPC-focused image prompt
+- .env              — added DISCORD_GUILD_ID=1133378983786971147
+- clear_commands.py — new utility (project root)
+
+CURRENT STATE (end of session):
+- Bot running, 21 commands synced correctly via setup_hook
+- /generatenpcs, /npcprofile, /style, /finances, /rules, /spell all registered
+- NPC story images character-action-focused (requires /generatenpcs run first)
+- EC rate no longer leaks into story bulletins
+- setup_hook pattern now canonical — do not revert to on_ready sync

@@ -1,0 +1,60 @@
+{
+  "name": "Eleanor Reed",
+  "classes": {
+    "Wizard": 4
+  },
+  "total_level": 4,
+  "max_hp": 18,
+  "ac_override": null,
+  "stats": {
+    "STR": 10,
+    "DEX": 14,
+    "CON": 14,
+    "INT": 18,
+    "WIS": 14,
+    "CHA": 16
+  },
+  "xp": 2700,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 60,
+    "pp": 0
+  },
+  "inventory": {
+    "Flak Jacket": 1,
+    "Potion of Healing": 2,
+    "Potion of Angelic Slumber": 1,
+    "Pistol Clip Cold damage +1d6": 1,
+    "Pistol Clip Radiant damage +1d8": 1,
+    "Quarterstaff": 1,
+    "Pistol": 1,
+    "Oil": 20,
+    "Backpack": 1,
+    "Pole": 1,
+    "Robe": 1,
+    "Rope": 1,
+    "Blanket": 1,
+    "Grappling Hook": 1,
+    "Parchment": 10,
+    "Tinderbox": 1,
+    "Book": 1,
+    "Lamp": 1,
+    "Ink Pen": 1,
+    "Ink": 1
+  },
+  "feats": [
+    "Arcane Prodigy",
+    "Dark Bargain",
+    "Firearm Specialist",
+    "Magic Initiate (Wizard)",
+    "Temporal Insight",
+    "Ward of Stability"
+  ],
+  "spell_slots": {},
+  "notes": {
+    "organizations": "Wizards Tower"
+  },
+  "fetched_at": "2026-03-17T07:57:09.384118"
+}

@@ -1,0 +1,29 @@
+{
+  "name": "The Gilded Fracture",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Expert navigators of the ever-shifting rifts, their ability to safely traverse the dimensional tears sets them apart from most adventurers in the Undercity.",
+  "members": [
+    {
+      "name": "Zara Nimblefoot",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A former member of the Iron Fang Consortium, she left with a price on her head for betraying them."
+    },
+    {
+      "name": "Elias Shatterstone",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Lost his left arm in a rift accident, replaced with a gleaming obsidian prosthetic that hums softly."
+    }
+  ],
+  "visual": "Clad in leather armor, their outfits are adorned with intricate designs made from shards of rift glass. Zara wears a silver, feathered cloak, while Elias carries a large, ornate crossbow. They move with a confident, measured stride, known for their sharp eyes and silent approach.",
+  "reputation_note": "Rumored to have a map to a hidden stash of rare magical artifacts, The Gilded Fracture is a target for both rival factions and opportunistic adventurers alike.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

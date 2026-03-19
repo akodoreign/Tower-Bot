@@ -1,0 +1,27 @@
+{
+  "name": "Corvin Thale",
+  "species": "Human",
+  "faction": "Wardens of Ash",
+  "rank": "Lieutenant-Inspector (internal affairs — investigates Warden misconduct)",
+  "role": "inspector",
+  "stats": {
+    "primary": [
+      "INT 16",
+      "WIS 14",
+      "CHA 13"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 9"
+    ],
+    "hp_range": "30–42"
+  },
+  "equipment": {
+    "weapons": "concealed short sword, crossbow",
+    "armour": "civilian clothes, padded vest under coat"
+  },
+  "sd_appearance": "Human, of average height and build, Corvin Thale, a Lieutenant-Inspector, is distinguished by his heavy-set frame and deliberate movements. His skin is weathered, bearing the marks of a life spent in the Undercity's grime. His hair, a matted mass of dark strands, is shorn short, and his eyes, a piercing grey, hold a steely resolve. Dressed in civilian attire, he wears a faded ash-grey coat over a padded vest, concealing a short sword at his waist and a crossbow slung over his back. A battered ledger is clutched tightly in his hand, and a distinctive ash-mark, marking him as an officer of the Wardens of Ash, is etched upon his left cheek.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "civilian, unremarkable by design — carrying a ledger and looking exhausted"
+}

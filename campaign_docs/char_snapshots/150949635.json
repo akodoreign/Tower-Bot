@@ -1,0 +1,67 @@
+{
+  "name": "Ragard Gronhammer",
+  "classes": {
+    "Fighter": 4
+  },
+  "total_level": 4,
+  "max_hp": 64,
+  "ac_override": null,
+  "stats": {
+    "STR": 18,
+    "DEX": 11,
+    "CON": 16,
+    "INT": 10,
+    "WIS": 13,
+    "CHA": 12
+  },
+  "xp": 2700,
+  "currencies": {
+    "cp": 97,
+    "sp": 0,
+    "ep": 0,
+    "gp": 90,
+    "pp": 0
+  },
+  "inventory": {
+    "Potion of Healing": 5,
+    "Spell Scroll (Level 1)": 1,
+    "Battle Axe Of Fire": 1,
+    "Potion of Angelic Slumber": 2,
+    "PlateMail of Movement With Spikes": 1,
+    "Banner of Quiet Formations": 1,
+    "Shield": 1,
+    "Javelin": 8,
+    "Battleaxe": 1,
+    "Greatsword": 1,
+    "Backpack": 1,
+    "Bedroll": 1,
+    "Mess Kit": 1,
+    "Rations (1 day)": 10,
+    "Rope, Hempen (50 feet)": 1,
+    "Tinderbox": 2,
+    "Torch": 20,
+    "Waterskin": 2,
+    "Oil": 2,
+    "Rations": 20,
+    "Rope": 1,
+    "Caltrops": 20,
+    "Crowbar": 1
+  },
+  "feats": [
+    "4: Weapon Mastery",
+    "Dark Bargain",
+    "Interception",
+    "Protection",
+    "Rallying Strike",
+    "Savage Attacker",
+    "Skill Expert",
+    "Soldier Ability Score Improvements",
+    "Way of the Iron Banner",
+    "Weapon Mastery"
+  ],
+  "spell_slots": {},
+  "notes": {
+    "otherNotes": "Narative Hero\nFlame Axe"
+  },
+  "fetched_at": "2026-03-17T13:09:18.414062"
+}

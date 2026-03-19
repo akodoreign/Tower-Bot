@@ -1,0 +1,42 @@
+{
+  "name": "Warden's Folly",
+  "affiliation": "Patchwork Saints",
+  "specialty": "A band of experts in unconventional tactics, specializing in handling the unstable rifts that plague the Undercity, offering a unique service that sets them apart from other adventurer crews.",
+  "members": [
+    {
+      "name": "Eira Duskwhisper",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "Once a high-ranking member of the Iron Fang Consortium, she defected after a mission went awry, leaving behind a legacy of unfulfilled contracts"
+    },
+    {
+      "name": "Thorne Ironhide",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his distinctive warhammer adorned with the emblem of the Patchwork Saints, he's a brutal but effective fighter"
+    },
+    {
+      "name": "Sylas Shadowstep",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "A catburglar with a penchant for stealing from the rich and corrupt, he's the group's eyes and ears in the Undercity"
+    },
+    {
+      "name": "Aria Mender",
+      "role": "Medic",
+      "species": "Human",
+      "note": "Always seen with a satchel filled with a myriad of potions and bandages, she's the only member of the group to show any compassion for the less fortunate"
+    }
+  ],
+  "visual": "Clad in tattered yet functional leather armor, they carry an air of professionalism and experience. Their gear is worn but well-maintained, and each member bears the distinctive mark of the Patchwork Saints on their person.",
+  "reputation_note": "They are feared by the criminals they pursue and respected by those they protect, but whispers echo through the Undercity of their mysterious past and allegiances",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a investigation-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

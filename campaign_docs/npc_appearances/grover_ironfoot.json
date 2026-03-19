@@ -1,0 +1,28 @@
+{
+  "name": "Grover Ironfoot",
+  "species": "Halfling",
+  "faction": "Iron Fang Consortium",
+  "rank": "Acquisition Agent",
+  "role": "senior acquisitions agent",
+  "home_district": "iron fang",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "DEX 14",
+      "INT 13"
+    ],
+    "secondary": [
+      "WIS 12",
+      "CON 11",
+      "STR 9"
+    ],
+    "hp_range": "35–50"
+  },
+  "equipment": {
+    "weapons": "concealed blade, crossbow",
+    "armour": "fine coat over leather"
+  },
+  "sd_appearance": "A diminutive yet commanding figure, roughly the size of a stool, stands amidst the sprawling marketplace of the Undercity. Grover Ironfoot, a halfling acquisition agent for the Iron Fang Consortium, is clad in a deep burgundy coat, the subtle emblem of his faction adorning the lapel. His skin, a rich, weathered tan from countless hours spent navigating the city's labyrinthine corridors, is framed by a shock of raven-black hair. His large, expressive eyes, a piercing hazel, are set off by a prominent scar that runs down the left side of his face. Hidden beneath his coat, a concealed blade and crossbow are ever-present, a testament to his mercantile-military role. One distinctive visual detail that sets him apart is a delicate, golden locket, always worn around his neck, a memento of his late wife, a constant reminder of his motivation to rise through the ranks.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "mercantile-military — expensive but practical, always armed, never obviously so"
+}

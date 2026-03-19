@@ -1,0 +1,476 @@
+[
+  {
+    "id": "pl_1773259556",
+    "player_id": 337743072232210432,
+    "player_name": "The DM",
+    "item_name": "Eleanor Reed's Hankerchef , found in the convention center. Found used.",
+    "description": "Eleanor Reed's Hankerchef , found in the convention center. Found used.",
+    "min_bid": 5000,
+    "current_bid": 12607942,
+    "bid_count": 76,
+    "bid_log": [
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 5154,
+        "at": "2026-03-11T21:58:30.210160",
+        "hot": false
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 5445,
+        "at": "2026-03-11T23:59:37.138893",
+        "hot": false
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 5861,
+        "at": "2026-03-12T05:55:32.585490",
+        "hot": false
+      },
+      {
+        "bidder": "Dova (personal account)",
+        "amount": 6252,
+        "at": "2026-03-12T22:51:00.614230",
+        "hot": false
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 6527,
+        "at": "2026-03-12T23:46:15.041051",
+        "hot": false
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 6815,
+        "at": "2026-03-13T04:42:44.875980",
+        "hot": false
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 7028,
+        "at": "2026-03-13T12:17:55.823509",
+        "hot": false
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 7277,
+        "at": "2026-03-13T21:54:38.241685",
+        "hot": false
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 7859,
+        "at": "2026-03-14T05:46:45.997449",
+        "hot": false
+      },
+      {
+        "bidder": "Outer_Wall_Supply",
+        "amount": 8189,
+        "at": "2026-03-14T09:50:36.824966",
+        "hot": false
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 8873,
+        "at": "2026-03-14T13:37:47.069147",
+        "hot": false
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 10006,
+        "at": "2026-03-14T17:36:46.490113",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 10932,
+        "at": "2026-03-14T19:48:14.601856",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 12042,
+        "at": "2026-03-14T19:48:14.601856",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 13736,
+        "at": "2026-03-14T21:47:11.115852",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 16077,
+        "at": "2026-03-14T21:47:11.115852",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 17955,
+        "at": "2026-03-14T21:47:11.115852",
+        "hot": true
+      },
+      {
+        "bidder": "Grand_Forum_Fence",
+        "amount": 19747,
+        "at": "2026-03-14T23:56:40.161917",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 21214,
+        "at": "2026-03-15T01:04:37.472563",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 24999,
+        "at": "2026-03-15T02:02:53.141438",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 29126,
+        "at": "2026-03-15T02:02:53.141438",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 31284,
+        "at": "2026-03-15T02:55:10.759778",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 33202,
+        "at": "2026-03-15T02:55:10.759778",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 36335,
+        "at": "2026-03-15T05:02:19.357396",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 39125,
+        "at": "2026-03-15T08:25:53.021523",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 42762,
+        "at": "2026-03-15T08:25:53.021523",
+        "hot": true
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 45997,
+        "at": "2026-03-15T09:31:49.238298",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 52183,
+        "at": "2026-03-15T12:18:44.562551",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 56953,
+        "at": "2026-03-15T12:18:44.562551",
+        "hot": true
+      },
+      {
+        "bidder": "The Widow (proxy bid)",
+        "amount": 66241,
+        "at": "2026-03-15T12:18:44.562551",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 75848,
+        "at": "2026-03-15T15:08:18.325603",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 80118,
+        "at": "2026-03-15T17:11:39.579482",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 89005,
+        "at": "2026-03-15T18:58:36.755575",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Serpent-adjacent)",
+        "amount": 100829,
+        "at": "2026-03-15T18:58:36.755575",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 116789,
+        "at": "2026-03-15T20:54:50.214777",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 128053,
+        "at": "2026-03-15T23:12:50.636703",
+        "hot": true
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 147059,
+        "at": "2026-03-15T23:12:50.636703",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 171521,
+        "at": "2026-03-16T03:26:17.192664",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 181596,
+        "at": "2026-03-16T03:26:17.192664",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 194800,
+        "at": "2026-03-16T04:32:02.240030",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 215842,
+        "at": "2026-03-16T05:29:29.882983",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 252383,
+        "at": "2026-03-16T13:39:39.293464",
+        "hot": true
+      },
+      {
+        "bidder": "The Widow (proxy bid)",
+        "amount": 274525,
+        "at": "2026-03-16T13:39:39.293464",
+        "hot": true
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 309700,
+        "at": "2026-03-16T17:03:32.509858",
+        "hot": true
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 329043,
+        "at": "2026-03-16T17:03:32.509858",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 365055,
+        "at": "2026-03-16T17:03:32.509858",
+        "hot": true
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 412558,
+        "at": "2026-03-16T18:04:47.245793",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 441493,
+        "at": "2026-03-16T18:04:47.245793",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 466024,
+        "at": "2026-03-16T21:06:32.661943",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Serpent-adjacent)",
+        "amount": 529987,
+        "at": "2026-03-16T21:06:32.661943",
+        "hot": true
+      },
+      {
+        "bidder": "Grand_Forum_Fence",
+        "amount": 599992,
+        "at": "2026-03-17T00:10:27.549402",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 670384,
+        "at": "2026-03-17T02:13:03.954816",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 757188,
+        "at": "2026-03-17T03:07:06.000454",
+        "hot": true
+      },
+      {
+        "bidder": "Dova (personal account)",
+        "amount": 893205,
+        "at": "2026-03-17T10:36:50.921281",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 988872,
+        "at": "2026-03-17T10:36:50.921281",
+        "hot": true
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 1072578,
+        "at": "2026-03-17T17:51:40.863362",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 1195483,
+        "at": "2026-03-17T20:34:41.494606",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 1282258,
+        "at": "2026-03-17T21:06:17.480705",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 1484548,
+        "at": "2026-03-18T02:06:06.292946",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 1681298,
+        "at": "2026-03-18T02:21:39.189789",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 1879217,
+        "at": "2026-03-18T02:21:39.189789",
+        "hot": true
+      },
+      {
+        "bidder": "Outer_Wall_Supply",
+        "amount": 2090358,
+        "at": "2026-03-18T05:35:03.896496",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 2339936,
+        "at": "2026-03-18T05:35:03.896496",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 2726869,
+        "at": "2026-03-18T07:22:50.170857",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 2977625,
+        "at": "2026-03-18T07:22:50.170857",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Serpent-adjacent)",
+        "amount": 3425684,
+        "at": "2026-03-18T07:22:50.170857",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 3697675,
+        "at": "2026-03-18T07:42:54.403896",
+        "hot": true
+      },
+      {
+        "bidder": "Grand_Forum_Fence",
+        "amount": 4281877,
+        "at": "2026-03-18T07:42:54.403896",
+        "hot": true
+      },
+      {
+        "bidder": "The Widow (proxy bid)",
+        "amount": 4657591,
+        "at": "2026-03-18T08:21:04.989726",
+        "hot": true
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 5363847,
+        "at": "2026-03-18T08:21:04.989726",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 6286879,
+        "at": "2026-03-18T08:21:04.989726",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 7375177,
+        "at": "2026-03-18T09:25:15.672745",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 8661015,
+        "at": "2026-03-18T11:36:25.413217",
+        "hot": true
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 9961850,
+        "at": "2026-03-18T11:36:25.413217",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 10676520,
+        "at": "2026-03-18T13:48:07.273159",
+        "hot": true
+      },
+      {
+        "bidder": "Dova (personal account)",
+        "amount": 11927862,
+        "at": "2026-03-18T14:48:32.356054",
+        "hot": true
+      }
+    ],
+    "last_bidder": "Anonymous (Iron Fang-adjacent)",
+    "listed_at": "2026-03-11T15:05:56.995040",
+    "expires_at": "2026-03-18T15:05:56.995040",
+    "status": "sold",
+    "final_price": 12607942,
+    "sold_at": "2026-03-18T15:22:50.907078"
+  }
+]

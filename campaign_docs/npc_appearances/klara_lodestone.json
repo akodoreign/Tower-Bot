@@ -1,0 +1,27 @@
+{
+  "name": "Klara Lodestone",
+  "species": "Gnome",
+  "faction": "Tower Authority",
+  "rank": "Field Compliance Officer",
+  "role": "officer",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "CHA 12",
+      "DEX 11",
+      "INT 10"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "longsword, heavy crossbow",
+    "armour": "plate armour, officer's insignia"
+  },
+  "sd_appearance": "A petite gnome, even for a halfling, with wiry limbs and a quick demeanor, Klara Lodestone cuts a stern figure. Her cropped, gray hair is neatly styled, and her eyes, perpetually alert, soften when she sees the younger Undercity residents. She wears a well-worn leather coat that seems to have absorbed the city's myriad hues, and beneath it, plate armor, adorned with her rank insignia. A longsword and heavy crossbow are slung over her back, the gleam of their enchantments hinting at the authority she wields. A distinctive silver badge of the Tower Authority, her faction, rests on her chest, its intricate design glinting in the dim Undercity light.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "armour maintained to standard, rank markings clearly displayed"
+}

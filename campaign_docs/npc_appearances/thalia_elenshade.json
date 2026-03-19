@@ -1,0 +1,28 @@
+{
+  "name": "Thalia Elenshade",
+  "species": "Half-Elf",
+  "faction": "Patchwork Saints",
+  "rank": "Saint",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A half-elf woman towers above the Undercity denizens, her slender frame cloaked in a patchwork robe of diverse textiles, a crimson armband flashing against the chaotic weave. Silver hair woven with threads of leather and metal cascades down her back, framing piercing emerald eyes that hold a quiet intensity. She wears a chainmail or scale mail under her robe, and a warhammer and crossbow are slung across her back, the weapons bearing the marks of past conflicts. A distinctive silver pendant in the shape of a broken star rests at her neck, a poignant reminder of her personal tragedy that fuels her fierce dedication to the Patchwork Saints' cause.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

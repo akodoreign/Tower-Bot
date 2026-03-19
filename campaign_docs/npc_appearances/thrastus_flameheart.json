@@ -1,0 +1,27 @@
+{
+  "name": "Thrastus Flameheart",
+  "species": "Dragonborn",
+  "faction": "Tower Authority",
+  "rank": "Senior Officer",
+  "role": "officer",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "CHA 12",
+      "DEX 11",
+      "INT 10"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "longsword, heavy crossbow",
+    "armour": "plate armour, officer's insignia"
+  },
+  "sd_appearance": "A towering Dragonborn, Thrastus Flameheart, stands over 6 feet with fiery red scales and piercing amber eyes. His plate armor, bearing the insignia of the Tower Authority, is meticulously maintained, showcasing his rank. A longsword and heavy crossbow, both imbued with subtle enchantments, hang at his side. One distinctive visual detail is his left shoulder, adorned with a large, intricately crafted hawk emblem – a symbol of his senior officer status within the faction.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "armour maintained to standard, rank markings clearly displayed"
+}

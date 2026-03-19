@@ -1,0 +1,27 @@
+{
+  "name": "Zephyrus Sylphim, the Smokestorm Serpent",
+  "species": "Genasi",
+  "faction": "Wardens of Ash",
+  "rank": "Sergeant",
+  "role": "warden",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "A towering, sleek Genasi with flowing silvery hair and eyes like a tempest of azure and violet strides through the Undercity's dimly lit alleys. His ash grey chainmail, adorned with the Wardens of Ash badge, clinks with each step, revealing a muscular build that speaks of a life spent in battle. A spear and crossbow rest easily on his back, while a handaxe is slung at his hip. A prominent ash-mark etched on his left cheek, the mark of an officer, adds an air of authority to his imposing figure. A swirling tendril of smoke coils around his right wrist, a testament to the elemental force that pulses beneath his skin.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

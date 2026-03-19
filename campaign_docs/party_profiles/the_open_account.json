@@ -1,0 +1,35 @@
+{
+  "name": "The Open Account",
+  "affiliation": "No Affiliation",
+  "specialty": "An elite team of adaptable scouts, capable of navigating the treacherous rifts and the ever-changing Undercity, securing opportunities where others fear to tread.",
+  "members": [
+    {
+      "name": "Voris Keldon",
+      "role": "Tracker",
+      "species": "Human",
+      "note": "A man with an uncanny ability to follow a scent, scarred from years of navigating the perilous rifts."
+    },
+    {
+      "name": "Thalia Thundershield",
+      "role": "Arcanist",
+      "species": "Dwarf",
+      "note": "Her iron will and mastery of rune magic make her invaluable in the unpredictable Undercity."
+    },
+    {
+      "name": "Elysia Nightshade",
+      "role": "Face",
+      "species": "Elf",
+      "note": "Her silken voice and keen intellect make her a formidable negotiator in the treacherous world of the Undercity."
+    }
+  ],
+  "visual": "Clad in leather armor and armed with an assortment of daggers, pistols, and wands, they move with a purposeful stride, their eyes always scanning the shadows for danger. A red 'O' symbol, marking them as 'The Open Account', is etched onto their chest plates.",
+  "reputation_note": "Whispers echo through the Undercity of a crew that can get any job done, no questions asked, but always at a steep price.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

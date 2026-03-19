@@ -1,0 +1,30 @@
+{
+  "name": "Coldbrook Syndicate",
+  "affiliation": "Tower Authority",
+  "specialty": "Specializing in covert operations within the Undercity, Coldbrook Syndicate is renowned for their ability to navigate the labyrinthine Warrens undetected, making them the go-to crew for delicate assignments that require discretion.",
+  "members": [
+    {
+      "name": "Orion Dredge",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars crisscross Orion's face from years of surviving the harsh Undercity streets"
+    },
+    {
+      "name": "Eira Stoneforge",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Eira's keen senses and her signature warhammer, 'Thunderclap', are her trademarks in the Undercity"
+    }
+  ],
+  "visual": "Clad in dark, form-fitting leather armor, the pair moves with a stealthy grace through the crowded city streets. Orion's long coat is adorned with intricate, glowing runes that shimmer ominously, signifying his association with the Tower Authority. Eira, on the other hand, carries a massive warhammer slung over her shoulder, a constant reminder of her prowess and strength.",
+  "reputation_note": "Rumors circulate about Coldbrook Syndicate's mysterious benefactor, a powerful figure within the Tower Authority, who allegedly provides them with resources and protection in exchange for their loyalty and services",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Failed a inter-guild-tier contract. Rank: Unknown (-2/5)"
+  ],
+  "missions_completed": 0,
+  "missions_failed": 1,
+  "tier": "Unknown",
+  "points": -2,
+  "generated": true
+}

@@ -1,0 +1,35 @@
+{
+  "name": "The Patient Knife",
+  "affiliation": "No Affiliation",
+  "specialty": "A versatile team of rift explorers, specializing in navigating and mapping the ever-shifting dimensions to discover valuable resources and hidden treasures.",
+  "members": [
+    {
+      "name": "Elysia Thornwhisper",
+      "role": "Leader",
+      "species": "Elf",
+      "note": "Known for her stoic demeanor and unwavering resolve, she leads with a quiet authority that commands respect."
+    },
+    {
+      "name": "Vex Silvershroud",
+      "role": "Tracker",
+      "species": "Half-Elf",
+      "note": "His keen senses and ability to follow trails in the most treacherous conditions make him an invaluable asset to the team."
+    },
+    {
+      "name": "Gideon Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A veteran of numerous rift battles, his battle-hardened physique and indomitable spirit make him a formidable force in combat."
+    }
+  ],
+  "visual": "Clad in leather armor and armed with an assortment of unique weapons, they move with a purposeful stride through the Undercity's labyrinthine streets. A distinctive silver knife, symbolizing their guild name, is always worn by each member.",
+  "reputation_note": "Whispers of their daring rift exploits and the treasure they've amassed make them a name to be reckoned with, yet their unwavering loyalty to one another and their mysterious, unaligned status keep them shrouded in intrigue.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

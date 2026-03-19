@@ -1,0 +1,35 @@
+{
+  "name": "Dead Reckoning Co.",
+  "affiliation": "No Affiliation",
+  "specialty": "Dead Reckoning Co. specializes in navigating the rifts, offering a unique service of retrieving lost or stolen artifacts from the other realms.",
+  "members": [
+    {
+      "name": "Ezra Voss",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Once a member of the Wardens of Ash, he left after a failed mission that haunts him to this day."
+    },
+    {
+      "name": "Kara Shen",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "Her agile form and keen senses make her an invaluable member in the chaotic Undercity."
+    },
+    {
+      "name": "Thorne Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His missing left eye replaced by a glowing gemstone, he's a formidable presence in any fight."
+    }
+  ],
+  "visual": "The trio wears matching leather armor, each adorned with a compass symbol in unique materials - silver for Ezra, obsidian for Kara, and iron for Thorne. They carry themselves with a silent, calculated intensity that makes others wary.",
+  "reputation_note": "Whispers suggest they have connections deep within the rifts, and that their services come with a steep price - but always deliver results.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

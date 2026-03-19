@@ -1,0 +1,56 @@
+{
+  "name": "Geralt",
+  "classes": {
+    "Monster Hunter": 5
+  },
+  "total_level": 5,
+  "max_hp": 34,
+  "ac_override": null,
+  "stats": {
+    "STR": 16,
+    "DEX": 15,
+    "CON": 15,
+    "INT": 10,
+    "WIS": 14,
+    "CHA": 9
+  },
+  "xp": 0,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 10,
+    "pp": 0
+  },
+  "inventory": {
+    "Scale Mail": 1,
+    "Dagger": 1,
+    "Longsword": 1,
+    "Spear": 1,
+    "Crossbow, Light": 1,
+    "Backpack": 1,
+    "Leatherworker's Tools": 1,
+    "Hunting Trap": 1,
+    "Bolts": 20,
+    "Traveler's Clothes": 1,
+    "Oil": 2,
+    "Rations": 10,
+    "Rope": 1,
+    "Tinderbox": 1,
+    "Torch": 10,
+    "Waterskin": 1,
+    "Caltrops": 20,
+    "Crowbar": 1
+  },
+  "feats": [
+    "5: Weapon Mastery (Grim Hollow: Player's Guide)",
+    "Ability Score Improvement",
+    "Beast Hunter Ability Score Increase",
+    "Blood Hound",
+    "Flurry",
+    "Weapon Mastery (Grim Hollow: Player's Guide)"
+  ],
+  "spell_slots": {},
+  "notes": {},
+  "fetched_at": "2026-03-12T09:31:35.976230"
+}

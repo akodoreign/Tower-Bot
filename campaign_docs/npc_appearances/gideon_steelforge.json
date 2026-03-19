@@ -1,0 +1,28 @@
+{
+  "name": "Gideon Steelforge",
+  "species": "Warforged",
+  "faction": "Tower Authority",
+  "rank": "Senior Officer",
+  "role": "officer",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "CHA 12",
+      "DEX 11",
+      "INT 10"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "longsword, heavy crossbow",
+    "armour": "plate armour, officer's insignia"
+  },
+  "sd_appearance": "A towering, battle-scarred Warforged with rust-streaked plate armor and a longsword at his hip stands sentinel, his gaze scanning the chaotic Undercity. His eyes—a cold, unyielding metallic blue—reflect the dim light of the city, revealing no emotion. A heavy crossbow rests on his shoulders, the Tower Authority insignia glinting on his breastplate. A distinctive mechanical halo adorns his head, a testament to his senior rank within the Tower Authority. His height, even among his kind, commands attention, a silent reminder of his role in maintaining order within the city's dark heart.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "armour maintained to standard, rank markings clearly displayed"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "The Slow Petition",
+  "affiliation": "No Affiliation",
+  "specialty": "A team of skilled investigators, specializing in solving complex cases that have confounded others, often involving the supernatural.",
+  "members": [
+    {
+      "name": "Lysander Vorenus",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A man with a scar running down his left cheek, earned during a failed mission that led to the loss of his left arm, replaced with a mechanical one."
+    },
+    {
+      "name": "Elias Whisperwind",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A tall, lean elf with silver hair and green eyes, known for his exceptional tracking skills and his mysterious, reclusive nature."
+    },
+    {
+      "name": "Nix Thunderfoot",
+      "role": "Arcanist",
+      "species": "Tiefling",
+      "note": "A young tiefling woman with fiery red skin and horns, who has a reputation for her unorthodox, but effective, spellcasting techniques."
+    },
+    {
+      "name": "Darius Stonefist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A gruff, burly dwarf with a thick beard and a metal plate covering the right side of his face, lost in a rift accident."
+    }
+  ],
+  "visual": "Dressed in black leather and heavy coats, they move with a purposeful, cautious stride through the Undercity. Each member carries a signature weapon, and their group is easily identified by a silver falcon emblem on their clothing.",
+  "reputation_note": "Whispers in the Undercity claim they are former members of the Argent Blades, disavowed for unorthodox methods and a thirst for justice that borders on obsession.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

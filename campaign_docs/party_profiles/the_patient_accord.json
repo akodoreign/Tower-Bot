@@ -1,0 +1,29 @@
+{
+  "name": "The Patient Accord",
+  "affiliation": "Patchwork Saints",
+  "specialty": "Specializing in covert operations and infiltration, The Patient Accord's unique approach involves blending into their targets' surroundings, dismantling corrupt networks from within.",
+  "members": [
+    {
+      "name": "Vex Silverspire",
+      "role": "Leader",
+      "species": "Half-Elf",
+      "note": "A scar running down her left cheek from a long-healed wound, earned during her time as a ward of the Patchwork Saints."
+    },
+    {
+      "name": "Kracken Ironfist",
+      "role": "Muscle",
+      "species": "Half-Orc",
+      "note": "His distinctive war hammer, forged from the debris of the Tower of Last Chance, is a constant reminder of the battles he's fought."
+    }
+  ],
+  "visual": "The duo can be spotted wearing the distinctive brown and gold livery of the Patchwork Saints, their attire patched together from scraps of various materials. Vex's elven features are softened by her practical, no-nonsense approach, while Kracken's imposing presence is tempered by his quiet, thoughtful demeanor.",
+  "reputation_note": "Whispers echo through the Undercity, warning of the cold efficiency of The Patient Accord. They're not to be trifled with, and their unwavering loyalty to the Patchwork Saints has earned them the respect – if not fear – of many.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

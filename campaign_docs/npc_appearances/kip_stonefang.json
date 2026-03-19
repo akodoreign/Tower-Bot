@@ -1,0 +1,28 @@
+{
+  "name": "Kip Stonefang",
+  "species": "Kobold",
+  "faction": "Patchwork Saints",
+  "rank": "Saint",
+  "role": "mercenary",
+  "home_district": "patchwork saints",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A compact, wiry kobold stands amidst a bustling market, his scaly skin a mosaic of intricate tattoos. He dons a patchwork cloak of assorted fabrics, the red armband of the Patchwork Saints visible beneath. A worn leather satchel hangs from his shoulder. In one hand, he wields a warhammer, its chain wrapped with worn leather and bearing the scars of past contracts. Across his back, a crossbow rests, its stock fashioned from wood that seems to glow faintly with an otherworldly energy. One of his eyes, the other lost in battle, glimmers with an intensity that betrays his relentless drive to prove his worth among the saints.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Yuna Saltis",
+  "species": "Tiefling",
+  "faction": "Obsidian Lotus",
+  "rank": "Memory Architect (specialist — designs and performs memory erasure contracts)",
+  "role": "memory architect",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "CHA 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "concealed knife, memory vials",
+    "armour": "fine black clothing, always gloved"
+  },
+  "sd_appearance": "Tiefling woman, approximately 4 feet tall, stands with her back against the dark stone wall of the Undercity. Pale lavender skin, her horns curling gently above her temples, a long tail twitching behind her. Her dark eyes, with no visible iris differentiation, seem to absorb the dim light of the city. Wearing black shadow-woven clothing, lotus flower motifs in black glass twinkle subtly against her attire. A concealed knife rests at her waist, and multiple memory vials adorn her outfit as jewellery. One distinctive visual detail — a pair of black-leather gloves covers her slender hands completely, a silent testament to her profession as a Memory Architect.",
+  "faction_visual": "black shadow-woven clothing, lotus flower motifs in black glass, memory vials as jewellery",
+  "style_note": "quiet in a way that feels engineered — black-on-black with glass-bead accessories"
+}

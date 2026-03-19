@@ -1,0 +1,43 @@
+{
+  "districts": {
+    "The Warrens": {
+      "condition": "Pressure Fog",
+      "description": "Fog sits knee-deep in the alleys. Night Pits are quieter than usual.",
+      "emoji": "\ud83c\udf01"
+    },
+    "Markets Infinite": {
+      "condition": "Pressure Calm",
+      "description": "Unusually pleasant morning in the Markets. Crowds are larger. Pickpockets are busier.",
+      "emoji": "\u2728"
+    },
+    "Sanctum Quarter": {
+      "condition": "Cold Sink",
+      "description": "Cold air has escaped. The temperature has dropped sharply.",
+      "emoji": "\u2744\ufe0f"
+    },
+    "Grand Forum": {
+      "condition": "Cold Sink",
+      "description": "Cold air has escaped. The temperature has dropped sharply.",
+      "emoji": "\u2744\ufe0f"
+    },
+    "Guild Spires": {
+      "condition": "Dim Clearance",
+      "description": "Good visibility from the upper Guild Spires. Someone's doing something on the roof.",
+      "emoji": "\ud83c\udf24\ufe0f"
+    },
+    "Outer Wall": {
+      "condition": "Cold Sink",
+      "description": "Gate District is freezing. Wall Quadrant C reports frost on the inner seal. FTA is aware.",
+      "emoji": "\u2744\ufe0f"
+    }
+  },
+  "pressure": 51,
+  "special_event": null,
+  "forecast": [
+    "False Dawn",
+    "Rift Weather",
+    "Dim Clearance"
+  ],
+  "updated_at": "2026-03-19T13:46:58.226363",
+  "last_posted_at": "2026-03-19T12:50:32.742939"
+}

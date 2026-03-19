@@ -1,0 +1,29 @@
+{
+  "name": "Hollow Crown Expedition",
+  "affiliation": "Tower Authority",
+  "specialty": "Hollow Crown Expedition specializes in navigating the unstable rifts, offering their clients unique artifacts and relics from beyond the Dome.",
+  "members": [
+    {
+      "name": "Jorian Thornshadow",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running down his left cheek, a grim reminder of a rift encounter gone wrong."
+    },
+    {
+      "name": "Zara Stonefist",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Known for her ability to trail even the most elusive prey, she wears a silver gauntlet, a symbol of her dedication to the Tower Authority."
+    }
+  ],
+  "visual": "The pair wear weathered leather vests and trousers, adorned with pockets filled with various tools and trinkets. Jorian's coat is emblazoned with a hollow crown, the symbol of their crew, while Zara's silver gauntlet gleams in the dim light.",
+  "reputation_note": "Whispers echo through the Undercity — the Hollow Crown Expedition's knowledge of the rifts is unmatched, but their methods are feared and questioned.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

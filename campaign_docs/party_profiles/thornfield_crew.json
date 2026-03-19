@@ -1,0 +1,35 @@
+{
+  "name": "Thornfield Crew",
+  "affiliation": "Serpent Choir",
+  "specialty": "Specializing in infiltration and sabotage, Thornfield Crew has a reputation for disappearing into the Undercity's labyrinthine depths and leaving chaos in their wake.",
+  "members": [
+    {
+      "name": "Eira Thornfield",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar running down her left cheek serves as a constant reminder of a past betrayal."
+    },
+    {
+      "name": "Vex Silenshade",
+      "role": "Tracker",
+      "species": "Tiefling",
+      "note": "His eyes glow ominously in the dark, a warning to any who might cross their path."
+    },
+    {
+      "name": "Zephyr Windrider",
+      "role": "Muscle",
+      "species": "Half-Elf",
+      "note": "His signature crossbow is adorned with feathers from creatures slain in the Rifts."
+    }
+  ],
+  "visual": "Clad in black leather and chainmail, they move with a quiet, purposeful intensity, their faces hidden beneath wide-brimmed hats. A silver serpent coil is etched into the hilt of each member's weapon, a symbol of their Serpent Choir allegiance.",
+  "reputation_note": "Thornfield Crew is feared for their ruthlessness and unwavering loyalty to the Serpent Choir. Whispers suggest they have connections that reach to the very top.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

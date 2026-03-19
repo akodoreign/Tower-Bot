@@ -1,0 +1,42 @@
+{
+  "name": "The Dim Accord",
+  "affiliation": "Obsidian Lotus",
+  "specialty": "Specializing in covert operations and infiltration, their technical prowess lies in their ability to blend seamlessly into the Undercity's shadows, often gaining access to restricted areas others cannot.",
+  "members": [
+    {
+      "name": "Zinnia Drakon",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scarred former Wardens of Ash enforcer who switched sides after losing her family in a raid gone wrong."
+    },
+    {
+      "name": "Vexil Ironhide",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "A gruff and battle-hardened warrior, his arm replaced with a mechanical one after a fateful encounter with a rift monster."
+    },
+    {
+      "name": "Eirwyn Nightshadow",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "A quiet and enigmatic sorcerer who hides his true power beneath a veil of humility."
+    },
+    {
+      "name": "Rilnar Swiftfoot",
+      "role": "Muscle",
+      "species": "Tabaxi",
+      "note": "A lithe and agile combatant, he's the only member of the group with a visible marking: a tattoo of a cat's paw on his cheek."
+    }
+  ],
+  "visual": "Clad in dark, form-fitting attire that blends with the Undercity's grime, they move with a coordinated silence and purpose, their only identifying mark being a small obsidian lotus emblem subtly woven into their clothing.",
+  "reputation_note": "Whispers echo of a crew that's feared for their stealth and ruthless efficiency, yet whispered about for their mysterious connections to the Obsidian Lotus.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a epic-tier contract. Rank: Unknown (+3/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 3,
+  "generated": true
+}

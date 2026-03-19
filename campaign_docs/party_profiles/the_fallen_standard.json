@@ -1,0 +1,35 @@
+{
+  "name": "The Fallen Standard",
+  "affiliation": "Glass Sigil",
+  "specialty": "Specializes in navigating and disarming dangerous rifts, setting them apart as one of the most reliable teams for high-risk, high-reward jobs",
+  "members": [
+    {
+      "name": "Zorian Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars from a past battle with a rift monster cover half of his face"
+    },
+    {
+      "name": "Aria Stoneheart",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Her left arm is replaced by a mechanical limb, a constant reminder of a failed mission"
+    },
+    {
+      "name": "Gavrik Riftbender",
+      "role": "Arcanist",
+      "species": "Tiefling",
+      "note": "Rumored to have mastered a forbidden ritual to temporarily control rift energies"
+    }
+  ],
+  "visual": "They wear the distinct Glass Sigil colors - deep blue and silver - on their leather armors and carry a variety of unique tools for rift navigation. In public, they move with an air of quiet confidence, often drawing curious glances and whispers",
+  "reputation_note": "The Fallen Standard, as they're known, are feared and respected for their rift navigating skills, but their association with the forbidden arts keeps them shrouded in mystery and intrigue",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

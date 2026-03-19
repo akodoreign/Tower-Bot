@@ -1,0 +1,30 @@
+{
+  "name": "Ironveil Syndicate",
+  "affiliation": "Adventurers Guild",
+  "specialty": "Specializing in undercity rift navigation and extraction of rare artifacts from the shattered realms",
+  "members": [
+    {
+      "name": "Vaelis Ironheart",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A veteran with a scarred face, known for his iron will and unwavering calm in the face of danger"
+    },
+    {
+      "name": "Zephyr Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A silent and stealthy figure, rumored to have a personal vendetta against the Serpent Choir"
+    }
+  ],
+  "visual": "Clad in sturdy leather armor and armed with an assortment of makeshift weapons, the Ironveil Syndicate are a sight of grim determination, always carrying themselves with a hardened resolve. A distinctive white bandana tied around Vaelis' head marks them as a guild-sanctioned crew in the undercity.",
+  "reputation_note": "Whispers in the undercity claim that the Ironveil Syndicate is not just another guild-affiliated crew, but a group of highly skilled and well-connected individuals with a reputation for pushing the boundaries of what is considered safe and sane in the city under the dome",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-14] Completed a escort-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

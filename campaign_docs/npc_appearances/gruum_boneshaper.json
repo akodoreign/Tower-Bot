@@ -1,0 +1,27 @@
+{
+  "name": "Gruum Boneshaper",
+  "species": "Dwarf",
+  "faction": "Wardens of Ash",
+  "rank": "Recruit",
+  "role": "mercenary",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering, broad-shouldered dwarf stands before you, his dense muscles rippling beneath a suit of sulfurous-glowing plate armor. His thick beard is braided into twin spiral horns that catch the flickering light of the city's gloom. His left cheek bears the mark of the Warden, an ash-gray badge of his allegiance. In one hand, he wields a warhammer, its weaponry telltale of past battles and triumphs. Across his back, a crossbow is slung, its stock weathered from countless campaigns. One distinctive visual detail sets him apart: his chain mail shirt, worn with pride and patched from years of service, carries an intricate design of ash-grey flames that seems to dance in the dim light.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Frank",
+  "classes": {
+    "Fighter": 4
+  },
+  "total_level": 4,
+  "max_hp": 28,
+  "ac_override": null,
+  "stats": {
+    "STR": 15,
+    "DEX": 14,
+    "CON": 13,
+    "INT": 12,
+    "WIS": 10,
+    "CHA": 8
+  },
+  "xp": 2700,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 0,
+    "pp": 0
+  },
+  "inventory": {
+    "Combat shotgun": 1,
+    "Scale Mail": 1,
+    "Pistol": 1,
+    "Rifle, Automatic": 1,
+    "Antimatter Rifle": 1
+  },
+  "feats": [
+    "4: Weapon Mastery",
+    "Alert",
+    "Archery",
+    "Blind Fighting",
+    "Dark Bargain",
+    "Honor [DMG 9.264]",
+    "Savage Attacker",
+    "Soldier Ability Score Improvements",
+    "Weapon Mastery"
+  ],
+  "spell_slots": {},
+  "notes": {},
+  "fetched_at": "2026-03-11T11:54:58.062240"
+}

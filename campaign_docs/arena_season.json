@@ -1,0 +1,167 @@
+{
+  "season": 1,
+  "match_count": 6,
+  "fighters": [
+    {
+      "name": "Aric Veyne",
+      "rank": 1,
+      "wins": 22,
+      "losses": 4,
+      "title": "The Silver Spire",
+      "faction": "Argent Blades",
+      "notes": "SS-Rank. Has not lost in fourteen months."
+    },
+    {
+      "name": "Kassia Mor",
+      "rank": 2,
+      "wins": 18,
+      "losses": 6,
+      "title": "The Ironwife",
+      "faction": "Argent Blades",
+      "notes": "Known for ending fights early. Rarely takes damage."
+    },
+    {
+      "name": "Brother Vex",
+      "rank": 3,
+      "wins": 16,
+      "losses": 7,
+      "title": null,
+      "faction": "Independent",
+      "notes": "Cult-trained. Movements that should not be physically possible."
+    },
+    {
+      "name": "Drell the Unfinished",
+      "rank": 4,
+      "wins": 14,
+      "losses": 11,
+      "title": "Crowd Favourite",
+      "faction": "Independent",
+      "notes": "Lost his right hand three seasons ago. Still ranked."
+    },
+    {
+      "name": "Sela Vance",
+      "rank": 5,
+      "wins": 13,
+      "losses": 9,
+      "title": null,
+      "faction": "Wardens of Ash",
+      "notes": "Active Warden. Fights for extra income. Korin disapproves."
+    },
+    {
+      "name": "The Composite",
+      "rank": 6,
+      "wins": 11,
+      "losses": 10,
+      "title": "Most Complaints Filed",
+      "faction": "Iron Fang",
+      "notes": "Suspected of illegal augmentation. FTA has an open file."
+    },
+    {
+      "name": "Nara Fen",
+      "rank": 7,
+      "wins": 10,
+      "losses": 10,
+      "title": null,
+      "faction": "Independent",
+      "notes": "Mari Fen's cousin. Does not acknowledge the connection."
+    },
+    {
+      "name": "Priest of Ash",
+      "rank": 8,
+      "wins": 10,
+      "losses": 12,
+      "title": null,
+      "faction": "Serpent Choir",
+      "notes": "Fights under divine contract terms. Wins count as Kharma donations."
+    },
+    {
+      "name": "Mads Cutter",
+      "rank": 9,
+      "wins": 8,
+      "losses": 12,
+      "title": null,
+      "faction": "Independent",
+      "notes": "Veteran. Slow now. Still dangerous because he knows everything."
+    },
+    {
+      "name": "The Patchwork Kid",
+      "rank": 10,
+      "wins": 7,
+      "losses": 13,
+      "title": "Most Injuries Per Bout",
+      "faction": "Patchwork Saints",
+      "notes": "Pol Greaves trained them. Fights like someone who expects to lose."
+    },
+    {
+      "name": "Lissa No-Name",
+      "rank": 11,
+      "wins": 6,
+      "losses": 14,
+      "title": null,
+      "faction": "Independent",
+      "notes": "Nobody knows where she came from. Glass Sigil is interested."
+    },
+    {
+      "name": "Gorvin Slate",
+      "rank": 12,
+      "wins": 4,
+      "losses": 16,
+      "title": "Crowd's Favourite Loser",
+      "faction": "Independent",
+      "notes": "Loses dramatically. Enormous fan base. Suspects the fix is in."
+    }
+  ],
+  "last_match_at": "2026-03-19T01:48:18.243968",
+  "next_match_at": "2026-03-21T19:41:50.243968",
+  "last_posted_at": null,
+  "match_log": [
+    {
+      "match": 1,
+      "type": "standard",
+      "winner": "Sela Vance",
+      "loser": "Drell the Unfinished",
+      "location": "the open-air Dust Ring at Guild Spires East",
+      "at": "2026-03-05T15:41:25.486264"
+    },
+    {
+      "match": 2,
+      "type": "upset",
+      "winner": "Lissa No-Name",
+      "loser": "Aric Veyne",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-07T22:56:51.718510"
+    },
+    {
+      "match": 3,
+      "type": "upset",
+      "winner": "Priest of Ash",
+      "loser": "Drell the Unfinished",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-10T07:07:40.388000"
+    },
+    {
+      "match": 4,
+      "type": "standard",
+      "winner": "Gorvin Slate",
+      "loser": "Priest of Ash",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-13T06:56:37.523071"
+    },
+    {
+      "match": 5,
+      "type": "exhibition",
+      "winner": "The Patchwork Kid",
+      "loser": "Kassia Mor",
+      "location": "the Grand Forum exhibition stage",
+      "at": "2026-03-16T01:29:59.363453"
+    },
+    {
+      "match": 6,
+      "type": "exhibition",
+      "winner": "Brother Vex",
+      "loser": "Drell the Unfinished",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-19T01:48:18.243968"
+    }
+  ]
+}

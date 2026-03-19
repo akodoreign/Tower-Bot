@@ -1,0 +1,27 @@
+{
+  "name": "Zephyrus Ironheart-Thrain",
+  "species": "Dragonborn",
+  "faction": "Tower Authority",
+  "rank": "Compliance Intern",
+  "role": "compliance officer",
+  "stats": {
+    "primary": [
+      "INT 15",
+      "WIS 13",
+      "CHA 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 9"
+    ],
+    "hp_range": "28–38"
+  },
+  "equipment": {
+    "weapons": "short sword, FTA badge",
+    "armour": "FTA uniform over light armour"
+  },
+  "sd_appearance": "A towering Dragonborn with obsidian scales, Zephyrus Ironheart-Thrain stands over 6 feet tall, his draconic head held high and tail flicking nervously. His hair, a stark contrast to his scales, is a vibrant shade of fire-orange, styled in a precise, tidy bun. He wears the Tower Authority uniform, the fabric impeccably clean despite the grime of the Undercity, over a light layer of armor. A short sword hangs at his hip, its hilt adorned with the familiar insignia of the FTA. A small, glowing FTA badge pins his uniform, casting an ethereal light on his stern face. A noticeable detail is a clipboard clutched tightly in his hand, filled with notes and lists, a testament to his relentless pursuit of order and justice in the chaotic Undercity.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "FTA uniform kept immaculate — young, earnest, slightly too eager"
+}

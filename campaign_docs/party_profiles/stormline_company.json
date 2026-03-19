@@ -1,0 +1,41 @@
+{
+  "name": "Stormline Company",
+  "affiliation": "No Affiliation",
+  "specialty": "Experienced in navigating the volatile rifts for loot and information, the Stormline Company has a reputation for returning with valuable artifacts and intelligence.",
+  "members": [
+    {
+      "name": "Mavric Stormforge",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred face, a constant reminder of battles won and lost"
+    },
+    {
+      "name": "Seraphina Duskshadow",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Always cloaked in black, her movements are as silent as the rifts themselves"
+    },
+    {
+      "name": "Thorgrim Ironhide",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Wears a suit of plate armor, his hammer never far from reach"
+    },
+    {
+      "name": "Zephyr Glimmerstep",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Quick-witted and charismatic, known for his silver-tongued persuasion"
+    }
+  ],
+  "visual": "Dressed in a mix of practical armor and leather, they move with a calculated grace, their faces etched with the hard lines of survival. A crimson banner bearing a lightning bolt emblazoned on their chest identifies them in the crowd.",
+  "reputation_note": "Rumored to be former Tower Authority operatives, their intentions remain a mystery, but their success speaks for itself",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

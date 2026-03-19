@@ -1,0 +1,30 @@
+{
+  "name": "The Borrowed Standard",
+  "affiliation": "No Affiliation",
+  "specialty": "Skilled in navigating and surviving the rifts, offering a unique blend of exploration and combat expertise.",
+  "members": [
+    {
+      "name": "Vaelis Darrowthorn",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Known for his uncanny ability to predict rift behavior, once a member of the Iron Fang Consortium before betraying them for his own cause"
+    },
+    {
+      "name": "Thalirion Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "A rift-born elf, with eyes that glow like embers, rumored to have a deep connection to the rifts themselves"
+    }
+  ],
+  "visual": "Vaelis, clad in a leather jacket adorned with trinkets from his past adventures, leads the group with a stern gaze. Thalirion, with his ghostly white hair and glowing eyes, follows closely, always scanning the surroundings with a keen focus.",
+  "reputation_note": "The Borrowed Standard is a name whispered with both fear and admiration. They're known for their ability to navigate the rifts and often seen as a beacon of hope for those lost in the Undercity's chaos",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a standard-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

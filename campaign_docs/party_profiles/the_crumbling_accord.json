@@ -1,0 +1,35 @@
+{
+  "name": "The Crumbling Accord",
+  "affiliation": "Guild of Ashen Scrolls",
+  "specialty": "Specializing in deciphering and acquiring obscure, often forbidden, ancient texts and artifacts, the Crumbling Accord is renowned for their unparalleled knowledge of the Undercity's hidden libraries and forgotten tomes.",
+  "members": [
+    {
+      "name": "Ryvara Aduro",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scarred from a rift encounter that left her with an unusual third eye, which glows when she accesses her vast knowledge."
+    },
+    {
+      "name": "Thorn Drakkus",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Covered in scars and tattoos from numerous battles, he's a formidable warrior with an uncanny ability to navigate the Undercity's labyrinth."
+    },
+    {
+      "name": "Nevarra Vos",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "She's known for her unusual magical bond with a sentient book, which she carries in a custom-made leather case adorned with silver runes."
+    }
+  ],
+  "visual": "The trio dress in muted, earth-toned clothing with subtle runes and symbols hidden within their layers, giving an air of mystery. They carry themselves with a quiet confidence, yet their eyes hold a depth of knowledge and a hint of danger.",
+  "reputation_note": "Whispers echo in the Undercity about the Crumbling Accord, a group of scholars turned adventurers, who are feared for their knowledge and sought after for their abilities. A word of caution, though: they are known to be as ruthless as they are intelligent.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

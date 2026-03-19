@@ -1,0 +1,28 @@
+{
+  "name": "Giselle Ironwhisper",
+  "species": "Human",
+  "faction": "Iron Fang Consortium",
+  "rank": "Street Runner",
+  "role": "street runner",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "DEX 16",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "WIS 10",
+      "STR 9"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "daggers, sling",
+    "armour": "leather coat"
+  },
+  "sd_appearance": "A tall, muscular human woman with short, silver-cropped hair and piercing green eyes moves with quiet intensity through the dimly lit streets of the Undercity. Her skin, weathered from countless battles, is complemented by a deep burgundy and gunmetal coat, the subtle Iron Fang mark on her lapel signaling her allegiance. Equipped with daggers and a sling, she is a picture of practicality, her worn boots scuffing the cobblestones with each purposeful step. One distinctive visual detail: a small, delicate locket tucked into her coat, a reminder of the daughter she fights tirelessly to protect.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "practical street clothes, nothing that slows movement, worn boots"
+}

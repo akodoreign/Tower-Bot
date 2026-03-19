@@ -1,0 +1,29 @@
+{
+  "name": "Saltborn Advance",
+  "affiliation": "Glass Sigil",
+  "specialty": "Specializing in covert operations and infiltration, the Saltborn Advance has earned a reputation for their uncanny ability to navigate the Undercity's complex web of factions undetected, making them the go-to crew for high-risk missions.",
+  "members": [
+    {
+      "name": "Orion Nightshade",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars crisscross his face, a grim testament to his years of service and survival in the Undercity."
+    },
+    {
+      "name": "Kora Sallow",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "Her eyes glow with an eerie silver light, a result of an ancient elixir that enhances her night vision."
+    }
+  ],
+  "visual": "Clad in dark, tailored leather coats with the Glass Sigil emblem subtly embossed on their left shoulders, the Saltborn Advance exudes an air of professionalism and danger. They carry themselves with a quiet intensity, a constant alertness visible in their every move.",
+  "reputation_note": "While some whisper of their loyalty to the Glass Sigil, others speak of their unwavering dedication to their missions and their ruthless efficiency. A word of caution: cross them, and you may never be found again.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

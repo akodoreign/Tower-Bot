@@ -1,0 +1,35 @@
+{
+  "name": "The Long Standard",
+  "affiliation": "No Affiliation",
+  "specialty": "A team of adaptable specialists, renowned for navigating and surviving the unpredictable rifts of the Undercity, making them the go-to crew for any task that requires navigating the city's chaotic reality.",
+  "members": [
+    {
+      "name": "Serafina Nightwind",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A seasoned veteran with a cybernetic left arm, replaced after a fateful encounter with a rift beast."
+    },
+    {
+      "name": "Thorgrim Iron-Fist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "Known for his legendary strength and a permanent scar running down his face, gained during a brawl in the Grand Forum."
+    },
+    {
+      "name": "Jaxon Swiftshadow",
+      "role": "Face",
+      "species": "Tabaxi",
+      "note": "Nimble, cunning, and with a reputation for his silver tongue, Jaxon is often seen adorned with various trinkets and jewelry."
+    }
+  ],
+  "visual": "The Long Standard can be identified by their worn but well-maintained leather coats, matching cloaks embroidered with a standard bearing the symbol of a long, sharp blade, and a noticeable air of determination and professionalism.",
+  "reputation_note": "Whispers echo through the Undercity, warning adventurers to stay clear of 'The Long Standard' - they are ruthless, but their word is their bond.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

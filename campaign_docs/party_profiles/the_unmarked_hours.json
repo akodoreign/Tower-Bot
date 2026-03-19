@@ -1,0 +1,36 @@
+{
+  "name": "The Unmarked Hours",
+  "affiliation": "Tower Authority",
+  "specialty": "A tight-knit team of stealth experts, skilled in infiltrating and securing rift zones before they wreak havoc on the Undercity",
+  "members": [
+    {
+      "name": "Thalia Valtoris",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Scars crisscross her face from countless close calls, but her cold, calculating gaze never falters"
+    },
+    {
+      "name": "Jax Rivenclaw",
+      "role": "Tracker",
+      "species": "Tabaxi",
+      "note": "His tail is adorned with intricate silver rings, a constant reminder of his family's debt to the Tower Authority"
+    },
+    {
+      "name": "Kael Vangard",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "His battle-worn armor is inscribed with runes that hum menacingly when he enters combat"
+    }
+  ],
+  "visual": "Clad in black, hooded cloaks with the Tower Authority insignia hidden beneath, they move through the Undercity like shadows, striking with precision and disappearing without a trace",
+  "reputation_note": "Rumored to be the only crew that can enter a rift zone and come out alive, they are both feared and respected by all factions in the Undercity",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Failed a inter-guild-tier contract. Rank: Unknown (-2/5)"
+  ],
+  "missions_completed": 0,
+  "missions_failed": 1,
+  "tier": "Unknown",
+  "points": -2,
+  "generated": true
+}

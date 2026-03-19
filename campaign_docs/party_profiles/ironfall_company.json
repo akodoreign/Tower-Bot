@@ -1,0 +1,36 @@
+{
+  "name": "Ironfall Company",
+  "affiliation": "Serpent Choir",
+  "specialty": "Known for their precision in navigating the unpredictable rifts, the Ironfall Company is a feared team for their ability to salvage valuable artifacts and resources from the tear-riddled reality.",
+  "members": [
+    {
+      "name": "Vexa Ironfall",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A scar from a rift accident runs down her left cheek, a constant reminder of the line between life and death."
+    },
+    {
+      "name": "Grimm Stoneweaver",
+      "role": "Tracker",
+      "species": "Dwarf",
+      "note": "Grimm is known to carry a pet raven, a gift from the rift, which helps him in locating the unfindable."
+    },
+    {
+      "name": "Zephyr Serpentwhisper",
+      "role": "Arcanist",
+      "species": "Elf",
+      "note": "Zephyr's eyes glow faintly green, a result of years of exposure to the rift energies, making him a prime target for the Serpent Choir."
+    }
+  ],
+  "visual": "Clad in leather armor stitched with serpent emblems, they move with purpose, their weapons polished to a mirror shine. The trio carries an air of professionalism and experience, garnering respect from the citizens of the Undercity.",
+  "reputation_note": "Rumored to have a contract with the Serpent Choir, their services come at a steep price, but the risks they take always seem to pay off.",
+  "history": [
+    "[2026-03-11] Party first logged.",
+    "[2026-03-15] Completed a investigation-tier contract. Rank: Unknown (+1/5)"
+  ],
+  "missions_completed": 1,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 1,
+  "generated": true
+}

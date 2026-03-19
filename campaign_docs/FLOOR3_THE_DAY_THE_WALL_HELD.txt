@@ -1,0 +1,662 @@
+FLOOR 3 — THE DAY THE WALL HELD
+A Greyhawk Shard Scenario — Year Two of the War
+
+DESIGN OVERVIEW (DM-FACING)
+
+Tone: Desperate last stand / Tactical war movie / Tragic victory — all three, layered
+Emotional Arc: One year of waiting — the moment of truth — costly, real, remembered victory
+Tower Role: Observer only — this floor ends on the party's terms, not the Tower's
+Setting: The border fort wall and the bay docks, simultaneous
+War State: The horde has arrived. BLACKWAKE is two hours from the bay.
+Split Action: Sir Alard holds the wall. The party takes a division to stop the landing.
+Win Condition: Stop BLACKWAKE before it unloads. Survive until Alard breaks the siege.
+Floor End: Victory — costly but real. The horde is stopped here.
+
+One year has passed since the party stood in the swamp, watching an ironclad take shape in the fog. One year since they dropped proof on a war table and watched command's certainty crack.
+
+The horde came on schedule. BLACKWAKE came with it.
+
+The smart play is not the obvious one. Everyone else is at the wall. The party knows what the wall doesn't stop.
+
+---
+
+BLOCK 1 — THE RETURN
+A Year Later. The War Is Here.
+
+DM READ-ALOUD: Arrival
+
+The Tower translates you mid-march. Again.
+
+Same cold air. Same wet earth. Same smell of pitch and iron.
+
+But the fort is different now.
+
+The walls are taller. The stakes are doubled. The watchtowers have two soldiers where there used to be one.
+
+And the sky to the east is wrong.
+
+Too much smoke. Too much orange. Too low on the horizon to be sunrise.
+
+A soldier near the gate sees you and his face does something complicated.
+
+Not surprise. Not relief.
+
+Recognition.
+
+"They said you'd be back," he says. "He said you'd be back."
+
+He doesn't explain who he means. He doesn't need to.
+
+WHAT HAS CHANGED (ONE YEAR)
+
+The party arrives to find the fort transformed — not by comfort, but by grim preparation. Sir Alard Montreval returned four months after the party left Floor 2. His terms were accepted, quietly, by officers who had no better options.
+
+What he built in the intervening year:
+- Mobile defense doctrine — the fort is no longer designed to hold ground, but to bleed the enemy and move
+- Civilian evacuation routes — pre-planned, drilled, protected
+- A division loyal to him personally, trained for independent action
+- Bay watchers — scouts who have been tracking BLACKWAKE's progress for six weeks
+
+What the party finds when they arrive:
+- Alard at the command table, calm, giving final orders — he looks up when they enter and nods once
+- The bay watcher report on the table: BLACKWAKE is two hours out
+- The wall defense is organized. The dock defense is not — no one has been willing to pull forces from the wall
+
+SIR ALARD MONTREVAL — FINAL BRIEFING
+
+He does not make a speech. He has three minutes and he uses them like a surgeon.
+
+"The wall will hold or it won't. I have done everything I can for it."
+
+"The ship is the problem no one at this table wants to name."
+
+"If BLACKWAKE reaches the bay and unloads, we fight on two fronts. We lose on two fronts."
+
+"I need someone at the docks who has seen it. Who knows what it can do."
+
+He looks at the party directly.
+
+"You know what it can do."
+
+He offers them a choice — clearly, without pressure:
+
+STAY AT THE WALL: Fight alongside Alard. The wall defense is brutal and honorable. The party's combat power is real here.
+
+GO TO THE DOCKS: Take a division of 40 soldiers. Stop BLACKWAKE before it lands. The smart play. The harder one.
+
+DM NOTE: If the party chooses the wall, run a modified version of Block 2 as the wall defense, then pivot to Block 4 when BLACKWAKE appears in the bay and makes the dock defense necessary anyway. The smart play is going to the docks first. Reward it by making the wall defense outcome worse if they don't.
+
+---
+
+BLOCK 2 — THE WALL
+Sir Alard's Fight (Background Track)
+
+The party does not fight this battle. But they feel it. The wall is two miles behind them and it is never quiet.
+
+WALL BEATS (Read at DM Discretion)
+
+BEAT 1 — As the party reaches the dock road:
+The horn sounds from the fort. One long note. The assault has begun. The sound of it carries further than it should.
+
+BEAT 2 — Midway through the docks:
+Smoke rises from the wall. Not from fire — from signal torches. Alard is holding, but he is burning his reserves to do it.
+
+BEAT 3 — When BLACKWAKE is first sighted:
+The horn at the fort changes. Two short notes. Repeated. You know that signal. It means: they see it too. It means Alard knows the clock just shortened.
+
+BEAT 4 — If the party stops BLACKWAKE:
+The horn at the fort sounds differently. Three notes. A pause. Three again. You have never heard that signal before. A soldier beside you exhales. "That's the breakthrough signal. He broke through." A pause. "He actually broke through."
+
+SIR ALARD — WALL OUTCOME (DM Reference)
+
+Regardless of party action at the docks, Sir Alard holds the wall. The cost:
+- He takes a wound in the final push — not fatal, but visible. He will carry it.
+- Twelve soldiers under his command die in the breach. He knows their names.
+- The officer who tried to scapegoat the party during Floor 2 dies on the wall. Alard does not mention this. The soldiers do.
+
+If the party stops BLACKWAKE, Alard breaks the siege from inside when the horde's rear falls into confusion. The wall holds.
+
+If the party does not stop BLACKWAKE in time, the horde lands troops at the bay. The wall is flanked. Alard executes the civilian evacuation doctrine and retreats — alive, but the fort falls.
+
+DM NOTE: Both outcomes still end the floor. Victory requires both the wall holding AND BLACKWAKE stopped. The floor's tone depends on the party making the hard call.
+
+---
+
+BLOCK 3 — THE DOCK ROAD
+Two Miles. Forty Soldiers. One Hour.
+
+DM READ-ALOUD: The March
+
+The dock road runs south along the river, away from the wall.
+
+Every soldier in your division knows they are marching away from the fight everyone else is running toward.
+
+No one argues. No one asks questions.
+
+They trust the people who came back from the swamp.
+
+Some of them were there when the proof landed on the war table. They know what you saw. They know what's coming.
+
+THE DIVISION (Party Resource)
+
+Unit Size: 40 soldiers total
+Veterans: 12 — soldiers who served under Alard, disciplined, steady
+Conscripts: 20 — local militia, trained for eight months, reliable under leadership
+Specialists: 8 — crossbowmen, one field surgeon, two engineers
+Morale: High — they chose this assignment. They know what it means.
+Commander: The party — orders are followed without question, but soldiers watch for hesitation
+
+ENCOUNTER: ORC ADVANCE SCREEN — Total CR ~7, tuned for 4 players at Level 4
+
+ORC ROAD CAPTAIN (CR 3 / 700 XP)
+Type: Medium Humanoid (Orc), Lawful Evil
+AC: 16 (chain mail, shield) | HP: 52 (7d8+21) | Speed: 30 ft.
+STR 18 (+4) / DEX 12 (+1) / CON 17 (+3) / INT 11 (+0) / WIS 13 (+1) / CHA 14 (+2)
+Saving Throws: Str +6, Con +5
+Skills: Athletics +6, Intimidation +4, Perception +3
+Senses: Darkvision 60 ft., Passive Perception 13
+
+Traits:
+- Aggressive (Bonus Action): Move up to speed toward a hostile creature.
+- Tactical Withdrawal: When below half HP, all allied orcs within 30 ft. can Disengage as a reaction.
+
+Actions:
+- Multiattack: Two attacks.
+- Greataxe: Melee +6 to hit, 10 (1d12+4) slashing.
+- Javelin: Ranged +6 to hit, range 30/120, 7 (1d6+4) piercing.
+- Rallying Cry (1/day): All allied orcs within 30 ft. gain 5 temporary HP and advantage on their next attack.
+
+ORC SKIRMISHER (CR 1 / 200 XP each — 3 total)
+AC: 13 (hide armor) | HP: 22 (3d8+9) | Speed: 35 ft.
+STR 15 (+2) / DEX 14 (+2) / CON 16 (+3) | Darkvision 60 ft.
+
+Traits:
+- Nimble Escape (Bonus Action): Disengage or Hide.
+- Pack Withdrawal: Disengage as a bonus action if ally within 10 ft.
+
+Actions:
+- Shortsword: +4 to hit, 5 (1d6+2) piercing.
+- Hand Crossbow: +4 to hit, range 30/120, 5 (1d6+2) piercing.
+
+GOBLIN SPOTTER (CR 1/2 / 100 XP each — 2 total)
+AC: 15 | HP: 10 (3d6) | Speed: 30 ft.
+DEX 16 (+3) | Skills: Stealth +7 | Darkvision 60 ft.
+
+Traits:
+- Nimble Escape (Bonus Action): Disengage or Hide.
+- Signal Horn (Action): Audible to 1 mile. If it escapes with this signal, BLACKWAKE's scout boats carry 1d4 extra Iron Marines into Phase 2.
+
+Actions:
+- Scimitar: +5 to hit, 6 (1d6+3) slashing.
+- Shortbow: +5 to hit, range 80/320, 6 (1d6+3) piercing.
+
+TACTICAL NOTE: The goblin spotters are the priority. If either escapes and uses Signal Horn, BLACKWAKE's Phase 2 scout boat marines increase by 1d4. The party's division can handle the road captain and skirmishers — the party should personally be hunting the spotters.
+
+SKILL CHALLENGE: March Under Pressure (3 successes before 2 failures)
+
+Athletics (Str) DC 14: Success: Division maintains march pace. Fail: Soldiers tire — disadvantage on first round of dock combat.
+Persuasion (Cha) DC 13: Success: Conscripts steady after skirmish. Fail: Two soldiers freeze at sight of BLACKWAKE.
+Perception (Wis) DC 14: Success: Spot the ambush before it closes. Fail: Orc line draws first blood — 1d6 damage to 1d4 soldiers.
+Survival (Wis) DC 13: Success: Find faster river path — arrive with 10 extra minutes. Fail: Standard arrival.
+Investigation (Int) DC 15: Success: Identify where BLACKWAKE will anchor from old bay charts. Choose position before it arrives.
+
+---
+
+BLOCK 4 — THE DOCKS
+Thirty Minutes Before BLACKWAKE
+
+DM READ-ALOUD: Arrival at the Bay Mouth
+
+The dock road ends at the bay mouth.
+
+Two stone platforms flank the channel — circular towers at their centers, fire pits burning, torches already lit along the bridge that connects them.
+
+Someone was here before you. Alard's bay watchers. They prepared what they could and then they ran.
+
+The platforms are intact. The bridge holds.
+
+But the fog to the south is the wrong color.
+
+Too orange. Too warm. Moving wrong.
+
+That is not fog. That is smoke from whatever BLACKWAKE already burned on its way in.
+
+And through it, just visible — the sound of oars. Rhythmic. Purposeful. Getting closer.
+
+Behind you, one of the veteran soldiers says quietly:
+
+"We are not enough."
+
+A pause.
+
+"Tell us what to do anyway."
+
+THE THREE PHASES — MAP OVERVIEW
+
+PHASE 1 (Rounds 1-2): Bay Mouth — Two Chain Towers, Central Bridge
+Party establishes positions. Scout boats probe the bridge. BLACKWAKE is in the smoke to the south. The bay chain is the only thing that might slow it.
+
+PHASE 2 (Rounds 3-5): Channel Entry — BLACKWAKE Under Oar
+The galley-ironclad enters the channel. Bolt throwers open fire on both platforms simultaneously. Red canvas and timber burn. The chain can still engage — but the window is closing.
+
+PHASE 3 (Round 6+): Town Plaza — The Ram
+BLACKWAKE does not anchor. Does not deploy ramps. It drives its bow through the stone pier and beaches in the plaza. The ship IS the landing ramp. Marines walk off the bow into the town square.
+
+PHASE 1 TERRAIN
+
+West Chain Tower: Stone, circular. Fire pit burning at center. Chain mechanism corroded — needs Engineering. BOTH towers required to raise bay chain. Crossbowmen here have elevated fire lanes.
+
+East Chain Tower: Mirror of west. BOTH must be activated simultaneously — requires splitting party or dividing engineers.
+
+Central Bridge: BLACKWAKE's scout boats will push marines across this in Round 2. Veterans hold it — without them, it falls immediately.
+
+Harbormaster's Building: Stone, northwest. Will not burn. Best position for field surgeon and wounded.
+
+Red Canvas Market Stalls: Flammable. BLACKWAKE's bolt throwers will ignite these in Phase 2. Do not stage soldiers here.
+
+Timber Dock Extensions: Will burn in Phase 2. Any soldiers on outer dock arms need to pull back.
+
+PHASE 1 — PREPARATION (One Planning Round)
+
+Ask the party out loud: BLACKWAKE is coming through that channel. You have two chain towers, one on each side. You have forty soldiers. Where does everyone go?
+
+Every choice made here has a direct mechanical consequence in Phases 2 and 3:
+- Engineers to both chain towers (split): Bay chain becomes available in Phase 2.
+- Crossbowmen to chain towers: +2 to hit against BLACKWAKE deck crew in Phase 2.
+- Veterans on the central bridge: Bridge holds for 3 rounds against scout boat marines.
+- Field surgeon to harbormaster's building: One soldier who would die in Phase 3 stabilizes.
+- Splitting party across both platforms: Better coverage, but neither position has full party strength.
+- Keeping party together on one platform: One side undefended when Phase 2 bolt fire begins.
+
+---
+
+BLOCK 5 — BLACKWAKE ARRIVES
+The Ship That Should Not Exist
+
+DM READ-ALOUD: Contact
+
+It comes out of the morning fog like something the world forgot to forbid.
+
+Slow. Inevitable. Steam rising from its iron flanks.
+
+The acid resin coating catches the light — the hull does not rust. Does not corrode.
+
+It is exactly as the schematic said it would be. Bigger than you remembered.
+
+Three hundred feet of iron hull. Two crane-towers of its own. Ramp mechanisms on the bow.
+
+And aboard it, disciplined and ready, an assault force that has been waiting a year for this bay.
+
+The BLACKWAKE slows as it approaches anchorage.
+
+From the command deck, a figure in a long riveted coat looks toward the docks.
+
+Even at this distance, you recognize the goggles.
+
+Vexrath Sablegear sees you too.
+
+He taps his cane once against the rail.
+
+He does not look surprised. He looks... interested.
+
+BLACKWAKE — SIEGE CONSTRUCT (Gargantuan Object)
+
+Hull AC: 18 (iron-reinforced, acid resin coated — immune to fire, resistant to piercing)
+Hull HP: 180 — Threshold: at 90 HP oars destroyed and cannot steer; at 0 hull breaches and begins sinking over 3 rounds
+Speed: 40 ft. water (oar-powered, does not need wind)
+Crew: 40 Iron Marines, 8 Bolt Thrower Crew, Vexrath Sablegear (boss)
+
+Bolt Throwers (x2): +6 to hit, range 60/200 ft., 4d10 piercing. Each thrower targets structures or groups of 3+ creatures in a 10 ft. area.
+
+Acid Hull Aura: Any creature starting its turn touching the hull takes 1d6 acid damage. Climbing requires DC 13 Athletics each round or 2d6 acid.
+
+Ram Prow: On the round it beaches (Phase 3), all creatures in a 30 ft. cone ahead of the bow must make DC 15 Str save or take 4d10 bludgeoning and be knocked prone.
+
+Oar Banks: AC 12, HP 20 each side. Destroying one oar bank reduces speed to 20 ft. Destroying both halts all water movement.
+
+IRON MARINE (CR 2 / 450 XP)
+Type: Medium Humanoid (Orc), Lawful Evil
+AC: 16 (chain mail, shield) | HP: 32 (5d8+10) | Speed: 30 ft.
+STR 17 (+3) / DEX 11 (+0) / CON 14 (+2) | Languages: Orc, Common
+
+Traits:
+- Shore Discipline: Do not make morale checks unless Vexrath is dead or BLACKWAKE is sinking.
+- Boarding Formation: When two marines within 5 ft. of each other, both gain +1 AC and cannot be moved by forced movement of 10 ft. or less.
+- Pack Tactics: Advantage on attack rolls if ally within 5 ft. of target.
+
+Actions:
+- Multiattack: Shortsword + Shield Bash.
+- Shortsword: +5 to hit, 6 (1d6+3) piercing.
+- Shield Bash: +5 to hit, 5 (1d4+3) bludgeoning. DC 13 Str save or pushed 5 ft. and knocked prone.
+- Javelin (3/combat): +5 to hit, range 30/120, 6 (1d6+3) piercing.
+
+BOLT THROWER CREW (CR 1/2 / 100 XP each — 4 per thrower, 8 total)
+Type: Small Humanoid (Goblin), Neutral Evil
+AC: 13 | HP: 14 (4d8-4) | DEX 14 (+2) | INT 14 (+2)
+
+Actions:
+- Dagger: +4 to hit, 4 (1d4+2) piercing.
+- Operate Bolt Thrower (requires 2 crew): +6 to hit, range 60/200, 4d10 piercing. Max damage against structures.
+- Reload (Bonus Action): If only 1 crew remains, bolt thrower cannot fire that round.
+
+Bolt Thrower (Object): AC 12, HP 25. DC 14 Athletics to overturn or push into water.
+
+VEXRATH SABLEGEAR — BOSS (CR 7 / 2,900 XP)
+Type: Medium Humanoid (Black Dragonborn), Lawful Neutral
+AC: 18 (riveted plate greatcoat — masterwork medium armor, INT bonus applies via Artificer)
+HP: 91 (14d8+28) | Speed: 30 ft.
+STR 14 (+2) / DEX 14 (+2) / CON 14 (+2) / INT 20 (+5) / WIS 14 (+2) / CHA 15 (+2)
+Saving Throws: Int +8, Con +5, Wis +5
+Skills: Arcana +8, Investigation +8, Perception +5, Athletics +5, History +8
+Damage Resistances: Acid (racial dragonborn)
+Condition Immunities: Frightened
+Languages: Common, Draconic, Goblin, Orc, Dwarvish
+
+Traits:
+- Structural Insight (Passive): Advantage on attack rolls against objects and structures. Targets take an additional 1d10 damage.
+- Tool Mastery: Use Tinker's or Smith's Tools as bonus action to interact with any constructed object within 10 ft.
+- The Design Is Sound (Reaction, 1/day): When BLACKWAKE takes damage, redirect up to 25 points to the water instead.
+- Acid Resistance: Takes no damage from BLACKWAKE's acid hull aura.
+
+Actions:
+- Multiattack: Two attacks — Arcane Cannon and Cane Strike, or two Arcane Cannon attacks.
+- Arcane Cannon: Ranged Spell Attack +8 to hit, range 120 ft., 18 (3d8+5) force. Critical hit: target knocked back 10 ft., DC 15 Str save or prone.
+- Cane Strike: Melee +5 to hit, reach 5 ft., 7 (1d8+2) bludgeoning + 9 (2d8) acid (ignores resistance).
+- Acid Breath (Recharge 5-6): 30 ft. line, 5 ft. wide. DC 14 Dex save. Fail: 28 (8d6) acid. Success: half. Structures take max automatically.
+
+Bonus Actions:
+- Tactical Assessment: Advantage on first attack roll against one studied creature until start of next turn.
+- Redirect Marines (1/round): Up to 4 Iron Marines within 60 ft. may immediately move up to half speed without provoking opportunity attacks.
+
+Legendary Actions (3/round, at end of another creature's turn):
+- Observe (1 action): Perception check (result 18), learns AC of one creature.
+- Controlled Burst (2 actions): One bolt thrower fires at a target Vexrath designates using his attack bonus (+8).
+- Acid Spatter (2 actions): Strike hull — acid spray hits all creatures within 10 ft. DC 13 Dex save or 2d6 acid.
+
+VEXRATH — MANNER IN COMBAT
+
+He does not rage. He does not taunt. He assesses out loud, as if thinking through a problem. He is disappointed by inefficiency. He is genuinely curious when the party surprises him.
+
+"Interesting. Both towers. You split the activation."
+"I had accounted for one."
+He looks at the chain cutting across the channel.
+"I had not accounted for coordination under fire."
+
+VEXRATH — SURRENDER CONDITION
+
+When BLACKWAKE's hull reaches 0 HP AND Vexrath is below 25 HP, he stops fighting. Not from fear — from calculation.
+
+He lowers the cane.
+"The ship is done."
+A pause. He does not look at the wreck.
+"You stopped the design. Not the intent."
+"I remember faces."
+He steps off the hull into the water. He does not surface where you can see.
+
+DM NOTE: Vexrath is a recurring antagonist. He survives intentionally. If the party tries to pursue him into the water, the acid resin makes the hull impassable and the bay is deep. He is gone. He said he would build another.
+
+---
+
+BLOCK 6 — THE FIGHT AT THE DOCKS
+Three Phases. Nothing Stops It. Win Anyway.
+
+PHASE 2 — BLACKWAKE ENTERS THE CHANNEL
+
+DM READ-ALOUD:
+
+It comes out of the smoke the way something comes out of a nightmare.
+Not fast. Not loud. Just... present. Then closer. Then undeniable.
+
+BLACKWAKE fills the channel the way a landslide fills a valley — not quickly, but completely.
+
+Iron hull. Oar banks working in perfect rhythm. Two bolt throwers on the deck already pivoting toward your positions.
+
+The acid resin on the hull catches the dawn light and does not reflect it. It absorbs it.
+
+On both sides of the channel, the market stalls begin to burn. Not from fire you set. From bolts you didn't hear coming.
+
+And on the command deck, walking the hull like a man on a morning inspection, the black dragonborn looks toward the towers.
+
+He sees you. He taps his cane once. Then he goes back to watching the channel.
+
+PHASE 2 ROUND-BY-ROUND:
+
+Round 1: BLACKWAKE enters channel. West bolt thrower fires on west chain tower (4d10). East bolt thrower fires on bridge soldiers. Bay chain activation attempt (both towers must act). Bridge veterans: DC 13 Con save or 1 killed.
+
+Round 2: Moves 40 ft. closer. Vexrath uses Controlled Burst on whichever tower activated first. Best round to destroy an oar bank (AC 12, HP 20).
+
+Round 3: Moves 40 ft. — now at the chain tower line. If chain raised: 3d10 bludgeoning, speed 0 for 1 round, hull AC drops to 16 for 2 rounds. If chain not raised: ship passes through.
+
+Round 4: If stopped by chain — Vexrath uses Acid Breath on closest chain tower (DC 14, 8d6 acid). Marines on scout boats try to board the bridge. If not stopped: Phase 3 begins.
+
+THE BAY CHAIN (Special Option)
+
+Requires engineers assigned to BOTH chain towers during Phase 1, OR two party members each at a tower making checks simultaneously.
+
+Investigation (Int) DC 14: Understand the mechanism. Success reduces Engineering DC by 2.
+Tinker's Tools / Athletics DC 16: Crank the chain housing. Both towers must succeed on the same round.
+Athletics (Str) DC 13: Manual override if mechanism jams mid-crank.
+
+If BOTH towers succeed same round: chain rises, BLACKWAKE takes 3d10 bludgeoning, speed 0 for 1 round, hull AC 16 for 2 rounds.
+If only ONE tower succeeds: partial chain — ship slows to 20 ft. but not stopped. Buys one extra round.
+If ship already past towers when chain rises: chain snaps on hull — 2d10 damage, no stopping effect, mechanism destroyed.
+
+PHASE 3 — BLACKWAKE BEACHES
+
+DM READ-ALOUD:
+
+You expect it to slow.
+Ships slow. Ships anchor. Ships wait for the tide.
+BLACKWAKE does not slow.
+
+The bow hits the stone pier at full oar-speed.
+
+The sound is not a crash. It is a statement.
+
+Cobblestones explode upward. The fountain plaza erupts with shrapnel and displaced stone.
+
+The bow punches through the pier and buries itself in the plaza.
+
+And then the oars stop.
+
+And the bow ramp folds down.
+
+The ramp is the landing zone.
+
+There are no gates to close. No water to cross.
+
+There is only forty feet of iron bow between you and everything that has been waiting to kill you.
+
+And at the top of that ramp, walking down it with the ease of a man descending his own front steps — Vexrath Sablegear.
+
+RAM IMPACT: Every creature in a 30 ft. cone ahead of the bow makes DC 15 Str save. Fail: 4d10 bludgeoning, knocked prone, pushed 15 ft. Success: half damage, not prone. Creatures behind full cover are unaffected.
+
+PHASE 3 TERRAIN:
+
+BLACKWAKE Bow (Beached): 40 ft. of acid-coated iron hull. Cannot be moved.
+Rubble Field: 30 ft. radius around bow. Difficult terrain. Half cover if prone.
+Fountain/Garden (Center Plaza): Cracked fountain, half cover. Trees burning by Phase 3 Round 2.
+Burning Market Stalls (NE): Adjacent creatures take 1d6 fire. Explodes Round 3 — 3d6 fire, 10 ft. radius, DC 13 Dex save.
+Left Dock Buildings (NW): Stone construction. Full cover. Field surgeon staged here if assigned.
+Bow Ramp: 40 ft. long, 10 ft. wide. Marines descend 5 per round.
+
+PHASE 3 ENCOUNTER COMPOSITION:
+
+Wave 1 (Round 1): 5 Iron Marines descend ramp.
+Wave 2 (Round 2): 5 more Iron Marines. Vexrath in combat. Bolt thrower crew fires into plaza.
+Wave 3 (Round 3): 5 more Iron Marines. Burning stall explosion check. Wall horn not yet.
+Wave 4 (Round 4+): 5 more Iron Marines per round. Alard's horn sounds at end of Round 4 or 5.
+
+STOPPING THE MARINE FLOW:
+
+Destroy the ramp (AC 14, HP 40): Ramp collapses — remaining marines cannot deploy. Vexrath loses his Reaction for 1 round.
+Hold the ramp top (melee): Maximum 2 marines can attack the position at once. Extremely dangerous. Extremely effective.
+Acid Barrel Detonation (if carried from Floor 2): 6d6 acid to all creatures on ramp, jams mechanism for 3 rounds.
+
+VICTORY CONDITIONS (all required):
+- BLACKWAKE's hull at 0 HP
+- Vexrath surrendered or driven into the water
+- Fewer than 5 Iron Marines remain standing
+- Alard's three-note horn has sounded
+
+IF THE PARTY IS STRUGGLING (use one, never all three):
+1. Kobold engineer (if captured Floor 2): climbs hull, finds failsafe, activates it joyfully. BLACKWAKE detonates from inside — 6d10 force in 20 ft. radius, hull immediately 0 HP. The kobold is in the blast.
+2. Structural weakness — the seam Vexrath had redone in the swamp: DC 14 Investigation to locate. Three attacks in one round totaling 30+ damage causes cascade hull failure. Hull AC drops to 12 for 2 rounds.
+3. Alard's cavalry arrives early (Round 3): 8 mounted soldiers crash through north plaza, cutting off marine reinforcements.
+
+---
+
+BLOCK 8 — THE AFTERMATH
+Victory, Costly But Real
+
+DM READ-ALOUD:
+
+The bay is quiet.
+
+BLACKWAKE's iron superstructure sits at the bottom with the grace of everything that was built to last and wasn't supposed to sink.
+
+The horde has broken at the wall.
+
+Not routed — the orcs do not rout easily — but the coherent assault is over.
+
+Fragments pull back into the treeline. Organized pursuit begins at dawn.
+
+On the loading platform, your soldiers are sitting down.
+
+Some are tending wounds. Some are staring at the water.
+
+One of them starts laughing — not hysteria, just the specific kind of disbelief that comes after something that wasn't supposed to work works.
+
+It spreads.
+
+Not celebration. Just the sound of people who are still alive and didn't expect to be.
+
+SIR ALARD — ARRIVAL
+
+Alard reaches the docks within the hour, on horseback, covered in someone else's blood and walking slightly wrong.
+
+He says nothing for a long moment.
+
+Then: "How many?"
+
+He means the dead. He will carry the number with every other number he carries.
+
+He looks at the wreck in the bay.
+
+"He'll build another," Alard says. He is not wrong.
+
+"But not here. Not today."
+
+A pause.
+
+"Today, we held."
+
+THE COST:
+- Name the soldiers who died. Even just one or two, specifically.
+- The fort sustained significant damage — it will hold, but needs months of repair.
+- The village Alard protected during Floor 2 survived — scouts confirm it is intact.
+- Alard's wound is real. He will not say how serious. He will not sit down.
+
+KARMA AWARDS:
+
+Choosing the docks over the wall — the smart and harder play: 50-100
+Stopping BLACKWAKE before full marine landing: 100-200
+Destroying both landing ramps: 25-50
+Using the bay chain (especially if engineered under fire): 50-75
+Division survivors above 25 soldiers: 50-100
+Confronting Vexrath directly in combat: 25-75
+Moral weight — acknowledging the cost of the victory: 25-50
+
+---
+
+BLOCK 9 — THE TOWER PULLS THEM
+The Floor Ends Before the Celebration Does
+
+DM READ-ALOUD:
+
+It happens the way it always does.
+
+Not with a warning. Not with a goodbye.
+
+The world begins to soften at the edges.
+
+The uniform threads start to loosen. The military coat relaxes. The insignia fades.
+
+You have been here long enough. The Tower has seen what it needed to see.
+
+You have time for one last look.
+
+Alard stands at the dock's edge, watching the bay.
+
+He does not look back.
+
+But he raises one hand.
+
+Not a wave.
+
+A salute.
+
+Given to people behind him. Given to you.
+
+The docks disappear.
+
+The cold air disappears.
+
+The smell of iron and acid and blood disappears.
+
+What does not disappear: the knowledge that it held.
+
+The war was not over. But this part of it — this day, this bay, this wall — held.
+
+---
+
+APPENDIX A — KEY NPC REFERENCE
+
+SIR ALARD MONTREVAL — Wall Commander
+Role: Commands the wall defense. Arrives at docks after breakthrough. Floor 3 closer.
+Alignment: Neutral Good | CR: 6 | AC: 17 | HP: 112
+Key Trait: He does not make speeches. He makes decisions. The soldiers move before he finishes.
+Wound: Takes a wound at the wall. Will not discuss severity. Does not sit down.
+Final Line: "Today, we held." He means more than the fort.
+
+VEXRATH SABLEGEAR — The Builder
+Role: Overseer of BLACKWAKE. Boss encounter. Floor 3 antagonist.
+Alignment: Lawful Neutral (he is building something. Morality is secondary to completion.)
+CR: 7 | AC: 18 | HP: 98
+Key Trait: He is not cruel. He is certain. He respects earned resistance. He remembers faces.
+Surrender: Below half HP when BLACKWAKE sinks — will not die for a sunk ship.
+Final Line: "I remember faces." He steps off the rail. Does not surface where you can see.
+Future Use: Recurring antagonist — he will build another BLACKWAKE.
+
+DIVISION VETERAN — Named Soldier (Optional)
+Give one soldier in the division a name and a face before the fight begins. The veteran who said "Tell us what to do anyway" is the natural choice.
+If they survive: they are one of the soldiers laughing on the loading platform at the end.
+If they die: they die doing what they came to do. Alard asks for the count. Their name is in it.
+
+---
+
+APPENDIX B — DM CHECKLIST
+
+Before the Session:
+- Decide which path the party will most likely choose — docks or wall — and have both blocks partially prepped
+- Name one soldier in the division before play begins. Write it down.
+- Decide Vexrath's condition going in — is this the first time the party has seen him since the swamp?
+- Review the kobold engineer option — if the party captured him in Floor 2, plant a subtle callback early in Block 1
+
+During the Session:
+- Use the wall beats (Block 2) throughout Blocks 3-5 to keep Alard's fight present
+- Track division casualties honestly — don't fudge upward or downward
+- Let the party plan in Block 4. Give them the full tactical picture. Reward the planning.
+- When BLACKWAKE arrives, read the full read-aloud. Don't rush it. That reveal is earned.
+
+Tone Reminders:
+- Desperate last stand: the wall beats, the division losses, the exhaustion of the march
+- Tactical war movie: the preparation phase, the crane drop, the bay chain, the smart play being rewarded
+- Tragic victory: name the dead, let Alard ask the count, let the party sit with what it cost
+
+After the Session:
+- Award Karma from the Block 8 table — do it at the table, not after
+- Ask the players: what did your character feel when the three-note horn sounded?
+- Note: Vexrath is alive. Somewhere. He said he would build another.
+
+FLOOR 3 — THE DAY THE WALL HELD — END

@@ -1,0 +1,28 @@
+{
+  "name": "Zara Leafwhisper",
+  "species": "Tabaxi",
+  "faction": "Tower Authority",
+  "rank": "Compliance Intern",
+  "role": "compliance officer",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 15",
+      "WIS 13",
+      "CHA 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 9"
+    ],
+    "hp_range": "28–38"
+  },
+  "equipment": {
+    "weapons": "short sword, FTA badge",
+    "armour": "FTA uniform over light armour"
+  },
+  "sd_appearance": "Tabaxi Compliance Intern Zara Leafwhisper, standing at a towering 2.5 feet, strides confidently through the Undercity. Her emerald fur glimmers under the dim lantern light, contrasting against her golden eyes that seem to pierce the shadows. She wears the immaculate FTA uniform over light armor, a short sword belted at her side and an FTA badge pinned to her chest. A single, distinctive golden feather quill is tucked behind her ear, a symbol of her unwavering pursuit of order and justice in the chaotic city.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "FTA uniform kept immaculate — young, earnest, slightly too eager"
+}

@@ -1,0 +1,35 @@
+{
+  "name": "Saltmarch Wanderers",
+  "affiliation": "Argent Blades",
+  "specialty": "A tight-knit group known for their unrivaled expertise in navigating the unstable rifts of the Undercity, offering clients safe passage through the city's ever-shifting terrain.",
+  "members": [
+    {
+      "name": "Elara Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "A stern woman with a scar running down her left cheek, earned during a particularly treacherous rift expedition."
+    },
+    {
+      "name": "Thorin Stonebreaker",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A burly dwarf with a cyborg arm, his past as a gladiator in the Outer Wall is a constant reminder of his brutal past."
+    },
+    {
+      "name": "Seraphina Shadowwhisper",
+      "role": "Face",
+      "species": "Elf",
+      "note": "A slender elf with a tattoo of a raven on her neck, her quick wit and charm have earned her many allies and enemies in the Sanctum Quarter."
+    }
+  ],
+  "visual": "They wear sturdy leather armor and carry a variety of weapons, with Elara's signature scarf often concealing her face in public. Their group is easily identifiable by their shared tabard, emblazoned with the Argent Blades emblem.",
+  "reputation_note": "Rumored to be former members of the Tower Authority, their loyalty to the Argent Blades remains a mystery, stirring both caution and intrigue among the denizens of the Undercity.",
+  "history": [
+    "[2026-03-11] Party first logged."
+  ],
+  "missions_completed": 0,
+  "missions_failed": 0,
+  "tier": "Unknown",
+  "points": 0,
+  "generated": true
+}

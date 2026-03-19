@@ -1,0 +1,28 @@
+{
+  "name": "Grimwit Stone-Eye",
+  "species": "Gnome",
+  "faction": "Obsidian Lotus",
+  "rank": "Specialist",
+  "role": "mercenary",
+  "home_district": "warrens",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A stooped, wiry gnome with a bushy silver beard and spectacles, Grimwit Stone-Eye stands before a table cluttered with vials, samples, and equipment. His skin, weathered and lined, is a stark contrast to his glossy black clothing, woven with lotus flower motifs in black glass. His chainmail and scale mail armor, worn and battle-scarred, bears tales of past contracts. A black glass lotus pin adorns his collar, and he carries a warhammer and a crossbow, one distinctive visual detail being the eye-shaped gem set into the hilt of his warhammer.",
+  "faction_visual": "black shadow-woven clothing, lotus flower motifs in black glass, memory vials as jewellery",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}
