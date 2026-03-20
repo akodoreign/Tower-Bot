@@ -1,0 +1,28 @@
+{
+  "name": "Yaulderna Silverstreak",
+  "species": "Half-Elf",
+  "faction": "Wizards Tower",
+  "rank": "Archmage — Head of the Wizards Tower",
+  "role": "wizard",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "DEX 14",
+      "CON 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "STR 8"
+    ],
+    "hp_range": "28–42"
+  },
+  "equipment": {
+    "weapons": "staff or wand, dagger at the belt",
+    "armour": "robes (no armour)"
+  },
+  "sd_appearance": "Tall, graceful half-elf with dark hair streaked silver, wearing deep blue and grey layered robes. Robes feature heavy design with component pockets, occasionally ink-stained and burned. Carries staff, dagger at belt. Glows faintly when thinking. Distinctive visual detail: hands occasionally glow. Wears Guild badge.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "heavy robe with component pockets, often ink-stained, sometimes accidentally burned"
+}

@@ -175,12 +175,75 @@ def _maybe_spawn_rift(rifts: List[Dict]) -> Optional[Dict]:
     return None
 
 
+# ---------------------------------------------------------------------------
+# Rift auto-resolution — NPC parties and factions seal rifts over time
+# ---------------------------------------------------------------------------
+# Early stages can fizzle on their own. Later stages require faction response.
+# The chance to auto-resolve is checked EACH TICK (hourly) once minimum
+# stage time has passed. Higher stages = lower auto-seal chance but higher
+# drama. If a rift reaches "critical" without being sealed, it either gets
+# a last-ditch NPC seal or becomes a disaster.
+#
+# Players can always pre-empt this via /sealrift or by completing a rift mission.
+
+# Per-tick auto-resolution chance BY STAGE (checked after min days elapsed)
+RIFT_AUTO_RESOLVE_CHANCE = {
+    "whisper":  0.25,   # 25% — most whispers just fizzle out naturally
+    "tremor":   0.15,   # 15% — Glass Sigil containment sometimes works
+    "crack":    0.10,   # 10% — needs real intervention, but NPC parties try
+    "open":     0.08,   # 8%  — hard to seal, NPC parties take casualties
+    "critical": 0.05,   # 5%  — last-ditch heroics, very unlikely without players
+}
+
+# Who seals it — flavour varies by stage and location
+_RIFT_SEALERS = {
+    "whisper": [
+        ("fizzle",    "The anomaly dissipated on its own. Glass Sigil instruments confirm: readings normal. False alarm."),
+        ("glass_sigil", "Glass Sigil containment team deployed a residue siphon near {location}. Readings stabilised within hours."),
+        ("natural",   "Whatever was building near {location} has stopped. No explanation. The city moves on."),
+    ],
+    "tremor": [
+        ("glass_sigil", "A Glass Sigil rapid-response unit sealed the micro-fracture near {location} before it could widen. Textbook containment."),
+        ("wardens",   "Wardens of Ash cordoned {location} while Glass Sigil technicians ran a three-hour stabilisation protocol. Tremors ceased."),
+        ("natural",   "The tremors near {location} stopped as suddenly as they started. Glass Sigil is calling it a pressure equalisation event. Nobody believes them."),
+    ],
+    "crack": [
+        ("npc_party", "An NPC adventurer party — {party_name} — sealed the crack at {location} after a six-hour operation. Two members hospitalised."),
+        ("wardens",   "Captain Korin deployed a full Warden containment squad to {location}. The crack was sealed with arcane cement and faith. Holding, for now."),
+        ("glass_sigil", "Senior Archivist Pell personally oversaw the sealing at {location}. Three Glass Sigil instruments were sacrificed in the process."),
+    ],
+    "open": [
+        ("npc_party", "{party_name} went into the open Rift at {location} and came back missing a member. But the Rift is sealed. Nobody's celebrating."),
+        ("wardens",   "A combined Warden-Argent Blades strike team sealed the Rift at {location}. Casualties reported but not confirmed. The area remains cordoned."),
+        ("faction_joint", "An unprecedented joint operation between the Wardens and the Serpent Choir sealed the Rift at {location}. The Choir's contract for the sealing is said to be... extensive."),
+    ],
+    "critical": [
+        ("npc_party", "{party_name} made a suicide run into the critical Rift at {location}. Against all odds, they sealed it. The party is in critical condition. The city owes them everything."),
+        ("wardens",   "Captain Korin led a last-stand operation at {location}. The Rift is sealed. Three Wardens did not come back. The Wall held."),
+        ("sacrifice", "An unidentified mage walked into the critical Rift at {location} alone. The tear closed behind them. Nobody knows who they were. The Glass Sigil is looking into it."),
+    ],
+}
+
+# NPC party names for auto-resolution flavour
+_SEAL_PARTY_NAMES = [
+    "Dustline Seven", "The Borrowed Hours", "Faultline Compact",
+    "Gravelight Company", "Ironveil Syndicate", "The Pale Majority",
+    "Remnant Clause", "Stormline Company", "The Weighted Verdict",
+    "Thorngate Crew", "Ashveil Collective", "The Cracked Seal",
+    "Six Feet Forward", "Ember Writ", "The Open Account",
+    "Coldbrook Syndicate", "Warden's Folly", "Last Rites Collective",
+]
+
+
 def _tick_rifts(rifts: List[Dict]) -> tuple[List[Dict], List[Dict]]:
     """
     Advance all active Rifts by one bulletin tick.
     Stage advancement is gated on REAL DAYS elapsed since stage_entered_at,
     not tick counts. Once the minimum days have passed, each tick rolls 20%
     to advance — so stages typically move within a few hours of becoming eligible.
+
+    Auto-resolution is also checked each tick: NPC parties, factions, or
+    natural fizzle can seal a rift before it escalates further.
     """
     events = []
     now = datetime.now()
@@ -204,7 +267,31 @@ def _tick_rifts(rifts: List[Dict]) -> tuple[List[Dict], List[Dict]]:
             events.append({"rift": rift, "event": "stage_update"})
             rift["last_bulletin_stage"] = stage
 
-        # Try to advance once minimum real days have elapsed
+        # --- Auto-resolution check (once min days have passed) ---
+        # Roll BEFORE advancement so a rift can be sealed at its current stage.
+        # Skip if it was JUST announced this tick (give it at least one bulletin).
+        if (days_elapsed >= min_days
+                and rift.get("last_bulletin_stage") == stage
+                and random.random() < RIFT_AUTO_RESOLVE_CHANCE.get(stage, 0)):
+            # Sealed!
+            seal_options = _RIFT_SEALERS.get(stage, _RIFT_SEALERS["crack"])
+            sealer_type, seal_template = random.choice(seal_options)
+            party_name = random.choice(_SEAL_PARTY_NAMES)
+            seal_desc = seal_template.format(
+                location=rift["location"],
+                party_name=party_name,
+            )
+            rift["resolved"]    = True
+            rift["outcome"]     = "sealed"
+            rift["sealed_by"]   = sealer_type
+            rift["sealed_at"]   = now.isoformat()
+            rift["seal_desc"]   = seal_desc
+            if sealer_type == "npc_party":
+                rift["seal_party"] = party_name
+            events.append({"rift": rift, "event": "sealed"})
+            continue  # don't also try to advance
+
+        # --- Try to advance once minimum real days have elapsed ---
         if days_elapsed >= min_days and random.random() < RIFT_ADVANCE_CHANCE:
             current_idx = RIFT_STAGES.index(stage)
             if current_idx < len(RIFT_STAGES) - 1:
@@ -268,6 +355,20 @@ async def _generate_rift_bulletin(rift: Dict, event: str) -> Optional[str]:
             f"A Rift at {location} was never sealed and has collapsed into a disaster. "
             f"Write a 3-4 line emergency bulletin. Terse, grim, specific. "
             f"What happened to the immediate area. Who is responding. What is lost."
+        )
+    elif event == "sealed":
+        seal_desc = rift.get("seal_desc", f"The Rift at {location} has been sealed.")
+        sealed_by = rift.get("sealed_by", "unknown")
+        seal_stage = stage  # the stage it was at when sealed
+        instruction = (
+            f"A Rift at {location} has been SEALED at the '{seal_stage}' stage. "
+            f"Resolution: {seal_desc} "
+            f"Write a 3-4 line Undercity bulletin reporting the successful sealing. "
+            f"Tone depends on the stage it was sealed at: "
+            f"whisper/tremor = brief, matter-of-fact, city barely noticed. "
+            f"crack = relief, some concern about what could have been. "
+            f"open/critical = dramatic, heroic, the city owes someone. "
+            f"Include the specific resolution details above. Ground it in the location."
         )
     else:
         instruction = (

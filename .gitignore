@@ -4,6 +4,9 @@ images/
 # Reference images for iterative A1111 generation (large PNGs)
 campaign_docs/image_refs/
 
+# Copyrighted reference material — do not distribute
+campaign_docs/Dungeons & Dragons 2024 Player's Handbook.txt
+
 # Generated mission modules (large .docx + .json intermediates)
 generated_modules/
 

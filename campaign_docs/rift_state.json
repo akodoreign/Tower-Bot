@@ -35,10 +35,10 @@
     "id": "rift_1773810382",
     "location": "Shantytown Heights",
     "loc_type": "warrens",
-    "stage": "whisper",
-    "stage_entered_at": "2026-03-18T00:06:22.371517",
+    "stage": "tremor",
+    "stage_entered_at": "2026-03-20T00:26:14.037507",
     "resolved": false,
     "spawned_at": "2026-03-18T00:06:22.371517",
-    "last_bulletin_stage": "whisper"
+    "last_bulletin_stage": "tremor"
   }
 ]

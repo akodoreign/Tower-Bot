@@ -1635,9 +1635,13 @@
     "body": "**Argent Blades \u2014 Echoes of an Unseen Past**\n*Tier: Investigation | Expires: TBD | Reward: 150 EC + 50 Kharma*\n\nEleanor Reed, your arcane insight and affinity for the arcane make you our best choice for this urgent investigation. Rumors have circulated of a relic from the distant past, one that could shift the balance of power in the Undercity. Contact Lady Cerys Valemont at the Grand Forum for further details and the location of the first clue. Your objective: uncover the truth behind these whispers, and secure this relic before it falls into the wrong hands.",
     "posted_at": "2026-03-15T09:41:18.366955",
     "expires_at": "2026-04-28T09:41:18.366955",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1482675049612972082,
-    "personal_for": "Eleanor Reed"
+    "personal_for": "Eleanor Reed",
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1484286333131292684,
+    "completed": true
   },
   {
     "title": "The Outer Wall's Protection",
@@ -1775,7 +1779,7 @@
     "body": "**Iron Fang Consortium \u2014 Shadows' Embrace**\n*Tier: Escort | Expires: TBD | Reward: 200 EC + 50 Kharma*\n\nA valuable cargo shipment is headed to the Grand Forum, but the Outer Wall remains a dangerous passage due to recent Rift activity. The Iron Fang Consortium needs a team of capable adventurers to escort the shipment through the dangerous terrain and ensure it reaches its destination safely.\n\n*Contact: Thoren, Sanctum Quarter*",
     "posted_at": "2026-03-17T09:05:05.881100",
     "expires_at": "2026-04-04T09:05:05.881100",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1483390713117937746,
     "claimed": true,
     "npc_claimed": true,
@@ -1791,7 +1795,7 @@
     "body": "**Glass Sigil \u2014 Arcane Archives: Lost Knowledge Recovery**\n*Tier: Escort | Expires: TBD | Reward: 100 EC + 100 Kharma*\n\nAssist Senior Archivist Pell in recovering lost knowledge from the Guild Spires' archives. As the Glass Sigil's resources are depleted, the Arcane Archives' contents are crucial to our survival.\n\n*Contact: Senior Archivist Pell, Guild Spires*",
     "posted_at": "2026-03-17T19:02:54.004485",
     "expires_at": "2026-03-24T19:02:54.004485",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1483541154694955138,
     "claimed": true,
     "npc_claimed": true,
@@ -1904,7 +1908,12 @@
     "posted_at": "2026-03-18T21:06:33.905178",
     "expires_at": "2026-03-26T21:06:33.905178",
     "resolved": false,
-    "message_id": 1483934664153370725
+    "message_id": 1483934664153370725,
+    "claimed": true,
+    "npc_claimed": true,
+    "claim_message_id": 1484300550852968549,
+    "npc_complete_at": "2026-03-22T04:23:38.398818",
+    "npc_outcome": "fail"
   },
   {
     "title": "The Guild Spires Incursion",
@@ -2385,5 +2394,17 @@
     "expires_at": "2026-08-16T19:27:45.152376",
     "resolved": false,
     "message_id": 1484272185031004192
+  },
+  {
+    "title": "The Shattered Alliance",
+    "faction": "Glass Sigil",
+    "tier": "inter-guild",
+    "reward": "500 EC, 50 Kharma",
+    "opposing_faction": "Wardens of Ash",
+    "body": "**Glass Sigil \u2014 The Shattered Alliance**\n*Tier: Inter-guild | Expires: TBD | Reward: 500 EC, 50 Kharma*\n*Opposes: Wardens of Ash*\n\nA powerful artifact, the Sapphire of Sorrow, has been stolen from the Glass Sigil archives. Rumors suggest the Wardens of Ash are behind the theft. Retrieve the artifact and bring it back to Senior Archivist Pell before they can use it against us.\n\n*Contact: Senior Archivist Pell, Glass Sigil Archives, Sanctum Quarter*",
+    "posted_at": "2026-03-20T02:46:50.532342",
+    "expires_at": "2026-06-05T02:46:50.532342",
+    "resolved": false,
+    "message_id": 1484382685408264235
   }
 ]

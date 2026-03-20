@@ -1,10 +1,35 @@
 {
   "name": "Unknown Party",
-  "affiliation": "No Affiliation",
-  "specialty": "General contracts",
-  "members": [],
-  "visual": "",
-  "reputation_note": "",
+  "affiliation": "Serpent Choir",
+  "specialty": "Unyielding in the face of danger, the Unknown Party is renowned for their ability to navigate the unpredictable rifts of the Undercity, dismantling the destructive anomalies that threaten the city's stability.",
+  "members": [
+    {
+      "name": "Jax Thorne",
+      "role": "Leader",
+      "species": "Human",
+      "note": "Known for his scarred visage, a grim reminder of battles past, Jax leads his team with unwavering resolve."
+    },
+    {
+      "name": "Vexa Nightshade",
+      "role": "Tracker",
+      "species": "Elf",
+      "note": "With her keen senses honed by centuries of experience, Vexa can find anyone or anything, even within the labyrinthine Undercity."
+    },
+    {
+      "name": "Gideon Ironfist",
+      "role": "Muscle",
+      "species": "Dwarf",
+      "note": "A battle-hardened dwarf, Gideon's strength and resilience are matched only by his fierce loyalty to the Unknown Party."
+    },
+    {
+      "name": "Zara Flamespark",
+      "role": "Arcanist",
+      "species": "Tiefling",
+      "note": "The youngest member of the team, Zara's volatile magic is a constant reminder of the line between life and death."
+    }
+  ],
+  "visual": "Clad in leather armor, adorned with serpent-like symbols and weapons forged from rift metal, the Unknown Party stands apart as a formidable force in the Undercity.",
+  "reputation_note": "Whispers suggest they are backed by the Serpent Choir, but their allegiance remains a mystery, and they are feared for their efficiency and ruthlessness.",
   "history": [
     "[2026-03-14] Party first logged.",
     "[2026-03-14] Failed a major-tier contract. Rank: Unknown (-2/5)",
@@ -23,11 +48,13 @@
     "[2026-03-18] Completed a local-tier contract. Rank: Established (+4/5)",
     "[2026-03-18] Completed a rift-tier contract. Rank: Established → Respected (+0/5)",
     "[2026-03-19] Completed a rift-tier contract. Rank: Respected (+3/5)",
-    "[2026-03-19] Failed a local-tier contract. Rank: Respected (+2/5)"
+    "[2026-03-19] Failed a local-tier contract. Rank: Respected (+2/5)",
+    "[2026-03-19] Failed a escort-tier contract. Rank: Respected (+1/5)",
+    "[2026-03-19] Completed a escort-tier contract. Rank: Respected (+2/5)"
   ],
-  "missions_completed": 15,
-  "missions_failed": 2,
+  "missions_completed": 16,
+  "missions_failed": 3,
   "tier": "Respected",
   "points": 2,
-  "generated": false
+  "generated": true
 }

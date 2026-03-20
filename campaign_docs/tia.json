@@ -2,53 +2,53 @@
   "sectors": {
     "relic": {
       "name": "Relic & Antiquities",
-      "value": 195.31,
-      "prev_value": 195.25,
-      "change_pct": 0.03
+      "value": 174.96,
+      "prev_value": 176.49,
+      "change_pct": -0.87
     },
     "essence": {
       "name": "Essence Coin Exchange",
-      "value": 112.2,
-      "prev_value": 113.92,
-      "change_pct": -1.51
+      "value": 102.7,
+      "prev_value": 101.45,
+      "change_pct": 1.23
     },
     "adventurer": {
       "name": "Adventurer Contracts",
-      "value": 101.75,
-      "prev_value": 100.18,
-      "change_pct": 1.57
+      "value": 104.31,
+      "prev_value": 103.07,
+      "change_pct": 1.2
     },
     "divine": {
       "name": "Divine Services & Kharma",
-      "value": 103.19,
-      "prev_value": 103.64,
-      "change_pct": -0.43
+      "value": 103.09,
+      "prev_value": 101.52,
+      "change_pct": 1.55
     },
     "smuggling": {
       "name": "Grey Market Logistics",
-      "value": 102.83,
-      "prev_value": 101.24,
-      "change_pct": 1.57
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "memory": {
       "name": "Memory & Information",
-      "value": 353.37,
-      "prev_value": 349.97,
-      "change_pct": 0.97
+      "value": 280.84,
+      "prev_value": 285.43,
+      "change_pct": -1.61
     },
     "security": {
       "name": "Security & Enforcement",
-      "value": 101.51,
+      "value": 100,
       "prev_value": 100,
-      "change_pct": 1.51
+      "change_pct": 0.0
     },
     "rift_tech": {
       "name": "Rift Technology",
-      "value": 2444311177.41,
-      "prev_value": 2413286649.97,
-      "change_pct": 1.29
+      "value": 4665622245.22,
+      "prev_value": 4641103442.89,
+      "change_pct": 0.53
     }
   },
-  "last_updated": "2026-03-19T13:46:58.220363",
-  "last_event": "Cult activity spooks security investors; information brokers see uptick in intel demand"
+  "last_updated": "2026-03-20T06:30:42.075503",
+  "last_event": "FTA enforcement action chills memory market, grey logistics, and relic trade"
 }

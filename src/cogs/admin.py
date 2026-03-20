@@ -263,12 +263,12 @@ def setup(client):
         )
 
     # -----------------------------------------------------------------
-    # /archive — manually trigger weekly archiving
+    # /archive — full weekly archiver
     # -----------------------------------------------------------------
 
     @client.tree.command(
         name="archive",
-        description="[DM only] Archive news memory and mission outcomes to weekly files."
+        description="[DM only] Archive resolved missions, sold items, old news, and more."
     )
     async def archive_cmd(interaction: discord.Interaction):
         dm_id = int(os.getenv("DM_USER_ID", 0))
@@ -280,22 +280,159 @@ def setup(client):
 
         await interaction.response.defer(ephemeral=True)
 
-        from src.mission_outcomes import archive_news_weekly, archive_outcomes_weekly
+        from src.weekly_archive import run_weekly_archive, archive_summary
 
-        results = []
-        news_file = archive_news_weekly()
-        if news_file:
-            results.append(f"\U0001f4f0 News archived: `{news_file}`")
-        else:
-            results.append("\U0001f4f0 News: nothing to archive")
+        results = run_weekly_archive()
+        summary = archive_summary()
 
-        outcomes_file = archive_outcomes_weekly()
-        if outcomes_file:
-            results.append(f"\U0001f4cb Outcomes trimmed: `{outcomes_file}`")
+        lines = ["**\U0001f4e6 Archive Results:**"]
+        labels = {
+            "missions":        "\u2694\ufe0f Missions",
+            "towerbay":        "\U0001f3ea TowerBay",
+            "player_listings": "\U0001f4b0 Player listings",
+            "bounties":        "\U0001f3af Bounties",
+            "missing_persons": "\U0001f50d Missing persons",
+            "outcomes":        "\U0001f4cb Outcomes",
+            "graveyard":       "\U0001f480 Graveyard",
+            "news_snapshot":   "\U0001f4f0 News snapshot",
+        }
+        for key, label in labels.items():
+            val = results.get(key, 0)
+            if isinstance(val, bool):
+                lines.append(f"{label}: {'saved' if val else 'nothing new'}")
+            elif val > 0:
+                lines.append(f"{label}: **{val}** archived")
+            else:
+                lines.append(f"{label}: nothing to archive")
+
+        lines.append("")
+        lines.append("**\U0001f4ca Archive Inventory:**")
+        for cat, info in summary.items():
+            lines.append(f"  {cat}: {info['weeks']} weeks, {info['records']} records")
+
+        await interaction.followup.send("\n".join(lines), ephemeral=True)
+
+    # -----------------------------------------------------------------
+    # /riftlist — show active rifts
+    # -----------------------------------------------------------------
+
+    @client.tree.command(
+        name="riftlist",
+        description="[DM only] Show all active Rift events and their current stage."
+    )
+    async def riftlist_cmd(interaction: discord.Interaction):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        from src.news_feed import _load_rift_state
+        rifts = _load_rift_state()
+        active = [r for r in rifts if not r.get("resolved")]
+        resolved = [r for r in rifts if r.get("resolved")]
+
+        if not active and not resolved:
+            await interaction.response.send_message(
+                "\U0001f30a No rifts in the system.", ephemeral=True
+            )
+            return
+
+        lines = []
+        if active:
+            lines.append("**\U0001f30a Active Rifts:**")
+            for r in active:
+                stage = r.get("stage", "?")
+                loc   = r.get("location", "?")
+                rid   = r.get("id", "?")
+                spawned = r.get("spawned_at", "")[:10]
+                stage_emoji = {"whisper": "\U0001f444", "tremor": "\U0001f4a2",
+                               "crack": "\u26a0\ufe0f", "open": "\U0001f6a8",
+                               "critical": "\u2622\ufe0f"}.get(stage, "\u2753")
+                lines.append(f"{stage_emoji} **{stage.upper()}** \u2014 {loc}")
+                lines.append(f"   ID: `{rid}` \u00b7 Spawned: {spawned}")
         else:
-            results.append("\U0001f4cb Outcomes: nothing to trim")
+            lines.append("**\U0001f30a No active rifts.**")
+
+        if resolved:
+            recent = sorted(resolved, key=lambda r: r.get("sealed_at", r.get("spawned_at", "")), reverse=True)[:5]
+            lines.append("")
+            lines.append("**Recent resolved:**")
+            for r in recent:
+                outcome = r.get("outcome", "?")
+                loc = r.get("location", "?")
+                emoji = "\u2705" if outcome == "sealed" else "\U0001f4a5"
+                lines.append(f"{emoji} {loc} \u2014 {outcome}")
+
+        await interaction.response.send_message("\n".join(lines), ephemeral=True)
+
+    # -----------------------------------------------------------------
+    # /sealrift — manually seal a rift (player completed mission, etc)
+    # -----------------------------------------------------------------
+
+    @client.tree.command(
+        name="sealrift",
+        description="[DM only] Manually seal an active Rift (e.g. players completed a rift mission)."
+    )
+    @app_commands.describe(
+        rift_id="Rift ID from /riftlist (e.g. 'rift_1742307600')",
+        sealed_by="Who sealed it — player party name, NPC, or faction",
+    )
+    async def sealrift_cmd(
+        interaction: discord.Interaction,
+        rift_id: str,
+        sealed_by: str = "player party",
+    ):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        from src.news_feed import _load_rift_state, _save_rift_state, _generate_rift_bulletin, _write_memory
+        from datetime import datetime as _dt
+
+        rifts = _load_rift_state()
+        target = None
+        for r in rifts:
+            if r.get("id") == rift_id and not r.get("resolved"):
+                target = r
+                break
+
+        if not target:
+            await interaction.followup.send(
+                f"\u274c No active rift found with ID `{rift_id}`. Use `/riftlist` to see active rifts.",
+                ephemeral=True,
+            )
+            return
+
+        stage = target.get("stage", "?")
+        loc   = target.get("location", "?")
+
+        target["resolved"]  = True
+        target["outcome"]   = "sealed"
+        target["sealed_by"] = sealed_by
+        target["sealed_at"] = _dt.now().isoformat()
+        target["seal_desc"] = f"Sealed by {sealed_by} at the {stage} stage near {loc}."
+        _save_rift_state(rifts)
+
+        # Generate and post a sealing bulletin
+        channel_id_str = os.getenv("DISCORD_CHANNEL_ID", "")
+        channel = client.get_channel(int(channel_id_str)) if channel_id_str else None
+
+        bulletin = await _generate_rift_bulletin(target, "sealed")
+        if bulletin and channel:
+            _write_memory(bulletin)
+            from src.news_feed import _dual_timestamp
+            formatted = f"-# \U0001f570\ufe0f {_dual_timestamp()}\n{bulletin}"
+            await channel.send(formatted)
 
         await interaction.followup.send(
-            "**\U0001f4e6 Archive Results:**\n" + "\n".join(results),
+            f"\u2705 Rift **{rift_id}** at **{loc}** ({stage} stage) sealed by **{sealed_by}**.\n"
+            f"{'Bulletin posted to channel.' if bulletin and channel else 'No bulletin generated.'}",
             ephemeral=True,
         )

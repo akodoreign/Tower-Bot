@@ -1,0 +1,28 @@
+{
+  "name": "Cassius Argent-Heart",
+  "species": "Human",
+  "faction": "Argent Blades",
+  "rank": "Senior Blade",
+  "role": "senior blade",
+  "home_district": "argent blades",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "Tall, muscular human with silver hair starting to gray and piercing green eyes, dressed in silver and white armor with blue accents, adorned with arena medals. His skin, though weathered from countless battles, is unmarred by visible scars. A longsword and shield emblazoned with the Argent Blades emblem are at his side. A distinctive, intricate silver heart-shaped pendant hangs around his neck, a constant reminder of his past mistake and his quest for redemption.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

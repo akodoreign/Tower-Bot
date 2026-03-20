@@ -1,0 +1,28 @@
+{
+  "name": "Zippy Quickclaw",
+  "species": "Kobold",
+  "faction": "Tower Authority",
+  "rank": "Compliance Intern",
+  "role": "compliance officer",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 15",
+      "WIS 13",
+      "CHA 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 9"
+    ],
+    "hp_range": "28–38"
+  },
+  "equipment": {
+    "weapons": "short sword, FTA badge",
+    "armour": "FTA uniform over light armour"
+  },
+  "sd_appearance": "A diminutive kobold with fiery red hair and piercing green eyes, approximately 2.5 feet in height, scurries through the Undercity's shadowed streets. His scaly skin glimmers with a hint of iridescence, a stark contrast to the dark surroundings. Wearing the immaculate Tower Authority uniform over light armor, he clutches a short sword and a FTA badge, both emblazoned with intricate patterns. A distinctive pair of goggles rest on his snout, reflecting the city's gloom with a slightly hopeful shine.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "FTA uniform kept immaculate — young, earnest, slightly too eager"
+}

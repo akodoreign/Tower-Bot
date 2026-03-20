@@ -235,7 +235,7 @@
     "bid_count": 60,
     "listed_at": "2026-03-12T15:58:17.400066",
     "expires_at": "2026-03-19T15:58:17.400066",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773349111,
@@ -249,7 +249,7 @@
     "bid_count": 61,
     "listed_at": "2026-03-12T15:58:31.503781",
     "expires_at": "2026-03-19T15:58:31.503781",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773349125,
@@ -263,7 +263,7 @@
     "bid_count": 61,
     "listed_at": "2026-03-12T15:58:45.294623",
     "expires_at": "2026-03-19T15:58:45.294623",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773349139,
@@ -277,7 +277,7 @@
     "bid_count": 50,
     "listed_at": "2026-03-12T15:58:59.619991",
     "expires_at": "2026-03-19T15:58:59.619991",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773698579,
@@ -287,8 +287,8 @@
     "condition": "Well-used",
     "seller": "The Nameless Broker - Undercity's enigmatic dealer of the unknown",
     "starting_bid": 34705,
-    "current_bid": 146905,
-    "bid_count": 19,
+    "current_bid": 197464,
+    "bid_count": 23,
     "listed_at": "2026-03-16T17:02:59.858743",
     "expires_at": "2026-03-23T17:02:59.858743",
     "sold": false
@@ -301,8 +301,8 @@
     "condition": "Well-used",
     "seller": "The Forgotten Quorum",
     "starting_bid": 37263,
-    "current_bid": 259474,
-    "bid_count": 30,
+    "current_bid": 329585,
+    "bid_count": 34,
     "listed_at": "2026-03-16T17:03:15.019768",
     "expires_at": "2026-03-23T17:03:15.019768",
     "sold": false
@@ -315,8 +315,8 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 rumored to be a scholar from the Undercity's hidden archive",
     "starting_bid": 29560,
-    "current_bid": 572738,
-    "bid_count": 39,
+    "current_bid": 799700,
+    "bid_count": 44,
     "listed_at": "2026-03-16T17:03:32.502343",
     "expires_at": "2026-03-23T17:03:32.502343",
     "sold": false
@@ -329,8 +329,8 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 Reputed to be a descendant of the Whispering Court",
     "starting_bid": 45869,
-    "current_bid": 245168,
-    "bid_count": 27,
+    "current_bid": 381492,
+    "bid_count": 33,
     "listed_at": "2026-03-17T16:52:32.430472",
     "expires_at": "2026-03-24T16:52:32.430472",
     "sold": false
@@ -343,8 +343,8 @@
     "condition": "Mint",
     "seller": "The Silent Tide - Submersible Salvagers",
     "starting_bid": 73534,
-    "current_bid": 272151,
-    "bid_count": 20,
+    "current_bid": 354650,
+    "bid_count": 24,
     "listed_at": "2026-03-17T16:52:45.247639",
     "expires_at": "2026-03-24T16:52:45.247639",
     "sold": false
@@ -357,10 +357,66 @@
     "condition": "Well-used",
     "seller": "The Ebon Broker",
     "starting_bid": 72804,
-    "current_bid": 162173,
-    "bid_count": 12,
+    "current_bid": 225278,
+    "bid_count": 16,
     "listed_at": "2026-03-18T16:54:44.313480",
     "expires_at": "2026-03-25T16:54:44.313480",
+    "sold": false
+  },
+  {
+    "id": 1773955626,
+    "name": "Cryptic Parchment of the Drowned Bard",
+    "description": "This ancient, weathered parchment contains a cryptic, haunting melody once performed by the infamous Drowned Bard, a spectral minstrel rumored to have enchanted the Undercity with his ethereal music. Found in the ruins of a sunken tavern, the parchment bears the eerie scent of seaweed and decay.",
+    "category": "Memorabilia",
+    "condition": "Well-used",
+    "seller": "The Veiled Merchant",
+    "starting_bid": 20134,
+    "current_bid": 28830,
+    "bid_count": 5,
+    "listed_at": "2026-03-19T16:27:06.276343",
+    "expires_at": "2026-03-26T16:27:06.276343",
+    "sold": false
+  },
+  {
+    "id": 1773955628,
+    "name": "Grimm's Shadowchariot",
+    "description": "Originally belonging to the infamous Grimm family, these spectral chariots were crafted from the remnants of their fallen enemies. The chariot is known to be unstable but swift, its spectral steeds whispering ancient chants as they gallop beneath the Undercity's Dome.",
+    "category": "Vehicles & Mounts",
+    "condition": "Well-used",
+    "seller": "Anonymous - Whispers suggest the Grimms may have taken on new apprentices.",
+    "starting_bid": 44423,
+    "current_bid": 50892,
+    "bid_count": 2,
+    "listed_at": "2026-03-19T16:27:08.775218",
+    "expires_at": "2026-03-26T16:27:08.775218",
+    "sold": false
+  },
+  {
+    "id": 1773955631,
+    "name": "Ebony Whisper's Echoing Oculus",
+    "description": "An enigmatic orb rumored to have once belonged to the Ebony Whisper, a spectral auctioneer infamous for his dark humor. Its origins shrouded in mystery, it echoes with otherworldly whispers when activated, offering a glimpse into the Undercity's hidden networks.",
+    "category": "Utility Gear",
+    "condition": "Well-used",
+    "seller": "Anonymously offered by the Silent Auctioneers Guild",
+    "starting_bid": 67352,
+    "current_bid": 95445,
+    "bid_count": 4,
+    "listed_at": "2026-03-19T16:27:11.265407",
+    "expires_at": "2026-03-26T16:27:11.265407",
+    "sold": false
+  },
+  {
+    "id": 1773955633,
+    "name": "Dark Serenade's Requiem Harpspear",
+    "description": "A twisted, ivory-handled harpoon tipped with a melancholic black crystal. Last wielded by the Bard of Shadows, a spectral minstrel known for his haunting ballads and fatal tunes, before his untimely demise in the Undercity's blood-soaked arenas.",
+    "category": "Weapons",
+    "condition": "Well-used",
+    "seller": "The Duskmere Syndicate",
+    "starting_bid": 18034,
+    "current_bid": 20327,
+    "bid_count": 2,
+    "listed_at": "2026-03-19T16:27:13.705486",
+    "expires_at": "2026-03-26T16:27:13.705486",
     "sold": false
   }
 ]
