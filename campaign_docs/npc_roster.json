@@ -108,33 +108,6 @@
     "last_event_at": "2026-03-27T18:56:34.825190"
   },
   {
-    "name": "Yuna Saltis",
-    "faction": "Obsidian Lotus",
-    "rank": "Memory Architect (specialist \u2014 designs and performs memory erasure contracts)",
-    "species": "Tiefling",
-    "age": "27",
-    "appearance": "Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always \u2014 claims it's professional habit. Very short.",
-    "location": "The Warrens, Obsidian Lotus secondary location (not the main house \u2014 she operates from a private room in the Night Pits)",
-    "motivation": "Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique \u2014 to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.",
-    "role": "Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).",
-    "secret": "She has retained a copy of every memory she has ever erased \u2014 stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
-    "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus \u2014 her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically \u2014 Yuna found this annoying and flattering in equal measure.",
-    "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?",
-    "status": "alive",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-05] Entered roster from static file.",
-      "[2026-03-11] Injured.",
-      "[2026-03-12] Recovered from injuries.",
-      "[2026-03-13] Injured.",
-      "[2026-03-14] Recovered from injuries.",
-      "[2026-03-19] Injured.",
-      "[2026-03-19] Recovered from injuries."
-    ],
-    "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-19T15:04:18.407855"
-  },
-  {
     "name": "Pol Greaves",
     "faction": "Patchwork Saints",
     "rank": "Field Captain (informal \u2014 Saints don't use formal ranks)",
@@ -172,7 +145,7 @@
     "secret": "Her research has identified a pattern \u2014 certain adventurers attract divine attention not because of their Legend Points but because of the specific shape of their story. She calls it narrative resonance. She has not published this because she doesn't know what it means yet \u2014 and because if the Culinary Council reads it, she has effectively written them a menu.",
     "relationships": "Professional respect for Eir Velan (somewhat intimidated). Academic rivalry with Dova (Glass Sigil) \u2014 same data sets, different methods. Has been quietly consulting with Kessan and Mira (info brokers) on data patterns she can't explain through archival sources alone.",
     "oracle_notes": "The Oracle would find Tessaly's research unsettling in the way a mirror is unsettling. She is close to understanding something about how stories work that the gods would prefer remained unwritten.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
       "[2026-03-05] Entered roster from static file.",
@@ -181,10 +154,11 @@
       "[2026-03-13] Injured.",
       "[2026-03-14] Recovered from injuries.",
       "[2026-03-26] Injured.",
-      "[2026-03-26] Recovered from injuries."
+      "[2026-03-26] Recovered from injuries.",
+      "[2026-03-30] Injured."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-26T10:25:10.639217"
+    "last_event_at": "2026-03-30T11:10:32.097860"
   },
   {
     "name": "Calix Drenn",
@@ -994,7 +968,7 @@
     "secret": "Once a high-ranking member of the Serpent Choir, he defected after a mission gone awry, now living in fear they'll discover his betrayal.",
     "relationships": "Maintains a fragile alliance with the Patchwork Saints, sharing intelligence in exchange for their protection.",
     "oracle_notes": "The Oracle senses a haunted spirit, burdened by guilt and constantly scanning for threats.",
-    "status": "injured",
+    "status": "alive",
     "revealed_secrets": [],
     "history": [
       "[2026-03-12] Introduced to the Undercity roster.",
@@ -1002,10 +976,11 @@
       "[2026-03-19] Recovered from injuries.",
       "[2026-03-27] Injured.",
       "[2026-03-28] Recovered from injuries.",
-      "[2026-03-30] Injured."
+      "[2026-03-30] Injured.",
+      "[2026-03-30] Recovered from injuries."
     ],
     "created_at": "2026-03-12T09:38:37.166138",
-    "last_event_at": "2026-03-30T07:25:40.961262"
+    "last_event_at": "2026-03-30T11:10:11.279156"
   },
   {
     "name": "Thoren Grudbreaker",
@@ -1635,8 +1610,8 @@
   },
   {
     "name": "Lysander Elveshadow",
-    "faction": "Patchwork Saints",
-    "rank": "Volunteer",
+    "faction": "Guild of Ashen Scrolls",
+    "rank": "Initiate",
     "species": "Half-Elf",
     "age": "40s",
     "appearance": "Lysander stands tall with a lean frame, a blend of human and elven features. His eyes, a piercing silver-blue, reflect the flickering lights of the Undercity's alleyways, and his hair, a cascade of dark curls, is braided with intricate patterns of worn leather strips.",
@@ -1649,10 +1624,11 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-24] Introduced to the Undercity roster."
+      "[2026-03-24] Introduced to the Undercity roster.",
+      "[2026-03-30] Defected from Patchwork Saints to Guild of Ashen Scrolls (rank: Initiate)."
     ],
     "created_at": "2026-03-24T11:33:08.546496",
-    "last_event_at": "2026-03-24T11:33:08.546496"
+    "last_event_at": "2026-03-30T11:10:26.881835"
   },
   {
     "name": "Torinn Wyrmbane",
@@ -1709,13 +1685,14 @@
     "secret": "It is rumored that Seraph possesses a rare artifact known as the Eye of the Dragon, a gem imbued with powerful magical properties that could shift the balance of power in the Undercity.",
     "relationships": "He maintains a professional but strained relationship with the senior archivist, Vex Argentshade, who often questions Seraph's obsession with certain obscure texts.",
     "oracle_notes": "The Oracle senses a deep, burning hunger within Seraph, a thirst for knowledge that seems almost insatiable.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-26] Introduced to the Undercity roster."
+      "[2026-03-26] Introduced to the Undercity roster.",
+      "[2026-03-30] Injured."
     ],
     "created_at": "2026-03-26T06:17:27.177792",
-    "last_event_at": "2026-03-26T06:17:27.177792"
+    "last_event_at": "2026-03-30T11:10:38.883027"
   },
   {
     "name": "Rianna Elenshade-Ironhammer",
@@ -2182,5 +2159,26 @@
     ],
     "created_at": "2026-03-30T07:25:24.445868",
     "last_event_at": "2026-03-30T07:25:24.445868"
+  },
+  {
+    "name": "Thrakkar Stonehollow",
+    "faction": "Glass Sigil",
+    "rank": "Senior Archivist",
+    "species": "Dragonborn",
+    "age": "50s",
+    "appearance": "Thrakkar is a towering, muscular dragonborn with scales as dark as obsidian. His horns are polished to a mirror-like sheen, and his eyes hold the wisdom of ages.",
+    "location": "Glass Sigil Archives, Lower Depths",
+    "motivation": "Thrakkar seeks to preserve the knowledge of the Undercity, believing it's the key to ensuring a brighter future. He does this out of a deep sense of duty, having survived the Last War that destroyed his home city.",
+    "role": "Thrakkar spends his days cataloguing and safeguarding the ancient texts of the Undercity.",
+    "secret": "Thrakkar was once a high-ranking member of the Tower Authority before it was overthrown. His loyalties remain divided, and he secretly communicates with some remnants of the old order.",
+    "relationships": "Thrakkar maintains a professional relationship with the Wardens of Ash, often negotiating for access to restricted archives.",
+    "oracle_notes": "The Oracle senses a storm brewing beneath Thrakkar's calm exterior, a storm of secrets and hidden loyalties.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-30] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-03-30T11:10:06.174581",
+    "last_event_at": "2026-03-30T11:10:06.174581"
   }
 ]

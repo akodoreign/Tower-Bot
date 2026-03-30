@@ -1,6 +1,6 @@
 # NPC ROSTER — TOWER OF LAST CHANCE
 # Auto-generated from npc_lifecycle system. Do not edit manually.
-# Last updated: 2026-03-30 07:25
+# Last updated: 2026-03-30 11:10
 # Active NPCs: 94
 
 ---NPC---
@@ -72,23 +72,6 @@ HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-0
 ---END NPC---
 
 ---NPC---
-NAME: Yuna Saltis
-STATUS: alive
-FACTION: Obsidian Lotus
-RANK: Memory Architect (specialist — designs and performs memory erasure contracts)
-SPECIES: Tiefling
-AGE: 27
-APPEARANCE: Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always — claims it's professional habit. Very short.
-LOCATION: The Warrens, Obsidian Lotus secondary location (not the main house — she operates from a private room in the Night Pits)
-MOTIVATION: Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique — to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.
-ROLE: Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).
-SECRET: She has retained a copy of every memory she has ever erased — stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.
-RELATIONSHIPS: Professional respect from The Widow (rare). Tolerated by the rest of the Lotus — her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically — Yuna found this annoying and flattering in equal measure.
-ORACLE NOTES: The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?
-HISTORY: [2026-03-12] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
----END NPC---
-
----NPC---
 NAME: Pol Greaves
 STATUS: alive
 FACTION: Patchwork Saints
@@ -107,7 +90,7 @@ HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-11] Injured. |
 
 ---NPC---
 NAME: Tessaly Orin
-STATUS: alive
+STATUS: injured
 FACTION: Guild of Ashen Scrolls
 RANK: Archivist Second Class (junior to Eir Velan, senior to Dova)
 SPECIES: Half-Elf
@@ -119,7 +102,7 @@ ROLE: Documents adventurer career trajectories, maintains the fate archive index
 SECRET: Her research has identified a pattern — certain adventurers attract divine attention not because of their Legend Points but because of the specific shape of their story. She calls it narrative resonance. She has not published this because she doesn't know what it means yet — and because if the Culinary Council reads it, she has effectively written them a menu.
 RELATIONSHIPS: Professional respect for Eir Velan (somewhat intimidated). Academic rivalry with Dova (Glass Sigil) — same data sets, different methods. Has been quietly consulting with Kessan and Mira (info brokers) on data patterns she can't explain through archival sources alone.
 ORACLE NOTES: The Oracle would find Tessaly's research unsettling in the way a mirror is unsettling. She is close to understanding something about how stories work that the gods would prefer remained unwritten.
-HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
+HISTORY: [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-30] Injured.
 ---END NPC---
 
 ---NPC---
@@ -668,7 +651,7 @@ HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-16] Promote
 
 ---NPC---
 NAME: Gavrik Ironshield
-STATUS: injured
+STATUS: alive
 FACTION: Iron Fang Consortium
 RANK: Street Runner
 SPECIES: Warforged
@@ -680,7 +663,7 @@ ROLE: Scours the city for valuable information and supplies, acting as a link be
 SECRET: Once a high-ranking member of the Serpent Choir, he defected after a mission gone awry, now living in fear they'll discover his betrayal.
 RELATIONSHIPS: Maintains a fragile alliance with the Patchwork Saints, sharing intelligence in exchange for their protection.
 ORACLE NOTES: The Oracle senses a haunted spirit, burdened by guilt and constantly scanning for threats.
-HISTORY: [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-28] Recovered from injuries. | [2026-03-30] Injured.
+HISTORY: [2026-03-19] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-28] Recovered from injuries. | [2026-03-30] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -1162,8 +1145,8 @@ HISTORY: [2026-03-23] Introduced to the Undercity roster. | [2026-03-26] Faction
 ---NPC---
 NAME: Lysander Elveshadow
 STATUS: alive
-FACTION: Patchwork Saints
-RANK: Volunteer
+FACTION: Guild of Ashen Scrolls
+RANK: Initiate
 SPECIES: Half-Elf
 AGE: 40s
 APPEARANCE: Lysander stands tall with a lean frame, a blend of human and elven features. His eyes, a piercing silver-blue, reflect the flickering lights of the Undercity's alleyways, and his hair, a cascade of dark curls, is braided with intricate patterns of worn leather strips.
@@ -1173,7 +1156,7 @@ ROLE: He patrols the streets at night, offering aid to the helpless and justice 
 SECRET: He is secretly a former member of the Argent Blades, forced to flee after a mission went awry and his cover was compromised
 RELATIONSHIPS: He maintains a tenuous alliance with a high-ranking member of the Argent Blades, who remains unaware of his true identity
 ORACLE NOTES: The Oracle senses a complex web of deception surrounding Lysander, hinting at a hidden past that could shake the foundations of the Undercity
-HISTORY: [2026-03-24] Introduced to the Undercity roster.
+HISTORY: [2026-03-24] Introduced to the Undercity roster. | [2026-03-30] Defected from Patchwork Saints to Guild of Ashen Scrolls (rank: Initiate).
 ---END NPC---
 
 ---NPC---
@@ -1212,7 +1195,7 @@ HISTORY: [2026-03-26] Introduced to the Undercity roster.
 
 ---NPC---
 NAME: Seraph Zephyrion
-STATUS: alive
+STATUS: injured
 FACTION: Glass Sigil
 RANK: Junior Archivist
 SPECIES: Dragonborn
@@ -1224,7 +1207,7 @@ ROLE: Daily, Seraph meticulously sorts and catalogues ancient tomes and artifact
 SECRET: It is rumored that Seraph possesses a rare artifact known as the Eye of the Dragon, a gem imbued with powerful magical properties that could shift the balance of power in the Undercity.
 RELATIONSHIPS: He maintains a professional but strained relationship with the senior archivist, Vex Argentshade, who often questions Seraph's obsession with certain obscure texts.
 ORACLE NOTES: The Oracle senses a deep, burning hunger within Seraph, a thirst for knowledge that seems almost insatiable.
-HISTORY: [2026-03-26] Introduced to the Undercity roster.
+HISTORY: [2026-03-26] Introduced to the Undercity roster. | [2026-03-30] Injured.
 ---END NPC---
 
 ---NPC---
@@ -1598,5 +1581,22 @@ ROLE: He spends his days gathering information, taking on minor contracts for th
 SECRET: Orion is secretly a member of the Wardens of Ash, a covert faction working against the Tower Authority. He provides them with information gathered from his Guild connections.
 RELATIONSHIPS: He maintains a strained but professional relationship with the Argent Blades, who have been investigating the same disappearances. Their shared goal may lead to an uneasy alliance.
 ORACLE NOTES: The Oracle senses a deep sorrow and a burning desire for truth hidden within Orion, mixed with a hint of deception.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Thrakkar Stonehollow
+STATUS: alive
+FACTION: Glass Sigil
+RANK: Senior Archivist
+SPECIES: Dragonborn
+AGE: 50s
+APPEARANCE: Thrakkar is a towering, muscular dragonborn with scales as dark as obsidian. His horns are polished to a mirror-like sheen, and his eyes hold the wisdom of ages.
+LOCATION: Glass Sigil Archives, Lower Depths
+MOTIVATION: Thrakkar seeks to preserve the knowledge of the Undercity, believing it's the key to ensuring a brighter future. He does this out of a deep sense of duty, having survived the Last War that destroyed his home city.
+ROLE: Thrakkar spends his days cataloguing and safeguarding the ancient texts of the Undercity.
+SECRET: Thrakkar was once a high-ranking member of the Tower Authority before it was overthrown. His loyalties remain divided, and he secretly communicates with some remnants of the old order.
+RELATIONSHIPS: Thrakkar maintains a professional relationship with the Wardens of Ash, often negotiating for access to restricted archives.
+ORACLE NOTES: The Oracle senses a storm brewing beneath Thrakkar's calm exterior, a storm of secrets and hidden loyalties.
 HISTORY: [2026-03-30] Introduced to the Undercity roster.
 ---END NPC---

@@ -33,6 +33,7 @@ class _TimedA1111Lock:
         self._acquired = False
 
     async def __aenter__(self):
+        global _a1111_lock
         import logging
         logger = logging.getLogger(__name__)
         try:
@@ -44,7 +45,6 @@ class _TimedA1111Lock:
                 f"🖼️ A1111 lock timeout after {_A1111_LOCK_TIMEOUT}s — creating new lock and declaring old one dead"
             )
             # Replace the dead lock with a fresh one
-            global _a1111_lock
             _a1111_lock = asyncio.Lock()
             # Try to acquire the new lock (should succeed immediately)
             try:
@@ -2585,7 +2585,19 @@ def _extract_contextual_characters(text: str) -> list[str]:
         descriptors.append("robed figure in ritual vestments")
     if any(w in text_lower for w in ["arcane", "mage", "wizard", "spell", "magical"]):
         descriptors.append("figure wearing enchanted robes, arcane symbols")
-    if any(w in text_lower for w in [\"oracle\", \"seer\", \"prophet\"]):\n        descriptors.append(\"mysteriously cloaked oracle figure\")\n    if any(w in text_lower for w in [\"noble\", \"lord\", \"lady\", \"aristocrat\", \"elite\"]):\n        descriptors.append(\"figure in fine silks, noble bearing\")\n    if any(w in text_lower for w in [\"crowd\", \"mass\", \"gathering\", \"assembly\"]):\n        descriptors.append(\"crowd of diverse figures\")\n    if any(w in text_lower for w in [\"stranger\", \"unknown\", \"mysterious\", \"hooded\"]):\n        descriptors.append(\"mysterious figure, features hidden\")\n    \n    return descriptors[:3]  # Limit to 3 contextual descriptors\n\n\ndef _get_party_home_district(party_profile: dict) -> str:
+    if any(w in text_lower for w in ["oracle", "seer", "prophet"]):
+        descriptors.append("mysteriously cloaked oracle figure")
+    if any(w in text_lower for w in ["noble", "lord", "lady", "aristocrat", "elite"]):
+        descriptors.append("figure in fine silks, noble bearing")
+    if any(w in text_lower for w in ["crowd", "mass", "gathering", "assembly"]):
+        descriptors.append("crowd of diverse figures")
+    if any(w in text_lower for w in ["stranger", "unknown", "mysterious", "hooded"]):
+        descriptors.append("mysterious figure, features hidden")
+    
+    return descriptors[:3]  # Limit to 3 contextual descriptors
+
+
+def _get_party_home_district(party_profile: dict) -> str:
     """Derive a home district key from a party profile JSON."""
     text = ((party_profile.get("specialty") or "") + " " +
             (party_profile.get("affiliation") or "")).lower()

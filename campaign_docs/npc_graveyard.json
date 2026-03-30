@@ -221,5 +221,34 @@
     "created_at": "2026-03-19T14:16:44.024053",
     "last_event_at": "2026-03-29T08:57:53.669672",
     "moved_to_graveyard_at": "2026-03-29T08:57:53.669672"
+  },
+  {
+    "name": "Yuna Saltis",
+    "faction": "Obsidian Lotus",
+    "rank": "Memory Architect (specialist — designs and performs memory erasure contracts)",
+    "species": "Tiefling",
+    "age": "27",
+    "appearance": "Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always — claims it's professional habit. Very short.",
+    "location": "The Warrens, Obsidian Lotus secondary location (not the main house — she operates from a private room in the Night Pits)",
+    "motivation": "Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique — to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.",
+    "role": "Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).",
+    "secret": "She has retained a copy of every memory she has ever erased — stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
+    "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus — her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically — Yuna found this annoying and flattering in equal measure.",
+    "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-05] Entered roster from static file.",
+      "[2026-03-11] Injured.",
+      "[2026-03-12] Recovered from injuries.",
+      "[2026-03-13] Injured.",
+      "[2026-03-14] Recovered from injuries.",
+      "[2026-03-19] Injured.",
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-03-30] Killed. Faction: Obsidian Lotus, Rank: Memory Architect (specialist — designs and performs memory erasure contracts)."
+    ],
+    "created_at": "2026-03-05T12:59:39.947925",
+    "last_event_at": "2026-03-30T11:10:19.675375",
+    "moved_to_graveyard_at": "2026-03-30T11:10:19.675375"
   }
 ]

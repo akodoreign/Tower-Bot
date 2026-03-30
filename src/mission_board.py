@@ -126,19 +126,20 @@ async def _get_results_channel(client, fallback_channel=None):
 # ---------------------------------------------------------------------------
 
 TIER_EXPIRY = {
-    "local":       (1,   7),
-    "patrol":      (1,   7),
-    "escort":      (7,  30),
-    "standard":    (7,  30),
+    "local":        (1,   7),
+    "patrol":       (1,   7),
+    "escort":       (7,  30),
+    "standard":     (7,  30),
     "investigation":(7, 30),
-    "rift":        (30, 90),
-    "dungeon":     (30, 90),
-    "major":       (30, 90),
-    "inter-guild": (30, 90),
-    "epic":        (90, 190),
-    "divine":      (90, 190),
-    "tower":       (90, 190),
-    "high-stakes": (60, 120),
+    "rift":         (30, 90),
+    "dungeon":      (30, 90),
+    "dungeon-delve":(30, 90),
+    "major":        (30, 90),
+    "inter-guild":  (30, 90),
+    "epic":         (90, 190),
+    "divine":       (90, 190),
+    "tower":        (90, 190),
+    "high-stakes":  (60, 120),
 }
 
 DEFAULT_EXPIRY = (7, 30)
@@ -152,6 +153,7 @@ PERSONAL_TIER_EXPIRY = {
     "investigation":(30,  60),
     "rift":         (60,  90),
     "dungeon":      (60,  90),
+    "dungeon-delve":(60,  90),
     "major":        (60,  90),
     "inter-guild":  (60,  90),
     "epic":         (90, 190),

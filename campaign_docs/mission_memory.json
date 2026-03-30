@@ -3850,5 +3850,71 @@
     "expires_at": "2026-05-09T11:57:39.118712",
     "resolved": false,
     "message_id": 1488145179876655266
+  },
+  {
+    "title": "Warrens Ward",
+    "faction": "Patchwork Saints",
+    "tier": "local",
+    "reward": "50 EC + 50 Kharma",
+    "opposing_faction": "Obsidian Lotus",
+    "body": "**Patchwork Saints \u2014 Warrens Ward**\n*Tier: Local | Expires: TBD | Reward: 50 EC + 50 Kharma*\n*Opposes: Obsidian Lotus*\n\nThe Patchwork Saints are in need of able hands to secure the Warren's district of \"Needle's Eye.\" A spike in Obsidian Lotus activity has left the district vulnerable. Mari Fen of the Adventurers Guild seeks help to safeguard the area and quell their influence.\n\n*Contact: Mari Fen, Adventurers Guild Spire*",
+    "posted_at": "2026-03-30T16:02:03.575723",
+    "expires_at": "2026-04-06T16:02:03.575723",
+    "resolved": false,
+    "message_id": 1488206687268638720
+  },
+  {
+    "title": "A Shadow Over Sanctum Quarter",
+    "faction": "Wardens of Ash",
+    "tier": "local",
+    "reward": "50 EC + 20 Kharma",
+    "opposing_faction": "",
+    "body": "**Wardens of Ash \u2014 A Shadow Over Sanctum Quarter**\n*Tier: Local | Expires: TBD | Reward: 50 EC + 20 Kharma*\n*Opposes: None*\n\nFollowing a recent rise in suspicious activity, it appears a group of thieves are attempting to infiltrate Sanctum Quarter. Your mission is to sweep through the district, locating and securing any signs of intrusion. Report any leads to Captain Havel Korin at the Wardens of Ash Headquarters.\n\n*Contact: Captain Havel Korin, Wardens of Ash Headquarters*",
+    "posted_at": "2026-03-30T16:04:07.546027",
+    "expires_at": "2026-04-06T16:04:07.546027",
+    "resolved": false,
+    "message_id": 1488207207098220774
+  },
+  {
+    "title": "Celestial Debt",
+    "faction": "Argent Blades",
+    "tier": "escort",
+    "reward": "150 EC + 50 Kharma",
+    "opposing_faction": "Serpent Choir",
+    "body": "**Argent Blades \u2014 Celestial Debt**\n*Tier: Escort | Expires: 21 days | Reward: 150 EC + 50 Kharma*\n*Opposes: Serpent Choir*\n\nA Lady Cerys Valemont has a request for you, Boxxo. Meet her at the Grand Forum, at the fountain of the fallen heroes, at dusk. She seeks an escort to the Sanctum Quarter. A Serpent Choir has taken an interest in an artifact that once belonged to her family, and she needs it returned. Your unique abilities make you an ideal candidate for this task. Be prepared, Boxxo, your past actions have caught up with you, and this mission will test your loyalties.",
+    "posted_at": "2026-03-30T16:06:03.927629",
+    "expires_at": "2026-05-13T16:06:03.927629",
+    "resolved": false,
+    "message_id": 1488207695570927768,
+    "personal_for": "Boxxo"
+  },
+  {
+    "title": "The Markets' Rune Weave",
+    "faction": "Wizards Tower",
+    "tier": "escort",
+    "reward": "150 EC + 100 Kharma",
+    "opposing_faction": "",
+    "body": "**Wizards Tower \u2014 The Markets' Rune Weave**\n*Tier: Escort | Expires: TBD | Reward: 150 EC + 100 Kharma*\n*Opposes: None*\n\nArchmage Yaulderna Silverstreak requests your presence for an arcane ritual at the heart of Markets Infinite. The enchantment will fortify the city's defenses, ensuring our continued prosperity. Escort the Archmage and her entourage through the bustling marketplace to the Wizards Tower.\n\n*Contact: Archmage Yaulderna Silverstreak, Wizards Tower*",
+    "posted_at": "2026-03-30T16:06:11.405110",
+    "expires_at": "2026-04-23T16:06:11.405110",
+    "resolved": true,
+    "message_id": 1488207725904007279,
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1488216561230811188,
+    "completed": true
+  },
+  {
+    "title": "Lost Dwarven Relics",
+    "faction": "Iron Fang Consortium",
+    "tier": "standard",
+    "reward": "150 EC + 50 Kharma",
+    "opposing_faction": "",
+    "body": "**Iron Fang Consortium \u2014 Lost Dwarven Relics**\n*Tier: Standard | Expires: 21 Days | Reward: 150 EC + 50 Kharma*\n*Opposes: None*\n\nContact: Zorick Ironbeard, Sanctum Quarter\n\nLegendary Dwarf warrior Ragard Gronhammer, we have reason to believe that an ancient cache of lost Dwarven artifacts lies buried deep within the Warrens. As a champion of your people, we seek your expertise to recover these relics and secure them for the Iron Fang Consortium. Success would not only bring immense profit but also restore honor to our shared heritage.",
+    "posted_at": "2026-03-30T16:09:07.972439",
+    "expires_at": "2026-05-13T16:09:07.972439",
+    "resolved": false,
+    "message_id": 1488208467067142155,
+    "personal_for": "Ragard Gronhammer"
   }
 ]
