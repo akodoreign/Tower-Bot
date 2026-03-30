@@ -29,28 +29,40 @@ class _TimedA1111Lock:
     """Context manager that acquires _a1111_lock with a timeout.
     If A1111 hangs and never releases, the lock auto-expires after _A1111_LOCK_TIMEOUT seconds."""
 
+    def __init__(self):
+        self._acquired = False
+
     async def __aenter__(self):
+        import logging
+        logger = logging.getLogger(__name__)
         try:
             await asyncio.wait_for(_a1111_lock.acquire(), timeout=_A1111_LOCK_TIMEOUT)
+            self._acquired = True
+            logger.info("🖼️ A1111 lock acquired")
         except asyncio.TimeoutError:
-            import logging
-            logging.getLogger(__name__).error(
-                f"🖼️ A1111 lock timed out after {_A1111_LOCK_TIMEOUT}s — forcing release"
+            logger.error(
+                f"🖼️ A1111 lock timeout after {_A1111_LOCK_TIMEOUT}s — creating new lock and declaring old one dead"
             )
-            # Force-release the stuck lock so future requests can proceed
+            # Replace the dead lock with a fresh one
+            global _a1111_lock
+            _a1111_lock = asyncio.Lock()
+            # Try to acquire the new lock (should succeed immediately)
             try:
-                _a1111_lock.release()
-            except RuntimeError:
-                pass
-            # Now acquire cleanly
-            await _a1111_lock.acquire()
+                await asyncio.wait_for(_a1111_lock.acquire(), timeout=10.0)
+                self._acquired = True
+                logger.warning("🖼️ Acquired fresh A1111 lock after timeout")
+            except Exception as e:
+                logger.error(f"🖼️ Could not acquire fresh A1111 lock: {e} — proceeding anyway (image will fail)")
+                self._acquired = False
         return self
 
     async def __aexit__(self, *args):
-        try:
-            _a1111_lock.release()
-        except RuntimeError:
-            pass  # Already released somehow
+        import logging
+        if self._acquired:
+            try:
+                _a1111_lock.release()
+            except RuntimeError as e:
+                logging.getLogger(__name__).warning(f"🖼️ A1111 lock release error: {e}")
 
 
 a1111_lock = _TimedA1111Lock()  # use this everywhere instead of _a1111_lock directly
@@ -146,8 +158,8 @@ def _load_rift_state() -> List[Dict]:
 def _save_rift_state(rifts: List[Dict]) -> None:
     try:
         RIFT_STATE_FILE.write_text(json.dumps(rifts, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"🌀 Could not save rift state: {e} — Rifts may be lost on bot restart")
 
 
 def _maybe_spawn_rift(rifts: List[Dict]) -> Optional[Dict]:
@@ -261,7 +273,8 @@ def _tick_rifts(rifts: List[Dict]) -> tuple[List[Dict], List[Dict]]:
         try:
             entered = datetime.fromisoformat(rift["stage_entered_at"])
             days_elapsed = (now - entered).total_seconds() / 86400
-        except Exception:
+        except (KeyError, ValueError) as date_err:
+            logger.warning(f"🌀 Could not parse rift stage_entered_at: {date_err} — skipping this rift")
             days_elapsed = 0
 
         # Emit a bulletin if this stage hasn't been announced yet
@@ -488,8 +501,8 @@ def _load_cadence() -> Dict:
 def _save_cadence(data: Dict) -> None:
     try:
         _CADENCE_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"📰 Could not save bulletin cadence: {e} — timing data may be lost")
 
 
 async def check_towerbay_tick(channel=None) -> Optional[str]:
@@ -524,8 +537,8 @@ async def check_towerbay_tick(channel=None) -> Optional[str]:
             last = datetime.fromisoformat(last_str)
             if (now - last).total_seconds() < 23 * 3600:  # 23h gate
                 return None
-        except Exception:
-            pass
+        except ValueError as e:
+            logger.warning(f"🏪 Corrupted towerbay_last_post timestamp: {last_str} — {e}")
 
     cadence["towerbay_last_post"] = now.isoformat()
     _save_cadence(cadence)
@@ -559,8 +572,8 @@ def check_exchange_tick() -> Optional[str]:
             last = datetime.fromisoformat(last_str)
             if (now - last).total_seconds() < 20 * 3600:
                 return None
-        except Exception:
-            pass
+        except ValueError as e:
+            logger.warning(f"💱 Corrupted exchange_last_post timestamp: {last_str} — {e}")
 
     cadence["exchange_last_post"] = now.isoformat()
     _save_cadence(cadence)
@@ -588,8 +601,8 @@ def check_tia_tick() -> Optional[str]:
             last = datetime.fromisoformat(last_str)
             if (now - last).total_seconds() < 4 * 3600:  # 4h gate
                 return None
-        except Exception:
-            pass
+        except ValueError as e:
+            logger.warning(f"📊 Corrupted tia_last_post timestamp: {last_str} — {e}")
 
     cadence["tia_last_post"] = now.isoformat()
     _save_cadence(cadence)
@@ -2530,14 +2543,49 @@ async def _prompt_agent(
             parts.append(char_tag)
         parts.append(scene_action)
         parts.append(loc_tags)
+        
+        # Add atmospheric variety to fallback prompts for more diversity
+        mood_options = [
+            "tense atmosphere, shadows",
+            "dramatic lighting, contrast",
+            "dim underground lighting",
+            "neon-lit scene, volumetric",
+            "candlelit atmosphere, grim",
+            "oppressive mood, foreboding",
+            "electric tension, danger",
+            "mysterious lighting, intrigue"
+        ]
+        parts.append(random.choice(mood_options))
+        
         mistral_tags = ", ".join(p for p in parts if p)
-        logger.info(f"🤖 Prompt agent: self-lookup fallback assembled {len(parts)} blocks")
+        logger.info(f"🤖 Prompt agent: self-lookup fallback assembled {len(parts)} blocks + atmosphere")
 
     final = ", ".join(p for p in [quality_header, char_tag, mistral_tags, framing] if p)
     return final
 
 
-def _get_party_home_district(party_profile: dict) -> str:
+def _extract_contextual_characters(text: str) -> list[str]:
+    """
+    Extract character type/role descriptors from bulletin text for prompts.
+    Returns list of contextual character descriptions to use when NPCs aren't found by name.
+    """
+    descriptors = []
+    text_lower = text.lower()
+    
+    # Look for role/type keywords
+    if any(w in text_lower for w in ["adventurer", "party", "guild member", "hero"]):
+        descriptors.append("adventurer in practical gear")
+    if any(w in text_lower for w in ["faction", "warden", "guard", "soldier"]):
+        descriptors.append("armed faction representative")
+    if any(w in text_lower for w in ["merchant", "trader", "shopkeep", "vendor"]):
+        descriptors.append("merchant in fine clothes")
+    if any(w in text_lower for w in ["assassin", "rogue", "thief", "criminal"]):
+        descriptors.append("figure in black leather, concealed face")
+    if any(w in text_lower for w in ["priest", "cleric", "holy", "temple", "sanctum"]):
+        descriptors.append("robed figure in ritual vestments")
+    if any(w in text_lower for w in ["arcane", "mage", "wizard", "spell", "magical"]):
+        descriptors.append("figure wearing enchanted robes, arcane symbols")
+    if any(w in text_lower for w in [\"oracle\", \"seer\", \"prophet\"]):\n        descriptors.append(\"mysteriously cloaked oracle figure\")\n    if any(w in text_lower for w in [\"noble\", \"lord\", \"lady\", \"aristocrat\", \"elite\"]):\n        descriptors.append(\"figure in fine silks, noble bearing\")\n    if any(w in text_lower for w in [\"crowd\", \"mass\", \"gathering\", \"assembly\"]):\n        descriptors.append(\"crowd of diverse figures\")\n    if any(w in text_lower for w in [\"stranger\", \"unknown\", \"mysterious\", \"hooded\"]):\n        descriptors.append(\"mysterious figure, features hidden\")\n    \n    return descriptors[:3]  # Limit to 3 contextual descriptors\n\n\ndef _get_party_home_district(party_profile: dict) -> str:
     """Derive a home district key from a party profile JSON."""
     text = ((party_profile.get("specialty") or "") + " " +
             (party_profile.get("affiliation") or "")).lower()
@@ -2606,12 +2654,35 @@ _BULLETIN_ACTION_KEYWORDS: list[tuple[str, str]] = [
 
 
 def _extract_scene_action(text: str) -> str:
-    """Extract a visual action phrase from bulletin text."""
+    """Extract a visual action phrase from bulletin text with better fallbacks."""
     text_lower = text.lower()
     for keyword, visual in _BULLETIN_ACTION_KEYWORDS:
         if keyword in text_lower:
             return visual
-    return "figures going about tense business in the district"
+    
+    # Enhanced fallback detection for common patterns
+    if any(w in text_lower for w in ["dead", "killed", "death", "funeral"]):
+        return "still figure on ground, onlookers gathered in grief"
+    elif any(w in text_lower for w in ["injured", "wounded", "blade", "blood"]):
+        return "figure slumped against wall, others tending wounds, tension"
+    elif any(w in text_lower for w in ["post", "board", "notice", "announce"]):
+        return "figure nailing notice to board, others gathering around"
+    elif any(w in text_lower for w in ["transaction", "deal", "exchange", "barter"]):
+        return "figures exchanging items in half-shadow, careful tension"
+    elif any(w in text_lower for w in ["vote", "election", "decision", "council"]):
+        return "figures gathered in serious discussion, hand raised to speak"
+    elif any(w in text_lower for w in ["discovery", "found", "reveal", "uncovered"]):
+        return "figure examining a new discovery, others watching intently"
+    elif any(w in text_lower for w in ["rift", "tear", "anomaly", "void"]):
+        return "figures surrounding a glowing rift, hand shielding eyes from light"
+    elif any(w in text_lower for w in ["treasure", "loot", "relic", "artifact"]):
+        return "figure holding up a glowing treasure, face lit from below, awe"
+    elif any(w in text_lower for w in ["hunt", "track", "search", "seek"]):
+        return "figure crouching, examining ground for clues, determined"
+    elif any(w in text_lower for w in ["gather", "crowd", "mass", "assemble"]):
+        return "crowd of figures assembled in hushed conversation, tension in air"
+    
+    return "figures engaged in dramatic business in the district"
 
 
 async def _build_image_prompt(memory_entries: List[str]) -> tuple:
@@ -2646,14 +2717,18 @@ async def _build_image_prompt(memory_entries: List[str]) -> tuple:
     if not real_entries:
         real_entries = memory_entries
 
-    recent_pool = real_entries[-8:]
+    # Wider pool (last 15 entries) and randomize selection for more variety
+    # This prevents repeating the same bulletins across image generations
+    recent_pool = real_entries[-15:] if len(real_entries) >= 15 else real_entries
     random.shuffle(recent_pool)
+    # Take only 10 to evaluate, then pick the first with characters or a random one
+    eval_pool = recent_pool[:10]
 
     chosen        = None
     found_npcs    = []
     found_parties = []
 
-    for entry in recent_pool:
+    for entry in eval_pool:
         npcs    = find_npc_in_text(entry)
         parties = _find_parties_in_text(entry)
         if npcs or parties:
@@ -2662,10 +2737,15 @@ async def _build_image_prompt(memory_entries: List[str]) -> tuple:
             found_parties = parties
             break
 
+    # If no NPCs/parties found in eval pool, pick from the full pool
+    # instead of just from the last 5
     if not chosen:
-        chosen        = random.choice(real_entries[-5:])
+        chosen        = random.choice(eval_pool) if eval_pool else random.choice(real_entries)
         found_npcs    = find_npc_in_text(chosen)
         found_parties = _find_parties_in_text(chosen)
+        # If still no NPCs found, try to extract context-based characters
+        if not found_npcs and not found_parties:
+            logger.info(f"🖼️ No named NPCs found in chosen bulletin — using contextual extraction")
 
     district_aesthetic = _get_district_aesthetic(chosen)
     if district_aesthetic is _AESTHETIC_FALLBACK:
@@ -2695,6 +2775,13 @@ async def _build_image_prompt(memory_entries: List[str]) -> tuple:
         if party_visual:
             first_sentence = party_visual.split('.')[0].strip()
             char_parts.append(first_sentence)
+
+    # If still not enough characters, use contextual extraction to add variety
+    if len(char_parts) < MAX_CHARS:
+        contextual = _extract_contextual_characters(chosen)
+        for desc in contextual:
+            if len(char_parts) < MAX_CHARS:
+                char_parts.append(desc)
 
     image_style = os.getenv("IMAGE_STYLE", "photorealistic").lower().strip()
     is_anime    = image_style == "anime"
@@ -2888,20 +2975,29 @@ async def generate_story_image() -> tuple:
     }
 
     # Check for reference images to use as img2img base
+    # REDUCED FREQUENCY: Only use img2img 35% of the time to add more txt2img variety
     from src.image_ref import (
         get_best_ref_for_scene, to_img2img_payload,
         detect_and_save_refs, SCENE_DENOISE,
     )
-    ref_bytes, denoise, ref_source = get_best_ref_for_scene(
-        chosen_bulletin if chosen_bulletin else image_prompt
-    )
-    if ref_bytes:
-        api_payload = to_img2img_payload(payload, ref_bytes, denoise)
-        endpoint = f"{A1111_URL}/sdapi/v1/img2img"
-        logger.info(f"🖼️ Story image using img2img ref: {ref_source} (denoise={denoise})")
+    
+    use_ref_chance = random.random() < 0.35
+    api_payload = payload
+    endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
+    ref_source = ""
+    
+    if use_ref_chance:
+        ref_bytes, denoise, ref_source = get_best_ref_for_scene(
+            chosen_bulletin if chosen_bulletin else image_prompt
+        )
+        if ref_bytes:
+            api_payload = to_img2img_payload(payload, ref_bytes, denoise)
+            endpoint = f"{A1111_URL}/sdapi/v1/img2img"
+            logger.info(f"🖼️ Story image using img2img ref: {ref_source} (denoise={denoise})")
+        else:
+            logger.info(f"🖼️ Story image using txt2img (no ref available, using pure prompt)")
     else:
-        api_payload = payload
-        endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
+        logger.info(f"🖼️ Story image using txt2img (rotational txt2img cycle for variety)")
 
     async with a1111_lock:
         for attempt in range(3):

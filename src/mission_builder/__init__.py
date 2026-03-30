@@ -551,14 +551,18 @@ Output ONLY Acts 3 and 4."""
 async def _gen_act_5_rewards(ctx: dict, overview: str) -> str:
     """Generate Act 5: Resolution, rewards, and consequences."""
     
+    # Get PC level for loot scaling
+    pc_level = get_max_pc_level()
+    
     rewards_block = format_rewards_block(
         tier=ctx['tier'],
         cr=ctx['cr'],
         faction=ctx['faction'],
         mission_reward_text=ctx['mission'].get('reward', ''),
+        pc_level=pc_level,
     )
     
-    loot_table = build_loot_table(ctx['cr'], ctx['tier'])
+    loot_table = build_loot_table(ctx['cr'], ctx['tier'], pc_level=pc_level)
     
     prompt = f"""Continue building the D&D 5e 2024 module for: {ctx['title']}
 CR: {ctx['cr']} | Tier: {ctx['tier']} | Faction: {ctx['faction']}
@@ -764,19 +768,31 @@ async def post_module_to_channel(client, docx_path: Path, mission: dict, player_
         await channel.send(embed=embed, file=file)
         logger.info(f"Module posted to channel {channel_id}: {title}")
         
-        # Post maps if available
-        maps_dir = docx_path.parent / docx_path.stem / "maps"
-        if maps_dir.exists():
-            map_files = list(maps_dir.glob("*.png"))
-            if map_files:
-                map_embed = discord.Embed(
-                    title=f"\U0001F5FA\uFE0F VTT Maps: {title}",
-                    description=f"{len(map_files)} tactical battlemaps (1024x1024px)",
-                    color=discord.Color.dark_teal(),
-                )
-                files = [discord.File(str(p), filename=p.name) for p in map_files[:10]]
-                await channel.send(embed=map_embed, files=files)
-                logger.info(f"Posted {len(files)} maps for: {title}")
+        # CRITICAL FIX: Generate and post maps
+        # Extract module_data from docx_path parent directory context
+        try:
+            # Reconstruct minimal module_data for map generation
+            module_data = {
+                "title": title,
+                "raw_content": mission.get("body", ""),
+                "sections": mission.get("sections", {}),
+                "metadata": {"primary_location": mission.get("location", "Unknown")},
+            }
+            
+            output_subdir = docx_path.parent.name if docx_path.parent else "generated_modules"
+            map_paths = await generate_module_maps(module_data, output_subdir=output_subdir, max_maps=5)
+            
+            if map_paths:
+                success = await post_maps_to_channel(client, map_paths, module_data)
+                if success:
+                    logger.info(f"✅ Maps successfully posted for: {title}")
+                else:
+                    logger.warning(f"⚠️ Maps generated but failed to post for: {title}")
+            else:
+                logger.warning(f"⚠️ No maps generated (A1111 unavailable?) for: {title}")
+        except Exception as e:
+            logger.error(f"❌ Map generation failed for {title}: {e}")
+            # Don't fail the entire post operation, just warn
         
         return True
     except Exception as e:

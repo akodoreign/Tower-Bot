@@ -170,7 +170,12 @@ def tick_calendar() -> List[Dict]:
         if ev.get("resolved"):
             continue
 
-        event_dt = datetime.fromisoformat(ev["event_date"])
+        try:
+            event_dt = datetime.fromisoformat(ev["event_date"])
+        except (ValueError, KeyError) as e:
+            logger.warning(f"🗓️ Could not parse event date {ev.get('event_date', 'MISSING')}: {e}")
+            continue
+        
         hours_until = (event_dt - now).total_seconds() / 3600
 
         # 48h advance announcement

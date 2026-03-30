@@ -60,44 +60,65 @@ EMOJI_FAIL     = "❌"   # DM reacts to mark a mission failed
 def _get_results_channel_id() -> int:
     """Channel ID for mission result messages (claims, completions, failures, expirations).
     Falls back to MISSION_BOARD_CHANNEL_ID if MISSION_RESULTS_CHANNEL_ID is not set."""
-    return int(os.getenv("MISSION_RESULTS_CHANNEL_ID",
-                         os.getenv("MISSION_BOARD_CHANNEL_ID", "0")))
+    results_id = int(os.getenv("MISSION_RESULTS_CHANNEL_ID", "0"))
+    if results_id:
+        return results_id
+    
+    board_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", "0"))
+    if not board_id:
+        logger.warning("❌ MISSION_RESULTS_CHANNEL_ID and MISSION_BOARD_CHANNEL_ID both unset")
+    return board_id
 
 
 async def _get_results_channel(client, fallback_channel=None):
-    """Resolve the results channel, falling back to board channel or provided fallback
-    if the results channel is inaccessible."""
-    results_id = _get_results_channel_id()
+    """
+    Resolve the results channel, falling back to board channel or provided fallback.
+    CRITICAL FIX: Actually validates channel is accessible before returning.
+    """
+    results_id = int(os.getenv("MISSION_RESULTS_CHANNEL_ID", "0"))
+    board_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", "0"))
     ch = None
 
-    if client and results_id:
-        # Try cache first, then fetch from API if not cached
+    # Try results channel first
+    if results_id and client:
         ch = client.get_channel(results_id)
-        if ch is None:
+        if ch is None and results_id:
             try:
                 ch = await client.fetch_channel(results_id)
-                logger.info(f"📋 Results channel {results_id} fetched from API (was not cached)")
+                logger.info(f"📋 Results channel {results_id} fetched from API")
             except Exception as e:
-                logger.warning(f"📋 Could not fetch results channel {results_id}: {e}")
+                logger.warning(f"📋 Cannot access results channel {results_id}: {e}")
                 ch = None
 
+    # Verify send permissions on results channel
     if ch is not None:
-        # Quick permission check — try to verify we can send
         try:
             perms = ch.permissions_for(ch.guild.me) if hasattr(ch, 'guild') and ch.guild else None
             if perms and not perms.send_messages:
-                logger.warning(
-                    f"📋 No send permission in results channel {results_id} — falling back to board channel"
-                )
+                logger.warning(f"📋 No send permission in results channel {results_id}, falling back")
                 ch = None
         except Exception:
-            pass  # If we can't check perms, try sending anyway
+            pass
 
-    if ch is None:
-        board_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", "0"))
-        ch = client.get_channel(board_id) if client else None
+    # Fallback to board channel if results channel failed
+    if ch is None and board_id and client:
+        ch = client.get_channel(board_id)
+        if ch is None and board_id:
+            try:
+                ch = await client.fetch_channel(board_id)
+                logger.info(f"📋 Board channel {board_id} fetched from API (fallback)")
+            except Exception as e:
+                logger.warning(f"📋 Cannot access board channel {board_id}: {e}")
+                ch = None
+
+    # Final fallback to provided channel
     if ch is None:
         ch = fallback_channel
+        if ch:
+            logger.info(f"📋 Using provided fallback channel")
+        else:
+            logger.error(f"❌ No valid channel available for mission results")
+    
     return ch
 
 # ---------------------------------------------------------------------------

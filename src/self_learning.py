@@ -30,8 +30,11 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
 # Learning window (24h clock, local time)
-LEARN_HOUR_START = int(os.getenv("LEARN_HOUR_START", "1"))   # 1 AM
-LEARN_HOUR_END   = int(os.getenv("LEARN_HOUR_END", "2"))     # 2 AM
+# CRITICAL FIX: Extended window from 1hr to 3hrs, and made configurable
+# Original: 1-2 AM only (1 hour) — too narrow, likely never triggers
+# New: 1-4 AM (3 hours) — wider window, more reliable
+LEARN_HOUR_START = int(os.getenv("LEARN_HOUR_START", "1"))   # 1 AM (configurable)
+LEARN_HOUR_END   = int(os.getenv("LEARN_HOUR_END", "4"))     # 4 AM (configurable, 3-hour window)
 
 # Paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -321,6 +324,85 @@ Format as:
 Keep it under 1500 characters."""
 
     return await _ask_ollama(prompt, system="You analyze conversation patterns. Be concise and actionable.")
+
+
+async def _study_failure_logs() -> Optional[str]:
+    """
+    CRITICAL FIX: Read error logs and mission failures for pattern analysis.
+    Used to identify broken mission formats, A1111 failures, balancing issues.
+    """
+    failures = []
+    
+    # Read bot error logs
+    error_log = CHAT_LOG_DIR / "bot_errors.log"
+    if error_log.exists():
+        try:
+            lines = error_log.read_text(encoding="utf-8", errors="ignore").splitlines()
+            # Get last 50 errors
+            errors = [l for l in lines[-50:] if l.strip()]
+            if errors:
+                failures.append(f"RECENT ERRORS ({len(errors)}):\n" + "\n".join(errors[:2000]))
+        except Exception as e:
+            logger.warning(f"Could not read error log: {e}")
+    
+    # Check mission failures/expirations
+    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
+    if mission_path.exists():
+        try:
+            missions = json.loads(mission_path.read_text(encoding="utf-8"))
+            failed_missions = [m for m in missions if m.get("outcome") == "failed"]
+            expired_missions = [m for m in missions if m.get("outcome") == "expired"]
+            
+            recent_fails = failed_missions[-10:] if len(failed_missions) > 10 else failed_missions
+            recent_expires = expired_missions[-10:] if len(expired_missions) > 10 else expired_missions
+            
+            if recent_fails:
+                fail_text = "\n".join(
+                    f"- {m.get('title')} (tier={m.get('tier')}, faction={m.get('faction')})"
+                    for m in recent_fails
+                )
+                failures.append(f"FAILED MISSIONS ({len(recent_fails)}):\n{fail_text}")
+            
+            if recent_expires:
+                expire_text = "\n".join(
+                    f"- {m.get('title')} (tier={m.get('tier')}, cr={m.get('cr')})"
+                    for m in recent_expires
+                )
+                failures.append(f"EXPIRED MISSIONS ({len(recent_expires)}):\n{expire_text}")
+        except Exception as e:
+            logger.warning(f"Could not analyze mission history: {e}")
+    
+    if not failures:
+        return None
+    
+    failure_text = "\n\n".join(failures)
+    
+    prompt = f"""Analyze these failure patterns from a D&D campaign system:
+
+{failure_text[:4000]}
+
+Write a skill file identifying:
+1. What types of errors appear most frequently
+2. Are mission failures clustered by tier/faction/difficulty?
+3. Are any specific system components failing? (A1111? Mission generator? Balance?)
+4. Root causes and proposed fixes
+
+Format as:
+# Skill: Failure Analysis
+**Keywords:** failure, error, problem, issue, bug, broken, fix, improvement
+**Category:** learned
+**Version:** 1
+**Source:** self-learned
+
+Be specific. List concrete problems and solutions. Keep under 2000 characters."""
+
+    system_prompt = (
+        "You are a system diagnostic AI. Analyze failure patterns to identify broken components. "
+        "Be direct about problems. Suggest concrete fixes."
+    )
+    
+    return await _ask_ollama(prompt, system=system_prompt)
+
 
 
 async def _study_world_state() -> Optional[str]:
@@ -702,6 +784,8 @@ async def run_learning_session():
     logger.info("🧠 Self-learning session starting...")
 
     studies = [
+        # CRITICAL FIX: Study failures FIRST to learn from errors and bugs
+        ("failure_analysis",   _study_failure_logs,       "failure_analysis"),
         # World state assessment runs first — guided by LEARNING_PHILOSOPHY
         ("world_state",        _study_world_state,         "world_assessment"),
         ("news_memory",        _study_news_memory,        "current_events"),

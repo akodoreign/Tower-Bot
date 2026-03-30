@@ -88,10 +88,12 @@ def get_max_pc_level() -> int:
     """Parse character_memory.txt and return the highest total class level."""
     char_file = DOCS_DIR / "character_memory.txt"
     if not char_file.exists():
+        logger.warning("📖 character_memory.txt not found — returning CR 0")
         return 0
     try:
         text = char_file.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
+    except Exception as e:
+        logger.warning(f"📖 Could not read character_memory.txt: {e}")
         return 0
 
     max_level = 0
@@ -100,12 +102,30 @@ def get_max_pc_level() -> int:
         if not line.upper().startswith("CLASS:"):
             continue
         class_text = line.split(":", 1)[1].strip()
-        level_matches = re.findall(r'(?:^|/)\s*\w+\s+(\d+)', class_text)
+        
+        # Parse multi-class like "Fighter/Monk (5/3)" or "Fighter 5/Monk 3" or "Fighter (5)" or "Fighter 5"
+        # Extract all numbers and sum them
+        level_matches = re.findall(r'\((\d+)(?:/(\d+))*\)|\s(\d+)(?:/\s*(\d+))?', class_text)
+        
         if level_matches:
-            total = sum(int(lv) for lv in level_matches)
+            total = 0
+            for match in level_matches:
+                # Each match is a tuple from the regex groups
+                for group in match:
+                    if group:
+                        total += int(group)
+            
             if total > max_level:
                 max_level = total
+                logger.debug(f"📖 Found character level {total} from: {class_text}")
+        else:
+            logger.debug(f"📖 Could not parse class levels from: {class_text}")
 
+    if max_level <= 0:
+        logger.warning("📖 No valid character levels found in character_memory.txt")
+        return 0
+        
+    logger.info(f"📖 Max PC level detected: {max_level}")
     return max_level
 
 
@@ -115,12 +135,14 @@ def get_cr(tier: str) -> int:
     
     CR = max_pc_level + tier_offset, clamped to [max_pc_level + 1, max_pc_level + 5].
     Falls back to legacy fixed table if character_memory.txt is unreadable.
+    
+    Returns CR clamped to valid range [1, 30].
     """
     max_level = get_max_pc_level()
 
     if max_level <= 0:
         cr = LEGACY_TIER_CR.get(tier.lower(), DEFAULT_CR)
-        logger.info(f"📖 CR fallback (no PC levels found): tier={tier} → CR {cr}")
+        logger.warning(f"⚠️ CR FALLBACK: No PC levels found in character_memory.txt. Using legacy tier={tier} → CR {cr}")
         return cr
 
     offset = TIER_OFFSET.get(tier.lower(), DEFAULT_OFFSET)
@@ -131,9 +153,16 @@ def get_cr(tier: str) -> int:
     cr = min(cr, max_level + 5)
     cr = max(1, min(cr, 30))
 
+    # BALANCE WARNINGS
+    if cr >= 28:
+        logger.warning(f"⚠️ DEADLY ENCOUNTER: CR {cr} for max_pc_level={max_level}, tier={tier}. Consider reducing threat level.")
+    elif cr >= 25:
+        logger.warning(f"⚠️ EPIC ENCOUNTER: CR {cr}. Ensure party has proper resources and healing.")
+    elif max_level + offset > 30:
+        logger.warning(f"⚠️ CR OVERFLOW: Calculation resulted in CR {max_level + offset} (clamped to 30). Party may be overleveled.")
+    
     logger.info(
-        f"📖 Dynamic CR: max_pc_level={max_level}, tier={tier}, "
-        f"offset=+{offset} → CR {cr}"
+        f"📖 CR: max_pc_level={max_level}, tier={tier}, offset=+{offset} → CR {cr}"
     )
     return cr
 

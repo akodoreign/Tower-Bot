@@ -15,6 +15,7 @@ Each lead has:
 from __future__ import annotations
 
 import random
+import logging
 from typing import List, Dict, Optional
 from .locations import (
     load_gazetteer,
@@ -23,6 +24,8 @@ from .locations import (
     get_sub_areas,
     build_location_context,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # Lead types and their characteristics
@@ -170,13 +173,21 @@ def generate_lead(
         location_name = f"A {lead_type} contact point"
         location_type = random.choice(lead_info["typical_locations"])
         location_desc = "A place where information changes hands"
+        logger.warning(f"🔗 Lead generation: no establishments found for {faction} in {district} — using fallback")
     
     # Get a reason why the players should go there
-    reasons = LOCATION_REASONS.get(location_type, LOCATION_REASONS["tavern"])
+    reasons = LOCATION_REASONS.get(location_type, LOCATION_REASONS.get("tavern", []))
+    if not reasons:
+        logger.warning(f"🔗 Lead generation: no location reasons for type '{location_type}' — using generic")
+        reasons = ["This location is relevant to the investigation"]
     why_go = random.choice(reasons)
     
     # Get NPC motivation
-    motivation = random.choice(NPC_MOTIVATIONS)
+    if not NPC_MOTIVATIONS:
+        logger.error(f"🔗 Lead generation: NPC_MOTIVATIONS list is empty!")
+        motivation = "unknown motivation"
+    else:
+        motivation = random.choice(NPC_MOTIVATIONS)
     
     return {
         "lead_type": lead_type,

@@ -394,54 +394,130 @@ def _diff_snapshots(old: dict, new: dict, char_name: str) -> list[str]:
 # Auto-update character_memory.txt with fresh DDB data
 # ---------------------------------------------------------------------------
 
-def _update_character_memory(char_name: str, snap: dict) -> None:
-    """Update the matching character block in character_memory.txt with fresh DDB data.
-    Only updates mechanical fields (class, HP, stats, XP, currency, feats, inventory).
-    Leaves ORACLE NOTES, PERSONALITY, and other manual fields untouched."""
+def _find_character_block(text: str, char_name: str) -> tuple[int, int] | None:
+    """
+    Find the start and end indices of a character block in character_memory.txt.
+    
+    Returns:
+        (start_idx, end_idx) tuple if found, None otherwise
+    """
+    sep = "---CHARACTER---"
+    blocks = text.split(sep)
+    
+    current_pos = 0
+    for i, block in enumerate(blocks):
+        block_start = current_pos
+        block_end = current_pos + len(block)
+        
+        # Check if this block contains the character
+        # Look for "NAME: {name}" anywhere in block (case-insensitive comparison)
+        for line in block.split("\n"):
+            if line.strip().upper().startswith("NAME:"):
+                # Extract name from "NAME: CharName" format
+                parts = line.split(":", 1)
+                if len(parts) == 2:
+                    stored_name = parts[1].strip()
+                    if stored_name.lower() == char_name.lower():
+                        # Found it — return absolute positions
+                        return (block_start, block_end)
+        
+        current_pos = block_end + len(sep)
+    
+    return None
+
+
+def _update_character_memory(char_name: str, snap: dict) -> bool:
+    """
+    Update the matching character block in character_memory.txt with fresh DDB data.
+    Only updates mechanical fields (class, HP, stats, XP, currency, inventory).
+    Preserves manual fields (ORACLE NOTES, PERSONALITY, etc).
+    
+    Returns:
+        True if updated successfully, False otherwise
+    """
     mem_file = Path(__file__).resolve().parent.parent / "campaign_docs" / "character_memory.txt"
     if not mem_file.exists():
-        return
+        logger.warning(f"📊 character_memory.txt not found")
+        return False
 
-    text = mem_file.read_text(encoding="utf-8", errors="ignore")
-    blocks = text.split("---CHARACTER---")
+    try:
+        text = mem_file.read_text(encoding="utf-8", errors="ignore")
+    except Exception as e:
+        logger.error(f"📊 Could not read character_memory.txt: {e}")
+        return False
 
-    updated = False
-    for i, block in enumerate(blocks):
-        if f"NAME: {char_name}" not in block:
+    # Find the character block
+    block_range = _find_character_block(text, char_name)
+    if block_range is None:
+        logger.warning(f"📊 {char_name}: not found in character_memory.txt")
+        return False
+    
+    start_idx, end_idx = block_range
+    char_block = text[start_idx:end_idx]
+    lines = char_block.split("\n")
+    
+    new_lines = []
+    field_updated = {
+        "CLASS": False,
+        "HP": False,
+        "STATS": False,
+        "CURRENCY": False,
+        "XP": False,
+        "INVENTORY": False,
+    }
+    
+    for line in lines:
+        # Extract field name (part before first colon only)
+        if ":" not in line:
+            new_lines.append(line)
             continue
-
-        lines = block.split("\n")
-        new_lines = []
-        for line in lines:
-            key = line.split(":")[0].strip() if ":" in line else ""
-
-            # Replace mechanical fields with fresh DDB data
-            if key == "CLASS":
-                cls_str = " / ".join(f"{c} {l}" for c, l in snap.get("classes", {}).items())
-                new_lines.append(f"CLASS: {cls_str}")
-                updated = True
-            elif key == "HP":
-                new_lines.append(f"HP: {snap.get('max_hp', '?')}")
-                updated = True
-            elif key == "STATS":
-                stats = snap.get("stats", {})
-                stat_str = " | ".join(f"{k} {v}" for k, v in stats.items())
-                new_lines.append(f"STATS: {stat_str}")
-                updated = True
-            elif key == "CURRENCY":
-                cur = snap.get("currencies", {})
-                cur_parts = [f"{v} {k.upper()}" for k, v in cur.items() if v > 0]
-                new_lines.append(f"CURRENCY: {', '.join(cur_parts) if cur_parts else '0 GP'}")
-                updated = True
-            else:
-                new_lines.append(line)
-
-        blocks[i] = "\n".join(new_lines)
-        break
-
-    if updated:
-        mem_file.write_text("---CHARACTER---".join(blocks), encoding="utf-8")
-        logger.info(f"📊 {char_name}: character_memory.txt updated with DDB data")
+        
+        key = line.split(":")[0].strip().upper()
+        
+        # Replace mechanical fields with fresh DDB data
+        if key == "CLASS" and snap.get("classes"):
+            cls_str = " / ".join(f"{c} {l}" for c, l in snap.get("classes", {}).items())
+            new_lines.append(f"CLASS: {cls_str}")
+            field_updated["CLASS"] = True
+        elif key == "HP" and snap.get("max_hp"):
+            new_lines.append(f"HP: {snap.get('max_hp', '?')}")
+            field_updated["HP"] = True
+        elif key == "STATS" and snap.get("stats"):
+            stats = snap.get("stats", {})
+            stat_str = " | ".join(f"{k} {v}" for k, v in stats.items())
+            new_lines.append(f"STATS: {stat_str}")
+            field_updated["STATS"] = True
+        elif key == "CURRENCY" and snap.get("currencies"):
+            cur = snap.get("currencies", {})
+            cur_parts = [f"{v}{k.upper()}" for k, v in cur.items() if v > 0]
+            new_lines.append(f"CURRENCY: {', '.join(cur_parts) if cur_parts else '0GP'}")
+            field_updated["CURRENCY"] = True
+        elif key == "XP" and snap.get("xp") is not None:
+            new_lines.append(f"XP: {snap.get('xp', 0):,}")
+            field_updated["XP"] = True
+        elif key == "INVENTORY" and snap.get("inventory"):
+            # Format: item (qty), item (qty)
+            inv = snap.get("inventory", {})
+            inv_parts = [f"{name} ({qty})" for name, qty in inv.items()]
+            new_lines.append(f"INVENTORY: {', '.join(inv_parts) if inv_parts else 'empty'}")
+            field_updated["INVENTORY"] = True
+        else:
+            # Preserve all other fields (ORACLE NOTES, PERSONALITY, etc)
+            new_lines.append(line)
+    
+    # Reconstruct the file
+    new_block = "\n".join(new_lines)
+    sep = "---CHARACTER---"
+    new_text = text[:start_idx] + new_block + text[end_idx:]
+    
+    try:
+        mem_file.write_text(new_text, encoding="utf-8")
+        updates = [k for k, v in field_updated.items() if v]
+        logger.info(f"✅ {char_name}: character_memory.txt updated ({', '.join(updates)})")
+        return True
+    except Exception as e:
+        logger.error(f"❌ {char_name}: failed to write character_memory.txt: {e}")
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -528,9 +604,11 @@ async def _check_character(char_info: dict, channel) -> str:
 
     # Update character_memory.txt so the Oracle has fresh data
     try:
-        _update_character_memory(char_name, new_snap)
+        success = _update_character_memory(char_name, new_snap)
+        if not success:
+            logger.warning(f"⚠️ {char_name}: character_memory.txt update failed — Oracle data may be stale")
     except Exception as e:
-        logger.warning(f"📊 {char_name}: character_memory.txt update failed: {e}")
+        logger.error(f"❌ {char_name}: character_memory.txt update exception: {e}")
 
     if channel is None:
         return "changed"  # changes detected but no channel to post to

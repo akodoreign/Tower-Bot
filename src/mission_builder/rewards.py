@@ -11,7 +11,10 @@ Provides:
 from __future__ import annotations
 
 import random
+import logging
 from typing import Dict, List, Tuple
+
+logger = logging.getLogger(__name__)
 
 # Gold ranges by tier
 GOLD_BY_TIER: Dict[str, Tuple[int, int]] = {
@@ -142,18 +145,45 @@ def get_random_magic_item(cr: int, count: int = 1) -> List[str]:
     return random.sample(items, min(count, len(items)))
 
 
-def calculate_gold_reward(tier: str, party_size: int = 4) -> Tuple[int, int]:
+def calculate_gold_reward(tier: str, party_size: int = 4, pc_level: int = 0) -> Tuple[int, int]:
     """
     Calculate gold reward range for a mission.
     
-    Returns (min, max) gold per player.
+    CRITICAL FIX: Now scales with PC level.
+    - PC level 1-5:   1.0x multiplier (base reward)
+    - PC level 6-10:  1.2x multiplier
+    - PC level 11-15: 1.5x multiplier
+    - PC level 16-20: 2.0x multiplier (epic tier)
+    
+    Args:
+        tier: Mission tier (local, standard, epic, etc)
+        party_size: Number of PCs (affects per-member reward)
+        pc_level: Highest total PC level (used to scale reward)
+    
+    Returns:
+        (min, max) gold per player
     """
     base_min, base_max = GOLD_BY_TIER.get(tier.lower(), (150, 400))
     
-    # Adjust slightly for party size
-    multiplier = 4 / max(party_size, 1)
+    # Adjust for party size
+    size_multiplier = 4 / max(party_size, 1)
     
-    return (int(base_min * multiplier), int(base_max * multiplier))
+    # CRITICAL FIX: Scale by PC level
+    level_multiplier = 1.0
+    if pc_level >= 16:
+        level_multiplier = 2.0
+    elif pc_level >= 11:
+        level_multiplier = 1.5
+    elif pc_level >= 6:
+        level_multiplier = 1.2
+    
+    final_min = int(base_min * size_multiplier * level_multiplier)
+    final_max = int(base_max * size_multiplier * level_multiplier)
+    
+    if level_multiplier != 1.0:
+        logger.info(f"💰 Loot scaled by PC level {pc_level}: {level_multiplier}x multiplier ({tier} tier)")
+    
+    return (final_min, final_max)
 
 
 def format_rewards_block(
@@ -161,13 +191,21 @@ def format_rewards_block(
     cr: int,
     faction: str,
     mission_reward_text: str = "",
+    pc_level: int = 0,
 ) -> str:
     """
     Generate a rewards section for the module.
     
+    Args:
+        tier: Mission tier
+        cr: Encounter CR
+        faction: Posting faction
+        mission_reward_text: Custom reward text
+        pc_level: Highest total PC level (for scaling)
+    
     Returns formatted text block for AI prompts.
     """
-    gold_min, gold_max = calculate_gold_reward(tier)
+    gold_min, gold_max = calculate_gold_reward(tier, pc_level=pc_level)
     item_tier = get_magic_item_tier(cr)
     sample_items = get_random_magic_item(cr, count=3)
     
@@ -313,9 +351,18 @@ def build_loot_table(
     tier: str,
     guaranteed_gold: bool = True,
     magic_item_chance: float = 0.5,
+    pc_level: int = 0,
 ) -> str:
-    """Build a formatted loot table."""
-    gold_min, gold_max = calculate_gold_reward(tier)
+    """Build a formatted loot table.
+    
+    Args:
+        cr: Encounter CR
+        tier: Mission tier
+        guaranteed_gold: Include guaranteed gold rewards
+        magic_item_chance: Probability of magic item (0-1)
+        pc_level: Highest total PC level (for scaling)
+    """
+    gold_min, gold_max = calculate_gold_reward(tier, pc_level=pc_level)
     item_tier = get_magic_item_tier(cr)
     
     lines = [

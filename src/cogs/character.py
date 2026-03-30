@@ -110,18 +110,30 @@ def setup(client):
                             import re as _re
                             raw = CHARACTER_MEMORY_FILE.read_text(encoding="utf-8")
                             blocks = raw.split("---CHARACTER---")
+                            found_and_updated = False
                             for bi, block in enumerate(blocks):
-                                if f"NAME: {character_name}" in block or f"NAME: {character_name.strip()}" in block:
+                                # Robust character name matching — case-insensitive, flexible spacing
+                                name_pattern = _re.compile(
+                                    rf'^NAME:\s*{_re.escape(character_name)}\s*$',
+                                    _re.MULTILINE | _re.IGNORECASE
+                                )
+                                if name_pattern.search(block):
+                                    # Update PLAYER field in this block
                                     blocks[bi] = _re.sub(
                                         r'^(PLAYER:\s*)\S+',
                                         lambda pm: pm.group(1) + new_player,
                                         block, count=1, flags=_re.MULTILINE
                                     )
+                                    found_and_updated = True
                                     break
-                            updated = "---CHARACTER---".join(blocks)
-                            if updated != raw:
-                                CHARACTER_MEMORY_FILE.write_text(updated, encoding="utf-8")
-                                logger.info(f"character_memory.txt: PLAYER for {character_name}: {current_player!r} -> {new_player!r}")
+                            
+                            if found_and_updated:
+                                updated = "---CHARACTER---".join(blocks)
+                                if updated != raw:
+                                    CHARACTER_MEMORY_FILE.write_text(updated, encoding="utf-8")
+                                    logger.info(f"character_memory.txt: PLAYER for {character_name}: {current_player!r} -> {new_player!r}")
+                            else:
+                                logger.warning(f"Could not locate character block for '{character_name}' when updating PLAYER field")
                         except Exception as _e:
                             logger.warning(f"Could not update PLAYER field for {character_name}: {_e}")
                     break

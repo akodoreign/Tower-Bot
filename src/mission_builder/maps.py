@@ -29,6 +29,7 @@ import base64
 import asyncio
 import logging
 from pathlib import Path
+from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 
 import httpx
@@ -175,9 +176,18 @@ def extract_map_scenes(module_data: dict) -> List[Dict]:
     raw_content = module_data.get("raw_content", "")
     sections = module_data.get("sections", {})
     
+    # Fallback to raw_content if sections missing
+    if not sections:
+        logger.warning("🗺️ No sections found in module_data; attempting raw_content parse")
+        sections = {"acts_1_2": raw_content, "acts_3_4": raw_content}
+    
     # Parse Act 2 leads (investigation locations)
     acts_1_2 = sections.get("acts_1_2", "")
-    lead_pattern = r"###\s*Lead\s*\d+:\s*([^\n]+)\n(.*?)(?=###|##|$)"
+    if not acts_1_2:
+        logger.info("🗺️ No acts_1_2 section found for lead extraction")
+    
+    # Flexible regex to match "Lead", "Investigation Lead", "## Lead", "### Lead", etc.
+    lead_pattern = r"(?:###|##)?\s*(?:Investigation\s+)?Lead\s*\d+:?\s*([^\n]+)\n(.*?)(?=(?:###|##)|\Z)"
     
     for match in re.finditer(lead_pattern, acts_1_2, re.DOTALL | re.IGNORECASE):
         location_name = match.group(1).strip()
@@ -241,6 +251,8 @@ def extract_map_scenes(module_data: dict) -> List[Dict]:
             })
     
     logger.info(f"🗺️ Extracted {len(scenes)} map scenes from module")
+    if not scenes:
+        logger.warning("🗺️ CRITICAL: No scenes extracted. Check module format or sections structure. Raw sample: {acts_1_2[:200]}...")
     return scenes
 
 
@@ -457,19 +469,31 @@ async def post_maps_to_channel(
     client,
     map_paths: List[Path],
     module_data: dict,
+    retry_count: int = 2,
 ) -> bool:
     """
-    Post generated maps to the maps channel.
+    Post generated maps to the maps channel with retry logic.
     
     Args:
         client: Discord client
         map_paths: List of paths to map files
         module_data: Module data for context
+        retry_count: Number of retries on transient failures
     
     Returns:
-        True if posted successfully
+        True if posted successfully, False otherwise
     """
     import discord
+    
+    if not map_paths:
+        logger.warning("🗺️ No map paths provided to post")
+        return False
+    
+    # Validate all map files exist before attempting post
+    for p in map_paths:
+        if not p.exists():
+            logger.error(f"🗺️ Map file missing: {p}")
+            return False
     
     channel_id = int(os.getenv("MAPS_CHANNEL_ID", "0"))
     if not channel_id:
@@ -477,13 +501,25 @@ async def post_maps_to_channel(
         channel_id = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "0"))
     
     if not channel_id:
-        logger.warning("🗺️ No maps channel configured")
+        logger.warning("🗺️ No maps channel configured (MAPS_CHANNEL_ID or MODULE_OUTPUT_CHANNEL_ID)")
         return False
     
     channel = client.get_channel(channel_id)
     if not channel:
-        logger.warning(f"🗺️ Maps channel {channel_id} not found")
+        logger.warning(f"🗺️ Maps channel {channel_id} cannot be accessed by bot")
         return False
+    
+    # Verify bot has send permissions
+    try:
+        perms = channel.permissions_for(channel.guild.me) if hasattr(channel, 'guild') and channel.guild else None
+        if perms and not perms.send_messages:
+            logger.error(f"🗺️ Bot lacks send_messages permission in maps channel {channel_id}")
+            return False
+        if perms and not perms.attach_files:
+            logger.error(f"🗺️ Bot lacks attach_files permission in maps channel {channel_id}")
+            return False
+    except Exception as e:
+        logger.warning(f"🗺️ Could not verify permissions: {e} — proceeding anyway")
     
     title = module_data.get("title", "Unknown Mission")
     
@@ -492,19 +528,36 @@ async def post_maps_to_channel(
         description=f"Generated {len(map_paths)} tactical battlemaps for this mission.\n"
                     f"*1024x1024px, optimized for D&D Beyond VTT*",
         color=discord.Color.dark_teal(),
+        timestamp=datetime.now(),
     )
     
-    try:
-        files = [
-            discord.File(str(p), filename=p.name)
-            for p in map_paths[:10]  # Discord limit
-        ]
-        await channel.send(embed=embed, files=files)
-        logger.info(f"🗺️ Posted {len(files)} maps to channel")
-        return True
-    except Exception as e:
-        logger.error(f"🗺️ Failed to post maps: {e}")
-        return False
+    # Retry loop for transient failures
+    for attempt in range(1, retry_count + 1):
+        try:
+            files = [
+                discord.File(str(p), filename=p.name)
+                for p in map_paths[:10]  # Discord limit
+            ]
+            await channel.send(embed=embed, files=files)
+            logger.info(f"✅ Posted {len(files)} maps to channel {channel_id} for: {title}")
+            return True
+        except discord.HTTPException as e:
+            if attempt < retry_count and e.status in [429, 503, 500]:  # Retry on rate limit or server error
+                wait_time = 2 ** attempt  # Exponential backoff
+                logger.warning(f"🗺️ HTTP {e.status} from Discord (attempt {attempt}/{retry_count}), waiting {wait_time}s...")
+                await asyncio.sleep(wait_time)
+                continue
+            else:
+                logger.error(f"🗺️ Discord HTTP error (final): {e.status} {e.message}")
+                return False
+        except Exception as e:
+            logger.error(f"🗺️ Failed to post maps (attempt {attempt}/{retry_count}): {e}")
+            if attempt < retry_count:
+                await asyncio.sleep(1)
+            else:
+                return False
+    
+    return False
 
 
 # ---------------------------------------------------------------------------

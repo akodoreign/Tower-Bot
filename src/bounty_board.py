@@ -106,7 +106,8 @@ def _last_bounty_posted_at() -> Optional[datetime]:
         return None
     try:
         return max(datetime.fromisoformat(b["posted_at"]) for b in posted)
-    except Exception:
+    except (ValueError, KeyError) as e:
+        logger.warning(f"🎯 Could not determine last bounty post time — corrupt date: {e}")
         return None
 
 
@@ -250,7 +251,8 @@ async def check_bounty_expirations(channel) -> None:
             continue
         try:
             exp = datetime.fromisoformat(b["expires_at"])
-        except Exception:
+        except (ValueError, KeyError) as e:
+            logger.warning(f"🎯 Could not parse bounty expiry date {b.get('expires_at', 'MISSING')}: {e}")
             continue
         if now >= exp:
             b["resolved"] = True
@@ -260,8 +262,8 @@ async def check_bounty_expirations(channel) -> None:
                 try:
                     msg = await channel.fetch_message(b["message_id"])
                     await msg.delete()
-                except Exception:
-                    pass
+                except Exception as del_err:
+                    logger.debug(f"🎯 Could not delete expired bounty message: {del_err}")
             logger.info(f"🎯 Bounty expired: {b['id']}")
 
     if updated:
