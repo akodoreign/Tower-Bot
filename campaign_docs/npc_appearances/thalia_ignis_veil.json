@@ -1,0 +1,28 @@
+{
+  "name": "Thalia Ignis-Veil",
+  "species": "Genasi",
+  "faction": "Brother Thane's Cult",
+  "rank": "Devoted",
+  "role": "mercenary",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Tall, muscular Genasi woman, her fiery orange skin and long, shimmering hair flow like molten embers amidst the gloom. Clad in chain mail or scale mail, her outfit bears the eclectic mix of the Undercity's diverse cultures. A ceremonial dagger adorned with glowing embers hangs at her waist, while a warhammer and crossbow rest on her back. One distinctive visual detail: her eyes, as deep and dark as obsidian, burn with a fierce determination, a beacon of her unwavering dedication to her faction and her quest for atonement.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

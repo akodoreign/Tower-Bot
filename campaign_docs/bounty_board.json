@@ -20,5 +20,27 @@
     "expires_at": "2026-04-09T19:48:45.841466",
     "resolved": false,
     "message_id": 1482178717756428319
+  },
+  {
+    "id": "bounty_1774164921",
+    "body": "\ud83c\udfaf **WANTED \u2014 Elysia Shadowveil**\n*Issued by: Wardens of Ash on behalf of Brother Thane's Cult*\n\n**Last known location:** The Warrens, near the Shattered Hymn tavern\n**Description:** A lithe and agile figure with silver hair, piercing emerald eyes, and a distinctive silver mark on her left cheek. Known to move in the shadows and extract memories without consent.\n\n**Alleged offence:** Unauthorized extraction of memories from the city's citizens\n\n**Reward:** 42,669 EC  \u00b7  *Wanted for questioning. Must be delivered intact and coherent.*\n\n*Her methods are cloaked in mystery, making her particularly dangerous and elusive.*\n\n\u23f3 *Bounty active for 17 days. 08 Apr 2026.*",
+    "issuer": "Wardens of Ash",
+    "proxy_faction": "Brother Thane's Cult",
+    "reward": 42669,
+    "posted_at": "2026-03-22T02:35:21.381701",
+    "expires_at": "2026-04-08T02:35:18.608699",
+    "resolved": false,
+    "message_id": 1485180067868053576
+  },
+  {
+    "id": "bounty_1774784504",
+    "body": "\ud83c\udfaf **WANTED \u2014 Sylas the Venomous**\n*Issued by: Adventurers Guild*\n\n**Last known location:** Sewers of the Hollows\n**Description:** A gaunt man with a twisted spine, sporting a hooded cloak and carrying a vial of green liquid. Known to slip into food stalls unnoticed.\n**Alleged offence:** Contamination of food supply in Markets Infinite causing widespread illness.\n\n**Reward:** 82,238 EC  \u00b7  *Dead or alive. The issuing authority has stopped caring which.*\n\n*His deadly concoctions have left a trail of suffering in the Undercity. A bounty on his head will bring much-needed relief to the suffering masses.*\n\n\u23f3 *Bounty active for 33 days. 01 May 2026.*",
+    "issuer": "Adventurers Guild",
+    "proxy_faction": null,
+    "reward": 82238,
+    "posted_at": "2026-03-29T06:41:44.674047",
+    "expires_at": "2026-05-01T06:41:41.865024",
+    "resolved": false,
+    "message_id": 1487778788954603730
   }
 ]

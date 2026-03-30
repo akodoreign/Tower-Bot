@@ -27,9 +27,13 @@
     "loc_type": "warrens",
     "stage": "tremor",
     "stage_entered_at": "2026-03-19T12:50:32.321415",
-    "resolved": false,
+    "resolved": true,
     "spawned_at": "2026-03-17T05:25:47.353675",
-    "last_bulletin_stage": "tremor"
+    "last_bulletin_stage": "tremor",
+    "outcome": "sealed",
+    "sealed_by": "wardens",
+    "sealed_at": "2026-03-21T14:28:23.660397",
+    "seal_desc": "Wardens of Ash cordoned Echo Alley while Glass Sigil technicians ran a three-hour stabilisation protocol. Tremors ceased."
   },
   {
     "id": "rift_1773810382",
@@ -37,8 +41,22 @@
     "loc_type": "warrens",
     "stage": "tremor",
     "stage_entered_at": "2026-03-20T00:26:14.037507",
-    "resolved": false,
+    "resolved": true,
     "spawned_at": "2026-03-18T00:06:22.371517",
-    "last_bulletin_stage": "tremor"
+    "last_bulletin_stage": "tremor",
+    "outcome": "sealed",
+    "sealed_by": "natural",
+    "sealed_at": "2026-03-22T04:23:19.691856",
+    "seal_desc": "The tremors near Shantytown Heights stopped as suddenly as they started. Glass Sigil is calling it a pressure equalisation event. Nobody believes them."
+  },
+  {
+    "id": "rift_1774254085",
+    "location": "Night Pits",
+    "loc_type": "warrens",
+    "stage": "open",
+    "stage_entered_at": "2026-03-29T11:44:02.831560",
+    "resolved": false,
+    "spawned_at": "2026-03-23T03:21:25.215726",
+    "last_bulletin_stage": "open"
   }
 ]

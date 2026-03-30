@@ -22,7 +22,13 @@
     "gp": 50,
     "pp": 0
   },
-  "inventory": {},
+  "inventory": {
+    "Bracers of Defense": 1,
+    "Belt of Storm Giant Strength": 1,
+    "Herbalism Kit": 1,
+    "Healer's Kit": 1,
+    "Climber's Kit": 1
+  },
   "feats": [
     "Crusher",
     "Dark Bargain",
@@ -32,5 +38,5 @@
   ],
   "spell_slots": {},
   "notes": {},
-  "fetched_at": "2026-03-12T09:32:02.542072"
+  "fetched_at": "2026-03-28T07:31:13.793587"
 }

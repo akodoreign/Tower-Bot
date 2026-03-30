@@ -1,0 +1,28 @@
+{
+  "name": "Gruggar Grimshackle",
+  "species": "Orc",
+  "faction": "Independent",
+  "rank": "Known Operator",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering orc, his deep green skin scarred and weathered, strides through the labyrinthine Undercity. His tusks gleam ominously as he moves, a hulking figure clad in a tattered leather coat. His eyes, sharp and cunning, are hidden beneath a low-brimmed, battered hat. A double-headed axe hangs from his belt, while a worn crossbow rests on his back. Among the eclectic mix of faction denizens, Gruggar stands out with his distinctive personal item: a large, ornate silver skull hanging around his neck, a grim reminder of his ruthless ambition.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

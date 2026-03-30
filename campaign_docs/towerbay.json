@@ -287,11 +287,11 @@
     "condition": "Well-used",
     "seller": "The Nameless Broker - Undercity's enigmatic dealer of the unknown",
     "starting_bid": 34705,
-    "current_bid": 197464,
-    "bid_count": 23,
+    "current_bid": 757509,
+    "bid_count": 39,
     "listed_at": "2026-03-16T17:02:59.858743",
     "expires_at": "2026-03-23T17:02:59.858743",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773698595,
@@ -301,11 +301,11 @@
     "condition": "Well-used",
     "seller": "The Forgotten Quorum",
     "starting_bid": 37263,
-    "current_bid": 329585,
-    "bid_count": 34,
+    "current_bid": 1429781,
+    "bid_count": 56,
     "listed_at": "2026-03-16T17:03:15.019768",
     "expires_at": "2026-03-23T17:03:15.019768",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773698612,
@@ -315,11 +315,11 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 rumored to be a scholar from the Undercity's hidden archive",
     "starting_bid": 29560,
-    "current_bid": 799700,
-    "bid_count": 44,
+    "current_bid": 8277186,
+    "bid_count": 74,
     "listed_at": "2026-03-16T17:03:32.502343",
     "expires_at": "2026-03-23T17:03:32.502343",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773784352,
@@ -329,11 +329,11 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 Reputed to be a descendant of the Whispering Court",
     "starting_bid": 45869,
-    "current_bid": 381492,
-    "bid_count": 33,
+    "current_bid": 2830102,
+    "bid_count": 59,
     "listed_at": "2026-03-17T16:52:32.430472",
     "expires_at": "2026-03-24T16:52:32.430472",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773784365,
@@ -343,11 +343,11 @@
     "condition": "Mint",
     "seller": "The Silent Tide - Submersible Salvagers",
     "starting_bid": 73534,
-    "current_bid": 354650,
-    "bid_count": 24,
+    "current_bid": 2394178,
+    "bid_count": 52,
     "listed_at": "2026-03-17T16:52:45.247639",
     "expires_at": "2026-03-24T16:52:45.247639",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773870884,
@@ -357,11 +357,11 @@
     "condition": "Well-used",
     "seller": "The Ebon Broker",
     "starting_bid": 72804,
-    "current_bid": 225278,
-    "bid_count": 16,
+    "current_bid": 2878118,
+    "bid_count": 53,
     "listed_at": "2026-03-18T16:54:44.313480",
     "expires_at": "2026-03-25T16:54:44.313480",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773955626,
@@ -371,11 +371,11 @@
     "condition": "Well-used",
     "seller": "The Veiled Merchant",
     "starting_bid": 20134,
-    "current_bid": 28830,
-    "bid_count": 5,
+    "current_bid": 568171,
+    "bid_count": 49,
     "listed_at": "2026-03-19T16:27:06.276343",
     "expires_at": "2026-03-26T16:27:06.276343",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773955628,
@@ -385,11 +385,11 @@
     "condition": "Well-used",
     "seller": "Anonymous - Whispers suggest the Grimms may have taken on new apprentices.",
     "starting_bid": 44423,
-    "current_bid": 50892,
-    "bid_count": 2,
+    "current_bid": 3354805,
+    "bid_count": 57,
     "listed_at": "2026-03-19T16:27:08.775218",
     "expires_at": "2026-03-26T16:27:08.775218",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773955631,
@@ -399,11 +399,11 @@
     "condition": "Well-used",
     "seller": "Anonymously offered by the Silent Auctioneers Guild",
     "starting_bid": 67352,
-    "current_bid": 95445,
-    "bid_count": 4,
+    "current_bid": 2140229,
+    "bid_count": 49,
     "listed_at": "2026-03-19T16:27:11.265407",
     "expires_at": "2026-03-26T16:27:11.265407",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1773955633,
@@ -413,10 +413,150 @@
     "condition": "Well-used",
     "seller": "The Duskmere Syndicate",
     "starting_bid": 18034,
-    "current_bid": 20327,
-    "bid_count": 2,
+    "current_bid": 977213,
+    "bid_count": 55,
     "listed_at": "2026-03-19T16:27:13.705486",
     "expires_at": "2026-03-26T16:27:13.705486",
+    "sold": true
+  },
+  {
+    "id": 1774304240,
+    "name": "The Silent Glider",
+    "description": "Once the swift steed of the enigmatic 'Nightglide' faction, this sleek, ghostly glider has been found hidden beneath the depths of the Undercity. Whispers suggest it was abandoned during a failed heist, its ethereal wings now tarnished by the stains of past adventures.",
+    "category": "Vehicles & Mounts",
+    "condition": "Well-used",
+    "seller": "Anonymous",
+    "starting_bid": 72423,
+    "current_bid": 4035939,
+    "bid_count": 53,
+    "listed_at": "2026-03-23T17:17:20.681748",
+    "expires_at": "2026-03-30T17:17:20.681748",
+    "sold": false
+  },
+  {
+    "id": 1774304243,
+    "name": "Wailing Banshee's Broken Symphony",
+    "description": "Once belonging to the notorious Banshee, Lamenta, this damaged musical instrument is said to unleash an eerie melody when played, calling forth restless spirits from the deepest pits of the Undercity. Acquired from the illicit Undercity auction, 'The Silent Market'.",
+    "category": "Contraband",
+    "condition": "Damaged",
+    "seller": "The Silent Market",
+    "starting_bid": 19455,
+    "current_bid": 344589,
+    "bid_count": 40,
+    "listed_at": "2026-03-23T17:17:23.046572",
+    "expires_at": "2026-03-30T17:17:23.046572",
+    "sold": false
+  },
+  {
+    "id": 1774304245,
+    "name": "Mournful Melodist's Lamenting Lyre",
+    "description": "Once the serenade of the Undercity's enigmatic bards, this haunting lyre is said to have been crafted from the remains of a fallen celestial being. Its ethereal strings resonate with an eerie melody that echoes through the Undercity, leaving a chilling sensation in its wake. Originally belonging to the mysterious 'Echoing Mourners', a secretive guild of bards dedicated to the lost souls of TowerBay.",
+    "category": "Arcane Instruments",
+    "condition": "Mint",
+    "seller": "The Echoing Mourners",
+    "starting_bid": 36694,
+    "current_bid": 667984,
+    "bid_count": 41,
+    "listed_at": "2026-03-23T17:17:25.898442",
+    "expires_at": "2026-03-30T17:17:25.898442",
+    "sold": false
+  },
+  {
+    "id": 1774391868,
+    "name": "Phantom's Mournful Melee-Scepter",
+    "description": "Originally wielded by the spectral bard of the Lamenting Chorus, this haunting weapon sings a melancholic dirge with each strike. The scepter's provenance is a chilling testament to its former owner's tragic end, making it a sought-after artifact by Undercity's elite.",
+    "category": "Weapons",
+    "condition": "Excellent",
+    "seller": "Anonymous - rumored to be a relic dealer from the Fallen Archivist's guild",
+    "starting_bid": 37349,
+    "current_bid": 629774,
+    "bid_count": 37,
+    "listed_at": "2026-03-24T17:37:48.319969",
+    "expires_at": "2026-03-31T17:37:48.319969",
+    "sold": false
+  },
+  {
+    "id": 1774391870,
+    "name": "Whispering Skeletal Steed",
+    "description": "This eerie mount, once a fallen noble, was bound by a sorcerer's dark pact. Its spectral form carries an unsettling whisper, a testament to its past. Found deep within the catacombs of the Undercity, rumored to be the property of the sinister Coven of the Forgotten.",
+    "category": "Vehicles & Mounts",
+    "condition": "Well-used",
+    "seller": "The Coven of the Forgotten",
+    "starting_bid": 33693,
+    "current_bid": 1062106,
+    "bid_count": 47,
+    "listed_at": "2026-03-24T17:37:50.781310",
+    "expires_at": "2026-03-31T17:37:50.781310",
+    "sold": false
+  },
+  {
+    "id": 1774477490,
+    "name": "The Wailing Wisp's Lament",
+    "description": "Once belonging to the infamous spirit weaver, this haunting musical flute is said to summon the forsaken melodies of the deceased. Rumored to have been smuggled from the spectral realm of the Lost Chorus, its ethereal notes echo the cries of the damned.",
+    "category": "Contraband",
+    "condition": "Mint",
+    "seller": "The Whispering Market, a shadowy faction with connections to the Undercity's hidden corners",
+    "starting_bid": 74893,
+    "current_bid": 852099,
+    "bid_count": 35,
+    "listed_at": "2026-03-25T17:24:50.845446",
+    "expires_at": "2026-04-01T17:24:50.845446",
+    "sold": false
+  },
+  {
+    "id": 1774567316,
+    "name": "Cryptheart's Sorrow-Embraced Armor",
+    "description": "A set of armor once worn by a fallen Captain of the Night's Watch, entwined with vines of shadows and an aura of sorrow. The armor was lost during the Captain's final stand against the Drowned Legion, and now seeks a new protector. Provenance unknown, but rumors whisper it was sold by the ghostly figure known as the Shade Broker.",
+    "category": "Armour",
+    "condition": "Well-used",
+    "seller": "The Shade Broker",
+    "starting_bid": 43705,
+    "current_bid": 199546,
+    "bid_count": 21,
+    "listed_at": "2026-03-26T18:21:56.602246",
+    "expires_at": "2026-04-02T18:21:56.602246",
+    "sold": false
+  },
+  {
+    "id": 1774567319,
+    "name": "Vesper's Lamenting Shardblade",
+    "description": "Once wielded by the infamous Vesper, the Fallen Captain of the Drowned Bard's Cryptic Guard. Its spectral edge whispers secrets of the deep, as it thirsts for the lifeblood of the Undercity's denizens. Found discarded in the heart of the Whispering Shroudbone Catacombs, this Mint condition blade promises a dark history and untold power.",
+    "category": "Weapons",
+    "condition": "Mint",
+    "seller": "The Ebony Whisper's Cryptic Auction House",
+    "starting_bid": 68253,
+    "current_bid": 384971,
+    "bid_count": 21,
+    "listed_at": "2026-03-26T18:21:59.459610",
+    "expires_at": "2026-04-02T18:21:59.459610",
+    "sold": false
+  },
+  {
+    "id": 1774567322,
+    "name": "Mourning Veil of the Forgotten Phantom",
+    "description": "Originally belonging to a spectral knight from the Ebon Whisper's Covenant, this armour is imbued with spectral essence that shimmers and pulses with an eerie glow. The veil's former owner perished in a forgotten battle beneath the Dome, but his ghostly presence lingers, whispering tales of war and loss to those who dare wear it.",
+    "category": "Armour",
+    "condition": "Well-used",
+    "seller": "The Mysterious Dealer of the Dome",
+    "starting_bid": 64867,
+    "current_bid": 330088,
+    "bid_count": 21,
+    "listed_at": "2026-03-26T18:22:02.197316",
+    "expires_at": "2026-04-02T18:22:02.197316",
+    "sold": false
+  },
+  {
+    "id": 1774567325,
+    "name": "Nightshade's Lamentable Elixir",
+    "description": "A vial of dark liquid, distilled from the tears of weeping wraiths, said to grant brief respite from the Undercity's torment. Originally brewed by the forgotten alchemist of the Shroudstalker's guild, this elixir has changed hands many times, its effects growing more potent with each consumption. Provenance unknown, but the taste leaves no doubt of its provenance.",
+    "category": "Consumables",
+    "condition": "Well-used",
+    "seller": "Anonymous \u2014 last seen in the TowerBay's shadowy corners",
+    "starting_bid": 36057,
+    "current_bid": 345633,
+    "bid_count": 35,
+    "listed_at": "2026-03-26T18:22:05.047439",
+    "expires_at": "2026-04-02T18:22:05.047439",
     "sold": false
   }
 ]

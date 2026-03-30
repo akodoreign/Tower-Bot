@@ -22,6 +22,7 @@ COG_MODULES = [
     "src.cogs.world",
     "src.cogs.admin",
     "src.cogs.module_gen",
+    "src.cogs.skills",
 ]
 
 

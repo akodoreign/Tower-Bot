@@ -109,11 +109,13 @@ RIFT_MIN_DAYS = {
 # ~20% per hour-ish tick = typically advances within a few hours of becoming eligible
 RIFT_ADVANCE_CHANCE = 0.20
 
-# Spawn chance per bulletin tick by location type (unchanged — these are hourly rolls)
+# Spawn chance per bulletin tick by location type
+# NOTE: Rifts should be RARE events, not routine. Reduced from original values.
+# A Rift spawning should feel like a big deal, not background noise.
 RIFT_SPAWN_CHANCE = {
-    "warrens":    0.015,  # 1.5% per tick — Warrens are structurally weak
-    "outer_wall": 0.004,  # 0.4% per tick
-    "other":      0.001,  # 0.1% per tick — anywhere else is extremely rare
+    "warrens":    0.003,  # 0.3% per tick (~1 per 14 days) — Warrens are weak but still rare
+    "outer_wall": 0.001,  # 0.1% per tick (~1 per 40 days)
+    "other":      0.0002, # 0.02% per tick (extremely rare, maybe once a month)
 }
 
 # Location pools by type
@@ -461,7 +463,7 @@ async def check_rift_tick(channel=None) -> Optional[str]:
         bulletin = await _generate_rift_bulletin(ev["rift"], ev["event"])
         if bulletin:
             _write_memory(bulletin)
-            output = f"-# 🕰️ {_dual_timestamp()}\n{bulletin}"
+            output = f"-# 🕰️ {_dual_timestamp()}\n\n{bulletin}"
 
     return output
 
@@ -565,7 +567,7 @@ def check_exchange_tick() -> Optional[str]:
 
     bulletin = format_exchange_bulletin()
     _write_memory("[EC/Kharma exchange rate posted]")
-    return f"-# 🕰️ {_dual_timestamp()}\n{bulletin}"
+    return f"-# 🕰️ {_dual_timestamp()}\n\n{bulletin}"
 
 
 def check_tia_tick() -> Optional[str]:
@@ -610,7 +612,7 @@ def check_weather_tick() -> Optional[str]:
     bulletin = format_weather_bulletin()
     _write_memory("[Dome weather report posted]")
     # Prepend dual timestamp consistent with all other bulletins
-    return f"-# \U0001f570\ufe0f {_dual_timestamp()}\n{bulletin}"
+    return f"-# \U0001f570\ufe0f {_dual_timestamp()}\n\n{bulletin}"
 
 
 async def check_arena_tick() -> Optional[str]:
@@ -621,7 +623,7 @@ async def check_arena_tick() -> Optional[str]:
     bulletin = await tick_arena()
     if bulletin:
         _write_memory("[Arena match result posted]")
-        return f"-# 🕰️ {_dual_timestamp()}\n{bulletin}"
+        return f"-# 🕰️ {_dual_timestamp()}\n\n{bulletin}"
     return None
 
 
@@ -639,7 +641,7 @@ def check_calendar_tick() -> list:
         else:
             text = format_event_result(ev)
         _write_memory(f"[Faction calendar: {item['type']} — {ev['type']}]")
-        outputs.append(f"-# 🕰️ {_dual_timestamp()}\n{text}")
+        outputs.append(f"-# 🕰️ {_dual_timestamp()}\n\n{text}")
     return outputs
 
 
@@ -705,10 +707,7 @@ Sable (Night Pits boss), Aric Veyne (SS-Rank adventurer, Silver Spire), Magister
 Kessan & Mira (Grand Forum info brokers, twins), Elune (apothecary owner), Kiva (Hermes shrine scout),
 Wex (courier, currently in trouble), Dova (Glass Sigil junior archivist), Lieutenant Varen (Wardens).
 
-DISTRICTS: Markets Infinite (Neon Row, Cobbleway Market, Floating Bazaar, Crimson Alley, Taste of Worlds),
-Sanctum Quarter (Pantheon Walk, Hall of Echoes, Divine Garden), Grand Forum (Central Plaza, Adventurer's Inn,
-Fountain of Echoes, Rift Bulletin Board), Guild Spires (Arena of Ascendance), The Warrens (Scrapworks,
-Brother Thane's Cult House, Night Pits, Echo Alley, Shantytown Heights, Collapsed Plaza), Outer Wall & Gates.
+{LIVE_CITY_DISTRICTS}
 
 ACTIVE TENSIONS:
 - Brother Thane is recruiting aggressively near the Collapsed Plaza. The Saints and Wardens are both watching.
@@ -1021,8 +1020,9 @@ async def refresh_news_types_if_needed() -> None:
     if not _needs_new_news_types():
         return
 
-    # Inject live roster into world lore for news type generation too
+    # Inject live roster and city geography into world lore for news type generation
     world_lore = _WORLD_LORE.replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block())
+    world_lore = world_lore.replace("{LIVE_CITY_DISTRICTS}", _build_city_districts_block())
     prompt = f"""{world_lore}
 
 ---
@@ -1035,9 +1035,11 @@ Each should be a short description of a story TYPE or ANGLE, specific to today's
 RULES:
 - Each entry is 1 sentence describing what the bulletin covers
 - Must be grounded in the Undercity setting — factions, districts, economy, NPCs
-- Do NOT generate Rift bulletins (handled separately by the Rift state machine)
+- Do NOT generate Rift bulletins — Rifts are RARE events handled by a separate state machine. The news should NOT constantly mention Rifts.
 - Do NOT generate TowerBay or TIA market bulletins (those have their own cadence)
-- Vary the tone: some street-level, some political, some supernatural, some economic, some human interest
+- CRITICAL — RIFT BAN: Do NOT mention Rifts, Rift residue, Rift seams, Rift activity, Rift exploration, tears in reality, dimensional anomalies, or anything Rift-related in ANY of the 10 entries. Rifts are rare catastrophes, NOT daily news fodder. If even ONE of your entries mentions Rifts, you have FAILED.
+- Focus on: faction politics, street crime, human interest, religious drama, guild disputes, economic news, weird occurrences that are NOT Rift-related, missing persons, merchant disputes, adventurer drama, divine contract news, Warrens survival stories, arena results, guild promotions/demotions
+- Vary the tone: some street-level, some political, some supernatural (but not Rift), some economic, some human interest
 - Make them feel current — what would be on people's lips in the Undercity TODAY
 - No numbering, no bullets, no preamble, no sign-off. Output exactly 10 plain-text lines, one per seed.
 - If your output contains anything other than 10 lines, you have failed."""
@@ -1244,6 +1246,15 @@ def _build_prompt(memory_entries: List[str]) -> str:
     if injured_block:
         npc_status_block += f"\n{injured_block}"
 
+    # Add recently deceased context so bulletins can reference recent deaths
+    try:
+        from src.npc_consequence import get_recently_deceased_block
+        recently_dead_block = get_recently_deceased_block(days=7)
+        if recently_dead_block:
+            npc_status_block += f"\n{recently_dead_block}"
+    except Exception:
+        pass
+
     if injured_names:
         name_list = ", ".join(injured_names)
         spotlight = random.choice(injured_names)
@@ -1316,8 +1327,9 @@ def _build_prompt(memory_entries: List[str]) -> str:
 
     bulletin_type = random.choice(all_types)
 
-    # Inject live roster NPCs into world lore (replaces hardcoded list)
+    # Inject live roster NPCs and city geography into world lore
     world_lore = _WORLD_LORE.replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block())
+    world_lore = world_lore.replace("{LIVE_CITY_DISTRICTS}", _build_city_districts_block())
 
     return f"""{world_lore}
 {economy_note}
@@ -1337,18 +1349,297 @@ RULES — READ ALL OF THESE:
 - Do NOT use the phrase \"where the echoes of whispered X and the whispers of hidden Y mingle\" — it is overused. Write fresh opening sentences.
 - You are a city news feed — write in-character, gritty, specific prose. Not an AI assistant.
 - Use Discord markdown: **bold** for names/headers, *italics* for atmosphere, emoji for flavour.
-- 3 to 6 lines. Punchy. Invent fresh named details — exact EC prices, precise locations, specific minor NPCs.
+- MINIMUM 3 lines, MAXIMUM 6 lines. If your bulletin is shorter than 3 lines, you have failed.
+- Invent fresh named details — exact EC prices, precise locations, specific minor NPCs.
 - You MAY follow up on a recent bulletin (a story escalates, a rumour is contradicted, an NPC reacts).
 - Ground everything in this specific city. No generic fantasy filler.
 - For HUMAN INTEREST pieces: small and specific. A real person's real problem. Warm, wry, or quietly sad. Not epic.
 - For NPC CONFLICT pieces: use only the named roster NPCs listed. Do NOT kill them — injuries and ambiguous danger are fine.
 - For PARTY pieces: use only the named party members listed. Treat them as living characters with real stakes.
+
+PROSE QUALITY — Your writing must:
+- BE SPECIFIC: Name exact locations, NPCs, numbers. "47 EC" not "some coins". "Cobbleway Market" not "a district".
+- BE GROUNDED: Physical details first, then emotional impact. Let readers feel, don't tell them to feel.
+- BE PUNCHY: Mix short sentences with longer ones. One image per sentence. Cut adjective avalanches.
+- AVOID PURPLE PROSE: No "ethereal glows", no "otherworldly pallors", no "ancient secrets mingling". Write like a reporter, not a novelist.
+- AVOID FLUFF PHRASES: Never use "It is worth noting", "Interestingly enough", "As the saying goes", "The city watches", "Whispers of X ripple through".
+- Something must HAPPEN. A headline alone is not a bulletin. A bulletin must have content — who, what, where, consequence.
+
 - If your response contains anything other than the bulletin itself, you have failed."""
 
 
 # ---------------------------------------------------------------------------
 # Editor agent — runs on every draft before it is saved or posted
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Fact-checker — validates faction assignments and NPC accuracy
+# ---------------------------------------------------------------------------
+
+_FACTCHECK_NEWS_SYS = """\
+You are a fact-checker for the Undercity Dispatch news feed.
+
+Your job is to CHECK a bulletin draft against the NPC ROSTER and CITY LOCATIONS provided,
+fix any FACTION ASSIGNMENT ERRORS or LOCATION ERRORS, and return the corrected text.
+
+CRITICAL CHECKS:
+1. FACTION ASSIGNMENT: Every NPC mentioned MUST be assigned to their CORRECT faction
+   as listed in the roster. If the bulletin says "Sera Voss of the Wardens" but the
+   roster says she belongs to Iron Fang Consortium, you MUST fix it.
+2. DEAD NPCs: If an NPC is listed as DECEASED, do NOT write about them as alive.
+   Either remove the reference or add "the late" before their name.
+3. NPC ROLES: If the bulletin gives an NPC a title or role that contradicts the
+   roster (e.g. calling a grunt a "leader"), correct it.
+4. FACTION NAMES: Only these factions exist: Iron Fang Consortium, Argent Blades,
+   Wardens of Ash, Serpent Choir, Obsidian Lotus, Glass Sigil, Patchwork Saints,
+   Adventurers Guild, Guild of Ashen Scrolls, Tower Authority, Wizards Tower,
+   Independent, Brother Thane's Cult. Any other faction name is WRONG.
+5. LOCATION NAMES: Only use locations that exist in the VALID LOCATIONS list provided.
+   If a bulletin mentions a made-up location, replace it with a similar valid one.
+   The city has 5 concentric rings - inner rings are for power/religion, outer rings
+   are residential/industrial/Warrens. Match locations to appropriate rings.
+6. TRANSPORT: Valid transit includes Train Tubes (Spine Line, Ring Express, Radial lines,
+   Deep Line) and Canals (The Moat, Forum Canal, Sanctum Canal, The Flow, Residential Canal,
+   The Trench). Invented transport names should be replaced with valid ones.
+
+OUTPUT RULES:
+- Output the CORRECTED bulletin only. No preamble, no commentary.
+- If nothing needs fixing, output the bulletin unchanged.
+- Do NOT add new content. Only fix faction/NPC/location errors.
+- Keep all formatting intact.
+"""
+
+
+GAZETTEER_FILE = DOCS_DIR / "city_gazetteer.json"
+
+
+def _load_gazetteer_locations() -> tuple[list, list, list]:
+    """
+    Load valid locations from city_gazetteer.json.
+    Returns (districts, establishments, transit) lists.
+    """
+    if not GAZETTEER_FILE.exists():
+        return [], [], []
+    try:
+        data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
+        
+        # Extract district names
+        districts = list(data.get("districts", {}).keys())
+        
+        # Extract establishment names from all districts
+        establishments = []
+        for district_data in data.get("districts", {}).values():
+            for est in district_data.get("notable_establishments", []):
+                if est.get("name"):
+                    establishments.append(est["name"])
+            for sub in district_data.get("sub_areas", []):
+                for loc in sub.get("locations", []):
+                    establishments.append(loc)
+        
+        # Extract transit hubs
+        transit = []
+        tubes = data.get("transportation", {}).get("train_tubes", {}).get("major_lines", [])
+        for line in tubes:
+            transit.append(line.get("name", ""))
+            transit.extend(line.get("stations", []))
+        
+        return districts, establishments, transit
+    except Exception:
+        return [], [], []
+
+
+def _build_city_districts_block() -> str:
+    """
+    Build a concise city geography summary from the gazetteer for prompt injection.
+    Replaces {LIVE_CITY_DISTRICTS} placeholder in _WORLD_LORE.
+    """
+    if not GAZETTEER_FILE.exists():
+        return "CITY DISTRICTS: No gazetteer data available."
+    
+    try:
+        data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return "CITY DISTRICTS: Could not load gazetteer."
+    
+    lines = ["CITY GEOGRAPHY (concentric rings around the Tower):"]
+    
+    # Ring structure summary
+    rings = data.get("ring_structure", [])
+    for ring in rings:
+        ring_num = ring.get("ring", "?")
+        name = ring.get("name", "Unknown")
+        dist = ring.get("distance_from_tower", "")
+        districts = ring.get("districts", [])
+        if districts:
+            lines.append(f"  Ring {ring_num} ({name}, {dist}): {', '.join(districts)}")
+    
+    # Key districts with sub-areas
+    districts = data.get("districts", {})
+    if districts:
+        lines.append("KEY LOCATIONS:")
+        for district_name, district_data in list(districts.items())[:8]:  # Top 8 districts
+            sub_areas = district_data.get("sub_areas", [])
+            sub_names = [s.get("name", "") for s in sub_areas[:4] if s.get("name")]
+            if sub_names:
+                lines.append(f"  {district_name}: {', '.join(sub_names)}")
+    
+    # Transport quick reference
+    transport = data.get("transportation", {})
+    tubes = transport.get("train_tubes", {}).get("major_lines", [])
+    if tubes:
+        tube_names = [t.get("name", "") for t in tubes[:5] if t.get("name")]
+        lines.append(f"TRAIN TUBES: {', '.join(tube_names)}")
+    
+    canals = transport.get("canal_rings", [])
+    if canals:
+        canal_names = [c.get("name", "") for c in canals[:4] if c.get("name")]
+        lines.append(f"CANALS: {', '.join(canal_names)}")
+    
+    # Warrens distribution
+    warrens = data.get("warrens_distribution", [])
+    if warrens:
+        warren_names = [w.get("name", "") for w in warrens[:3] if w.get("name")]
+        lines.append(f"WARRENS CLUSTERS: {', '.join(warren_names)} (scattered, not one district)")
+    
+    return "\n".join(lines)
+
+
+async def _fact_check_bulletin(draft: str) -> str:
+    """
+    Validate a bulletin against the NPC roster and city gazetteer.
+    Fix faction assignment errors and invalid location names.
+    Returns the corrected bulletin text.
+    """
+    import httpx
+    import logging
+    logger = logging.getLogger(__name__)
+
+    if not draft or len(draft.split()) < 10:
+        return draft
+
+    # Build NPC roster reference for fact-checking
+    npc_roster_path = DOCS_DIR / "npc_roster.json"
+    graveyard_path = DOCS_DIR / "npc_graveyard.json"
+    
+    roster_lines = []
+    dead_lines = []
+    
+    try:
+        if npc_roster_path.exists():
+            roster = json.loads(npc_roster_path.read_text(encoding="utf-8"))
+            for npc in roster:
+                name = npc.get("name", "")
+                faction = npc.get("faction", "Independent")
+                role = npc.get("role", "")
+                rank = npc.get("rank", "")
+                status = npc.get("status", "alive")
+                if name:
+                    line = f"- {name}: {faction}"
+                    if rank:
+                        line += f", {rank}"
+                    if role:
+                        line += f" ({role})"
+                    if status == "injured":
+                        line += " [INJURED]"
+                    roster_lines.append(line)
+    except Exception as e:
+        logger.warning(f"✏️ Fact-check: Could not load NPC roster: {e}")
+
+    try:
+        if graveyard_path.exists():
+            graveyard = json.loads(graveyard_path.read_text(encoding="utf-8"))
+            for npc in graveyard:
+                name = npc.get("name", "")
+                faction = npc.get("faction", "")
+                if name:
+                    dead_lines.append(f"- {name} ({faction}) — DECEASED")
+    except Exception:
+        pass
+
+    # Load valid locations from gazetteer
+    districts, establishments, transit = _load_gazetteer_locations()
+    location_block = ""
+    if districts or establishments:
+        loc_parts = []
+        if districts:
+            loc_parts.append(f"Districts: {', '.join(districts[:20])}")
+        if establishments:
+            # Sample 30 establishments to keep prompt manageable
+            sample = establishments[:30] if len(establishments) > 30 else establishments
+            loc_parts.append(f"Establishments: {', '.join(sample)}")
+        if transit:
+            sample_transit = transit[:15] if len(transit) > 15 else transit
+            loc_parts.append(f"Transit: {', '.join(sample_transit)}")
+        location_block = "\n".join(loc_parts)
+    else:
+        location_block = "No location data available."
+
+    roster_block = "\n".join(roster_lines) if roster_lines else "No roster data available."
+    dead_block = "\n".join(dead_lines) if dead_lines else "None currently."
+
+    from src.faction_reputation import KNOWN_FACTIONS
+    faction_list = ", ".join(KNOWN_FACTIONS)
+
+    prompt = f"""Check this bulletin against the NPC roster and city locations. Fix any errors.
+
+VALID FACTIONS (ONLY these exist): {faction_list}, Independent, Brother Thane's Cult
+
+NPC ROSTER (use these exact faction assignments):
+{roster_block}
+
+DECEASED NPCs (do NOT reference as alive):
+{dead_block}
+
+VALID LOCATIONS (use these or similar):
+{location_block}
+
+---BEGIN BULLETIN---
+{draft}
+---END BULLETIN---
+
+Output the corrected bulletin only. No preamble."""
+
+    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(ollama_url, json={
+                "model": ollama_model,
+                "messages": [
+                    {"role": "system", "content": _FACTCHECK_NEWS_SYS},
+                    {"role": "user", "content": prompt},
+                ],
+                "stream": False,
+            })
+            resp.raise_for_status()
+            data = resp.json()
+
+        result = ""
+        if isinstance(data, dict):
+            msg = data.get("message", {})
+            if isinstance(msg, dict):
+                result = msg.get("content", "").strip()
+
+        # Strip any preamble
+        lines = result.splitlines()
+        skip = ("sure", "here's", "here is", "certainly", "of course",
+                "below is", "corrected", "the corrected")
+        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
+            lines.pop(0)
+        result = "\n".join(lines).strip()
+
+        if result and len(result.split()) >= len(draft.split()) * 0.7:
+            logger.info("✅ Fact-check: bulletin validated/corrected")
+            return result
+        else:
+            logger.warning("✏️ Fact-check: result too short, using original")
+            return draft
+
+    except Exception as e:
+        logger.warning(f"✏️ Fact-check failed: {e} — using original bulletin")
+        return draft
+
 
 async def _edit_bulletin(draft: str, memory_entries: List[str]) -> str:
     """
@@ -1359,6 +1650,9 @@ async def _edit_bulletin(draft: str, memory_entries: List[str]) -> str:
     import httpx
     import logging
     logger = logging.getLogger(__name__)
+
+    # First, run fact-check for faction accuracy
+    draft = await _fact_check_bulletin(draft)
 
     context_entries = memory_entries[-6:] if memory_entries else []
     context_block   = ""
@@ -1483,7 +1777,7 @@ async def generate_bulletin() -> Optional[str]:
             "stream": False,
         }
 
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             resp = await client.post(ollama_url, json=payload)
             resp.raise_for_status()
             data = resp.json()
@@ -1590,8 +1884,17 @@ async def generate_bulletin() -> Optional[str]:
             bulletin = '\n'.join(_content_lns).strip()
 
         if bulletin:
+            # Validate bulletin has proper content (not just a title)
+            bulletin_lines = bulletin.strip().splitlines()
+            if len(bulletin_lines) < 2 or len(bulletin.strip()) < 50:
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"📰 Bulletin too short ({len(bulletin_lines)} lines, {len(bulletin)} chars) — may be malformed: {bulletin[:100]}..."
+                )
+            # Ensure proper separation between timestamp and content
+            # Use double-newline for better Discord embed rendering
             _write_memory(bulletin)
-            return f"-# \U0001f570\ufe0f {_dual_timestamp()}\n{bulletin}"
+            return f"-# \U0001f570\ufe0f {_dual_timestamp()}\n\n{bulletin}"
 
     except Exception as e:
         import logging, traceback
@@ -2748,7 +3051,8 @@ async def generate_bulletin_draft() -> tuple:
             bulletin = await _edit_bulletin(bulletin, memory)
 
         if bulletin:
-            formatted = f"-# \U0001f570\ufe0f {_dual_timestamp()}\n{bulletin}"
+            # Use double-newline for better Discord embed rendering
+            formatted = f"-# \U0001f570\ufe0f {_dual_timestamp()}\n\n{bulletin}"
             return formatted, bulletin
 
     except Exception as e:

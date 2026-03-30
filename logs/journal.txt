@@ -57,3 +57,67 @@ CURRENT STATE (end of session):
 - NPC story images character-action-focused (requires /generatenpcs run first)
 - EC rate no longer leaks into story bulletins
 - setup_hook pattern now canonical — do not revert to on_ready sync
+[2026-03-27 01:13:24] ═══ LEARNING SESSION START ═══
+[2026-03-27 01:13:24] Studying: news_memory
+[2026-03-27 01:14:41] SAVED: learned_current_events_20260327.md (1823 chars)
+[2026-03-27 01:14:51] Studying: mission_patterns
+[2026-03-27 01:15:15] SAVED: learned_mission_patterns_20260327.md (926 chars)
+[2026-03-27 01:15:25] Studying: npc_roster
+[2026-03-27 01:16:44] SAVED: learned_npc_landscape_20260327.md (2015 chars)
+[2026-03-27 01:16:54] Studying: faction_reputation
+[2026-03-27 01:17:27] SAVED: learned_faction_standing_20260327.md (1159 chars)
+[2026-03-27 01:17:37] Studying: conversation_logs
+[2026-03-27 01:17:37]   → No content generated for conversation_logs
+[2026-03-27 01:17:47] Session complete: 5 studied, 4 saved, 0 errors
+[2026-03-27 01:17:47] ═══ LEARNING SESSION END ═══
+
+[2026-03-28 01:14:25] ═══ LEARNING SESSION START ═══
+[2026-03-28 01:14:25] Studying: news_memory
+[2026-03-28 01:16:04] SAVED: learned_current_events_20260327.md (2297 chars)
+[2026-03-28 01:16:14] Studying: mission_patterns
+[2026-03-28 01:16:48] SAVED: learned_mission_patterns_20260327.md (1096 chars)
+[2026-03-28 01:16:58] Studying: npc_roster
+[2026-03-28 01:18:58]   → No content generated for npc_roster
+[2026-03-28 01:19:08] Studying: faction_reputation
+[2026-03-28 01:19:51] SAVED: learned_faction_standing_20260327.md (1293 chars)
+[2026-03-28 01:20:01] Studying: conversation_logs
+[2026-03-28 01:20:01]   → No content generated for conversation_logs
+[2026-03-28 01:20:11] Session complete: 5 studied, 3 saved, 0 errors
+[2026-03-28 01:20:11] ═══ LEARNING SESSION END ═══
+
+[2026-03-29 01:05:03] ═══ LEARNING SESSION START ═══
+[2026-03-29 01:05:03] Studying: world_state
+[2026-03-29 01:06:07] SAVED: learned_world_assessment_20260329.md (1736 chars)
+[2026-03-29 01:06:17] Studying: news_memory
+[2026-03-29 01:07:32] SAVED: learned_current_events_20260327.md (1794 chars)
+[2026-03-29 01:07:42] Studying: mission_patterns
+[2026-03-29 01:08:14] SAVED: learned_mission_patterns_20260327.md (1047 chars)
+[2026-03-29 01:08:24] Studying: npc_roster
+[2026-03-29 01:09:52] SAVED: learned_npc_landscape_20260327.md (2137 chars)
+[2026-03-29 01:10:02] Studying: faction_reputation
+[2026-03-29 01:10:43] SAVED: learned_faction_standing_20260327.md (1341 chars)
+[2026-03-29 01:10:53] Studying: conversation_logs
+[2026-03-29 01:10:53]   → No content generated for conversation_logs
+[2026-03-29 01:11:03] Session complete: 6 studied, 5 saved, 0 errors
+[2026-03-29 01:11:03] ═══ LEARNING SESSION END ═══
+
+[2026-03-30 01:02:42] ═══ LEARNING SESSION START ═══
+[2026-03-30 01:02:42] Studying: world_state
+[2026-03-30 01:04:18] SAVED: learned_world_assessment_20260329.md (3386 chars)
+[2026-03-30 01:04:28] Studying: news_memory
+[2026-03-30 01:05:17] SAVED: learned_current_events_20260327.md (1413 chars)
+[2026-03-30 01:05:27] Studying: mission_patterns
+[2026-03-30 01:06:03] SAVED: learned_mission_patterns_20260327.md (1367 chars)
+[2026-03-30 01:06:13] Studying: mission_quality
+[2026-03-30 01:07:07] SAVED: learned_mission_quality_20260330.md (1860 chars)
+[2026-03-30 01:07:17] Studying: mission_types
+[2026-03-30 01:08:13] SAVED: learned_mission_type_ideas_20260330.md (1890 chars)
+[2026-03-30 01:08:23] Studying: npc_roster
+[2026-03-30 01:09:25] SAVED: learned_npc_landscape_20260327.md (1950 chars)
+[2026-03-30 01:09:35] Studying: faction_reputation
+[2026-03-30 01:10:14] SAVED: learned_faction_standing_20260327.md (1565 chars)
+[2026-03-30 01:10:24] Studying: conversation_logs
+[2026-03-30 01:10:24]   → No content generated for conversation_logs
+[2026-03-30 01:10:34] Session complete: 8 studied, 7 saved, 0 errors
+[2026-03-30 01:10:34] ═══ LEARNING SESSION END ═══
+

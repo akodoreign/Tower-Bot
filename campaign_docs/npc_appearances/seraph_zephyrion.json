@@ -1,0 +1,28 @@
+{
+  "name": "Seraph Zephyrion",
+  "species": "Dragonborn",
+  "faction": "Glass Sigil",
+  "rank": "Junior Archivist",
+  "role": "archivist",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 17",
+      "WIS 14",
+      "CHA 10"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CON 11",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "staff or dagger (last resort)",
+    "armour": "scholar's robes"
+  },
+  "sd_appearance": "Stoic Dragonborn standing over 6 feet tall, clad in faded pale blue scholar robes with brass instrument clips and a sturdy leather belt. His fiery red scales, stark against the muted hues, intermingle with the delicate filigree of the robes. Emerald eyes, piercing behind glass-lens goggles, scour over worn scrolls and tomes in his worn leather satchel. Reinforced elbows bear the weight of multiple scroll cases, while his ink-stained hands, adorned with reading lenses, turn each page with reverence. A dagger, last resort, peeks from the waistband of his robes. A singular crystal pendant, nestled in the draconic necklace, glimmers, casting prismatic light onto the Undercity's gloom.",
+  "faction_visual": "pale blue scholar robes, brass instrument clips, glass-lens goggles, ink-stained hands",
+  "style_note": "ink-stained hands, reading lenses, reinforced elbows, multiple scroll cases"
+}

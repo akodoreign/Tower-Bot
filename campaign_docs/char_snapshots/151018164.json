@@ -1,10 +1,10 @@
 {
   "name": "Frank",
   "classes": {
-    "Fighter": 4
+    "Fighter": 5
   },
-  "total_level": 4,
-  "max_hp": 28,
+  "total_level": 5,
+  "max_hp": 34,
   "ac_override": null,
   "stats": {
     "STR": 15,
@@ -14,7 +14,7 @@
     "WIS": 10,
     "CHA": 8
   },
-  "xp": 2700,
+  "xp": 6500,
   "currencies": {
     "cp": 0,
     "sp": 0,
@@ -42,5 +42,5 @@
   ],
   "spell_slots": {},
   "notes": {},
-  "fetched_at": "2026-03-11T11:54:58.062240"
+  "fetched_at": "2026-03-20T08:17:53.865166"
 }

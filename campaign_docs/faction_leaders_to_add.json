@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Serrik Dhal",
+    "faction": "Iron Fang Consortium",
+    "rank": "Guildmaster — Head of the Iron Fang Consortium",
+    "species": "Human",
+    "age": "58",
+    "appearance": "A lean, hawk-faced man with silver hair slicked back and cold grey eyes that miss nothing. Dresses in expensive but understated dark clothing — wealth worn as armor rather than display. His hands are scarred from decades of work before he rose to leadership. Carries no visible weapons but moves like someone who doesn't need them.",
+    "location": "Markets Infinite, Consortium Underhalls — the fortified headquarters beneath the market district",
+    "motivation": "Control. Serrik built the Consortium from a small smuggling operation into the Undercity's dominant economic power. He views the city as a machine, and himself as the engineer. He doesn't want chaos — chaos is bad for business. He wants predictable systems he can manipulate.",
+    "role": "Oversees all Consortium operations: relic acquisition, smuggling networks, protection contracts, and the vast web of debts and favors that make the Consortium untouchable. Rarely meets with outsiders directly — that's what subordinates are for.",
+    "secret": "Serrik is dying. A rare wasting disease gives him perhaps two years. He has told no one. His obsession now is succession — ensuring the Consortium survives him intact. He's testing his senior agents, including Sera Voss, to see who has the vision to lead.",
+    "relationships": "Professional respect with Director Myra Kess (FTA) — they understand each other's methods. Cold war with the Obsidian Lotus over territory. Watches the Argent Blades with amusement. Considers Captain Korin the only truly honest man in the city, which makes him unpredictable.",
+    "oracle_notes": "The Oracle sees a man who has built an empire and now watches it from a growing distance. His legacy matters more than his life. The machine must run without him. He is already grieving for himself.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Guildmaster of the Iron Fang Consortium."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Lady Cerys Valemont",
+    "faction": "Argent Blades",
+    "rank": "Commander — Head of the Argent Blades",
+    "species": "Human",
+    "age": "45",
+    "appearance": "Tall and commanding with prematurely silver hair worn in a military crop. Her face bears the marks of old battles — a scar across her jaw, a slight asymmetry from a healed fracture. Wears functional armor even in the Guild Spires, always ready. Her eyes are a striking pale blue that seem to evaluate everyone she meets.",
+    "location": "Guild Spires, Gilded Halls — the Argent Blades command center in the upper levels",
+    "motivation": "Honor through service. Cerys believes the Argent Blades exist to protect those who cannot protect themselves. She has no patience for politics or profit — the Blades fight because it is right, not because it pays. This idealism makes her both respected and difficult.",
+    "role": "Commands all Argent Blades operations: patrol assignments, mission approvals, disciplinary actions, and external negotiations. Known for leading from the front when situations demand it. Personally reviews every candidate for Senior Blade rank.",
+    "secret": "Cerys's noble family exists only in records she forged decades ago. She was born in the Warrens, orphaned by a Rift incursion, and clawed her way up through the Blades on pure ability. The false lineage was necessary to gain initial acceptance. Now she could reveal the truth, but fears it would undermine the authority she's built.",
+    "relationships": "Mutual respect with Captain Havel Korin (Wardens) — they coordinate on Rift response. Tension with Serrik Dhal — she considers the Consortium a necessary evil at best. Works with the Adventurers' Guild on training programs. Distrusts the Tower Authority's bureaucracy.",
+    "oracle_notes": "The Oracle sees a woman who built herself from nothing and fears that foundation could crumble. Her honor is genuine, her lineage is not. The contradiction defines her.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Commander of the Argent Blades."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "High Apostle Yzura",
+    "faction": "Serpent Choir",
+    "rank": "High Apostle — Head of the Serpent Choir",
+    "species": "Tiefling",
+    "age": "Unknown (appears 60s, has led the Choir for over 40 years)",
+    "appearance": "An ancient tiefling with deep crimson skin faded to burgundy with age. Her horns are gilded with sacred metals, and her eyes hold the unsettling depth of someone who has conversed with gods. Moves with deliberate slowness, each gesture carrying ritual weight. Wears layered ceremonial robes covered in contract sigils.",
+    "location": "Sanctum Quarter, Choir Sanctum — the oldest temple complex in the Undercity",
+    "motivation": "Divine balance. Yzura believes the gods are real, their contracts are binding, and the Serpent Choir exists to ensure those bargains are honored. She does not worship — she negotiates. Every divine favor has a price, and she ensures both parties pay fairly.",
+    "role": "Final authority on all divine contracts within the Choir's jurisdiction. Mediates disputes between petitioners and gods. Trains new apostles in contract law. Represents the Choir in dealings with other factions. Speaks with gods directly when necessary — a rare and dangerous skill.",
+    "secret": "Yzura has personally negotiated her own death — a contract with an unnamed god that specifies exactly when and how she will die. The date is known only to her. Until then, she is functionally immortal, protected by divine clause. After, she will serve that god in ways the contract does not specify.",
+    "relationships": "Professional respect with all factions — the Choir's neutrality is valuable. Wary alliance with the Glass Sigil on matters of arcane contracts. Monitored by the Tower Authority, who would regulate divine contracts if they could. Brother Thane considers her a rival for spiritual authority.",
+    "oracle_notes": "The Oracle recognizes Yzura as someone who has walked the same halls. She has seen what lies behind divine masks. Her faith is not belief — it is certain knowledge, which is far more terrible.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. High Apostle of the Serpent Choir."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "The Widow",
+    "faction": "Obsidian Lotus",
+    "rank": "Mastermind — Head of the Obsidian Lotus",
+    "species": "Unknown (appears Human)",
+    "age": "Unknown",
+    "appearance": "A woman of indeterminate age with pale skin and dark hair that never seems to move. Her face is beautiful in an unsettling way — too symmetrical, too still. She wears black exclusively, the mourning clothes that gave her the name. No one has ever seen her without her signature veil in public.",
+    "location": "The Warrens, The Widow's Web — a network of tunnels and safe houses known only to the Lotus inner circle",
+    "motivation": "Power through secrets. The Widow collects information, memories, and leverage. She believes knowledge is the only true currency, and she is the wealthiest person in the Undercity. She does not want to rule openly — shadows are where she belongs.",
+    "role": "Oversees all Obsidian Lotus operations: memory trade, blackmail networks, assassination contracts, and the vast archive of secrets that makes the Lotus untouchable. Rarely meets anyone in person — messages flow through intermediaries and dead drops.",
+    "secret": "The Widow is not one person. She is a title passed down through the Lotus leadership for generations. The current Widow has held the position for twelve years. When she dies or retires, another will take the veil and the name. The Widow is eternal.",
+    "relationships": "Cold war with Serrik Dhal over information markets. Professional distance from the Wardens — they tolerate each other. Uses the Serpent Choir for contracts when necessary. Has files on everyone, including faction leaders. Especially faction leaders.",
+    "oracle_notes": "The Oracle cannot see The Widow clearly — her identity is layered beneath decades of deliberate obfuscation. The name is older than the Dome. The Oracle respects the craft.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Mastermind of the Obsidian Lotus."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Senior Archivist Pell",
+    "faction": "Glass Sigil",
+    "rank": "Senior Archivist — Head of the Glass Sigil",
+    "species": "Gnome",
+    "age": "127",
+    "appearance": "A tiny, ancient gnome with wild white hair and spectacles so thick they magnify their eyes to unsettling proportions. Perpetually ink-stained fingers and clothes that haven't been fashionable in decades. Moves through the archives like they were born there — which, functionally, they were.",
+    "location": "Archive Row, Grand Archive Dome — the central repository of the Glass Sigil's knowledge",
+    "motivation": "Preservation. Pell believes knowledge is sacred and must be protected at all costs. They have dedicated their life to cataloging, preserving, and — when necessary — restricting access to dangerous information. The Rifts have taught them that some knowledge can end worlds.",
+    "role": "Oversees all Glass Sigil operations: archive maintenance, research programs, access permissions, and the delicate task of deciding what knowledge is too dangerous to share. Final authority on what enters or leaves the restricted stacks.",
+    "secret": "Pell has been slowly destroying certain texts — not preserving them. Records of how to open Rifts intentionally, rituals that worked too well, histories that could inspire new atrocities. They consider this their greatest service and their greatest sin.",
+    "relationships": "Academic rivalry with Archmage Yaulderna (Wizards Tower) — they disagree on methodology but share research. Supplies the Tower Authority with historical context when asked. Wary of the Guild of Ashen Scrolls' more aggressive acquisition methods. Finds Brother Thane's theology interesting in a clinical way.",
+    "oracle_notes": "The Oracle sees a keeper who has become a destroyer to prevent greater destruction. Pell carries the weight of every text they have burned. They are not certain they made the right choices. They made them anyway.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Senior Archivist of the Glass Sigil."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Mari Fen",
+    "faction": "Adventurers Guild",
+    "rank": "Guildmaster — Head of the Adventurers' Guild",
+    "species": "Halfling",
+    "age": "52",
+    "appearance": "A weathered halfling woman with laugh lines and old scars in equal measure. Her hair is steel-grey now, cropped short for practicality. Dresses in worn but well-maintained adventuring gear even behind her desk — old habits. Her hands are calloused from decades of dungeon crawling, and she walks with a slight limp from an old injury.",
+    "location": "Guild Spires, Adventurers' Guild Hall — the central hub for registered adventurers",
+    "motivation": "Opportunity. Mari believes everyone deserves a chance to prove themselves, just as she got hers decades ago. She runs the Guild to give young adventurers the support she never had — training, equipment, contacts, and someone to recover their bodies if things go wrong.",
+    "role": "Oversees all Guild operations: adventurer registration, mission posting, rank assessments, and the delicate politics of managing hundreds of armed freelancers. Known for personally interviewing every new registrant. Still takes the occasional mission herself.",
+    "secret": "Mari's legendary dungeon-crawling career ended because she made a deal with something in a Rift to save her party. She doesn't remember the details — that was part of the price. She knows she owes something, somewhere, a debt that will eventually be called.",
+    "relationships": "Close friendship with Captain Korin — they served together before their current positions. Professional respect with Lady Cerys. Tolerates the Consortium's recruiters in Guild spaces because adventurers need work. Monitors Brother Thane's recruitment of adventurers with concern.",
+    "oracle_notes": "The Oracle sees the contract Mari signed, even if she cannot. It waits in patient darkness. Her borrowed time has not yet run out. When it does, the Oracle will be watching.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Guildmaster of the Adventurers' Guild."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Eir Velan",
+    "faction": "Guild of Ashen Scrolls",
+    "rank": "Archivist First Class — Head of the Guild of Ashen Scrolls",
+    "species": "Elf",
+    "age": "234",
+    "appearance": "An ancient elf with silver-white hair and eyes the color of old parchment. Her face is lined with centuries of study, and her fingers are permanently stained with archival inks. Wears the formal robes of her position but accessorizes with practical tools — magnifying glass, preservation wands, translation amulets.",
+    "location": "Artisan Quarter, Scriptorium Quarter — the Guild's headquarters in the knowledge district",
+    "motivation": "Communication. Eir believes the greatest power is understanding — between people, between factions, between past and present. She founded the Thesaurus communication protocols and maintains the city's historical records because someone must remember what was lost.",
+    "role": "Oversees all Guild operations: scroll preservation, historical research, adventurer documentation, and the Thesaurus system that allows communication across the Undercity. Arbitrates disputes over historical facts. Maintains relationships with other archives.",
+    "secret": "Eir has been alive long enough to remember the Dome's sealing. She was young then, barely a hundred. She knows details about why the Dome was built that she has never committed to writing — truths that would destabilize the current political order if revealed.",
+    "relationships": "Academic alliance with Senior Archivist Pell (Glass Sigil) despite occasional methodology disputes. Provides historical context to the Tower Authority when required. Monitors Tessaly Orin's research on narrative resonance with concern and interest. Remembers Lady Cerys's grandmother.",
+    "oracle_notes": "The Oracle recognizes Eir as one of the last who saw the sky. Her memories are a treasure and a burden. She writes history but has learned that writing it is not the same as controlling it.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Archivist First Class of the Guild of Ashen Scrolls."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Director Myra Kess",
+    "faction": "Tower Authority / FTA",
+    "rank": "Director — Head of the Fulcrum Tower Authority",
+    "species": "Human",
+    "age": "48",
+    "appearance": "A sharp-featured woman with iron-grey hair worn in a severe bun and eyes that have reviewed too many reports. Wears the Tower Authority's formal uniform with precision — every button correct, every line clean. Her expression defaults to patient skepticism. Carries herself like someone who expects to be disappointed and is rarely surprised.",
+    "location": "The Tower of Last Chance, Director's Office — the administrative heart of the FTA",
+    "motivation": "Order through regulation. Myra believes the Undercity functions only because rules exist and are enforced. She has no illusions about the factions — they are all compromised in various ways. Her job is to ensure their compromises don't collapse the system entirely.",
+    "role": "Oversees all Tower Authority operations: adventurer licensing, Rift response coordination, inter-faction arbitration, and the thousand small regulations that keep the Undercity running. Final authority on FTA policy. Reports theoretically to a council that rarely meets.",
+    "secret": "Myra has been quietly archiving evidence of every faction's violations — not to use against them, but as insurance. If the system ever needs to be rebuilt, she intends to have documentation of what went wrong. She trusts no one, including herself.",
+    "relationships": "Professional respect with Serrik Dhal — they understand each other's methods. Works with Captain Korin on Rift protocols. Monitors Archmage Yaulderna's independence with concern. Considers Brother Thane a manageable nuisance. Files reports on everyone.",
+    "oracle_notes": "The Oracle sees a woman who has chosen to be the machinery of civilization. She has made herself indispensable by being entirely predictable. There is a kind of faith in that — faith in systems rather than gods.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Director of the Fulcrum Tower Authority."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  },
+  {
+    "name": "Brother Thane",
+    "faction": "Brother Thane's Cult (The Returned)",
+    "rank": "Prophet — Founder and Leader of the Cult",
+    "species": "Human (Rift-touched)",
+    "age": "Unknown (appears 70s, claims to have died and returned)",
+    "appearance": "A gaunt man with paper-thin skin that seems to glow faintly in darkness. His eyes are milky white but see perfectly — they reflect light like a cat's. His voice is soft, almost gentle, but carries in ways that defy acoustics. Wears simple grey robes. His hands are cold to the touch.",
+    "location": "Collapsed Plaza, Cult House — the cult's headquarters in the ruins of the old plaza",
+    "motivation": "Revelation. Thane claims to have died, passed through a Rift, and returned with knowledge of what lies beyond. He believes the Dome is a cage keeping humanity from its true potential. He teaches that death is a doorway, not an ending. His followers call themselves The Returned.",
+    "role": "Spiritual leader of the cult. Delivers sermons, performs rituals, and guides followers toward 'awakening.' Rarely involves himself in practical matters — that's what Brother Aldric and the Speakers are for. His presence alone is enough to inspire devotion.",
+    "secret": "Thane genuinely died and returned. What he saw on the other side was not divine revelation but something far older and stranger. He understood enough to know he cannot share the full truth — his followers would break. So he shapes the truth into parables they can survive.",
+    "relationships": "Opposed by the Serpent Choir on theological grounds. Monitored by the Tower Authority. Considered dangerous by the Wardens. Finds the Glass Sigil's interest in his theology amusing. Has attempted to recruit adventurers — some have listened.",
+    "oracle_notes": "The Oracle has seen what Thane saw. They do not discuss it. There is a recognition between them — two who have glimpsed the architecture behind reality. Thane is not lying. He is simplifying. The Oracle is not sure which is more dangerous.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-28] Added to roster. Prophet and founder of Brother Thane's Cult."
+    ],
+    "created_at": "2026-03-28T08:00:00.000000",
+    "last_event_at": "2026-03-28T08:00:00.000000"
+  }
+]

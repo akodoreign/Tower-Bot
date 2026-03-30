@@ -23,13 +23,13 @@
     "pp": 0
   },
   "inventory": {
+    "Ring of Protection": 1,
     "Flak Jacket": 1,
     "Potion of Healing": 2,
     "Potion of Angelic Slumber": 1,
     "Pistol Clip Cold damage +1d6": 1,
     "Pistol Clip Radiant damage +1d8": 1,
     "Quarterstaff": 1,
-    "Pistol": 1,
     "Oil": 20,
     "Backpack": 1,
     "Pole": 1,
@@ -56,5 +56,5 @@
   "notes": {
     "organizations": "Wizards Tower"
   },
-  "fetched_at": "2026-03-17T07:57:09.384118"
+  "fetched_at": "2026-03-28T12:48:49.827958"
 }

@@ -1,11 +1,11 @@
 {
   "season": 1,
-  "match_count": 6,
+  "match_count": 10,
   "fighters": [
     {
       "name": "Aric Veyne",
       "rank": 1,
-      "wins": 22,
+      "wins": 23,
       "losses": 4,
       "title": "The Silver Spire",
       "faction": "Argent Blades",
@@ -14,8 +14,8 @@
     {
       "name": "Kassia Mor",
       "rank": 2,
-      "wins": 18,
-      "losses": 6,
+      "wins": 19,
+      "losses": 8,
       "title": "The Ironwife",
       "faction": "Argent Blades",
       "notes": "Known for ending fights early. Rarely takes damage."
@@ -78,28 +78,28 @@
       "name": "Mads Cutter",
       "rank": 9,
       "wins": 8,
-      "losses": 12,
+      "losses": 13,
       "title": null,
       "faction": "Independent",
       "notes": "Veteran. Slow now. Still dangerous because he knows everything."
     },
     {
-      "name": "The Patchwork Kid",
-      "rank": 10,
-      "wins": 7,
-      "losses": 13,
-      "title": "Most Injuries Per Bout",
-      "faction": "Patchwork Saints",
-      "notes": "Pol Greaves trained them. Fights like someone who expects to lose."
-    },
-    {
       "name": "Lissa No-Name",
-      "rank": 11,
-      "wins": 6,
+      "rank": 10,
+      "wins": 8,
       "losses": 14,
       "title": null,
       "faction": "Independent",
       "notes": "Nobody knows where she came from. Glass Sigil is interested."
+    },
+    {
+      "name": "The Patchwork Kid",
+      "rank": 11,
+      "wins": 7,
+      "losses": 14,
+      "title": "Most Injuries Per Bout",
+      "faction": "Patchwork Saints",
+      "notes": "Pol Greaves trained them. Fights like someone who expects to lose."
     },
     {
       "name": "Gorvin Slate",
@@ -111,8 +111,8 @@
       "notes": "Loses dramatically. Enormous fan base. Suspects the fix is in."
     }
   ],
-  "last_match_at": "2026-03-19T01:48:18.243968",
-  "next_match_at": "2026-03-21T19:41:50.243968",
+  "last_match_at": "2026-03-29T08:27:25.330592",
+  "next_match_at": "2026-04-01T04:27:19.330592",
   "last_posted_at": null,
   "match_log": [
     {
@@ -162,6 +162,38 @@
       "loser": "Drell the Unfinished",
       "location": "the Night Pits invitation bout",
       "at": "2026-03-19T01:48:18.243968"
+    },
+    {
+      "match": 7,
+      "type": "standard",
+      "winner": "Lissa No-Name",
+      "loser": "Mads Cutter",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-21T20:31:36.112839"
+    },
+    {
+      "match": 8,
+      "type": "standard",
+      "winner": "Kassia Mor",
+      "loser": "The Patchwork Kid",
+      "location": "the open-air Dust Ring at Guild Spires East",
+      "at": "2026-03-24T10:36:06.424861"
+    },
+    {
+      "match": 9,
+      "type": "title",
+      "winner": "Aric Veyne",
+      "loser": "Kassia Mor",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-26T19:13:14.523953"
+    },
+    {
+      "match": 10,
+      "type": "exhibition",
+      "winner": "Lissa No-Name",
+      "loser": "Kassia Mor",
+      "location": "the Night Pits invitation bout",
+      "at": "2026-03-29T08:27:25.330592"
     }
   ]
 }

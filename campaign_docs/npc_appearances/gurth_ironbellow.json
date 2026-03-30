@@ -1,0 +1,28 @@
+{
+  "name": "Gurth Ironbellow",
+  "species": "Half-Orc",
+  "faction": "Adventurers Guild",
+  "rank": "Unranked",
+  "role": "mercenary",
+  "home_district": "warrens",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering, heavily muscled half-orc with scarred features, greenish skin, and piercing ice blue eyes wields a warhammer and crossbow, his worn leather and chainmail attire adorned with the Adventurers Guild badge. His tusks glint beneath the dim tavern light as he stands sentinel at The Rusty Axe, his eyes reflecting a fierce determination to prove his worth as an adventurer, yearning for respect from his peers.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

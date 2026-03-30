@@ -1,0 +1,61 @@
+{
+  "name": "Keta Fadeworth",
+  "classes": {
+    "Artificer": 4
+  },
+  "total_level": 4,
+  "max_hp": 23,
+  "ac_override": null,
+  "stats": {
+    "STR": 15,
+    "DEX": 16,
+    "CON": 13,
+    "INT": 15,
+    "WIS": 12,
+    "CHA": 10
+  },
+  "xp": 0,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 10,
+    "pp": 0
+  },
+  "inventory": {
+    "Scale Mail, +2": 1,
+    "Cap of Water Breathing": 1,
+    "Periapt of Health": 1,
+    "Spell Scroll (Level 3)": 1,
+    "Spell Scroll (Level 5)": 2,
+    "Potion of Angelic Slumber": 1,
+    "Crossbow, Light": 1,
+    "Double-Barrel Shotgun": 1,
+    "Backpack": 1,
+    "Thieves' Tools": 1,
+    "Mule": 1,
+    "Traveler's Clothes": 1,
+    "Potion of Healing": 2,
+    "Crossbow Bolts": 18,
+    "Crowbar": 2,
+    "Hammer": 2,
+    "Piton": 15,
+    "Rations (1 day)": 20,
+    "Rope, Hempen (50 feet)": 2,
+    "Tinderbox": 2,
+    "Waterskin": 2,
+    "Torch": 10
+  },
+  "feats": [
+    "Dark Bargain",
+    "Fortification Expert",
+    "Pioneer Ability Score Increase",
+    "Survivor"
+  ],
+  "spell_slots": {},
+  "notes": {
+    "otherNotes": "32 Karma\n54 EC- currency \n\nGiant of knights wrath watching\nDemonic like judge of fire watching\n\nnew outfit including wings and fish nets for models",
+    "organizations": "mechanic badge"
+  },
+  "fetched_at": "2026-03-21T18:36:35.976954"
+}

@@ -3,6 +3,7 @@ npcs.py — NPC generation patterns and dialogue helpers.
 
 Provides:
 - NPC roster loading and filtering
+- Faction leader lookup
 - NPC context formatting for prompts
 - Dialogue template generation
 - Secret and motivation patterns
@@ -17,6 +18,43 @@ from typing import List, Dict, Optional
 
 DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "campaign_docs"
 
+# Canonical faction leader names — used as fallback if not in roster
+FACTION_LEADERS = {
+    "iron fang consortium": "Serrik Dhal",
+    "iron fang": "Serrik Dhal",
+    "consortium": "Serrik Dhal",
+    "argent blades": "Lady Cerys Valemont",
+    "wardens of ash": "Captain Havel Korin",
+    "wardens": "Captain Havel Korin",
+    "serpent choir": "High Apostle Yzura",
+    "choir": "High Apostle Yzura",
+    "obsidian lotus": "The Widow",
+    "lotus": "The Widow",
+    "glass sigil": "Senior Archivist Pell",
+    "sigil": "Senior Archivist Pell",
+    "adventurers guild": "Mari Fen",
+    "adventurers' guild": "Mari Fen",
+    "guild of ashen scrolls": "Eir Velan",
+    "ashen scrolls": "Eir Velan",
+    "tower authority": "Director Myra Kess",
+    "fta": "Director Myra Kess",
+    "fulcrum tower authority": "Director Myra Kess",
+    "wizards tower": "Archmage Yaulderna Silverstreak",
+    "wizard tower": "Archmage Yaulderna Silverstreak",
+    "patchwork saints": "Pol Greaves",  # Field Captain, closest to leader
+    "saints": "Pol Greaves",
+    "brother thane's cult": "Brother Thane",
+    "thane's cult": "Brother Thane",
+    "the returned": "Brother Thane",
+}
+
+# Leadership rank keywords — used to identify leaders in roster
+LEADER_RANKS = [
+    "guildmaster", "commander", "captain", "director", "archmage",
+    "high apostle", "mastermind", "senior archivist", "archivist first class",
+    "prophet", "head of", "leader",
+]
+
 
 def load_npc_roster() -> List[dict]:
     """Load the NPC roster from disk."""
@@ -27,6 +65,75 @@ def load_npc_roster() -> List[dict]:
         return json.loads(roster_file.read_text(encoding="utf-8"))
     except Exception:
         return []
+
+
+def get_faction_leader(faction: str) -> Optional[dict]:
+    """
+    Get the faction leader NPC from the roster.
+    
+    Tries multiple methods:
+    1. Look for known leader name in roster
+    2. Look for leadership rank keywords
+    3. Return None if not found (caller should use fallback name)
+    """
+    roster = load_npc_roster()
+    faction_lower = faction.lower().strip()
+    
+    # Get canonical leader name
+    canonical_name = None
+    for key, name in FACTION_LEADERS.items():
+        if key in faction_lower or faction_lower in key:
+            canonical_name = name.lower()
+            break
+    
+    # Search roster for faction members
+    faction_npcs = []
+    for npc in roster:
+        npc_faction = npc.get("faction", "").lower()
+        if faction_lower in npc_faction or any(k in npc_faction for k in [faction_lower]):
+            if npc.get("status") == "alive":
+                faction_npcs.append(npc)
+    
+    # First: look for canonical leader by name
+    if canonical_name:
+        for npc in faction_npcs:
+            if canonical_name in npc.get("name", "").lower():
+                return npc
+    
+    # Second: look for leadership rank keywords
+    for npc in faction_npcs:
+        rank = npc.get("rank", "").lower()
+        for keyword in LEADER_RANKS:
+            if keyword in rank:
+                return npc
+    
+    # Third: look in full roster by canonical name (leader might have faction listed differently)
+    if canonical_name:
+        for npc in roster:
+            if canonical_name in npc.get("name", "").lower():
+                if npc.get("status") == "alive":
+                    return npc
+    
+    return None
+
+
+def get_faction_leader_name(faction: str) -> str:
+    """
+    Get the faction leader's name, from roster or fallback.
+    
+    Always returns a name — uses canonical fallback if not in roster.
+    """
+    leader = get_faction_leader(faction)
+    if leader:
+        return leader.get("name", "Unknown Leader")
+    
+    # Fallback to canonical names
+    faction_lower = faction.lower().strip()
+    for key, name in FACTION_LEADERS.items():
+        if key in faction_lower or faction_lower in key:
+            return name
+    
+    return f"the {faction} leader"
 
 
 def get_npcs_by_faction(faction: str, alive_only: bool = True) -> List[dict]:
@@ -102,16 +209,26 @@ def get_relevant_npcs(
     """
     Get relevant NPCs for a mission context.
     
-    Prioritizes NPCs from the posting faction, adds some from other factions.
+    Prioritizes:
+    1. Faction leader (always included if exists)
+    2. Other NPCs from the posting faction
+    3. Some NPCs from other factions
     """
     roster = load_npc_roster()
     faction_lower = faction.lower()
+    
+    # Get faction leader first
+    leader = get_faction_leader(faction)
     
     faction_npcs = []
     other_npcs = []
     
     for npc in roster:
         if npc.get("status") != "alive":
+            continue
+        
+        # Skip leader — we'll add them first
+        if leader and npc.get("name") == leader.get("name"):
             continue
         
         if faction_lower in npc.get("faction", "").lower():
@@ -123,7 +240,16 @@ def get_relevant_npcs(
     random.shuffle(faction_npcs)
     random.shuffle(other_npcs)
     
-    return faction_npcs[:faction_count] + other_npcs[:other_count]
+    # Build result: leader first, then faction NPCs, then others
+    result = []
+    if leader:
+        result.append(leader)
+        faction_count -= 1  # Leader counts toward faction count
+    
+    result.extend(faction_npcs[:faction_count])
+    result.extend(other_npcs[:other_count])
+    
+    return result
 
 
 # NPC personality trait templates
@@ -252,7 +378,12 @@ def build_npc_prompt_block(
     relevant = get_relevant_npcs(faction)
     npc_block = format_npc_block(relevant)
     
+    # Get faction leader name for reference
+    leader_name = get_faction_leader_name(faction)
+    
     lines = [
+        f"FACTION LEADER: {leader_name}",
+        "",
         "AVAILABLE ROSTER NPCs (use these if appropriate):",
         npc_block,
         "",
@@ -287,17 +418,51 @@ def build_npc_prompt_block(
 
 
 def format_quest_giver_guidance(faction: str) -> str:
-    """Generate quest-giver roleplay guidance."""
-    faction_npcs = get_npcs_by_faction(faction, alive_only=True)
+    """
+    Generate quest-giver roleplay guidance.
     
+    Prioritizes faction leader, falls back to other faction NPCs.
+    """
+    # Try to get faction leader first
+    leader = get_faction_leader(faction)
+    
+    if leader:
+        name = leader.get("name", "The contact")
+        rank = leader.get("rank", "leader")
+        appearance = leader.get("appearance", "")
+        motivation = leader.get("motivation", "")
+        
+        # Extract first sentence of appearance for brief description
+        brief_appearance = appearance.split(".")[0] if appearance else "a commanding presence"
+        
+        return f"""QUEST-GIVER ROLEPLAY:
+Contact: {name} ({rank})
+Appearance: {brief_appearance}
+Motivation: {motivation[:100]}...
+
+IMPORTANT: {name} is the faction leader. Use this name consistently.
+
+DIALOGUE RULES:
+- 2-3 lines of actual dialogue, then pause for player questions
+- DO NOT monologue — let players ask
+- Share critical info, hold back 1-2 details for Insight checks
+- If players ask something the contact doesn't know, say so
+
+SAMPLE OPENING:
+"{name} looks up as you approach. {brief_appearance}. 
+'You're the ones who took the job? Good. Here's what you need to know.'"
+
+Then bullet the key facts, not a speech.
+"""
+    
+    # Fallback: try other faction NPCs
+    faction_npcs = get_npcs_by_faction(faction, alive_only=True)
     if faction_npcs:
         giver = faction_npcs[0]
         name = giver.get("name", "The contact")
-        personality = giver.get("personality", "professional")
         
         return f"""QUEST-GIVER ROLEPLAY:
 Contact: {name}
-Personality: {personality}
 
 DIALOGUE RULES:
 - 2-3 lines of actual dialogue, then pause for player questions
@@ -312,9 +477,20 @@ SAMPLE OPENING:
 Then bullet the key facts, not a speech.
 """
     
-    return """QUEST-GIVER ROLEPLAY:
-Create a contact NPC appropriate for the posting faction.
+    # Ultimate fallback: use canonical leader name
+    leader_name = get_faction_leader_name(faction)
+    return f"""QUEST-GIVER ROLEPLAY:
+Contact: {leader_name} (faction leader)
+
+DIALOGUE RULES:
 - 2-3 lines of actual dialogue, then pause for player questions
 - DO NOT monologue — let players ask
 - Share critical info, hold back 1-2 details for Insight checks
+- If players ask something the contact doesn't know, say so
+
+SAMPLE OPENING:
+"{leader_name} looks up as you approach. [brief physical description]. 
+'You're the ones who took the job? Good. Here's what you need to know.'"
+
+Then bullet the key facts, not a speech.
 """

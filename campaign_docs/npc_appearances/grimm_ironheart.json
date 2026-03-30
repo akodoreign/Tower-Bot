@@ -1,0 +1,28 @@
+{
+  "name": "Grimm Ironheart",
+  "species": "Dwarf",
+  "faction": "Argent Blades",
+  "rank": "Senior Blade",
+  "role": "senior blade",
+  "home_district": "argent blades",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A burly, scarred dwarf, standing roughly 4.5 feet tall and densely muscled, with a short salt-and-pepper beard and piercing icy-blue eyes, strides into the light. His silver and white scale mail armor, adorned with blue accents and the emblem of the Argent Blades, shines in the flickering torchlight. A longsword and shield rest securely in his massive hands, the shield bearing the same faction symbol. A single, menacing scar, running down the left side of his face, adds a distinctive visual detail to his theatrical, glory-hunter presence.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

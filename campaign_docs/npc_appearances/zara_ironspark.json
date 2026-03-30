@@ -1,0 +1,28 @@
+{
+  "name": "Zara Ironspark",
+  "species": "Warforged",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Scribe",
+  "role": "contract scribe",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "INT 16",
+      "CHA 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "22–35"
+  },
+  "equipment": {
+    "weapons": "quill as a weapon (metaphorically), dagger",
+    "armour": "tattered coat over threadbare robe"
+  },
+  "sd_appearance": "A towering, rigid figure of polished copper and glowing emerald eyes emerges from the shadows, their height and precision of movement hinting at a non-human origin. The ash-white robe of the Guild of Ashen Scrolls drapes over a threadbare under-robe, with multiple sealed scroll cases adorning their waist. A quill, symbolizing their role as a scribe, is visibly worn as a makeshift weapon, while a dagger and a tattered coat complete their ensemble. A distinctive forked tongue flickers from between the Warforged's lips, adding an eerie, yet intriguing touch to their appearance.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "coat over robe, always quill and parchment, forked tongue flickering"
+}

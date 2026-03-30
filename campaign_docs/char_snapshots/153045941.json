@@ -19,7 +19,7 @@
     "cp": 0,
     "sp": 0,
     "ep": 0,
-    "gp": 8,
+    "gp": 10,
     "pp": 0
   },
   "inventory": {
@@ -54,8 +54,8 @@
   ],
   "spell_slots": {},
   "notes": {
-    "otherNotes": "32 Karma\n161 EC- currency \n\nGiant of knights wrath watching\nDemonic like judge of fire watching\n\nnew outfit including wings and fish nets for models",
+    "otherNotes": "182 Karma\n204 EC- currency \n\nGiant of knights wrath watching\nDemonic like judge of fire watching\n\nnew outfit including wings and fish nets for models",
     "organizations": "mechanic badge"
   },
-  "fetched_at": "2026-03-14T18:52:25.441040"
+  "fetched_at": "2026-03-21T20:41:15.976650"
 }

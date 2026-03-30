@@ -316,33 +316,49 @@ def _sweep_dead_to_graveyard(npcs: List[dict]) -> int:
 # Ollama generation helper
 # ---------------------------------------------------------------------------
 
-async def _generate(prompt: str) -> Optional[str]:
+async def _generate(prompt: str, timeout: float = 300.0, retries: int = 2) -> Optional[str]:
+    """Call Ollama and return the text response.
+    Retries on timeout — lifecycle prompts can be slow."""
     import httpx
     ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-    try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
-        lines = text.splitlines()
-        skip = ("sure", "here's", "here is", "as requested", "certainly",
-                "of course", "i hope", "below is", "absolutely")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or None
-    except Exception as e:
-        logger.error(f"npc_lifecycle _generate error: {e}")
-        return None
+
+    last_err = None
+    for attempt in range(1, retries + 1):
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                resp = await client.post(ollama_url, json={
+                    "model": ollama_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "stream": False,
+                })
+                resp.raise_for_status()
+                data = resp.json()
+
+            text = ""
+            if isinstance(data, dict):
+                msg = data.get("message", {})
+                if isinstance(msg, dict):
+                    text = msg.get("content", "").strip()
+
+            lines = text.splitlines()
+            skip = ("sure", "here's", "here is", "as requested", "certainly",
+                    "of course", "i hope", "below is", "absolutely")
+            while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
+                lines.pop(0)
+            return "\n".join(lines).strip() or None
+
+        except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.WriteTimeout) as e:
+            last_err = e
+            logger.warning(f"🧬 npc_lifecycle Ollama TIMEOUT (attempt {attempt}/{retries}): {type(e).__name__}")
+            if attempt < retries:
+                await asyncio.sleep(5)
+        except Exception as e:
+            logger.error(f"🧬 npc_lifecycle _generate error: {type(e).__name__}: {e}")
+            return None
+
+    logger.error(f"🧬 npc_lifecycle _generate FAILED after {retries} attempts")
+    return None
 
 
 # ---------------------------------------------------------------------------

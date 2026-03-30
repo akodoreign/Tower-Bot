@@ -1,0 +1,28 @@
+{
+  "name": "Aldric Ebonwhisper",
+  "species": "Elf",
+  "faction": "Serpent Choir",
+  "rank": "Petitioner",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Elf, tall and gaunt, with silver eyes that glow in the Undercity's gloom. Sharp, pointed ears atop a lithe frame, aged yet timeless. Clad in tattered black robes, serpent symbols twining across the fabric. Worn leather and chainmail armor, weighted warhammer and crossbow at his side. One coiled serpent pendant dangles from his neck, a symbol of his faction, the Serpent Choir. In the dim light, Aldric's jade green and black divine silk robe seems to pulse with an eerie, unnatural life.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

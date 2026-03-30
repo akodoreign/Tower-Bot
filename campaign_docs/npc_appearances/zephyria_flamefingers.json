@@ -1,0 +1,28 @@
+{
+  "name": "Zephyria Flamefingers",
+  "species": "Genasi",
+  "faction": "Guild of Ashen Scrolls",
+  "rank": "Scribe",
+  "role": "contract scribe",
+  "home_district": "ashen scrolls tower",
+  "stats": {
+    "primary": [
+      "INT 16",
+      "CHA 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CON 10",
+      "STR 8"
+    ],
+    "hp_range": "22–35"
+  },
+  "equipment": {
+    "weapons": "quill as a weapon (metaphorically), dagger",
+    "armour": "tattered coat over threadbare robe"
+  },
+  "sd_appearance": "A towering, imposing figure with the build of a genasi, her fiery hair pulled back into a tight braid, stands at the heart of the Guild of Ashen Scrolls in the Undercity. Her eyes, a swirling vortex of blue and orange flames, pierce the dim light of the chamber. She wears an ash-white archival robe, adorned with multiple sealed scroll cases, and a tattered coat over a threadbare robe. A quill, metaphorically her weapon, and a dagger are visible on her person. Her forked tongue flickers in the dim light, a distinctive visual detail that adds an eerie, otherworldly allure to her appearance.",
+  "faction_visual": "ash-white archival robes, multiple sealed scroll cases, fate-reading tools",
+  "style_note": "coat over robe, always quill and parchment, forked tongue flickering"
+}

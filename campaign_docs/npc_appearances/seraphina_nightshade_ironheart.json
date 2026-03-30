@@ -1,0 +1,28 @@
+{
+  "name": "Seraphina Nightshade-Ironheart",
+  "species": "Elf",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "home_district": "glass sigil",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "A tall, slender elf of ethereal build, Seraphina Nightshade-Ironheart, stands before the flickering torchlight in the heart of the Undercity's labyrinth. Her shaved head, adorned with glowing runes, catches the dim light, casting an eerie glow. Her piercing green eyes, sharp as a dagger's point, gaze with a steady, unwavering intensity. Draped in tattered cult robes of a grey hue, the wrappings hint at the fervor of her faith, while a makeshift metal-banded staff in her hands attests to her role as a speaker. A hidden dagger rests at her waist, a testament to her readiness to protect the Brother Thane's Cult, her distinctive visual detail being a silver talisman hanging from a leather cord around her neck, the symbol of the Tower of Last Chance.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

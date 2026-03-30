@@ -1,0 +1,28 @@
+{
+  "name": "Lysander Elveshadow",
+  "species": "Half-Elf",
+  "faction": "Patchwork Saints",
+  "rank": "Volunteer",
+  "role": "mercenary",
+  "home_district": "patchwork saints",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Lysander Elveshadow, a tall and lean half-elf with dark curls braided with leather strips, stands watch in the Undercity's alleyways. His piercing silver-blue eyes glint with determination, reflecting the flickering lights above. Wearing a patchwork cloak and a red armband of the Patchwork Saints, he is clad in worn leather and chainmail, a warhammer and crossbow visible at his side. A distinctive visual detail is the medicinal pouch hanging from his belt, a testament to his role as a volunteer offering aid to the city's oppressed.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

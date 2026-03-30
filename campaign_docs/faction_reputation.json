@@ -1,27 +1,27 @@
 {
   "Iron Fang Consortium": {
     "tier": "Neutral",
-    "points": 0
+    "points": -1
   },
   "Argent Blades": {
     "tier": "Neutral",
-    "points": 1
+    "points": 2
   },
   "Wardens of Ash": {
     "tier": "Friendly",
-    "points": 0
+    "points": 1
   },
   "Serpent Choir": {
     "tier": "Neutral",
-    "points": 0
+    "points": -1
   },
   "Obsidian Lotus": {
     "tier": "Neutral",
-    "points": 0
+    "points": -1
   },
   "Glass Sigil": {
     "tier": "Friendly",
-    "points": 0
+    "points": 2
   },
   "Patchwork Saints": {
     "tier": "Friendly",
@@ -41,6 +41,6 @@
   },
   "Wizards Tower": {
     "tier": "Associated",
-    "points": 0
+    "points": 1
   }
 }

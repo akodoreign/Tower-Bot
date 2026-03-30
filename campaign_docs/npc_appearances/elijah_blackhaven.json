@@ -1,0 +1,28 @@
+{
+  "name": "Elijah Blackhaven",
+  "species": "Human",
+  "faction": "Adventurers Guild",
+  "rank": "E-Rank",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Tall, lean human with a gaunt face, piercing blue eyes, and a diagonal scar across his left cheek, clad in worn leather armor and rusted steel sword. Wearing the badge of the Adventurers Guild, he carries a warhammer and a crossbow, his chainmail adorned with battle scars and fading emblems of past contracts. A single, flickering lantern hangs from his belt, casting a dancing, ominous glow on the Undercity's cobblestone streets.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

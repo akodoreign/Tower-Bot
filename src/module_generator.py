@@ -1026,51 +1026,84 @@ Output the corrected section. No preamble."""
 
 _FLOW_SYS = """\
 You are a professional D&D module editor. Your job is to restructure a raw draft
-so a DM can read it straight through at the table, scene by scene, without
-flipping back and forth.
+into the LIVING CAMPAIGN MODULE format used by organised play campaigns.
 
-THINK IN SCENES AND LOCATIONS.
-Each scene is a COMPLETE UNIT built around ONE place or ONE encounter.
-Everything the DM needs for that scene stays together in this order:
+MODULE STRUCTURE (like Heroes of Rokugan living campaign modules):
 
-  SCENE UNIT ORDER (repeat for each scene):
-  1. SCENE HEADING (### Scene N: Title)
-  2. READ-ALOUD block — the DM reads this to players as they arrive/enter.
-     (*italic text* = read-aloud. It comes FIRST so the DM sets the scene
-     before doing anything else.)
-  3. WHAT THE DM KNOWS — background context for this specific scene only.
-  4. NPCs PRESENT — name, appearance, personality, opening dialogue.
-     Introduce each NPC BEFORE any dialogue from them.
-  5. WHAT HAPPENS — the events, conversations, and choices in this scene.
-     Include NPC dialogue in natural order within the events.
-  6. SKILL CHECKS & MECHANICS — DCs, saves, skill challenges for this scene.
-     These come AFTER the narrative they support, not before.
-  7. TABLES — rumour tables, loot, random encounters stay with their scene.
-  8. DM NOTES — contingencies, "if the party does X", pacing tips.
-     These come LAST in the scene.
-  9. TRANSITION — one sentence bridging to the next scene/location.
-     "When the party leaves the tavern..." or "The trail leads to..."
+## Act Structure
+Each act is a MAJOR PHASE of the adventure with its own pacing goal:
+- **Act 1: The Briefing** (~30 min) — Hook, meeting, intel gathering
+- **Act 2: The Investigation** (~30 min) — Multiple parallel leads to follow
+- **Act 3: The Confrontation** (~45 min) — Combat, climax, resolution
+- **Act 4: Resolution** (~15 min) — Aftermath, rewards, consequences
 
-BRANCHING:
-If a scene has multiple paths (e.g. three NPCs to visit, or sneak vs. fight),
-structure each branch as a sub-section within the scene:
-  ### Scene 5: Gathering Intel
-  #### Option A: The Soot & Cinder Tavern
-  [complete unit for this option]
-  #### Option B: The Scrapworks
-  [complete unit for this option]
+## SCENE UNIT ORDER (within each act):
+1. **SCENE HEADING** (### Scene N: Title)
+2. **READ-ALOUD BLOCK** — *Italic text* the DM reads to players on arrival.
+   This comes FIRST. 3-6 vivid sentences setting the scene.
+3. **DM BACKGROUND** — What the DM knows that players don't.
+4. **NPCs PRESENT** — Each NPC gets:
+   - Name, faction, role, appearance (3+ details)
+   - Opening dialogue line in quotes
+   - What they know, what they want, what they'll do
+5. **INFORMATION TIERS** — For investigation scenes, structure as:
+   - **Easy (DC 10-12):** Basic information anyone would share
+   - **Medium (DC 13-15):** Requires persuasion or the right approach
+   - **Hard (DC 18+):** Secrets, requires leverage or creative play
+6. **WHAT HAPPENS** — The events, choices, and outcomes.
+7. **SKILL CHECKS** — List specific DCs after the narrative context.
+8. **DM NOTES** — "If the party does X..." contingencies.
+9. **TRANSITION** — One sentence bridging to the next scene.
 
-STAT BLOCKS:
-- Minor stat references (HP, AC, attack) stay inline with their encounter.
-- Full stat blocks go AFTER the scene narrative, before DM Notes.
-- Boss stat blocks go after the boss encounter narrative.
+## INVESTIGATION STRUCTURE (Act 2) — CRITICAL
+Investigation acts must offer MULTIPLE PARALLEL LEADS, not a linear path.
+Structure as OPTIONS the party can pursue in any order:
 
-CRITICAL RULES:
+### Scene 5: Gathering Intel
+The party can investigate through multiple avenues:
+
+#### Option A: [Location/Faction] (e.g. "The Scrapworks")
+*Read-aloud for this location.*
+NPC: [name, appearance, faction]
+Information available:
+- DC 10: [basic info]
+- DC 15: [deeper info]
+- DC 20: [secret/key clue]
+How this connects to the climax: [explanation]
+
+#### Option B: [Different Location/Faction]
+[Same structure as Option A]
+
+#### Option C: [Third Avenue]
+[Same structure]
+
+#### The Bait Option (Optional)
+If players want to set a trap or lure out the enemy...
+[Mechanics and outcomes]
+
+### Connecting the Dots
+Once the party has gathered enough clues (at least 2-3 leads followed),
+they can piece together: [what they learn]
+This points them toward: [Act 3 location]
+
+## RUMOUR/INFORMATION TABLES
+For investigation scenes, include d6 or d8 tables:
+| d6 | Rumour | True/False |
+|---|--------|------------|
+(Fill all rows with specific, useful information)
+
+## STAT BLOCKS
+- Minor stats (HP, AC, attack) inline with encounters
+- Full stat blocks in a ### Stat Blocks subsection after the scene narrative
+- Boss stat blocks after the boss encounter, before DM Notes
+
+## CRITICAL RULES:
 - Do NOT rewrite, shorten, or remove ANY content. Keep ALL text, dialogue,
   stats, details, and tables. Just reorganise them.
-- Do NOT add new content beyond brief 1-sentence transition bridges between scenes.
-- Do NOT change voice, tone, or style.
-- Keep all markdown formatting (##, ###, **bold**, *italic*, tables, lists) intact.
+- Do NOT add new content beyond transition bridges and structural headers.
+- Structure investigation acts as PARALLEL OPTIONS, not linear scenes.
+- Every NPC interaction needs information tiers (what they share at different DCs).
+- Keep all markdown formatting (##, ###, **bold**, *italic*, tables) intact.
 - Output the COMPLETE restructured section. If you omit content, you have failed.
 - No preamble, no commentary. Output only the restructured section."""
 

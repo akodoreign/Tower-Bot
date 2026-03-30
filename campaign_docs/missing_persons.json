@@ -4,7 +4,7 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 EIRLYN VERIAN**\n*Filed by: Senior Archivist Pell*\n\n**Last seen:** The Archivist's Guild, Guild Spires, approximately 3 days ago\n**Description:** Young woman, 24, with auburn hair and piercing green eyes. Last seen wearing a leather jacket adorned with a broken Glass Sigil badge, black trousers, and a silver necklace with a pendulum charm.\n\n**Circumstances:** Eiryn was always punctual and dedicated to her duties as a junior archivist. Her absence from two consecutive shifts is highly unusual. Her last known contact was a brief message stating she would be late due to personal matters, but no further communication has been received.\n\n*Anyone with information contact the Archivist's Guild or the Guardian's Watch, Guild Spires.*",
     "posted_at": "2026-03-05T20:06:51.931378",
     "expires_at": "2026-03-26T20:06:31.774457",
-    "resolved": false,
+    "resolved": true,
     "found": false
   },
   {
@@ -12,7 +12,7 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 MALCOLM \"PATCH\" THORNTON**\n*Filed by: Pol Greaves*\n\n**Last seen:** The Nook & Knave, in The Warrens, approximately 3 days ago\n**Description:** 38-year-old, 6'2\", stitch-marked face, wearing a threadbare leather jacket, a Saints' emblem patch on the sleeve\n**Circumstances:** Regular volunteer at the Patchwork Saints shelter, last contact was a worried text about a missing child, no response since.",
     "posted_at": "2026-03-08T12:51:38.111757",
     "expires_at": "2026-03-24T12:51:25.588580",
-    "resolved": false,
+    "resolved": true,
     "found": false
   },
   {
@@ -44,6 +44,38 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 ELIASHA ZHARA**\n*Filed by: the Choir \u2014 officially, quietly*\n\n**Last seen:** The Scroll Keepers' Archive, Sanctum Quarter, approximately 5 days ago\n**Description:** Young novice of the Serpent Choir, 19 years old, with a striking scar on her left cheek, wearing the hooded robe of her order. Carrying a bound, leather-bound tome and a silver-handled dagger.\n**Circumstances:** Last seen signing a contract with the Shadow Merchants, her usual routine involved daily prayers and study at the archives. Last contact was a brief, cryptic message: \"Something is not as it seems.\"\n\n*Anyone with information contact the Serpent Choir's Sanctum Quarter offices.*",
     "posted_at": "2026-03-19T17:29:41.595092",
     "expires_at": "2026-04-04T17:29:38.705483",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1774156676",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 RYLITH LANTERNE**\n*Filed by: Iron Fang Consortium debt officer*\n\n**Last seen:** Stall 42, Markets Infinite, approximately 7 days ago\n**Description:** Middle-aged woman, 4'11\", grey eyes, short black hair with silver streaks, wearing a worn leather apron over a red and gold tunic, carrying a satchel of rare spices\n**Circumstances:** Rylith's stall has been empty for a week, unusual as she's always diligent with her business. Last contact was a brief note saying she'd be away for a few days.\n\n*Anyone with information contact the Iron Fang Consortium office in Markets Infinite.*",
+    "posted_at": "2026-03-22T00:17:56.217350",
+    "expires_at": "2026-04-20T00:17:53.470937",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1774377155",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 TALON SWIFTWHISPER**\n*Filed by: an anonymous third party*\n\n**Last seen:** The Smoky Hollow, Night Pits, approximately 5 days ago\n**Description:** 35-year-old, 5'10\", slender build with striking lavender hair. Last spotted wearing a worn leather coat and a silver pendant of a crescent moon.\n**Circumstances:** Talon Swiftwhisper was a regular client at the Obsidian Lotus. Last contact was after attending a memory-erasure session, which is uncharacteristic of his usual visits.",
+    "posted_at": "2026-03-24T13:32:35.483055",
+    "expires_at": "2026-04-19T13:32:33.102241",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1774608536",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 Elara Thorne**\n*Filed by: Lieutenant Varen*\n\n**Last seen:** Outer Wall Guardpost 7, approximately 3 days ago\n**Description:** Aged 34, slender build, long raven hair tucked under a leather helm with the insignia of the Warden's guild. Wearing a chainmail vest, a leather tunic adorned with Warden insignia, and a cloak emblazoned with the city's crest. Carrying a shield emblazoned with a silver wolf and a longsword at her side.\n\n**Circumstances:** Elara was last reported on her routine patrol check. Last known contact was a brief radio transmission, which ended abruptly. Her absence is unusual, as she is diligent in her duties.\n\n*Anyone with information contact Wardens' Headquarters, Outer Wall, immediately.*",
+    "posted_at": "2026-03-27T05:48:56.399453",
+    "expires_at": "2026-04-22T05:48:53.222748",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1774824279",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 Elara Silvershield**\n*Filed by: Lieutenant Varen*\n\n**Last seen:** Outer Wall's Broken Bridge Gate, approximately 3 days ago\n**Description:** Elara, 35, tall with a scar running diagonally across her left cheek. Last seen in her Warden patrol uniform with a silver badge. Carrying a standard patrol lantern.\n\n**Circumstances:** Elara was last heard on radio during a routine check at the Outer Wall's edge. Last contact was routine and no distress signal was received. If you have seen Elara or have any information, contact the Warden's Quarters, Undergate.",
+    "posted_at": "2026-03-29T17:44:39.198298",
+    "expires_at": "2026-04-17T17:44:36.623190",
     "resolved": false,
     "found": false
   }

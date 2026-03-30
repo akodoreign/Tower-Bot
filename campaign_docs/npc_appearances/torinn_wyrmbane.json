@@ -1,0 +1,28 @@
+{
+  "name": "Torinn Wyrmbane",
+  "species": "Dragonborn",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "A towering Dragonborn clad in tattered grey cult robes, his scales an ominous crimson, stands at the center of a dimly lit chamber. His eyes, glowing with an eerie intensity, gaze upon the faithful gathered before him. A makeshift metal-banded staff adorns his right hand, while a hidden dagger is cleverly concealed within the folds of his robes. A single, distinctive visual detail sets him apart from the rest - a red, dragon-shaped brooch, glowing faintly, pinned to his chest, symbolizing his unwavering devotion to the Cult and their ultimate goal.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

@@ -68,19 +68,31 @@ async def _get_results_channel(client, fallback_channel=None):
     """Resolve the results channel, falling back to board channel or provided fallback
     if the results channel is inaccessible."""
     results_id = _get_results_channel_id()
-    ch = client.get_channel(results_id) if client else None
+    ch = None
+
+    if client and results_id:
+        # Try cache first, then fetch from API if not cached
+        ch = client.get_channel(results_id)
+        if ch is None:
+            try:
+                ch = await client.fetch_channel(results_id)
+                logger.info(f"📋 Results channel {results_id} fetched from API (was not cached)")
+            except Exception as e:
+                logger.warning(f"📋 Could not fetch results channel {results_id}: {e}")
+                ch = None
+
     if ch is not None:
         # Quick permission check — try to verify we can send
         try:
             perms = ch.permissions_for(ch.guild.me) if hasattr(ch, 'guild') and ch.guild else None
             if perms and not perms.send_messages:
-                import logging
-                logging.getLogger(__name__).warning(
+                logger.warning(
                     f"📋 No send permission in results channel {results_id} — falling back to board channel"
                 )
                 ch = None
         except Exception:
             pass  # If we can't check perms, try sending anyway
+
     if ch is None:
         board_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", "0"))
         ch = client.get_channel(board_id) if client else None
@@ -337,10 +349,11 @@ should be a short, evocative description of a JOB TYPE, not a full mission.
 RULES:
 - Each entry must be 1-2 sentences describing the kind of contract
 - Must be grounded in the Undercity setting (factions, districts, economy)
-- Must NOT be a Rift mission (those are handled separately)
+- CRITICAL — NO RIFT MISSIONS: Do NOT generate any Rift-related mission types. No Rift clearance, no Rift investigation, no Rift containment, no "anomaly" that is secretly a Rift. Rifts are handled by a separate system and are RARE events. If any entry mentions Rifts, you have FAILED.
 - Must NOT repeat the common types (local jobs, patrol, escort, investigation, inter-guild, dungeon, high-stakes, epic)
 - Should feel specific and fresh — think about what's happening in the city RIGHT NOW
-- Vary tone: some gritty street-level, some political, some supernatural, some economic
+- Good mission ideas: faction espionage, debt collection, missing persons, relic retrieval, political blackmail, guild rivalry, smuggling jobs, protection contracts, bounty hunting, sabotage, courier work, arena challenges, divine contract fulfillment, merchant disputes
+- Vary tone: some gritty street-level, some political, some supernatural (but NOT Rifts), some economic
 - No numbering, no bullet points, no preamble. Output exactly 10 lines, one per entry.
 - If your output contains anything other than 10 plain-text lines, you have failed."""
 
@@ -527,7 +540,7 @@ async def _generate(prompt: str) -> Optional[str]:
 
     try:
         import httpx
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             resp = await client.post(ollama_url, json={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
@@ -995,7 +1008,9 @@ async def check_claims(channel, client=None) -> None:
         if not notice:
             notice = f"✅ **CONTRACT CLAIMED — {mission['title']}**\n*Taken by {party_name}. Contract is no longer available.*"
 
-        new_msg = await channel.send(notice)
+        # Post NPC claim notice to results channel (falls back to board if no access)
+        results_ch = await _get_results_channel(client, fallback_channel=channel) if client else channel
+        new_msg = await results_ch.send(notice)
 
         # Schedule NPC completion 1-3 days after claim
         complete_dt = datetime.utcnow() + timedelta(

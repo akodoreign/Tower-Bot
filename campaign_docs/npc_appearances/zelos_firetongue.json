@@ -1,0 +1,28 @@
+{
+  "name": "Zelos Firetongue",
+  "species": "Tiefling",
+  "faction": "Brother Thane's Cult",
+  "rank": "Devoted",
+  "role": "mercenary",
+  "home_district": "brother thane",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Tiefling of towering stature, skin shades of crimson and violet, horns curling menacingly above piercing red eyes that burn with quiet intensity. Clad in chain mail or scale mail, his armor weary from countless battles, a warhammer and crossbow at his side. A long tail, tipped in grey, coils around his waist, the end adorned with a twisted, bone-carved emblem – a symbol of his devotion to Brother Thane and his role within the Brother Thane's Cult.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

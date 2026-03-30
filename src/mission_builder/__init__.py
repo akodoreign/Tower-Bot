@@ -62,6 +62,12 @@ from .docx_builder import (
     validate_module_data,
     get_output_dir,
 )
+from .maps import (
+    extract_map_scenes,
+    generate_vtt_map,
+    generate_module_maps,
+    post_maps_to_channel,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -229,6 +235,47 @@ async def _ollama_generate(prompt: str, system: str = "", timeout: float = 300.0
         return ""
 
 
+def _post_process_module_text(text: str, forbidden_names: list = None) -> str:
+    """
+    Post-process generated module text to fix common issues:
+    1. Strip/convert READ ALOUD blocks to Scene Description
+    2. Remove placeholder text
+    3. Remove forbidden names (player Discord names used as NPCs)
+    """
+    if not text:
+        return text
+    
+    forbidden_names = forbidden_names or []
+    
+    # Convert READ ALOUD headers to Scene Description
+    # Handles: > ***READ ALOUD:***  **READ ALOUD:**  ***READ ALOUD***  etc.
+    read_aloud_pattern = r'[>\s]*\*{2,3}\s*[^\w]*READ\s*ALOUD:?\s*[^\w]*\*{2,3}'
+    text = re.sub(read_aloud_pattern, '**Scene Description:**', text, flags=re.IGNORECASE)
+    
+    # Remove standalone READ ALOUD markers on their own line
+    text = re.sub(r'^\s*[^\w]*READ\s*ALOUD:?\s*$', '', text, flags=re.IGNORECASE | re.MULTILINE)
+    
+    # Replace placeholder text
+    text = text.replace('Read-aloud for this location.', '[Describe the atmosphere and key features of this location]')
+    text = text.replace('Read-aloud for this location', '[Describe the atmosphere and key features of this location]')
+    
+    # Remove "No specific location or read-aloud provided" placeholders
+    text = re.sub(r'No specific (?:location|read-aloud)(?: or read-aloud)? provided\.?', '', text, flags=re.IGNORECASE)
+    
+    # Replace forbidden names with generic placeholders
+    for name in forbidden_names:
+        if name and len(name) > 2:
+            # Use word boundaries to avoid partial matches
+            pattern = r'\b' + re.escape(name) + r'\b'
+            text = re.sub(pattern, '[FACTION_LEADER]', text, flags=re.IGNORECASE)
+    
+    # Log warning if READ ALOUD still present
+    if 'READ ALOUD' in text.upper():
+        logger.warning("Post-processing: READ ALOUD still present after cleanup")
+    
+    return text
+
+
 # ---------------------------------------------------------------------------
 # System prompt — UPDATED: No Read Aloud, emphasize investigation leads
 # ---------------------------------------------------------------------------
@@ -238,20 +285,32 @@ You are an expert D&D 5e 2024 module designer creating content for the Tower of 
 The setting is the Undercity — a sealed underground city under a Dome, with factions, Rifts, and dark urban fantasy themes.
 All content must be D&D 5e 2024 (5.5e) compatible.
 
-CRITICAL QUALITY RULES — follow these exactly:
+CRITICAL FORBIDDEN PATTERNS — AUTOMATIC FAILURE IF YOU USE THESE:
 
-### NO READ ALOUD SECTIONS
-- Do NOT write "Read Aloud" boxes or boxed text for the DM to read
-- Instead, provide SCENE DESCRIPTIONS: brief atmospheric notes (2-3 sentences) the DM can paraphrase
-- Players engage through INVESTIGATION LEADS, not scripted narration
+- NEVER write "Read Aloud", "READ ALOUD", or any boxed text for the DM to read verbatim
+- NEVER use the player's name (the person who claimed the mission) as an NPC name
+- NEVER use the same NPC name in narrative text with a different name in the stat block
+- NEVER write placeholder text like "Read-aloud for this location."
+- NEVER put DM guidance, mechanics, or tactical notes inside "READ ALOUD" blocks
 
-### INVESTIGATION LEADS (the core structure)
+If you write "READ ALOUD" anywhere in your output, you have FAILED the task.
+
+WHAT TO WRITE INSTEAD:
+
+Use these section types:
+
+**Scene Description** (2-3 sentences): Atmospheric notes the DM paraphrases. NOT read verbatim.
+**NPC Appearance**: Physical description the DM uses to describe the NPC.
+**DM Note**: Mechanical info, DCs, hidden info, tactical guidance — DM-only content.
+**Dialogue**: Actual NPC speech in quotes that the DM can voice.
+
+INVESTIGATION LEADS (the core structure):
 - Each lead gives players a SPECIFIC PLACE to go AND a REASON to go there
-- Include: Location → Contact NPC → What they know → WHY go there → Approach options
+- Include: Location -> Contact NPC -> What they know -> WHY go there -> Approach options
 - Always provide multiple valid approaches (social, stealth, direct, investigation)
 - Skill checks with DCs for each approach
 
-### OTHER RULES
+OTHER RULES:
 - Every NPC name MUST be identical between narrative text and stat block
 - Maximum 5-7 scenes for a 2-hour session
 - Every creature the party fights MUST have a complete stat block inline
@@ -565,37 +624,47 @@ async def generate_module(mission: dict, player_name: str = "") -> Optional[Path
     tier = mission.get("tier", "standard")
     faction = mission.get("faction", "Unknown")
     
-    logger.info(f"🔧 Generating module for: {title}")
+    logger.info(f"Generating module for: {title}")
     
     # Gather context
     ctx = gather_context(mission)
-    logger.info(f"📍 Primary location: {ctx['primary_location']}")
-    logger.info(f"📊 CR: {ctx['cr']} | Tier: {ctx['tier']}")
+    logger.info(f"Primary location: {ctx['primary_location']}")
+    logger.info(f"CR: {ctx['cr']} | Tier: {ctx['tier']}")
+    
+    # Build list of forbidden names (player Discord names that should NOT be used as NPCs)
+    # The player_name is passed in — we don't want it appearing as an NPC
+    forbidden_names = []
+    if player_name:
+        forbidden_names.append(player_name)
     
     # Generate sections
-    logger.info("📝 Generating overview...")
+    logger.info("Generating overview...")
     overview = await _gen_overview(ctx)
     if not overview:
-        logger.error("❌ Failed to generate overview")
+        logger.error("Failed to generate overview")
         return None
+    overview = _post_process_module_text(overview, forbidden_names)
     
-    logger.info("📝 Generating Acts 1-2 (briefing + investigation)...")
+    logger.info("Generating Acts 1-2 (briefing + investigation)...")
     acts_1_2 = await _gen_acts_1_2(ctx, overview)
     if not acts_1_2:
-        logger.error("❌ Failed to generate Acts 1-2")
+        logger.error("Failed to generate Acts 1-2")
         return None
+    acts_1_2 = _post_process_module_text(acts_1_2, forbidden_names)
     
-    logger.info("📝 Generating Acts 3-4 (complication + confrontation)...")
+    logger.info("Generating Acts 3-4 (complication + confrontation)...")
     acts_3_4 = await _gen_acts_3_4(ctx, overview)
     if not acts_3_4:
-        logger.error("❌ Failed to generate Acts 3-4")
+        logger.error("Failed to generate Acts 3-4")
         return None
+    acts_3_4 = _post_process_module_text(acts_3_4, forbidden_names)
     
-    logger.info("📝 Generating Act 5 + Rewards...")
+    logger.info("Generating Act 5 + Rewards...")
     act_5_rewards = await _gen_act_5_rewards(ctx, overview)
     if not act_5_rewards:
-        logger.error("❌ Failed to generate Act 5")
+        logger.error("Failed to generate Act 5")
         return None
+    act_5_rewards = _post_process_module_text(act_5_rewards, forbidden_names)
     
     # Format for DOCX
     module_data = format_module_for_docx(
@@ -622,10 +691,10 @@ async def generate_module(mission: dict, player_name: str = "") -> Optional[Path
     
     # Validate
     if not validate_module_data(module_data):
-        logger.warning("⚠️ Module validation failed, attempting build anyway")
+        logger.warning("Module validation failed, attempting build anyway")
     
     # Build DOCX
-    logger.info("📄 Building DOCX file...")
+    logger.info("Building DOCX file...")
     
     safe_title = re.sub(r'[^\w\s-]', '', title).strip().replace(' ', '_')[:50]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -633,9 +702,24 @@ async def generate_module(mission: dict, player_name: str = "") -> Optional[Path
     output_path = await build_docx(module_data, filename=f"{safe_title}_{timestamp}")
     
     if output_path:
-        logger.info(f"✅ Module generated: {output_path}")
+        logger.info(f"Module generated: {output_path}")
+        
+        # Generate VTT maps for combat scenes
+        # Maps use image_ref.py for iterative improvement
+        try:
+            map_paths = await generate_module_maps(
+                module_data,
+                output_subdir=output_path.stem,  # Use module filename as subdir
+                max_maps=4,  # Limit to 4 maps per module
+            )
+            if map_paths:
+                logger.info(f"Generated {len(map_paths)} VTT maps")
+                # Store map paths in module_data for later posting
+                module_data["map_paths"] = [str(p) for p in map_paths]
+        except Exception as e:
+            logger.warning(f"Map generation failed (non-fatal): {e}")
     else:
-        logger.error("❌ DOCX generation failed")
+        logger.error("DOCX generation failed")
     
     return output_path
 
@@ -646,12 +730,12 @@ async def post_module_to_channel(client, docx_path: Path, mission: dict, player_
 
     channel_id = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "0"))
     if not channel_id:
-        logger.warning("📖 MODULE_OUTPUT_CHANNEL_ID not set — cannot post module")
+        logger.warning("MODULE_OUTPUT_CHANNEL_ID not set — cannot post module")
         return False
 
     channel = client.get_channel(channel_id)
     if not channel:
-        logger.warning(f"📖 Module output channel {channel_id} not found")
+        logger.warning(f"Module output channel {channel_id} not found")
         return False
 
     title = mission.get("title", "Unknown Mission")
@@ -663,7 +747,7 @@ async def post_module_to_channel(client, docx_path: Path, mission: dict, player_
     level_note = f" (party max level {max_level})" if max_level > 0 else ""
 
     embed = discord.Embed(
-        title=f"📖 Mission Module: {title}",
+        title=f"Mission Module: {title}",
         description=(
             f"**Claimed by:** {player_name}\n"
             f"**Faction:** {faction}\n"
@@ -678,10 +762,25 @@ async def post_module_to_channel(client, docx_path: Path, mission: dict, player_
     try:
         file = discord.File(str(docx_path), filename=f"{title[:60]}.docx")
         await channel.send(embed=embed, file=file)
-        logger.info(f"📖 Module posted to channel {channel_id}: {title}")
+        logger.info(f"Module posted to channel {channel_id}: {title}")
+        
+        # Post maps if available
+        maps_dir = docx_path.parent / docx_path.stem / "maps"
+        if maps_dir.exists():
+            map_files = list(maps_dir.glob("*.png"))
+            if map_files:
+                map_embed = discord.Embed(
+                    title=f"\U0001F5FA\uFE0F VTT Maps: {title}",
+                    description=f"{len(map_files)} tactical battlemaps (1024x1024px)",
+                    color=discord.Color.dark_teal(),
+                )
+                files = [discord.File(str(p), filename=p.name) for p in map_files[:10]]
+                await channel.send(embed=map_embed, files=files)
+                logger.info(f"Posted {len(files)} maps for: {title}")
+        
         return True
     except Exception as e:
-        logger.error(f"📖 Failed to post module: {e}")
+        logger.error(f"Failed to post module: {e}")
         return False
 
 
@@ -693,4 +792,9 @@ __all__ = [
     "get_cr",
     "get_max_pc_level",
     "get_output_dir",
+    # Map generation
+    "extract_map_scenes",
+    "generate_vtt_map",
+    "generate_module_maps",
+    "post_maps_to_channel",
 ]

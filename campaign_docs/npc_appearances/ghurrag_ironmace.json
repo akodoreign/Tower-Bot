@@ -1,0 +1,28 @@
+{
+  "name": "Ghurrag Ironmace",
+  "species": "Orc",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "home_district": "brother thane",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "Massive orc, towering over others, deep green skin speckled with battle scars, prominent tusks glinting under dim light. Yellow eyes hold a cold intensity, reflecting the flickering candlelight within a gloomy cult chamber. Ghurrag, Speaker of Brother Thane's Cult, stands robed in tattered grey wrappings, his makeshift metal-banded staff in one hand, a hidden dagger at his waist. One distinctive visual detail: intricate tattoos of his deity, glowing eerily in the dim light, cover Ghurrag's broad back, marking him as a revered leader within the Undercity's twisted realm.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

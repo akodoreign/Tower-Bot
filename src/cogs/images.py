@@ -7,6 +7,7 @@ import discord
 from discord import app_commands
 
 from src.log import logger
+from src.npc_lookup import get_npc_sd_prompt, extract_and_lookup_npcs
 
 
 def setup(client):
@@ -49,8 +50,21 @@ def setup(client):
         model     = os.getenv("A1111_MODEL", "")
         width, height = (896, 512) if orientation == "wide" else (512, 896)
 
+        # Check for quoted NPC names and inject their appearance
+        npc_appearance = get_npc_sd_prompt(prompt)
+        npc_matches = extract_and_lookup_npcs(prompt)
+        if npc_matches:
+            npc_names = [m['name'] for m in npc_matches]
+            logger.info(f"🎨 /draw detected NPCs: {npc_names}")
+        
+        # Build full prompt with NPC appearance injected
+        base_prompt = prompt.rstrip(",. ")
+        if npc_appearance:
+            base_prompt = f"{base_prompt}, {npc_appearance}"
+            logger.info(f"🎨 /draw injected NPC appearance: {npc_appearance[:80]}...")
+        
         full_prompt = (
-            prompt.rstrip(",. ")
+            base_prompt
             + ", photorealistic, cinematic lighting, highly detailed, 8k, sharp focus, atmospheric"
         )
         negative = (

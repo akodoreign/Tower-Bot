@@ -472,5 +472,408 @@
     "status": "sold",
     "final_price": 12607942,
     "sold_at": "2026-03-18T15:22:50.907078"
+  },
+  {
+    "id": "pl_1774130678",
+    "player_id": 337743072232210432,
+    "player_name": "The DM",
+    "item_name": "Statue of Eleanor Reed",
+    "description": "Statue of Eleanor Reed",
+    "min_bid": 550,
+    "current_bid": 342161,
+    "bid_count": 64,
+    "bid_log": [
+      {
+        "bidder": "Outer_Wall_Supply",
+        "amount": 587,
+        "at": "2026-03-21T19:32:18.536320",
+        "hot": false
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 622,
+        "at": "2026-03-21T20:31:36.100837",
+        "hot": false
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 665,
+        "at": "2026-03-22T01:12:43.741002",
+        "hot": false
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 714,
+        "at": "2026-03-22T08:32:15.379534",
+        "hot": false
+      },
+      {
+        "bidder": "The Widow (proxy bid)",
+        "amount": 778,
+        "at": "2026-03-22T11:37:44.131069",
+        "hot": false
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 809,
+        "at": "2026-03-22T16:52:21.965313",
+        "hot": false
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 859,
+        "at": "2026-03-23T13:14:23.817507",
+        "hot": false
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 890,
+        "at": "2026-03-24T04:21:08.207182",
+        "hot": false
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 964,
+        "at": "2026-03-24T11:32:56.562668",
+        "hot": false
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 1042,
+        "at": "2026-03-24T13:32:33.064811",
+        "hot": false
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 1123,
+        "at": "2026-03-24T16:33:56.854860",
+        "hot": false
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 1217,
+        "at": "2026-03-24T18:41:52.167383",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 1312,
+        "at": "2026-03-25T03:57:10.565166",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 1482,
+        "at": "2026-03-25T07:04:43.121196",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 1658,
+        "at": "2026-03-25T07:04:43.121196",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Serpent-adjacent)",
+        "amount": 1850,
+        "at": "2026-03-25T09:03:35.073663",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Serpent-adjacent)",
+        "amount": 2103,
+        "at": "2026-03-25T10:55:22.544439",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 2443,
+        "at": "2026-03-25T10:55:22.544439",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 2882,
+        "at": "2026-03-25T13:05:16.257245",
+        "hot": true
+      },
+      {
+        "bidder": "FTA_Compliance_Surplus",
+        "amount": 3161,
+        "at": "2026-03-25T14:48:34.826847",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 3432,
+        "at": "2026-03-25T14:48:34.826847",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 3850,
+        "at": "2026-03-25T15:41:53.107239",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 4359,
+        "at": "2026-03-25T18:29:33.872647",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 5097,
+        "at": "2026-03-25T20:23:15.742864",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 5639,
+        "at": "2026-03-25T21:33:11.909365",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 6003,
+        "at": "2026-03-25T21:33:11.909365",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 6828,
+        "at": "2026-03-25T21:33:11.909365",
+        "hot": true
+      },
+      {
+        "bidder": "Verified Buyer #7714",
+        "amount": 7312,
+        "at": "2026-03-25T22:36:42.075931",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 8241,
+        "at": "2026-03-25T22:36:42.075931",
+        "hot": true
+      },
+      {
+        "bidder": "Outer_Wall_Supply",
+        "amount": 8732,
+        "at": "2026-03-25T22:36:42.075931",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 10264,
+        "at": "2026-03-25T23:40:27.894123",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 12075,
+        "at": "2026-03-25T23:40:27.894123",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 13195,
+        "at": "2026-03-26T00:44:06.531037",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 14560,
+        "at": "2026-03-26T01:49:15.959451",
+        "hot": true
+      },
+      {
+        "bidder": "Sanctum_Quarter_Rep",
+        "amount": 15680,
+        "at": "2026-03-26T01:49:15.959451",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 17728,
+        "at": "2026-03-26T03:51:30.116359",
+        "hot": true
+      },
+      {
+        "bidder": "The Widow (proxy bid)",
+        "amount": 19048,
+        "at": "2026-03-26T03:51:30.116359",
+        "hot": true
+      },
+      {
+        "bidder": "Wandering_Broker_X",
+        "amount": 20319,
+        "at": "2026-03-26T03:51:30.116359",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 22077,
+        "at": "2026-03-26T05:00:45.020713",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 25257,
+        "at": "2026-03-26T07:47:24.284611",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 27753,
+        "at": "2026-03-26T07:47:24.284611",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 31607,
+        "at": "2026-03-26T12:28:57.502494",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 34225,
+        "at": "2026-03-26T13:23:37.517520",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 39097,
+        "at": "2026-03-26T13:23:37.517520",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 41409,
+        "at": "2026-03-26T13:23:37.517520",
+        "hot": true
+      },
+      {
+        "bidder": "Patchwork_Saints_Proxy",
+        "amount": 44277,
+        "at": "2026-03-26T15:20:53.688155",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 51992,
+        "at": "2026-03-26T20:16:04.101007",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 57524,
+        "at": "2026-03-26T20:16:04.101007",
+        "hot": true
+      },
+      {
+        "bidder": "Echo_Alley_Curios",
+        "amount": 61237,
+        "at": "2026-03-26T21:08:59.537011",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 71812,
+        "at": "2026-03-26T21:08:59.537011",
+        "hot": true
+      },
+      {
+        "bidder": "NightPits_Acquisitions",
+        "amount": 75906,
+        "at": "2026-03-26T23:53:44.872916",
+        "hot": true
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 88142,
+        "at": "2026-03-26T23:53:44.872916",
+        "hot": true
+      },
+      {
+        "bidder": "Dova (personal account)",
+        "amount": 95628,
+        "at": "2026-03-27T04:53:16.149064",
+        "hot": true
+      },
+      {
+        "bidder": "Undercity_Procurement_Office",
+        "amount": 100776,
+        "at": "2026-03-27T10:16:22.368655",
+        "hot": true
+      },
+      {
+        "bidder": "Grand_Forum_Fence",
+        "amount": 113825,
+        "at": "2026-03-27T15:00:33.195568",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 123034,
+        "at": "2026-03-27T23:42:09.469499",
+        "hot": true
+      },
+      {
+        "bidder": "Ashen_Scrolls_Acquisition",
+        "amount": 133751,
+        "at": "2026-03-27T23:42:09.469499",
+        "hot": true
+      },
+      {
+        "bidder": "Outer_Wall_Supply",
+        "amount": 150273,
+        "at": "2026-03-28T00:34:59.236319",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous (Iron Fang-adjacent)",
+        "amount": 168191,
+        "at": "2026-03-28T02:48:18.601215",
+        "hot": true
+      },
+      {
+        "bidder": "Corvin_shadow_acct",
+        "amount": 193532,
+        "at": "2026-03-28T02:48:18.601215",
+        "hot": true
+      },
+      {
+        "bidder": "Tessaly_Alt_Acct",
+        "amount": 214909,
+        "at": "2026-03-28T11:23:59.198895",
+        "hot": true
+      },
+      {
+        "bidder": "Bidder: Crimson Alley",
+        "amount": 252051,
+        "at": "2026-03-28T12:18:47.561513",
+        "hot": true
+      },
+      {
+        "bidder": "Guild_Spires_Equipment",
+        "amount": 275704,
+        "at": "2026-03-28T12:18:47.561513",
+        "hot": true
+      },
+      {
+        "bidder": "Anonymous \u2014 high rep",
+        "amount": 316044,
+        "at": "2026-03-28T16:45:24.790619",
+        "hot": true
+      }
+    ],
+    "last_bidder": "NightPits_Acquisitions",
+    "listed_at": "2026-03-21T17:04:38.620838",
+    "expires_at": "2026-03-28T17:04:38.620838",
+    "status": "sold",
+    "frozen": false,
+    "final_price": 342161,
+    "sold_at": "2026-03-28T17:45:56.010309"
   }
 ]

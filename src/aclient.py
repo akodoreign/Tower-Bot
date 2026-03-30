@@ -11,6 +11,10 @@ from utils.message_utils import send_split_message
 from dotenv import load_dotenv
 
 from src.tower_rag import build_context_from_messages  # Tower RAG / campaign_docs
+from src.skill_loader import match_skills, format_skills_for_prompt  # Skill system
+from src.npc_lookup import get_npc_context_for_prompt  # Quoted NPC name lookup
+from src.self_learning import self_learning_loop  # Nightly self-learning
+from src.npc_consequence import process_bulletin  # Post-bulletin NPC death/injury scanner
 from src.news_feed import (
     generate_bulletin, next_interval_seconds,
     generate_story_image, next_image_interval_seconds,
@@ -120,6 +124,8 @@ class DiscordClient(discord.Client):
         asyncio.get_event_loop().create_task(self.npc_lifecycle_loop())
         # Start the character sheet monitor loop
         asyncio.get_event_loop().create_task(self.character_monitor_loop())
+        # Start the nightly self-learning loop
+        asyncio.get_event_loop().create_task(self._self_learning_loop())
 
         while True:
             if self.current_channel is not None:
@@ -162,6 +168,13 @@ class DiscordClient(discord.Client):
                     if bulletin:
                         await channel.send(embed=wrap_bulletin(bulletin, "news"))
                         logger.info(f"📰 Startup bulletin {i+1}/3 posted to #{channel.name}")
+                        # Scan for NPC death/injury consequences
+                        try:
+                            changes = process_bulletin(bulletin)
+                            for c in changes:
+                                logger.info(f"📰 NPC consequence: {c}")
+                        except Exception as ce:
+                            logger.warning(f"📰 NPC consequence scan error: {ce}")
             except Exception as e:
                 logger.exception(f"📰 Startup bulletin error: {e}")
 
@@ -181,6 +194,13 @@ class DiscordClient(discord.Client):
                 if bulletin:
                     await channel.send(embed=wrap_bulletin(bulletin, "news"))
                     logger.info(f"📰 Bulletin posted to #{channel.name}")
+                    # Scan for NPC death/injury consequences
+                    try:
+                        changes = process_bulletin(bulletin)
+                        for c in changes:
+                            logger.info(f"📰 NPC consequence: {c}")
+                    except Exception as ce:
+                        logger.warning(f"📰 NPC consequence scan error: {ce}")
                     # TIA news reaction — scan bulletin for market-moving keywords
                     tia_flash = react_to_bulletin(bulletin)
                     if tia_flash:
@@ -194,6 +214,13 @@ class DiscordClient(discord.Client):
                 if rift_bulletin:
                     await channel.send(embed=wrap_bulletin(rift_bulletin, "rift"))
                     logger.info(f"🌀 Rift bulletin posted to #{channel.name}")
+                    # Scan rift bulletins too — disasters can kill NPCs
+                    try:
+                        changes = process_bulletin(rift_bulletin)
+                        for c in changes:
+                            logger.info(f"🌀 Rift NPC consequence: {c}")
+                    except Exception as ce:
+                        logger.warning(f"🌀 Rift NPC consequence scan error: {ce}")
                     tia_flash = react_to_bulletin(rift_bulletin)
                     if tia_flash:
                         await channel.send(embed=wrap_bulletin(tia_flash, "tia_flash"))
@@ -580,7 +607,8 @@ class DiscordClient(discord.Client):
                 await asyncio.sleep(5 * 60)
 
     async def npc_lifecycle_loop(self):
-        """Run daily NPC lifecycle — new NPC introduced, existing NPCs evolve."""
+        """Run daily NPC lifecycle — new NPC introduced, existing NPCs evolve.
+        Also checks the resurrection queue for major NPCs killed in bulletins."""
         discord_channel_id = os.getenv("DISCORD_CHANNEL_ID")
         if not discord_channel_id:
             return
@@ -598,6 +626,39 @@ class DiscordClient(discord.Client):
                     await run_daily_lifecycle(channel)
             except Exception as e:
                 logger.exception(f"🧬 NPC lifecycle error: {e}")
+
+            # Check resurrection queue — major NPCs killed in bulletins come back after 2-7 days
+            try:
+                from src.npc_consequence import check_resurrection_queue, resurrect_npc
+                due = check_resurrection_queue()
+                for entry in due:
+                    npc = resurrect_npc(entry)
+                    if npc:
+                        name = npc.get('name', 'Unknown')
+                        faction = npc.get('faction', 'Unknown')
+                        logger.info(f"✨ RESURRECTED: {name} ({faction}) returned to active roster")
+                        # Post resurrection bulletin to news channel
+                        try:
+                            channel = self.get_channel(int(discord_channel_id))
+                            if channel:
+                                res_bulletin = (
+                                    f"✨ **BREAKING: {name} Lives.**\n"
+                                    f"Reports of {name}'s death appear to have been "
+                                    f"greatly exaggerated — or perhaps not exaggerated enough. "
+                                    f"The {faction} {'operative' if faction != 'Independent' else 'figure'} "
+                                    f"was seen alive in the Undercity today, though details "
+                                    f"of their return remain unclear. Divine intervention? "
+                                    f"Arcane contingency? The city has questions."
+                                )
+                                from src.bulletin_embeds import wrap_bulletin
+                                await channel.send(embed=wrap_bulletin(res_bulletin, "news"))
+                                # Also save to memory so future bulletins know
+                                from src.news_feed import _write_memory
+                                _write_memory(f"{name} ({faction}) has been resurrected and returned to the Undercity. Previously reported dead.")
+                        except Exception as post_err:
+                            logger.warning(f"✨ Could not post resurrection bulletin for {name}: {post_err}")
+            except Exception as res_err:
+                logger.warning(f"🧬 Resurrection queue check error: {res_err}")
 
             interval = next_lifecycle_seconds()
             logger.info(f"🧬 Next NPC lifecycle in {interval // 3600}h {(interval % 3600) // 60}m")
@@ -667,6 +728,12 @@ class DiscordClient(discord.Client):
 
                 except Exception as e:
                     logger.warning(f"🧹 Log cleanup error on {log_path.name}: {e}")
+
+    async def _self_learning_loop(self):
+        """Wrapper to start the self-learning background loop."""
+        await self.wait_until_ready()
+        logger.info("🧠 Self-learning loop registered")
+        await self_learning_loop()
 
     async def enqueue_message(self, message, prompt: str):
         """
@@ -785,6 +852,26 @@ class DiscordClient(discord.Client):
         except Exception as e:
             logger.exception(f"tower_rag.build_context_from_messages failed: {e}")
             system_context = ""
+
+        # Inject matched skills into context
+        try:
+            matched = match_skills(user_message, self.conversation_history, top_n=3)
+            if matched:
+                skill_block = format_skills_for_prompt(matched)
+                if skill_block:
+                    system_context = system_context + "\n\n" + skill_block if system_context else skill_block
+                    logger.info(f"🧠 Injected {len(matched)} skills: {[s.title for s in matched]}")
+        except Exception as e:
+            logger.warning(f"skill_loader: skill injection failed: {e}")
+
+        # Inject NPC context for quoted names (e.g., "Serrik Dhal")
+        try:
+            npc_context = get_npc_context_for_prompt(user_message)
+            if npc_context:
+                system_context = system_context + "\n" + npc_context if system_context else npc_context
+                logger.info(f"👤 Injected NPC context for quoted names")
+        except Exception as e:
+            logger.warning(f"npc_lookup: NPC context injection failed: {e}")
 
         # Build message list for the model:
         # - single system message for this turn (Tower context, lore/rules/intent)

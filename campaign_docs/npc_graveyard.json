@@ -1,5 +1,32 @@
 [
   {
+    "name": "Grozak Bonecrusher",
+    "faction": "Wardens of Ash",
+    "rank": "Lieutenant",
+    "species": "Orc",
+    "age": "50s",
+    "appearance": "A scarred orc with a bald head and a prominent scar running down his left cheek. He carries himself with a stern, no-nonsense demeanor.",
+    "location": "Temple Quarter, Ash Mansion",
+    "motivation": "Driven by a fierce loyalty to the Wardens of Ash and a thirst for revenge against those who betrayed his former squad.",
+    "role": "Leads a squad of Ash Wardens in enforcing the law and maintaining order within the Undercity.",
+    "secret": "Grozak secretly hunts for the traitor who led to the death of his squad, using his position to gather information and track down the perpetrator.",
+    "relationships": "Has a tense alliance with the Iron Fang Consortium due to past conflicts, but has recently established a covert understanding to work together against common threats.",
+    "oracle_notes": "The Oracle senses a burning anger simmering beneath Grozak's gruff exterior, a fury that could lead him to make dangerous choices.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-08] Introduced to the Undercity roster.",
+      "[2026-03-11] Promoted from Sergeant to Lieutenant within Wardens of Ash.",
+      "[2026-03-19] Injured.",
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-03-26] Killed during mission: The Crown's Balance"
+    ],
+    "created_at": "2026-03-08T09:54:01.240136",
+    "last_event_at": "2026-03-19T14:36:02.926233",
+    "moved_to_graveyard_at": "2026-03-26T06:41:31.542747",
+    "cause_of_death": "Killed by adventurers during 'The Crown's Balance'"
+  },
+  {
     "name": "Rook",
     "faction": "Argent Blades (contract — not a member)",
     "rank": "Unranked (refuses ranking system)",
@@ -23,27 +50,51 @@
     "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
   },
   {
-    "name": "Alaric Stonemason",
-    "faction": "Argent Blades",
-    "rank": "Blade",
-    "species": "Human",
+    "name": "Zephyrus Ironheart-Thrain",
+    "faction": "Tower Authority",
+    "rank": "Compliance Intern",
+    "species": "Dragonborn",
     "age": "40s",
-    "appearance": "A lean, battle-hardened man with a scar running down his left cheek, and a signature Argent Blades blade sheathed at his side.",
-    "location": "Cobblestone Alley, East Spire",
-    "motivation": "Seeking redemption for past sins committed in the name of the Argent Blades, he now works undercover to expose corruption within the ranks.",
-    "role": "Actively patrols the Undercity, ensuring the safety of citizens and investigating suspicious activities.",
-    "secret": "His past identity as a feared enforcer for the Argent Blades is unknown to his fellow Blades.",
-    "relationships": "Maintains a strained but necessary alliance with the Iron Fang Consortium, who are unaware of his double-agency.",
-    "oracle_notes": "The Oracle senses a deep conflict within Alaric, a man who fights for justice while carrying the weight of his own transgressions.",
+    "appearance": "A towering figure with scales the color of obsidian, Zephyrus Ironheart-Thrain carries a stern demeanor, often seen with a clipboard and a stern expression.",
+    "location": "The Shattered Spire, Citadel District",
+    "motivation": "Driven by a desire for order and justice, Zephyrus seeks to eradicate any signs of chaos in the Undercity.",
+    "role": "Enforces regulations and disciplines citizens under the watchful eye of the Tower Authority.",
+    "secret": "In his past life, Zephyrus was a notorious bandit known as 'The Iron Gale'. His true identity remains unknown to most, even within the Tower Authority.",
+    "relationships": "Maintains a tense but professional relationship with the Argent Blades due to his former criminal connections.",
+    "oracle_notes": "The Oracle senses an underlying unrest and a battle between two powerful personas within Zephyrus Ironheart-Thrain.",
     "status": "dead",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-06] Introduced to the Undercity roster.",
-      "[2026-03-11] Injured.",
-      "[2026-03-11] Succumbed to injuries. Faction: Argent Blades, Rank: Blade."
+      "[2026-03-11] Introduced to the Undercity roster.",
+      "[2026-03-19] Killed. Faction: Tower Authority, Rank: Compliance Intern.",
+      "[2026-03-27] Doppelganger sighting — someone impersonating Zephyrus Ironheart-Thrain spotted in the Undercity."
     ],
-    "created_at": "2026-03-06T10:04:56.466312",
-    "last_event_at": "2026-03-11T13:10:25.810232",
+    "created_at": "2026-03-11T15:45:22.083492",
+    "last_event_at": "2026-03-19T13:58:42.936508",
+    "moved_to_graveyard_at": "2026-03-19T13:58:42.944017"
+  },
+  {
+    "name": "Grover Ironfoot",
+    "faction": "Iron Fang Consortium",
+    "rank": "Acquisition Agent",
+    "species": "Halfling",
+    "age": "40s",
+    "appearance": "Grover stands at an imposing height for a halfling, his sturdy frame adorned with a leather jacket and a patchwork of Iron Fang emblems. A scar runs down his left cheek, a battle scar earned during a particularly dangerous acquisition.",
+    "location": "The Bazaar's Shard — Iron Fang Consortium headquarters",
+    "motivation": "Grover seeks to rise through the ranks of the Iron Fang Consortium to secure a more prosperous future for his family, driven by the memory of his deceased wife who was killed in a rift accident.",
+    "role": "Grover scours the Undercity for valuable artifacts and rare resources, always looking for the next big score.",
+    "secret": "Unbeknownst to the Iron Fang Consortium, Grover is secretly working with the Wardens of Ash to gather intelligence on the Consortium's operations, hoping to betray them and take control of the city's black market.",
+    "relationships": "Grover maintains a tense alliance with Zippy Quickclaw, the leader of the Patchwork Saints, who owes Grover a significant debt.",
+    "oracle_notes": "The Oracle senses a hidden ambition and a heart heavy with loss within Grover Ironfoot, a man poised on the precipice of power.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-12] Introduced to the Undercity roster.",
+      "[2026-03-16] Killed. Faction: Iron Fang Consortium, Rank: Acquisition Agent.",
+      "[2026-03-26] Doppelganger sighting — someone impersonating Grover Ironfoot spotted in the Undercity."
+    ],
+    "created_at": "2026-03-12T10:23:50.568752",
+    "last_event_at": "2026-03-16T07:41:46.841082",
     "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
   },
   {
@@ -65,11 +116,61 @@
       "[2026-03-06] Introduced to the Undercity roster.",
       "[2026-03-10] Promoted from Junior Archivist to Archivist within Glass Sigil.",
       "[2026-03-12] Injured.",
-      "[2026-03-12] Succumbed to injuries. Faction: Glass Sigil, Rank: Archivist."
+      "[2026-03-12] Succumbed to injuries. Faction: Glass Sigil, Rank: Archivist.",
+      "[2026-03-24] Doppelganger sighting — someone impersonating Jorick Sparrowthief spotted in the Undercity."
     ],
     "created_at": "2026-03-06T12:02:14.330235",
     "last_event_at": "2026-03-12T08:01:57.822262",
     "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
+  },
+  {
+    "name": "Alaric Stonemason",
+    "faction": "Argent Blades",
+    "rank": "Blade",
+    "species": "Human",
+    "age": "40s",
+    "appearance": "A lean, battle-hardened man with a scar running down his left cheek, and a signature Argent Blades blade sheathed at his side.",
+    "location": "Cobblestone Alley, East Spire",
+    "motivation": "Seeking redemption for past sins committed in the name of the Argent Blades, he now works undercover to expose corruption within the ranks.",
+    "role": "Actively patrols the Undercity, ensuring the safety of citizens and investigating suspicious activities.",
+    "secret": "His past identity as a feared enforcer for the Argent Blades is unknown to his fellow Blades.",
+    "relationships": "Maintains a strained but necessary alliance with the Iron Fang Consortium, who are unaware of his double-agency.",
+    "oracle_notes": "The Oracle senses a deep conflict within Alaric, a man who fights for justice while carrying the weight of his own transgressions.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-06] Introduced to the Undercity roster.",
+      "[2026-03-11] Injured.",
+      "[2026-03-11] Succumbed to injuries. Faction: Argent Blades, Rank: Blade.",
+      "[2026-03-28] Doppelganger sighting — someone impersonating Alaric Stonemason spotted in the Undercity."
+    ],
+    "created_at": "2026-03-06T10:04:56.466312",
+    "last_event_at": "2026-03-11T13:10:25.810232",
+    "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
+  },
+  {
+    "name": "Klara Lodestone",
+    "faction": "Tower Authority",
+    "rank": "Field Compliance Officer",
+    "species": "Gnome",
+    "age": "50s",
+    "appearance": "Small but sturdy, Klara Lodestone sports a cropped gray haircut and wears a well-worn leather coat. She carries a stern expression, but her eyes soften when she sees the younger Undercity residents.",
+    "location": "Grand Forum, FTA satellite office — compliance checks, secretly Thane's Cult",
+    "motivation": "Klara seeks to maintain order in the Undercity, believing it's the only way for the city to stand a chance against the rifts. Her personal connection to the city drives her determination.",
+    "role": "Oversees compliance checks and enforcement actions in the Undercity.",
+    "secret": "Klara is secretly a member of Brother Thane's Cult, using her position within the Tower Authority to gather information for the cult.",
+    "relationships": "Maintains a professional relationship with the Wardens of Ash, working together to keep the Undercity safe, but keeps her secret affiliation hidden.",
+    "oracle_notes": "The Oracle senses a hidden loyalty beneath Klara's stern exterior, her connection to the cult a thorny secret.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-11] Introduced to the Undercity roster.",
+      "[2026-03-27] Injured.",
+      "[2026-03-27] Succumbed to injuries. Faction: Tower Authority, Rank: Field Compliance Officer."
+    ],
+    "created_at": "2026-03-11T13:05:59.040757",
+    "last_event_at": "2026-03-27T14:06:42.433475",
+    "moved_to_graveyard_at": "2026-03-27T14:06:42.433475"
   },
   {
     "name": "Thrain Ironwound",
@@ -96,49 +197,29 @@
     "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
   },
   {
-    "name": "Grover Ironfoot",
-    "faction": "Iron Fang Consortium",
-    "rank": "Acquisition Agent",
-    "species": "Halfling",
-    "age": "40s",
-    "appearance": "Grover stands at an imposing height for a halfling, his sturdy frame adorned with a leather jacket and a patchwork of Iron Fang emblems. A scar runs down his left cheek, a battle scar earned during a particularly dangerous acquisition.",
-    "location": "The Bazaar's Shard — Iron Fang Consortium headquarters",
-    "motivation": "Grover seeks to rise through the ranks of the Iron Fang Consortium to secure a more prosperous future for his family, driven by the memory of his deceased wife who was killed in a rift accident.",
-    "role": "Grover scours the Undercity for valuable artifacts and rare resources, always looking for the next big score.",
-    "secret": "Unbeknownst to the Iron Fang Consortium, Grover is secretly working with the Wardens of Ash to gather intelligence on the Consortium's operations, hoping to betray them and take control of the city's black market.",
-    "relationships": "Grover maintains a tense alliance with Zippy Quickclaw, the leader of the Patchwork Saints, who owes Grover a significant debt.",
-    "oracle_notes": "The Oracle senses a hidden ambition and a heart heavy with loss within Grover Ironfoot, a man poised on the precipice of power.",
-    "status": "dead",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-12] Introduced to the Undercity roster.",
-      "[2026-03-16] Killed. Faction: Iron Fang Consortium, Rank: Acquisition Agent."
-    ],
-    "created_at": "2026-03-12T10:23:50.568752",
-    "last_event_at": "2026-03-16T07:41:46.841082",
-    "moved_to_graveyard_at": "2026-03-19T08:08:08.391183"
-  },
-  {
-    "name": "Zephyrus Ironheart-Thrain",
-    "faction": "Tower Authority",
-    "rank": "Compliance Intern",
+    "name": "Nalus Thundertide",
+    "faction": "Glass Sigil",
+    "rank": "Senior Archivist",
     "species": "Dragonborn",
     "age": "40s",
-    "appearance": "A towering figure with scales the color of obsidian, Zephyrus Ironheart-Thrain carries a stern demeanor, often seen with a clipboard and a stern expression.",
-    "location": "The Shattered Spire, Citadel District",
-    "motivation": "Driven by a desire for order and justice, Zephyrus seeks to eradicate any signs of chaos in the Undercity.",
-    "role": "Enforces regulations and disciplines citizens under the watchful eye of the Tower Authority.",
-    "secret": "In his past life, Zephyrus was a notorious bandit known as 'The Iron Gale'. His true identity remains unknown to most, even within the Tower Authority.",
-    "relationships": "Maintains a tense but professional relationship with the Argent Blades due to his former criminal connections.",
-    "oracle_notes": "The Oracle senses an underlying unrest and a battle between two powerful personas within Zephyrus Ironheart-Thrain.",
+    "appearance": "Nalus stands tall with a robust physique, his scales shimmering like obsidian under the flickering Dome lights. A book of forbidden knowledge always tucked under his arm.",
+    "location": "Archive Row, Grand Archive Dome senior offices — leads research, hidden royal heritage",
+    "motivation": "Despite his prestigious position, Nalus yearns to reclaim his people's lost history, hidden within the ancient texts he studies.",
+    "role": "Spends his days deciphering arcane texts and maintaining the Scriptorium's vast library.",
+    "secret": "A hidden tattoo of a dragon marks him as a descendant of the last royal line, a fact that could ignite a rebellion within the Glass Sigil.",
+    "relationships": "Clandestinely communicates with key members of the Iron Fang Consortium, sharing valuable information.",
+    "oracle_notes": "The Oracle senses a burning ambition and a sense of duty that may soon consume the Undercity.",
     "status": "dead",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-11] Introduced to the Undercity roster.",
-      "[2026-03-19] Killed. Faction: Tower Authority, Rank: Compliance Intern."
+      "[2026-03-19] Introduced to the Undercity roster.",
+      "[2026-03-26] Injured.",
+      "[2026-03-26] Recovered from injuries.",
+      "[2026-03-28] Injured.",
+      "[2026-03-29] Succumbed to injuries. Faction: Glass Sigil, Rank: Senior Archivist."
     ],
-    "created_at": "2026-03-11T15:45:22.083492",
-    "last_event_at": "2026-03-19T13:58:42.936508",
-    "moved_to_graveyard_at": "2026-03-19T13:58:42.944017"
+    "created_at": "2026-03-19T14:16:44.024053",
+    "last_event_at": "2026-03-29T08:57:53.669672",
+    "moved_to_graveyard_at": "2026-03-29T08:57:53.669672"
   }
 ]

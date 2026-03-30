@@ -1,0 +1,28 @@
+{
+  "name": "Grug Ironfist",
+  "species": "Orc",
+  "faction": "Brother Thane's Cult",
+  "rank": "Speaker",
+  "role": "speaker",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "WIS 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 8"
+    ],
+    "hp_range": "25–38"
+  },
+  "equipment": {
+    "weapons": "makeshift staff, hidden dagger",
+    "armour": "tattered cult robes"
+  },
+  "sd_appearance": "A towering orc, Grug Ironfist stands at the city's bustling marketplace, his deep green skin etched with battle scars and a thick, gray beard that reaches his chest. He wears a simple robe adorned with intricate, silver tattoos that seem to dance on his skin, reflecting the Undercity's vibrant light in a myriad of patterns. His outfit, a tattered cult robe, hangs loosely from his massive frame, and he carries a makeshift staff, its metal bands glinting ominously, and a hidden dagger at his waist. A distinctive silver crown, a symbol of his rank as Speaker, rests atop his head, casting an eerie glow on his face, a face that carries a fervent expression of determination.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "cult's grey wrappings, makeshift metal-banded staff, fervent expression"
+}

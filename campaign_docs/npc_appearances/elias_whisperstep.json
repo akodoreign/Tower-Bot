@@ -1,0 +1,28 @@
+{
+  "name": "Elias Whisperstep",
+  "species": "Tabaxi",
+  "faction": "Argent Blades",
+  "rank": "Blade",
+  "role": "senior blade",
+  "home_district": "argent blades",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A tall, lean Tabaxi with emerald eyes and a distinctive scar running down his left cheek, Elias Whisperstep strides onto the stage. His silver and white armor, adorned with blue accents and theatrical presence, glimmers under the dim light. The Argent Blades' emblem on his shield is proudly displayed. A longsword hangs at his side, its hilt glinting in the shadows. A single streak of white in his otherwise dark fur runs from the top of his head, framing his fierce, focused gaze. A silver medallion, earned from a past victory, glints around his neck, catching the audience's eye as he assumes his position, ready to strike.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

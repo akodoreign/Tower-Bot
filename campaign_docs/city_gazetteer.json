@@ -1,0 +1,831 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-03-27",
+    "description": "Master gazetteer for the Undercity - all districts, underground locations, and establishments"
+  },
+  "ring_structure": [
+    {
+      "ring": 0,
+      "name": "Tower Core",
+      "distance_from_tower": "0-0.5 miles",
+      "description": "The Tower of Last Chance itself. Restricted access.",
+      "districts": ["Tower of Last Chance"]
+    },
+    {
+      "ring": 1,
+      "name": "Grand Forum Ring",
+      "distance_from_tower": "0.5-8 miles",
+      "description": "Administrative heart. Archives, courts, guild HQs.",
+      "districts": ["Grand Forum", "Guild Spires", "Archive Row", "Diplomats Row"]
+    },
+    {
+      "ring": 2,
+      "name": "Sanctum Ring",
+      "distance_from_tower": "8-18 miles",
+      "description": "Religious and scholarly. Temples, academies, research.",
+      "districts": ["Sanctum Quarter", "Temple Row", "Academy Heights", "The Reliquary", "Cult Corners"]
+    },
+    {
+      "ring": 3,
+      "name": "Commerce Ring",
+      "distance_from_tower": "18-35 miles",
+      "description": "Markets, entertainment, industry. Economic engine.",
+      "districts": ["Cobbleway Market", "Floating Bazaar", "Neon Row", "Night Pits", "Scrapworks", "Artisan Quarter", "Markets Infinite"]
+    },
+    {
+      "ring": 4,
+      "name": "Residential Ring",
+      "distance_from_tower": "35-55 miles",
+      "description": "Where most citizens live. Middle to lower class.",
+      "districts": ["Hearthstone District", "Ember Ward", "Coppergate", "Ashfall Terraces", "Duskhollow"]
+    },
+    {
+      "ring": 5,
+      "name": "Outer Ring",
+      "distance_from_tower": "55-65 miles",
+      "description": "Industrial, military, Warrens pockets. The edge.",
+      "districts": ["Outer Wall", "Ironworks", "Shantytown Heights", "Collapsed Plaza", "The Fringe"]
+    }
+  ],
+  "districts": {
+    "Tower of Last Chance": {
+      "ring": 0,
+      "description": "The ancient semi-sentient structure at the heart of the Undercity. The Oracle dwells within.",
+      "faction_presence": ["Tower Authority"],
+      "danger_level": "restricted",
+      "sub_areas": [
+        {"name": "The Oracle Chamber", "description": "Where the Oracle speaks to those deemed worthy"},
+        {"name": "The Great Beam", "description": "Energy column rising from the Tower apex, visible everywhere"},
+        {"name": "Tower Authority Command", "description": "Director Myra Kess's administrative offices"},
+        {"name": "Archival Vaults", "description": "Deep storage of records the Tower Authority deems sensitive"}
+      ],
+      "notable_establishments": []
+    },
+    "Grand Forum": {
+      "ring": 1,
+      "description": "The open plaza at the city's political heart. Public announcements, political maneuvering, information brokers.",
+      "faction_presence": ["Tower Authority", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Announcement Stone", "description": "Where official proclamations are made"},
+        {"name": "Broker's Corner", "description": "Where information changes hands"},
+        {"name": "Petitioner's Steps", "description": "Where citizens wait for audience with officials"},
+        {"name": "Forum Undercroft", "locations": ["The Whisper Gallery", "Broker's Cache", "Old Forum Cistern"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Gilded Quill", "type": "tavern", "description": "Upscale establishment favored by diplomats and info brokers"},
+        {"name": "Kessan & Mira's Booth", "type": "info_broker", "description": "The twins' visible operation point"},
+        {"name": "Grand Forum Library", "type": "library", "description": "Guild of Ashen Scrolls main archive"}
+      ]
+    },
+    "Guild Spires": {
+      "ring": 1,
+      "description": "Towering faction headquarters. The Adventurers Guild, Merchant Guild, and Artificers make their homes here.",
+      "faction_presence": ["Adventurers Guild", "Argent Blades"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Adventurers Guild Hall", "description": "Mission board, registration, Mari Fen's desk"},
+        {"name": "Silver Spire", "description": "Aric Veyne's tower, SS-Rank adventurer residence"},
+        {"name": "Merchant Guild Tower", "description": "Trade licenses, tariff negotiations"},
+        {"name": "Artificers Collective", "description": "Magical item certification and sales"}
+      ],
+      "notable_establishments": [
+        {"name": "The Ranking Board", "type": "notice_board", "description": "Public adventurer rankings"},
+        {"name": "Prospect's Rest", "type": "inn", "description": "Budget lodging for new adventurers"},
+        {"name": "The Gilded Halls", "type": "guild_hall", "description": "Argent Blades showpiece headquarters"}
+      ]
+    },
+    "Archive Row": {
+      "ring": 1,
+      "description": "Glass Sigil territory. Libraries, scriptoriums, and the accumulated knowledge of ages.",
+      "faction_presence": ["Glass Sigil", "Guild of Ashen Scrolls"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Grand Archive Dome", "description": "Main Glass Sigil repository under the great glass dome"},
+        {"name": "Scroll Vault", "description": "Temperature-controlled rare manuscript storage"},
+        {"name": "The Cataloguing Halls", "description": "Where junior archivists sort incoming materials"},
+        {"name": "Archive Catacombs", "locations": ["Forbidden Stacks", "The Memory Vault", "Residue Storage"]}
+      ],
+      "notable_establishments": [
+        {"name": "Senior Archivist Pell's Office", "type": "office", "description": "Glass Sigil leadership"},
+        {"name": "The Inkwell", "type": "tavern", "description": "Where archivists drink and gossip"},
+        {"name": "Scribe's Supply", "type": "shop", "description": "Writing materials, preservation supplies"}
+      ]
+    },
+    "Diplomats Row": {
+      "ring": 1,
+      "description": "Embassy buildings and neutral meeting grounds for inter-faction negotiations.",
+      "faction_presence": ["Tower Authority", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Neutral Hall", "description": "Where factions meet under truce"},
+        {"name": "Embassy Row", "description": "Foreign dignitary residences"},
+        {"name": "The Garden of Accord", "description": "Formal gardens for diplomatic functions"}
+      ],
+      "notable_establishments": []
+    },
+    "Sanctum Quarter": {
+      "ring": 2,
+      "description": "Major temples and religious administration. Serpent Choir's seat of power.",
+      "faction_presence": ["Serpent Choir"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Pantheon Walk", "description": "Street of major deity temples"},
+        {"name": "Choir Hall", "description": "Serpent Choir headquarters, High Apostle Yzura's seat"},
+        {"name": "Contract Archives", "description": "Divine contract storage, heavily warded"},
+        {"name": "Sanctum Catacombs", "locations": ["Burial Vaults", "Penitent's Walk", "The Sealed Crypts", "Choir Undercroft"]}
+      ],
+      "notable_establishments": [
+        {"name": "Vesper's Consultation Office", "type": "office", "description": "Contract Mediator Vesper sees petitioners here"},
+        {"name": "The Pilgrim's Rest", "type": "inn", "description": "Lodging for religious travelers"},
+        {"name": "Tithe House", "type": "administrative", "description": "Where divine contracts are finalized and payments rendered"}
+      ]
+    },
+    "Temple Row": {
+      "ring": 2,
+      "description": "Cathedral of the Eternal Flame, Temple of the Silent Watch, Shrine of Forgotten Names.",
+      "faction_presence": ["Serpent Choir", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Cathedral of the Eternal Flame", "description": "Tallest religious structure, sacred fire never extinguished"},
+        {"name": "Temple of the Silent Watch", "description": "Monastery of contemplative monks"},
+        {"name": "Shrine of Forgotten Names", "description": "Memorial to those lost to Rifts"},
+        {"name": "Temple Crypts", "locations": ["Flame Keeper Tombs", "Silent Watch Ossuary", "The Nameless Vault"]}
+      ],
+      "notable_establishments": []
+    },
+    "Academy Heights": {
+      "ring": 2,
+      "description": "Wizards Tower, magical education, and arcane research facilities.",
+      "faction_presence": ["Wizards Tower"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Wizards Tower", "description": "Archmage Yaulderna Silverstreak's domain"},
+        {"name": "Student Quarters", "description": "Dormitories for apprentices and journeymen"},
+        {"name": "The Laboratories", "description": "Experimental magic research"},
+        {"name": "Academy Underhalls", "locations": ["Experiment Vaults", "The Binding Chambers", "Golem Storage", "Planar Research Wing"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Smoking Wand", "type": "tavern", "description": "Where students and faculty relax"},
+        {"name": "Reagent Row", "type": "market", "description": "Magical component shops"},
+        {"name": "The Licensing Office", "type": "administrative", "description": "Arcane practice permits issued here"}
+      ]
+    },
+    "The Reliquary": {
+      "ring": 2,
+      "description": "Sacred items studied and stored under heavy guard and wards.",
+      "faction_presence": ["Glass Sigil", "Serpent Choir"],
+      "danger_level": "restricted",
+      "sub_areas": [
+        {"name": "Display Halls", "description": "Public exhibition of approved artifacts"},
+        {"name": "Study Chambers", "description": "Where scholars examine relics"},
+        {"name": "Deep Vaults", "locations": ["Cursed Item Storage", "Divine Fragment Repository", "The Forbidden Collection"]}
+      ],
+      "notable_establishments": []
+    },
+    "Cult Corners": {
+      "ring": 2,
+      "description": "Brother Thane's Meeting Hall and other smaller faiths operate here.",
+      "faction_presence": ["Brother Thane's Cult", "Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Brother Thane's Meeting Hall", "description": "Public gathering space for the Returned"},
+        {"name": "Minor Shrine Row", "description": "Small temples to obscure deities"},
+        {"name": "The Vigil House", "description": "Where cult members keep watch"},
+        {"name": "Cult Warrens", "locations": ["Initiation Chambers", "The Speaking Room", "Hidden Sanctum"]}
+      ],
+      "notable_establishments": []
+    },
+    "Cobbleway Market": {
+      "ring": 3,
+      "description": "Traditional open-air bazaar. Spice Alley, Cloth Row, street food stalls.",
+      "faction_presence": ["Iron Fang Consortium", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Spice Alley", "description": "Aromatic corridor of spice merchants"},
+        {"name": "Cloth Row", "description": "Textile traders and tailors"},
+        {"name": "Food Court", "description": "Street food from a hundred cultures"},
+        {"name": "Market Undercroft", "locations": ["Smuggler's Cache", "Cold Storage", "The Black Stalls"]}
+      ],
+      "notable_establishments": [
+        {"name": "Elune's Apothecary", "type": "shop", "description": "Potions, herbs, remedies"},
+        {"name": "The Honest Scale", "type": "tavern", "description": "Merchant's drinking hole"}
+      ]
+    },
+    "Markets Infinite": {
+      "ring": 3,
+      "description": "The sprawling commercial heart of the city. Iron Fang Consortium territory.",
+      "faction_presence": ["Iron Fang Consortium"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Crimson Alley", "description": "Iron Fang's back-channel dealings"},
+        {"name": "Relic Row", "description": "Adventuring gear and recovered artifacts"},
+        {"name": "The Counting Houses", "description": "Banks and money changers"},
+        {"name": "Consortium Underhalls", "locations": ["Guildmaster Dhal's Vault", "Acquisition Storage", "The Silent Auction"]}
+      ],
+      "notable_establishments": [
+        {"name": "Sera Voss's Storage Room", "type": "office", "description": "Behind a spice merchant, where Sera conducts business"},
+        {"name": "The Iron Coin", "type": "tavern", "description": "Consortium-friendly establishment"},
+        {"name": "TowerBay Depot", "type": "market", "description": "Auction house for rare goods"}
+      ]
+    },
+    "Floating Bazaar": {
+      "ring": 3,
+      "description": "Elevated neon-lit platforms. Luxury goods, tourist attractions, sky restaurants.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Sky Platforms", "description": "Floating commercial platforms lit with neon"},
+        {"name": "The Promenade", "description": "Upscale shopping walkway"},
+        {"name": "Vista Dining", "description": "Restaurants with views of the Tower"},
+        {"name": "Platform Maintenance", "locations": ["Service Tunnels", "Generator Rooms", "The Drop"]}
+      ],
+      "notable_establishments": []
+    },
+    "Neon Row": {
+      "ring": 3,
+      "description": "Entertainment district. Taverns, theaters, pleasure houses. Never sleeps.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "The Neon Strip", "description": "Main entertainment drag"},
+        {"name": "Theater Row", "description": "Playhouses and performance venues"},
+        {"name": "The Vice Quarter", "description": "Less reputable establishments"},
+        {"name": "Neon Underbelly", "locations": ["Lotus Back Rooms", "The Memory Den", "Pleasure Tunnels"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Velvet Curtain", "type": "theater", "description": "Most prestigious playhouse"},
+        {"name": "The Laughing Skull", "type": "tavern", "description": "Adventurer dive bar"}
+      ]
+    },
+    "Night Pits": {
+      "ring": 3,
+      "description": "Blood sport arenas. Gambling, gladiator culture, Sable's territory.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "high",
+      "sub_areas": [
+        {"name": "The Grand Pit", "description": "Main arena, seats thousands"},
+        {"name": "Fighter's Row", "description": "Gladiator barracks and training"},
+        {"name": "The Betting Halls", "description": "Where fortunes change hands"},
+        {"name": "Pit Warrens", "locations": ["Beast Pens", "The Bone Rooms", "Sable's Private Arena", "Corpse Disposal Tunnels"]}
+      ],
+      "notable_establishments": [
+        {"name": "Sable's Office", "type": "office", "description": "Night Pits boss operates from here"},
+        {"name": "The Last Round", "type": "tavern", "description": "Fighter's bar"},
+        {"name": "Champion's Obelisk", "type": "landmark", "description": "Names of arena champions carved in stone"}
+      ]
+    },
+    "Scrapworks": {
+      "ring": 3,
+      "description": "Industrial salvage district. Mara the Scrapper's territory.",
+      "faction_presence": ["Patchwork Saints", "Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Mara's Yard", "description": "Main salvage operation"},
+        {"name": "The Sorting Floors", "description": "Where scrap is categorized"},
+        {"name": "Recycler's Row", "description": "Workshops converting scrap to goods"},
+        {"name": "Scrap Tunnels", "locations": ["Material Cache", "The Rust Maze", "Salvage Vaults"]}
+      ],
+      "notable_establishments": [
+        {"name": "Mara's Office", "type": "office", "description": "The Scrapper runs her operation from here"},
+        {"name": "The Oily Rag", "type": "tavern", "description": "Worker's drinking hole"}
+      ]
+    },
+    "Artisan Quarter": {
+      "ring": 3,
+      "description": "Craftspeople, artists, and the Guild of Ashen Scrolls scriptorium.",
+      "faction_presence": ["Guild of Ashen Scrolls", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Scriptorium Quarter", "description": "Where Ashen Scrolls scribes work"},
+        {"name": "Potter's Lane", "description": "Ceramics and glasswork"},
+        {"name": "Jeweler's Row", "description": "Fine metalwork and gems"},
+        {"name": "Artisan Cellars", "locations": ["Kiln Vaults", "Dye Works", "Secret Studios"]}
+      ],
+      "notable_establishments": [
+        {"name": "Archivist Eir Velan's Study", "type": "office", "description": "Guild of Ashen Scrolls leadership"}
+      ]
+    },
+    "Hearthstone District": {
+      "ring": 4,
+      "description": "Middle-class families. Stable, respectable neighborhoods.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Family Row", "description": "Modest but comfortable homes"},
+        {"name": "Market Square", "description": "Local shops and services"},
+        {"name": "Community Hall", "description": "Local governance and gatherings"},
+        {"name": "Hearthstone Basements", "locations": ["Root Cellars", "Storm Shelters", "Community Bunker"]}
+      ],
+      "notable_establishments": []
+    },
+    "Ember Ward": {
+      "ring": 4,
+      "description": "Working class district. Union halls, mutual aid networks.",
+      "faction_presence": ["Patchwork Saints", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Union Hall", "description": "Worker organization headquarters"},
+        {"name": "Shift Housing", "description": "Dormitories for factory workers"},
+        {"name": "The Commons", "description": "Shared green space"},
+        {"name": "Ember Undercroft", "locations": ["Union Vault", "Strike Bunker", "Aid Cache"]}
+      ],
+      "notable_establishments": []
+    },
+    "Coppergate": {
+      "ring": 4,
+      "description": "Lower middle class. Aspiring merchants and small business owners.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Shop Row", "description": "Small storefronts"},
+        {"name": "Copper Market", "description": "Budget goods and secondhand sales"},
+        {"name": "Tenement Blocks", "description": "Dense housing"},
+        {"name": "Coppergate Cellars", "locations": ["Storage Vaults", "Hidden Markets", "Escape Routes"]}
+      ],
+      "notable_establishments": []
+    },
+    "Ashfall Terraces": {
+      "ring": 4,
+      "description": "Vertical housing built into volcanic slopes. Warm, smoky.",
+      "faction_presence": ["Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Upper Terraces", "description": "Better housing with views"},
+        {"name": "Mid-Slopes", "description": "Average residential"},
+        {"name": "Lower Vents", "description": "Near volcanic activity, cheap but dangerous"},
+        {"name": "Lava Tubes", "locations": ["Forge Caverns", "Vent Communities", "Thermal Baths", "Magma Shrine"]}
+      ],
+      "notable_establishments": []
+    },
+    "Duskhollow": {
+      "ring": 4,
+      "description": "Perpetual shadow zone. Home to night workers, those who avoid light.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Shadow Row", "description": "Main residential street, always dark"},
+        {"name": "Night Market", "description": "Commerce that operates after dark"},
+        {"name": "The Blind Quarter", "description": "Where those without sight live comfortably"},
+        {"name": "Duskhollow Depths", "locations": ["Shadow Sanctum", "Blind Council Hall", "The Lightless Library"]}
+      ],
+      "notable_establishments": []
+    },
+    "Outer Wall": {
+      "ring": 5,
+      "description": "Warden military installations. Four Great Gates, 12 bastions.",
+      "faction_presence": ["Wardens of Ash"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "North Gate (The Frost Gate)", "description": "Faces the cold wastes"},
+        {"name": "South Gate (The Ash Gate)", "description": "Faces volcanic regions"},
+        {"name": "East Gate (The Dawn Gate)", "description": "First to see light"},
+        {"name": "West Gate (The Dusk Gate)", "description": "Last light of day"},
+        {"name": "Wall Tunnels", "locations": ["Patrol Routes", "Armories", "Emergency Bunkers", "The Wall Crypts"]}
+      ],
+      "notable_establishments": [
+        {"name": "Captain Korin's Command", "type": "military", "description": "Warden headquarters"},
+        {"name": "Lieutenant Varen's Post", "type": "military", "description": "Secondary command"},
+        {"name": "The Shield & Ash", "type": "tavern", "description": "Warden drinking establishment"}
+      ]
+    },
+    "Ironworks": {
+      "ring": 5,
+      "description": "Iron Fang heavy industry. Factories, foundries, worker housing.",
+      "faction_presence": ["Iron Fang Consortium"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Foundry Row", "description": "Main production facilities"},
+        {"name": "Worker Barracks", "description": "Company housing"},
+        {"name": "Shipping Yards", "description": "Where goods leave for distribution"},
+        {"name": "Industrial Underworks", "locations": ["Cooling Tunnels", "Slag Pits", "The Furnace Heart", "Smuggler's Loading"]}
+      ],
+      "notable_establishments": [
+        {"name": "Iron Fang Smokestacks", "type": "landmark", "description": "Always producing smoke"}
+      ]
+    },
+    "Shantytown Heights": {
+      "ring": 5,
+      "description": "Vertical slums. Patchwork Saints territory. Poverty but community.",
+      "faction_presence": ["Patchwork Saints"],
+      "danger_level": "high",
+      "sub_areas": [
+        {"name": "Stack Housing", "description": "Vertical slums built atop each other"},
+        {"name": "Saints' Refuge", "description": "Patchwork Saints aid station"},
+        {"name": "The Bridges", "description": "Precarious walkways between stacks"},
+        {"name": "Shanty Warrens", "locations": ["Community Caches", "Hidden Clinics", "Escape Routes", "The Deepstack"]}
+      ],
+      "notable_establishments": []
+    },
+    "Collapsed Plaza": {
+      "ring": 5,
+      "description": "Ruined district from a past Rift disaster. Scavenger territory. Dangerous.",
+      "faction_presence": ["Brother Thane's Cult", "Independent"],
+      "danger_level": "extreme",
+      "sub_areas": [
+        {"name": "The Rubble Fields", "description": "Collapsed buildings, unstable footing"},
+        {"name": "Scavenger Camps", "description": "Temporary settlements of the desperate"},
+        {"name": "Brother Thane's Cult House", "description": "Where the Returned gather"},
+        {"name": "Plaza Depths", "locations": ["Rift Scar Caves", "The Broken Sanctum", "Rubble Tunnels", "Cult Catacombs"]}
+      ],
+      "notable_establishments": []
+    },
+    "The Fringe": {
+      "ring": 5,
+      "description": "Edge of mapped territory. Last permanent habitation before the unknown.",
+      "faction_presence": ["Independent", "Glass Sigil"],
+      "danger_level": "extreme",
+      "sub_areas": [
+        {"name": "Last Light Settlement", "description": "Final outpost of civilization"},
+        {"name": "Monitoring Stations", "description": "Rift observation posts"},
+        {"name": "The Edge", "description": "Where the city simply ends"},
+        {"name": "Fringe Tunnels", "locations": ["Observation Bunkers", "Emergency Caches", "The Void Watch"]}
+      ],
+      "notable_establishments": []
+    }
+  },
+  "warrens_distribution": [
+    {
+      "name": "Eastern Warrens",
+      "description": "Oldest warren network. Smugglers, cults, Patchwork Saints stronghold.",
+      "danger_level": "high",
+      "locations": ["Smuggler's Run", "Cult Hollow", "Saints' Haven", "The Old Tunnels", "Echo Alley"]
+    },
+    {
+      "name": "Northern Warrens (The Depths)",
+      "description": "Deepest underground. Mushroom farms, blind communities, forgotten things.",
+      "danger_level": "extreme",
+      "locations": ["Mushroom Caverns", "Blind Town", "The Deep Markets", "Forgotten Vaults", "The Lightless Lake"]
+    },
+    {
+      "name": "Western Warrens (Rustside)",
+      "description": "Former industrial. Toxic salvage, dangerous chemicals, desperate communities.",
+      "danger_level": "high",
+      "locations": ["Rust Tunnels", "Chemical Dumps", "Salvage Town", "The Corroded Halls", "Poison Lake"]
+    },
+    {
+      "name": "Southern Warrens (Ashfall)",
+      "description": "Near volcanic vents. Forge communities, heat-adapted peoples.",
+      "danger_level": "high",
+      "locations": ["Vent Town", "Forge Caverns", "The Hot Springs", "Magma Shrine", "Ember Depths"]
+    },
+    {
+      "name": "Underbelly Warrens",
+      "description": "Vertical slums in the city's foundations. No natural light ever reaches here.",
+      "danger_level": "high",
+      "locations": ["Foundation Slums", "The Drip", "Pillar Town", "The Forgotten Layer", "Root Cellars"]
+    }
+  ],
+  "underground_network": {
+    "sewers": {
+      "description": "The vast sewer network that serves the entire city. Multiple levels, some areas unmapped.",
+      "danger_level": "varies",
+      "major_sections": [
+        {
+          "name": "Forum Sewers",
+          "ring": 1,
+          "description": "Well-maintained, Warden-patrolled. Clean by sewer standards.",
+          "danger_level": "low",
+          "locations": ["Main Junction", "Maintenance Hub Alpha", "The Clean Run"]
+        },
+        {
+          "name": "Sanctum Drains",
+          "ring": 2,
+          "description": "Holy water runoff creates strange effects. Some areas warded.",
+          "danger_level": "moderate",
+          "locations": ["Blessed Confluence", "Temple Runoff", "The Purified Pools", "Choir Drainage"]
+        },
+        {
+          "name": "Market Underdrain",
+          "ring": 3,
+          "description": "Heavy traffic from commerce. Smuggler routes. Rat problems.",
+          "danger_level": "moderate",
+          "locations": ["Merchant's Secret", "Smuggler's Junction", "The Rat King's Domain", "Consortium Bypass"]
+        },
+        {
+          "name": "Residential Collectors",
+          "ring": 4,
+          "description": "Standard residential waste. Occasionally used by criminals.",
+          "danger_level": "low",
+          "locations": ["Hearthstone Drain", "Ember Collector", "The Common Flow"]
+        },
+        {
+          "name": "Industrial Outflow",
+          "ring": 5,
+          "description": "Toxic, dangerous, largely unmonitored. Strange mutations.",
+          "danger_level": "high",
+          "locations": ["Ironworks Discharge", "Chemical Flow", "The Poison Current", "Mutant Pools"]
+        },
+        {
+          "name": "Sewer Grid 7",
+          "ring": 5,
+          "description": "Rift-affected section. Reality unstable. Glass Sigil monitors.",
+          "danger_level": "extreme",
+          "locations": ["Monitoring Station 7", "The Warp Zone", "Rift Breach Point", "Quarantine Section"]
+        },
+        {
+          "name": "The Deep Sewers",
+          "ring": "varies",
+          "description": "Ancient levels beneath the modern system. No maps exist.",
+          "danger_level": "extreme",
+          "locations": ["The Forgotten Flow", "Ancient Cisterns", "The Drowned City", "Primordial Pools"]
+        }
+      ]
+    },
+    "lairs": {
+      "description": "Known creature lairs and monster dens throughout the underground.",
+      "locations": [
+        {
+          "name": "The Rat King's Warren",
+          "district": "Market Underdrain",
+          "description": "Massive intelligent rat colony. Trade information for food.",
+          "inhabitants": "Giant rats, rat-folk, the Rat King himself",
+          "danger_level": "moderate"
+        },
+        {
+          "name": "Slime Pits",
+          "district": "Industrial Outflow",
+          "description": "Toxic pools breeding oozes and slimes of various types.",
+          "inhabitants": "Oozes, slimes, corrupted elementals",
+          "danger_level": "high"
+        },
+        {
+          "name": "The Spider Galleries",
+          "district": "Eastern Warrens",
+          "description": "Web-choked tunnels home to giant spider colonies.",
+          "inhabitants": "Giant spiders, ettercaps, phase spiders",
+          "danger_level": "high"
+        },
+        {
+          "name": "Goblin Warrens",
+          "district": "Northern Warrens",
+          "description": "Extensive goblin settlement in the deep tunnels.",
+          "inhabitants": "Goblins, hobgoblins, bugbears",
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Carrion Caves",
+          "district": "Collapsed Plaza Depths",
+          "description": "Where ghouls and worse feed on the dead.",
+          "inhabitants": "Ghouls, ghasts, carrion crawlers",
+          "danger_level": "high"
+        },
+        {
+          "name": "Troll Depths",
+          "district": "Rustside Warrens",
+          "description": "Where trolls regenerate in the dark and hunt.",
+          "inhabitants": "Trolls, cave trolls",
+          "danger_level": "extreme"
+        },
+        {
+          "name": "The Wyvern Roost",
+          "district": "Ashfall Terraces Lava Tubes",
+          "description": "Volcanic caves where fire-resistant wyverns nest.",
+          "inhabitants": "Fire wyverns, salamanders",
+          "danger_level": "extreme"
+        },
+        {
+          "name": "Mimic Alley",
+          "district": "Abandoned Commerce Tunnels",
+          "description": "An entire section where mimics have established dominance.",
+          "inhabitants": "Mimics of all sizes",
+          "danger_level": "high"
+        }
+      ]
+    },
+    "dungeons": {
+      "description": "Ancient structures, abandoned facilities, and dangerous complexes beneath the city.",
+      "locations": [
+        {
+          "name": "The Old Prison",
+          "district": "Forum Undercroft",
+          "description": "Pre-Tower era prison complex. Cells still intact. Something still screams at night.",
+          "history": "Built before the Tower arrived. Used for political prisoners. Sealed after an incident.",
+          "danger_level": "high",
+          "levels": 3
+        },
+        {
+          "name": "The Sunken Temple",
+          "district": "Sanctum Catacombs",
+          "description": "Temple to a forgotten god, collapsed into the underground. Still holy... to something.",
+          "history": "Predates current pantheon. Collapsed during the Third Rift Crisis.",
+          "danger_level": "high",
+          "levels": 5
+        },
+        {
+          "name": "Artificer's Folly",
+          "district": "Academy Underhalls",
+          "description": "Abandoned research complex. Failed golem experiments still patrol.",
+          "history": "Sealed after a catastrophic experiment 200 years ago.",
+          "danger_level": "extreme",
+          "levels": 4
+        },
+        {
+          "name": "The Merchant Vaults",
+          "district": "Consortium Underhalls",
+          "description": "Legendary treasure vaults from the first Merchant Princes. Trapped extensively.",
+          "history": "Built during the founding era. Keys lost to time.",
+          "danger_level": "extreme",
+          "levels": 6
+        },
+        {
+          "name": "The Warden Tombs",
+          "district": "Wall Tunnels",
+          "description": "Where fallen Wardens are interred. Honor guard still patrols.",
+          "history": "Sacred burial ground for defenders of the Wall.",
+          "danger_level": "moderate",
+          "levels": 2
+        },
+        {
+          "name": "The Rift Laboratories",
+          "district": "Sewer Grid 7",
+          "description": "Research facility built to study Rifts. Abandoned after researchers changed.",
+          "history": "Tower Authority project, terminated. Records sealed.",
+          "danger_level": "extreme",
+          "levels": 3
+        },
+        {
+          "name": "The Drowned Coliseum",
+          "district": "Deep Sewers",
+          "description": "Ancient arena from a civilization before the Tower. Partially flooded.",
+          "history": "Unknown origin. Predates all records.",
+          "danger_level": "high",
+          "levels": 2
+        },
+        {
+          "name": "Thane's Labyrinth",
+          "district": "Collapsed Plaza Depths",
+          "description": "Tunnel complex being excavated by Brother Thane's Cult. Purpose unknown.",
+          "history": "Currently under construction. The Cult guards it jealously.",
+          "danger_level": "high",
+          "levels": "unknown"
+        }
+      ]
+    },
+    "sanctums": {
+      "description": "Hidden holy places, cult strongholds, and secret gathering places.",
+      "locations": [
+        {
+          "name": "The Choir Undercroft",
+          "district": "Sanctum Catacombs",
+          "description": "Secret Serpent Choir meeting hall. Divine contracts too sensitive for surface.",
+          "faction": "Serpent Choir",
+          "access": "High-ranking Choir members only"
+        },
+        {
+          "name": "Thane's Inner Sanctum",
+          "district": "Collapsed Plaza Depths",
+          "description": "Brother Thane's true seat of power. Where the Returned truly gather.",
+          "faction": "Brother Thane's Cult",
+          "access": "Trusted cult members, Speakers and above"
+        },
+        {
+          "name": "The Widow's Web",
+          "district": "Eastern Warrens",
+          "description": "Obsidian Lotus true headquarters. The Widow rules from here.",
+          "faction": "Obsidian Lotus",
+          "access": "Lotus leadership, Ghosts and above"
+        },
+        {
+          "name": "The Memory Vault",
+          "district": "Archive Catacombs",
+          "description": "Glass Sigil's most sensitive storage. Memories deemed too dangerous to exist.",
+          "faction": "Glass Sigil",
+          "access": "Senior Archivists only"
+        },
+        {
+          "name": "Saints' Refuge",
+          "district": "Shantytown Heights Warren",
+          "description": "Secret Patchwork Saints headquarters and emergency shelter.",
+          "faction": "Patchwork Saints",
+          "access": "Saints members, those in need"
+        },
+        {
+          "name": "The Forge Shrine",
+          "district": "Southern Warrens",
+          "description": "Secret shrine to Ashara the Phoenix Marshal. Wardens' hidden faith.",
+          "faction": "Wardens of Ash",
+          "access": "Wardens who know the old ways"
+        },
+        {
+          "name": "The Counting House",
+          "district": "Consortium Underhalls",
+          "description": "Iron Fang's true vault and meeting room. Where real deals happen.",
+          "faction": "Iron Fang Consortium",
+          "access": "Senior agents and Guildmaster Dhal"
+        },
+        {
+          "name": "The Arena Crypts",
+          "district": "Night Pits Warrens",
+          "description": "Where Argent Blades initiate new members through blood trials.",
+          "faction": "Argent Blades",
+          "access": "Blades undergoing initiation"
+        },
+        {
+          "name": "The Silent Library",
+          "district": "Duskhollow Depths",
+          "description": "Repository of forbidden texts maintained by an unknown curator.",
+          "faction": "Unknown",
+          "access": "Those who find the way"
+        },
+        {
+          "name": "The Tower's Roots",
+          "district": "Deep Sewers",
+          "description": "Ancient chambers at the Tower's foundation. The Oracle's dreams echo here.",
+          "faction": "None/Tower itself",
+          "access": "Unknown - no confirmed visitors"
+        }
+      ]
+    },
+    "transit_tunnels": {
+      "description": "The underground transit network connecting districts.",
+      "locations": [
+        {
+          "name": "Deep Line Stations",
+          "description": "Unofficial underground train connecting warren clusters. No Warden patrols.",
+          "stations": ["Eastern Junction", "Depths Station", "Rustside Platform", "Ashfall Terminal", "Underbelly Stop"]
+        },
+        {
+          "name": "Maintenance Tunnels",
+          "description": "Service tunnels for the legitimate train lines. Worker access only.",
+          "danger_level": "low"
+        },
+        {
+          "name": "Abandoned Stations",
+          "description": "Old stations from routes no longer in service.",
+          "locations": ["Old Forum East", "Sanctum Crossing", "The Sealed Platform", "Ghost Station 9"]
+        }
+      ]
+    },
+    "special_underground": {
+      "description": "Unique underground locations that don't fit other categories.",
+      "locations": [
+        {
+          "name": "Echo Alley",
+          "district": "Eastern Warrens",
+          "description": "Acoustically haunted smuggler tunnels. Sound behaves wrong. Obsidian Lotus territory.",
+          "features": ["Dead drops", "Echoing chambers", "Sound traps", "The Whisper Node"],
+          "danger_level": "high"
+        },
+        {
+          "name": "The Fungal Forest",
+          "district": "Northern Warrens",
+          "description": "Massive underground mushroom forest. Food source for deep communities.",
+          "features": ["Luminescent fungi", "Spore clouds", "Myconid settlements"],
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Crystalline Caves",
+          "district": "Southern Warrens",
+          "description": "Natural crystal formations with magical resonance.",
+          "features": ["Crystal growths", "Magic amplification zones", "Resonance chambers"],
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Bone Market",
+          "district": "Underbelly Warrens",
+          "description": "Underground black market dealing in remains, relics, and forbidden goods.",
+          "features": ["Necromantic supplies", "Relic trading", "Information sales"],
+          "danger_level": "high"
+        },
+        {
+          "name": "The Drowning Pools",
+          "district": "Deep Sewers",
+          "description": "Flooded chambers with air pockets. Aquatic creatures and worse.",
+          "features": ["Submerged passages", "Air chambers", "Underwater ruins"],
+          "danger_level": "extreme"
+        },
+        {
+          "name": "Rift Scar Zone",
+          "district": "Multiple",
+          "description": "Areas permanently damaged by Rift activity. Reality is thin.",
+          "features": ["Spatial distortions", "Temporal echoes", "Wild magic zones"],
+          "danger_level": "extreme"
+        }
+      ]
+    }
+  },
+  "transportation": {
+    "train_tubes": {
+      "description": "Seven major tube lines connecting the city.",
+      "major_lines": [
+        {"name": "Spine Line (Silver)", "route": "Tower → Forum → Sanctum → Markets → North Wall", "stations": ["Tower Station", "Forum Central", "Sanctum Gate", "Market Hub", "North Wall Terminal"]},
+        {"name": "Ring Express (Gold)", "route": "Circular around Commerce Ring", "stations": ["Markets North", "Floating Bazaar", "Neon Row", "Night Pits", "Scrapworks", "Artisan Quarter"]},
+        {"name": "Eastern Radial (Blue)", "route": "Forum → Sanctum East → Markets East → Hearthstone → Eastern Warrens", "stations": ["Forum East", "Temple Row", "Cobbleway", "Hearthstone Central", "Eastern Warren Access"]},
+        {"name": "Western Radial (Red)", "route": "Forum → Academy → Artisan → Duskhollow → Rustside", "stations": ["Forum West", "Academy Heights", "Artisan Gate", "Duskhollow", "Rustside Terminal"]},
+        {"name": "Northern Radial (White)", "route": "Forum → Temple Row → Floating Bazaar → Ashfall → Fringe", "stations": ["Forum North", "Cathedral Station", "Sky Platform", "Ashfall Terraces", "Fringe Station"]},
+        {"name": "Southern Radial (Green)", "route": "Forum → Guild Spires → Scrapworks → Collapsed Plaza → Southern Warrens", "stations": ["Forum South", "Guild Spires", "Scrapworks Gate", "Plaza Edge", "Southern Warren Access"]},
+        {"name": "Deep Line (Black)", "route": "Unofficial underground connecting warren clusters", "stations": ["Eastern Junction", "Depths Station", "Rustside Platform", "Ashfall Terminal", "Underbelly Stop"]}
+      ]
+    },
+    "canal_rings": [
+      {"name": "First Ring Canal (The Moat)", "description": "Surrounds Tower. Ceremonial only."},
+      {"name": "Forum Canal", "description": "Separates Forum from Sanctum. Diplomatic vessels."},
+      {"name": "Sanctum Canal", "description": "Temple procession barges, pilgrims."},
+      {"name": "Commerce Canal (The Flow)", "description": "Heaviest traffic. Cargo, merchants."},
+      {"name": "Residential Canal", "description": "Commuter ferries, local fishing."},
+      {"name": "Outer Canal (The Trench)", "description": "Industrial shipping, military patrols, smugglers at night."}
+    ]
+  }
+}

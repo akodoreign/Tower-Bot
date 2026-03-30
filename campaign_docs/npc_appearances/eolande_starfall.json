@@ -1,0 +1,28 @@
+{
+  "name": "Eolande Starfall",
+  "species": "Elf",
+  "faction": "Wardens of Ash",
+  "rank": "Sergeant",
+  "role": "warden",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "A tall, agile elf with silver hair braided tightly and piercing blue eyes, adorned in ash grey chainmail, wears the insignia of the Wardens on her chest. Her left cheek bears the distinctive mark of an ash symbol, signifying her rank as a sergeant. She carries a spear slung across her back, a handaxe at her side, and a crossbow strapped to her back. Her posture is alert, a hand resting on the hilt of her spear, her eyes scanning the crowd with an intensity that speaks of her vigilance and unwavering duty.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

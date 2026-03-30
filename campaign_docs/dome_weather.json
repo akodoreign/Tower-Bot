@@ -1,43 +1,43 @@
 {
   "districts": {
     "The Warrens": {
-      "condition": "Pressure Fog",
-      "description": "Fog sits knee-deep in the alleys. Night Pits are quieter than usual.",
-      "emoji": "\ud83c\udf01"
+      "condition": "Resonance Hum",
+      "description": "A low-frequency hum reverberating through the infrastructure. Source: Dome structural flex.",
+      "emoji": "\ud83c\udfb5"
     },
     "Markets Infinite": {
-      "condition": "Stagnant Grey",
-      "description": "The crowd heat and still air have produced an interesting smell in Taste of Worlds.",
-      "emoji": "\ud83c\udf2b\ufe0f"
+      "condition": "Deep Freeze",
+      "description": "Dome thermal regulators offline in this sector. Breath is visible. Pipes are at risk.",
+      "emoji": "\ud83e\udd76"
     },
     "Sanctum Quarter": {
-      "condition": "Acid Drizzle",
-      "description": "Fine acidic mist seeps from the Dome's upper vents.",
-      "emoji": "\ud83c\udf27\ufe0f"
+      "condition": "Veil Thin",
+      "description": "The boundary feels thin near the Hall of Echoes. Novices report hearing voices not their own.",
+      "emoji": "\ud83d\udc41\ufe0f"
     },
     "Grand Forum": {
-      "condition": "Echo Storms",
-      "description": "The Central Plaza is carrying every conversation to every other corner. Brokers are whispering.",
-      "emoji": "\ud83d\udd0a"
+      "condition": "Cinder Smog",
+      "description": "Furnace output has overwhelmed the filters. Visibility poor. Breathing unpleasant.",
+      "emoji": "\ud83d\udca8"
     },
     "Guild Spires": {
-      "condition": "Dim Clearance",
-      "description": "Good visibility from the upper Guild Spires. Someone's doing something on the roof.",
-      "emoji": "\ud83c\udf24\ufe0f"
+      "condition": "Blood Light",
+      "description": "The Dome's light panels are stuck on deep red. Everything looks like a darkroom. Eerie.",
+      "emoji": "\ud83d\udd34"
     },
     "Outer Wall": {
-      "condition": "Acid Drizzle",
-      "description": "The Wall is weeping. Acid mist is pooling at the base of Gate District. Stay back.",
-      "emoji": "\ud83c\udf27\ufe0f"
+      "condition": "Whistling Vents",
+      "description": "Pressure equalisation through narrow vents is producing an eerie whistle across the district.",
+      "emoji": "\ud83c\udf90"
     }
   },
-  "pressure": 53,
+  "pressure": 50,
   "special_event": null,
   "forecast": [
-    "Rift Weather",
-    "Thermal Surge",
-    "Dim Clearance"
+    "Sewer Backflow",
+    "Black Ice",
+    "Deep Freeze"
   ],
-  "updated_at": "2026-03-20T06:30:42.076503",
-  "last_posted_at": "2026-03-19T12:50:32.742939"
+  "updated_at": "2026-03-30T07:43:32.641074",
+  "last_posted_at": "2026-03-30T07:43:32.648234"
 }

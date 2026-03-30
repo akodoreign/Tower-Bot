@@ -1,0 +1,28 @@
+{
+  "name": "Gurrek Ironheart",
+  "species": "Orc",
+  "faction": "Wardens of Ash",
+  "rank": "Recruit",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering orc, Gurrek Ironheart, stands guard on the Mudflats, his deep green-grey skin weathered by countless battles. His prominent tusks curl down from a rough, scarred face that betrays a hint of sadness beneath his stern exterior. He wears chainmail armour, the faction's ash grey chainmail adorned with the Wardens of Ash badge, and a matching ash-mark graces his left cheek. A warhammer and crossbow are strapped to his back, worn leather and chainmail suggesting a history of past contracts. A large, intricately-carved bone necklace, a symbol of his penance, hangs heavily around his neck, a testament to his motivation to atone for past mistakes and protect others.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}
