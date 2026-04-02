@@ -21,15 +21,17 @@
       "[2026-03-10] New secret acquired.",
       "[2026-03-11] Secret revealed: Sera Voss, in her clandestine existence, serves as a secret ...",
       "[2026-03-12] Injured.",
-      "[2026-03-12] Recovered from injuries."
+      "[2026-03-12] Recovered from injuries.",
+      "[2026-03-31] Injured.",
+      "[2026-04-01] Recovered from injuries."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-12T10:24:32.902665"
+    "last_event_at": "2026-04-01T11:35:57.883804"
   },
   {
     "name": "Corvin Thale",
     "faction": "Wardens of Ash",
-    "rank": "Lieutenant-Inspector (internal affairs \u2014 investigates Warden misconduct)",
+    "rank": "Warden",
     "species": "Human",
     "age": "52",
     "appearance": "Heavy-set, deliberate in movement. Always in civilian clothes while on duty \u2014 the only Warden who never wears the uniform. Carries a battered ledger he writes in constantly.",
@@ -50,10 +52,11 @@
       "[2026-03-22] Recovered from injuries.",
       "[2026-03-25] Injured.",
       "[2026-03-26] Recovered from injuries.",
-      "[2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted."
+      "[2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.",
+      "[2026-04-01] Promoted from Lieutenant-Inspector (internal affairs \u2014 investigates Warden misconduct) to Warden within Wardens of Ash."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-26T05:55:24.484393"
+    "last_event_at": "2026-04-01T11:36:11.771457"
   },
   {
     "name": "Mira Kessan",
@@ -75,10 +78,12 @@
       "[2026-03-11] Injured.",
       "[2026-03-11] Recovered from injuries.",
       "[2026-03-26] Injured.",
-      "[2026-03-26] Recovered from injuries."
+      "[2026-03-26] Recovered from injuries.",
+      "[2026-03-30] Injured.",
+      "[2026-03-31] Recovered from injuries."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-26T06:30:57.812874"
+    "last_event_at": "2026-03-31T13:16:44.649708"
   },
   {
     "name": "Brother Aldric",
@@ -108,33 +113,6 @@
     "last_event_at": "2026-03-27T18:56:34.825190"
   },
   {
-    "name": "Yuna Saltis",
-    "faction": "Obsidian Lotus",
-    "rank": "Memory Architect (specialist \u2014 designs and performs memory erasure contracts)",
-    "species": "Tiefling",
-    "age": "27",
-    "appearance": "Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always \u2014 claims it's professional habit. Very short.",
-    "location": "The Warrens, Obsidian Lotus secondary location (not the main house \u2014 she operates from a private room in the Night Pits)",
-    "motivation": "Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique \u2014 to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.",
-    "role": "Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).",
-    "secret": "She has retained a copy of every memory she has ever erased \u2014 stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
-    "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus \u2014 her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically \u2014 Yuna found this annoying and flattering in equal measure.",
-    "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?",
-    "status": "alive",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-05] Entered roster from static file.",
-      "[2026-03-11] Injured.",
-      "[2026-03-12] Recovered from injuries.",
-      "[2026-03-13] Injured.",
-      "[2026-03-14] Recovered from injuries.",
-      "[2026-03-19] Injured.",
-      "[2026-03-19] Recovered from injuries."
-    ],
-    "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-19T15:04:18.407855"
-  },
-  {
     "name": "Pol Greaves",
     "faction": "Patchwork Saints",
     "rank": "Field Captain (informal \u2014 Saints don't use formal ranks)",
@@ -158,33 +136,6 @@
     ],
     "created_at": "2026-03-05T12:59:39.947925",
     "last_event_at": "2026-03-17T05:42:32.915336"
-  },
-  {
-    "name": "Tessaly Orin",
-    "faction": "Guild of Ashen Scrolls",
-    "rank": "Archivist Second Class (junior to Eir Velan, senior to Dova)",
-    "species": "Half-Elf",
-    "age": "38",
-    "appearance": "Ink-stained hands permanently. Wears reading lenses on a chain. Tends to mutter while working. Hair in a permanent state of being-just-put-up-or-just-taken-down.",
-    "location": "Grand Forum Library, lower stacks (she has effectively colonised a section of the archive for her personal research project)",
-    "motivation": "The question. Tessaly became an archivist because she wanted to answer one specific question: why do certain adventurers attract divine attention while others of equal Legend Points do not? She has been building a dataset for nine years. She is close to something.",
-    "role": "Documents adventurer career trajectories, maintains the fate archive index, assists Eir Velan with Thesaurus communication protocols.",
-    "secret": "Her research has identified a pattern \u2014 certain adventurers attract divine attention not because of their Legend Points but because of the specific shape of their story. She calls it narrative resonance. She has not published this because she doesn't know what it means yet \u2014 and because if the Culinary Council reads it, she has effectively written them a menu.",
-    "relationships": "Professional respect for Eir Velan (somewhat intimidated). Academic rivalry with Dova (Glass Sigil) \u2014 same data sets, different methods. Has been quietly consulting with Kessan and Mira (info brokers) on data patterns she can't explain through archival sources alone.",
-    "oracle_notes": "The Oracle would find Tessaly's research unsettling in the way a mirror is unsettling. She is close to understanding something about how stories work that the gods would prefer remained unwritten.",
-    "status": "alive",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-05] Entered roster from static file.",
-      "[2026-03-11] Injured.",
-      "[2026-03-11] Recovered from injuries.",
-      "[2026-03-13] Injured.",
-      "[2026-03-14] Recovered from injuries.",
-      "[2026-03-26] Injured.",
-      "[2026-03-26] Recovered from injuries."
-    ],
-    "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-26T10:25:10.639217"
   },
   {
     "name": "Calix Drenn",
@@ -234,10 +185,12 @@
       "[2026-03-17] Injured.",
       "[2026-03-17] Recovered from injuries.",
       "[2026-03-19] Injured.",
-      "[2026-03-19] Recovered from injuries."
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-03-31] Injured.",
+      "[2026-04-01] Recovered from injuries."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-03-19T06:37:56.692571"
+    "last_event_at": "2026-04-01T11:36:04.706688"
   },
   {
     "name": "Gorgon Gizzick",
@@ -849,28 +802,6 @@
     "last_event_at": "2026-03-25T09:00:54.330413"
   },
   {
-    "name": "Kip Stonefang",
-    "faction": "Patchwork Saints",
-    "rank": "Saint",
-    "species": "Kobold",
-    "age": "40s",
-    "appearance": "A compact, wiry kobold with intricate, mosaic-like tattoos covering his scaleless body. He walks with a steady, determined gait, a worn leather satchel slung over his shoulder.",
-    "location": "Shantytown Heights, Saints' Refuge tunnels \u2014 messenger, spy (secretly Thane's Cult)",
-    "motivation": "Driven by a relentless desire to prove his worth among his fellow saints, Kip seeks to uncover the darkest secrets of the Undercity to bolster his standing within the faction.",
-    "role": "Serves as a messenger and spy, navigating the treacherous Undercity to gather intel for the Patchwork Saints.",
-    "secret": "Unbeknownst to his comrades, Kip is secretly a member of Brother Thane's Cult, feeding them sensitive information he gathers during his missions.",
-    "relationships": "Has a tenuous alliance with Grozak Ironscrivener, the scribe of the Argent Blades, who often uses Kip's intel for his own purposes.",
-    "oracle_notes": "The Oracle senses a deep-rooted conflict within Kip, a tug-of-war between loyalty to his faith and a hidden allegiance to a dangerous enemy.",
-    "status": "alive",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-12] Introduced to the Undercity roster.",
-      "[2026-03-18] Committed a significant betrayal within Patchwork Saints."
-    ],
-    "created_at": "2026-03-12T07:32:18.138524",
-    "last_event_at": "2026-03-18T19:58:36.318473"
-  },
-  {
     "name": "Zara Leafwhisper",
     "faction": "Tower Authority",
     "rank": "Compliance Intern",
@@ -994,7 +925,7 @@
     "secret": "Once a high-ranking member of the Serpent Choir, he defected after a mission gone awry, now living in fear they'll discover his betrayal.",
     "relationships": "Maintains a fragile alliance with the Patchwork Saints, sharing intelligence in exchange for their protection.",
     "oracle_notes": "The Oracle senses a haunted spirit, burdened by guilt and constantly scanning for threats.",
-    "status": "injured",
+    "status": "alive",
     "revealed_secrets": [],
     "history": [
       "[2026-03-12] Introduced to the Undercity roster.",
@@ -1002,10 +933,11 @@
       "[2026-03-19] Recovered from injuries.",
       "[2026-03-27] Injured.",
       "[2026-03-28] Recovered from injuries.",
-      "[2026-03-30] Injured."
+      "[2026-03-30] Injured.",
+      "[2026-03-30] Recovered from injuries."
     ],
     "created_at": "2026-03-12T09:38:37.166138",
-    "last_event_at": "2026-03-30T07:25:40.961262"
+    "last_event_at": "2026-03-30T11:10:11.279156"
   },
   {
     "name": "Thoren Grudbreaker",
@@ -1249,10 +1181,12 @@
     "revealed_secrets": [],
     "history": [
       "[2026-03-18] Introduced to the Undercity roster.",
-      "[2026-03-28] Committed a significant betrayal within Obsidian Lotus."
+      "[2026-03-28] Committed a significant betrayal within Obsidian Lotus.",
+      "[2026-03-30] Injured.",
+      "[2026-03-31] Recovered from injuries."
     ],
     "created_at": "2026-03-18T09:39:01.112281",
-    "last_event_at": "2026-03-28T09:18:08.105498"
+    "last_event_at": "2026-03-31T13:16:51.647973"
   },
   {
     "name": "Elysia Thornshadow",
@@ -1535,15 +1469,16 @@
     "motivation": "Elias fights for the Argent Blades to avenge his family, killed in a rift accident. He seeks to ensure no other family suffers the same fate.",
     "role": "Elias leads covert operations, gathering intelligence on potential threats and neutralizing them before they can cause harm.",
     "secret": "Unknown to his fellow Blades, Elias is secretly a relic hunter, searching for artifacts to sell on the black market. He uses the money to fund his mission.",
-    "relationships": "Elias has a strained relationship with the Wardens of Ash due to their rivalry over relics.",
+    "relationships": "Elias has a strained relationship with the Wardens of Ash due to their rivalry over relics. | Alliance with Gorgon Gizzick (Brother Thane's Cult).",
     "oracle_notes": "The Oracle senses a hidden ambition and a burning desire for vengeance in Elias Whisperstep.",
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-20] Introduced to the Undercity roster."
+      "[2026-03-20] Introduced to the Undercity roster.",
+      "[2026-03-30] Formed alliance with Gorgon Gizzick (Brother Thane's Cult)."
     ],
     "created_at": "2026-03-20T06:51:34.434225",
-    "last_event_at": "2026-03-20T06:51:34.434225"
+    "last_event_at": "2026-03-30T13:10:18.021274"
   },
   {
     "name": "Thalia Ignis-Veil",
@@ -1635,8 +1570,8 @@
   },
   {
     "name": "Lysander Elveshadow",
-    "faction": "Patchwork Saints",
-    "rank": "Volunteer",
+    "faction": "Guild of Ashen Scrolls",
+    "rank": "Initiate",
     "species": "Half-Elf",
     "age": "40s",
     "appearance": "Lysander stands tall with a lean frame, a blend of human and elven features. His eyes, a piercing silver-blue, reflect the flickering lights of the Undercity's alleyways, and his hair, a cascade of dark curls, is braided with intricate patterns of worn leather strips.",
@@ -1649,10 +1584,11 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-24] Introduced to the Undercity roster."
+      "[2026-03-24] Introduced to the Undercity roster.",
+      "[2026-03-30] Defected from Patchwork Saints to Guild of Ashen Scrolls (rank: Initiate)."
     ],
     "created_at": "2026-03-24T11:33:08.546496",
-    "last_event_at": "2026-03-24T11:33:08.546496"
+    "last_event_at": "2026-03-30T11:10:26.881835"
   },
   {
     "name": "Torinn Wyrmbane",
@@ -1712,10 +1648,12 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-26] Introduced to the Undercity roster."
+      "[2026-03-26] Introduced to the Undercity roster.",
+      "[2026-03-30] Injured.",
+      "[2026-03-30] Recovered from injuries."
     ],
     "created_at": "2026-03-26T06:17:27.177792",
-    "last_event_at": "2026-03-26T06:17:27.177792"
+    "last_event_at": "2026-03-30T13:10:10.938344"
   },
   {
     "name": "Rianna Elenshade-Ironhammer",
@@ -2091,13 +2029,14 @@
     "secret": "Myra knows the Tower of Last Chance is more than a building \u2014 it's a containment system. She doesn't know exactly what it contains or why it was built, but she's seen enough classified files to understand that the entire Dome exists for a reason the original builders never documented. She has chosen not to investigate further. Some questions are better left unasked when you're responsible for keeping the system running.",
     "relationships": "Professional respect for Captain Havel Korin (Wardens) \u2014 he's the most reliable ally she has. The offer to Lady Cerys Valemont (Argent Blades) represents her attempt to build a real military force. Calix Drenn is one of her better Field Officers. Watches the faction leaders constantly \u2014 trust is not something she offers lightly.",
     "oracle_notes": "The Oracle finds Myra's willful ignorance about the Tower's true purpose both understandable and dangerous. She has chosen stability over truth, which is a reasonable choice for an administrator \u2014 but the truth does not care whether you choose to see it. Myra will eventually have to confront what the Tower actually is. The Oracle is watching to see how she handles that moment.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-29] Added to roster. Director of the Tower Authority. Knows the Tower is a containment system but has chosen not to investigate what it contains."
+      "[2026-03-29] Added to roster. Director of the Tower Authority. Knows the Tower is a containment system but has chosen not to investigate what it contains.",
+      "[2026-04-01] Injured."
     ],
     "created_at": "2026-03-29T01:00:00.000000",
-    "last_event_at": "2026-03-29T01:00:00.000000"
+    "last_event_at": "2026-04-01T11:36:17.127642"
   },
   {
     "name": "Brother Thane",
@@ -2182,5 +2121,89 @@
     ],
     "created_at": "2026-03-30T07:25:24.445868",
     "last_event_at": "2026-03-30T07:25:24.445868"
+  },
+  {
+    "name": "Thrakkar Stonehollow",
+    "faction": "Glass Sigil",
+    "rank": "Senior Archivist",
+    "species": "Dragonborn",
+    "age": "50s",
+    "appearance": "Thrakkar is a towering, muscular dragonborn with scales as dark as obsidian. His horns are polished to a mirror-like sheen, and his eyes hold the wisdom of ages.",
+    "location": "Glass Sigil Archives, Lower Depths",
+    "motivation": "Thrakkar seeks to preserve the knowledge of the Undercity, believing it's the key to ensuring a brighter future. He does this out of a deep sense of duty, having survived the Last War that destroyed his home city.",
+    "role": "Thrakkar spends his days cataloguing and safeguarding the ancient texts of the Undercity.",
+    "secret": "Thrakkar was once a high-ranking member of the Tower Authority before it was overthrown. His loyalties remain divided, and he secretly communicates with some remnants of the old order.",
+    "relationships": "Thrakkar maintains a professional relationship with the Wardens of Ash, often negotiating for access to restricted archives.",
+    "oracle_notes": "The Oracle senses a storm brewing beneath Thrakkar's calm exterior, a storm of secrets and hidden loyalties.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-30] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-03-30T11:10:06.174581",
+    "last_event_at": "2026-03-30T11:10:06.174581"
+  },
+  {
+    "name": "Isaac 'Ironhide' Gallows",
+    "faction": "Iron Fang Consortium",
+    "rank": "Acquisition Agent",
+    "species": "Human",
+    "age": "40s",
+    "appearance": "A hulking figure with scarred muscles, he carries a heavy burden with an air of quiet determination.",
+    "location": "The Iron Quarter, Blacksmith's Alley",
+    "motivation": "Seeks to escape the Undercity and reclaim his stolen legacy in the Iron Fang Consortium, driven by his unwavering loyalty.",
+    "role": "Negotiates deals for the Iron Fang Consortium, often delving into the city's dangerous underbelly.",
+    "secret": "His true identity is a nobleman, exiled and stripped of his title due to a tragic event.",
+    "relationships": "Has a complicated relationship with Lady Cerys Valemont, who is unaware of his true identity.",
+    "oracle_notes": "The Oracle senses a powerful will hidden beneath the brute exterior, a man who once held a crown but now wears a mask.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-30] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-03-30T13:09:57.758312",
+    "last_event_at": "2026-03-30T13:09:57.758312"
+  },
+  {
+    "name": "Zinnia Flamegrip",
+    "faction": "Adventurers Guild",
+    "rank": "Unranked",
+    "species": "Kobold",
+    "age": "50s",
+    "appearance": "Zinnia is a wiry, battle-scarred kobold with a shock of fiery red hair and piercing green eyes. She carries herself with a quiet confidence, despite the constant tension in her shoulders.",
+    "location": "The Slums district, near the Guild's secret training facility",
+    "motivation": "Zinnia dreams of proving herself as a true warrior and earning a place among the Guild's elite. She joins every dangerous mission she can, hoping to catch the eye of the Guild masters.",
+    "role": "Zinnia spends her days scouting for potential missions, gathering information from her network of informants.",
+    "secret": "Zinnia is secretly a member of Brother Thane's Cult, using her position within the Guild to gather intelligence on their rival factions.",
+    "relationships": "She maintains a tenuous alliance with Grug Ironfist, the leader of the Wardens of Ash, but their mutual distrust often threatens to erupt into open conflict.",
+    "oracle_notes": "The Oracle senses a burning ambition in Zinnia, tempered by a cunning mind and a willingness to bend the rules when necessary.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-31] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-03-31T13:16:39.591133",
+    "last_event_at": "2026-03-31T13:16:39.591133"
+  },
+  {
+    "name": "Thaddeus 'Thunder' Arden",
+    "faction": "Independent",
+    "rank": "Respected Freelance",
+    "species": "Human",
+    "age": "40s",
+    "appearance": "A broad-shouldered man with a scarred face and piercing blue eyes, he's often seen with a battered leather coat and a well-worn, silver-handled axe.",
+    "location": "The Rusted Spire, the heart of the Undercity",
+    "motivation": "Thunder seeks to protect the citizens of the Undercity from the dangers that lurk within and outside the Dome, driven by a personal vendetta against a powerful faction leader.",
+    "role": "He takes on dangerous jobs and adventures for those who can afford his services, often using his connections with various factions to get things done.",
+    "secret": "Thunder is secretly a former member of the Wardens of Ash, forced out due to his reluctance to carry out an order he deemed unjust.",
+    "relationships": "He maintains a tense alliance with the Argent Blades, sharing information and sometimes working together against common enemies.",
+    "oracle_notes": "The Oracle senses a profound sense of duty and hidden pain in Thunder, but also a fierce determination that could make him a dangerous ally or enemy.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-01] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-01T11:35:52.817165",
+    "last_event_at": "2026-04-01T11:35:52.817165"
   }
 ]

@@ -1,43 +1,43 @@
 {
   "districts": {
     "The Warrens": {
-      "condition": "Resonance Hum",
-      "description": "A low-frequency hum reverberating through the infrastructure. Source: Dome structural flex.",
-      "emoji": "\ud83c\udfb5"
+      "condition": "Rust Rain",
+      "description": "Oxidised particulate is falling with the condensation. Everything it touches stains brown.",
+      "emoji": "\ud83d\udfe4"
     },
     "Markets Infinite": {
+      "condition": "Veil Thin",
+      "description": "The boundary between planes feels permeable. Faint sounds from elsewhere. Shadows move wrong.",
+      "emoji": "\ud83d\udc41\ufe0f"
+    },
+    "Sanctum Quarter": {
+      "condition": "Ghost Light",
+      "description": "Pale orbs drifting through the Divine Garden. The Choir says they're benign. Nobody asked them.",
+      "emoji": "\ud83d\udc7b"
+    },
+    "Grand Forum": {
       "condition": "Deep Freeze",
       "description": "Dome thermal regulators offline in this sector. Breath is visible. Pipes are at risk.",
       "emoji": "\ud83e\udd76"
     },
-    "Sanctum Quarter": {
-      "condition": "Veil Thin",
-      "description": "The boundary feels thin near the Hall of Echoes. Novices report hearing voices not their own.",
-      "emoji": "\ud83d\udc41\ufe0f"
-    },
-    "Grand Forum": {
-      "condition": "Cinder Smog",
-      "description": "Furnace output has overwhelmed the filters. Visibility poor. Breathing unpleasant.",
-      "emoji": "\ud83d\udca8"
-    },
     "Guild Spires": {
-      "condition": "Blood Light",
-      "description": "The Dome's light panels are stuck on deep red. Everything looks like a darkroom. Eerie.",
-      "emoji": "\ud83d\udd34"
-    },
-    "Outer Wall": {
       "condition": "Whistling Vents",
       "description": "Pressure equalisation through narrow vents is producing an eerie whistle across the district.",
       "emoji": "\ud83c\udf90"
+    },
+    "Outer Wall": {
+      "condition": "Cold Sink",
+      "description": "Gate District is freezing. Wall Quadrant C reports frost on the inner seal. FTA is aware.",
+      "emoji": "\u2744\ufe0f"
     }
   },
-  "pressure": 50,
+  "pressure": 49,
   "special_event": null,
   "forecast": [
-    "Sewer Backflow",
-    "Black Ice",
-    "Deep Freeze"
+    "Furnace Draft",
+    "Total Dark",
+    "Total Dark"
   ],
-  "updated_at": "2026-03-30T07:43:32.641074",
-  "last_posted_at": "2026-03-30T07:43:32.648234"
+  "updated_at": "2026-04-02T06:12:04.312807",
+  "last_posted_at": "2026-04-02T05:18:35.025945"
 }

@@ -1,0 +1,28 @@
+{
+  "name": "Isaac 'Ironhide' Gallows",
+  "species": "Human",
+  "faction": "Iron Fang Consortium",
+  "rank": "Acquisition Agent",
+  "role": "senior acquisitions agent",
+  "home_district": "argent blades",
+  "stats": {
+    "primary": [
+      "CHA 16",
+      "DEX 14",
+      "INT 13"
+    ],
+    "secondary": [
+      "WIS 12",
+      "CON 11",
+      "STR 9"
+    ],
+    "hp_range": "35–50"
+  },
+  "equipment": {
+    "weapons": "concealed blade, crossbow",
+    "armour": "fine coat over leather"
+  },
+  "sd_appearance": "A hulking human of average height, Isaac 'Ironhide' Gallows emerges from the shadows. His scarred muscles ripple beneath a deep burgundy and gunmetal coat, the Iron Fang mark subtly emblazoned on the lapel. His dark, unruly hair falls to his broad shoulders, contrasting with piercing green eyes that reflect the flickering torchlight. A concealed blade peeks from his waist, and a crossbow rests casually over his leather-clad shoulder, its stealthy menace accentuated by the fine coat draped over it. A distinctive, intricately woven iron band encircles his left forearm, a grim testament to his unwavering loyalty and the price he has paid in the Undercity.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "mercantile-military — expensive but practical, always armed, never obviously so"
+}

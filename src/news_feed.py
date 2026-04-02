@@ -33,6 +33,7 @@ class _TimedA1111Lock:
         self._acquired = False
 
     async def __aenter__(self):
+        global _a1111_lock
         import logging
         logger = logging.getLogger(__name__)
         try:
@@ -44,7 +45,6 @@ class _TimedA1111Lock:
                 f"🖼️ A1111 lock timeout after {_A1111_LOCK_TIMEOUT}s — creating new lock and declaring old one dead"
             )
             # Replace the dead lock with a fresh one
-            global _a1111_lock
             _a1111_lock = asyncio.Lock()
             # Try to acquire the new lock (should succeed immediately)
             try:
@@ -352,14 +352,14 @@ RIFT_STAGE_FLAVOUR = {
 
 
 async def _generate_rift_bulletin(rift: Dict, event: str) -> Optional[str]:
-    """Ask Ollama to write a Rift-stage bulletin grounded in current state."""
-    import httpx, logging
+    """
+    Generate a Rift-stage bulletin using KimiAgent.
+    
+    REFACTORED: Now uses src.agents.generate_bulletin helper.
+    """
+    from src.agents import generate_bulletin
+    import logging
     logger = logging.getLogger(__name__)
-
-    from src.ollama_busy import is_available, get_busy_reason
-    if not is_available():
-        logger.info(f"🌀 Ollama busy ({get_busy_reason()}) — skipping rift bulletin")
-        return None
 
     location  = rift["location"]
     stage     = rift["stage"]
@@ -373,7 +373,6 @@ async def _generate_rift_bulletin(rift: Dict, event: str) -> Optional[str]:
         )
     elif event == "sealed":
         seal_desc = rift.get("seal_desc", f"The Rift at {location} has been sealed.")
-        sealed_by = rift.get("sealed_by", "unknown")
         seal_stage = stage  # the stage it was at when sealed
         instruction = (
             f"A Rift at {location} has been SEALED at the '{seal_stage}' stage. "
@@ -394,37 +393,13 @@ async def _generate_rift_bulletin(rift: Dict, event: str) -> Optional[str]:
             f"Do NOT over-dramatise early stages. A whisper is just a whisper."
         )
 
-    prompt = f"""{_WORLD_LORE_BRIEF}
-
-{instruction}
-
-RULES:
-- Output ONLY the bulletin. No preamble, no sign-off.
-- Use Discord markdown. 3-4 lines max.
-- Ground it in the specific location and current faction responses appropriate to that stage.
-- If your response contains anything other than the bulletin, you have failed."""
-
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
-        lines = text.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or None
+        bulletin = await generate_bulletin(
+            news_type="rift",
+            instruction=instruction,
+            max_lines=4,
+        )
+        return bulletin
     except Exception as e:
         logger.error(f"Rift bulletin generation error: {e}")
         return None
@@ -663,9 +638,9 @@ async def check_missing_tick() -> list:
     Called each bulletin cycle.
     Posts a missing persons notice when due, and any resolution updates.
     Returns list of bulletin strings.
+    
+    REFACTORED: generate_missing_bulletin now uses KimiAgent internally.
     """
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
     outputs = []
 
     # Check resolutions first
@@ -676,7 +651,7 @@ async def check_missing_tick() -> list:
 
     # Maybe post a new notice
     if should_post_missing():
-        bulletin = await generate_missing_bulletin(ollama_model, ollama_url)
+        bulletin = await generate_missing_bulletin()  # No longer needs ollama params
         if bulletin:
             _write_memory("[Missing persons notice posted]")
             outputs.append(bulletin)
@@ -2585,7 +2560,19 @@ def _extract_contextual_characters(text: str) -> list[str]:
         descriptors.append("robed figure in ritual vestments")
     if any(w in text_lower for w in ["arcane", "mage", "wizard", "spell", "magical"]):
         descriptors.append("figure wearing enchanted robes, arcane symbols")
-    if any(w in text_lower for w in [\"oracle\", \"seer\", \"prophet\"]):\n        descriptors.append(\"mysteriously cloaked oracle figure\")\n    if any(w in text_lower for w in [\"noble\", \"lord\", \"lady\", \"aristocrat\", \"elite\"]):\n        descriptors.append(\"figure in fine silks, noble bearing\")\n    if any(w in text_lower for w in [\"crowd\", \"mass\", \"gathering\", \"assembly\"]):\n        descriptors.append(\"crowd of diverse figures\")\n    if any(w in text_lower for w in [\"stranger\", \"unknown\", \"mysterious\", \"hooded\"]):\n        descriptors.append(\"mysterious figure, features hidden\")\n    \n    return descriptors[:3]  # Limit to 3 contextual descriptors\n\n\ndef _get_party_home_district(party_profile: dict) -> str:
+    if any(w in text_lower for w in ["oracle", "seer", "prophet"]):
+        descriptors.append("mysteriously cloaked oracle figure")
+    if any(w in text_lower for w in ["noble", "lord", "lady", "aristocrat", "elite"]):
+        descriptors.append("figure in fine silks, noble bearing")
+    if any(w in text_lower for w in ["crowd", "mass", "gathering", "assembly"]):
+        descriptors.append("crowd of diverse figures")
+    if any(w in text_lower for w in ["stranger", "unknown", "mysterious", "hooded"]):
+        descriptors.append("mysterious figure, features hidden")
+    
+    return descriptors[:3]  # Limit to 3 contextual descriptors
+
+
+def _get_party_home_district(party_profile: dict) -> str:
     """Derive a home district key from a party profile JSON."""
     text = ((party_profile.get("specialty") or "") + " " +
             (party_profile.get("affiliation") or "")).lower()

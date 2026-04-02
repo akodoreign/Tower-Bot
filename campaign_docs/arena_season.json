@@ -1,11 +1,11 @@
 {
   "season": 1,
-  "match_count": 10,
+  "match_count": 11,
   "fighters": [
     {
       "name": "Aric Veyne",
       "rank": 1,
-      "wins": 23,
+      "wins": 24,
       "losses": 4,
       "title": "The Silver Spire",
       "faction": "Argent Blades",
@@ -69,7 +69,7 @@
       "name": "Priest of Ash",
       "rank": 8,
       "wins": 10,
-      "losses": 12,
+      "losses": 13,
       "title": null,
       "faction": "Serpent Choir",
       "notes": "Fights under divine contract terms. Wins count as Kharma donations."
@@ -111,8 +111,8 @@
       "notes": "Loses dramatically. Enormous fan base. Suspects the fix is in."
     }
   ],
-  "last_match_at": "2026-03-29T08:27:25.330592",
-  "next_match_at": "2026-04-01T04:27:19.330592",
+  "last_match_at": "2026-04-01T05:21:00.673439",
+  "next_match_at": "2026-04-04T03:59:41.673439",
   "last_posted_at": null,
   "match_log": [
     {
@@ -194,6 +194,14 @@
       "loser": "Kassia Mor",
       "location": "the Night Pits invitation bout",
       "at": "2026-03-29T08:27:25.330592"
+    },
+    {
+      "match": 11,
+      "type": "standard",
+      "winner": "Aric Veyne",
+      "loser": "Priest of Ash",
+      "location": "the Arena's underground Cage circuit",
+      "at": "2026-04-01T05:21:00.673439"
     }
   ]
 }

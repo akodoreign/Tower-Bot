@@ -2,22 +2,17 @@
 # Skill: Mission Patterns
 **Keywords:** mission, pattern, history, success, failure, difficulty, board
 **Category:** learned
-**Version:** 4
+**Version:** 7
 **Source:** self-learned
 
-**Description:** Analyzes patterns from the D&D campaign's mission history to provide insights and suggestions.
-
-**Observations:**
-
-1. **Mission Types:** Most frequent mission types are "The Warrens" (3), "Veil" (2), and "Lost" (2). "Sweep" and "Shattered" have been claimed but not yet completed.
-
-2. **Success/Failure Patterns:** The success rate is approximately 50%. Missions with the word "Veil" have been completed, while "Lost" and "Sweep" have been claimed but not yet completed.
-
-3. **Difficulty Distribution:** Difficulty ratings are unspecified. Further analysis would be needed to determine the distribution.
-
-4. **Suggestions:** To maintain balance and engagement, consider generating a mix of completed and open missions with varying difficulty levels. Recommended mission types for the next batch are "The Forgotten Veil Unraveled", "Feathers of a Legend", "The Test of Faith", "The Protected Convoy", and "The Lost Runner". These missions are either open or have not been completed yet and vary in type, offering a balanced and engaging experience.
-
-**Actions:**
-- Analyze mission history to identify patterns.
-- Provide insights and suggestions based on the observed patterns.
+**Analysis Summary:**
+- Most frequent mission types: Claimed (41.67%) and Completed (38.33%) missions
+- Success rate: 71.43%
+- Difficulty distribution: Majority (58.33%) of missions are of unknown difficulty
+- Suggestions for new missions:
+  - Increase variety by introducing more missions of known difficulty levels
+  - Balance the number of open, claimed, and completed missions to provide a mix of exploration and challenge
+  - Consider adding higher difficulty missions to engage advanced parties
 ```
+
+This analysis highlights that the majority of the missions are claimed and completed, with a relatively high success rate. However, the difficulty of most missions is unknown. To improve the campaign's diversity and challenge, it is recommended to introduce more missions of known difficulty levels and balance the number of open, claimed, and completed missions. Additionally, consider adding higher difficulty missions for advanced parties.

@@ -55,8 +55,32 @@
     "loc_type": "warrens",
     "stage": "open",
     "stage_entered_at": "2026-03-29T11:44:02.831560",
-    "resolved": false,
+    "resolved": true,
     "spawned_at": "2026-03-23T03:21:25.215726",
-    "last_bulletin_stage": "open"
+    "last_bulletin_stage": "open",
+    "outcome": "sealed",
+    "sealed_by": "wardens",
+    "sealed_at": "2026-03-30T12:48:52.474906",
+    "seal_desc": "A combined Warden-Argent Blades strike team sealed the Rift at Night Pits. Casualties reported but not confirmed. The area remains cordoned."
+  },
+  {
+    "id": "rift_1775013156",
+    "location": "Collapsed Plaza",
+    "loc_type": "warrens",
+    "stage": "whisper",
+    "stage_entered_at": "2026-03-31T22:12:36.885391",
+    "resolved": false,
+    "spawned_at": "2026-03-31T22:12:36.885391",
+    "last_bulletin_stage": "whisper"
+  },
+  {
+    "id": "rift_1775021193",
+    "location": "Scrapworks",
+    "loc_type": "warrens",
+    "stage": "whisper",
+    "stage_entered_at": "2026-04-01T00:26:33.981382",
+    "resolved": false,
+    "spawned_at": "2026-04-01T00:26:33.981382",
+    "last_bulletin_stage": "whisper"
   }
 ]

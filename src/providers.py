@@ -66,33 +66,91 @@ class BaseProvider(ABC):
 
 class FreeProvider(BaseProvider):
     """
-    Local provider using Ollama (mistral by default) as backend.
+    Local provider using Pi/OpenClaw stack with Qwen and Kimi agents.
+
+    REFACTORED: Now uses the new agent system:
+        - QwenAgent: Fast local inference (default for /chat)
+        - KimiAgent: Complex reasoning with subagents (optional)
 
     This implements the BaseProvider interface so it can be used by
     the ProviderManager and the /provider command just like OpenAI, Claude, etc.
-    It calls ONLY the local Ollama HTTP API at http://localhost:11434/api/chat.
     """
 
     def __init__(self):
         super().__init__(api_key=None)
-        # Hard-lock to local mistral model
-        self.default_model_name = "mistral"
-        # If you ever want to allow changing the name via env var:
-        # self.default_model_name = os.getenv("OLLAMA_MODEL", "mistral")
+        # Default to qwen for fast local inference
+        self.default_model_name = os.getenv("QWEN_MODEL", "qwen")
+        self._qwen_agent = None
+        self._kimi_agent = None
 
-    async def _ollama_chat(
+    def _get_qwen_agent(self):
+        """Lazy-load QwenAgent."""
+        if self._qwen_agent is None:
+            from src.agents import QwenAgent
+            self._qwen_agent = QwenAgent()
+        return self._qwen_agent
+
+    def _get_kimi_agent(self):
+        """Lazy-load KimiAgent."""
+        if self._kimi_agent is None:
+            from src.agents import KimiAgent
+            self._kimi_agent = KimiAgent()
+        return self._kimi_agent
+
+    async def _agent_chat(
         self,
         messages: List[Dict[str, str]],
         model_name: Optional[str] = None,
         **kwargs,
     ) -> str:
+        """
+        Route chat to appropriate agent based on model name.
+        
+        Model routing:
+            - 'kimi' or 'kimi-k2.5:cloud' → KimiAgent (complex reasoning)
+            - anything else → QwenAgent (fast local)
+        """
+        if model_name is None:
+            model_name = self.default_model_name
+
+        # Determine which agent to use
+        use_kimi = model_name and ("kimi" in model_name.lower())
+
+        try:
+            if use_kimi:
+                agent = self._get_kimi_agent()
+            else:
+                agent = self._get_qwen_agent()
+
+            # Use the agent's chat method for multi-turn conversation
+            response = await agent.chat(
+                messages=messages,
+                temperature=kwargs.get("temperature"),
+                max_tokens=kwargs.get("max_tokens"),
+            )
+
+            if response.success:
+                return response.content
+            else:
+                logger.warning(f"FreeProvider agent error: {response.error}")
+                return f"*Agent error: {response.error}*"
+
+        except Exception as e:
+            logger.error(f"FreeProvider error: {type(e).__name__}: {e}")
+            # Fallback to direct Ollama call for resilience
+            return await self._fallback_ollama_chat(messages, model_name, **kwargs)
+
+    async def _fallback_ollama_chat(
+        self,
+        messages: List[Dict[str, str]],
+        model_name: Optional[str] = None,
+        **kwargs,
+    ) -> str:
+        """Fallback direct Ollama call if agent system fails."""
         import httpx
 
         if model_name is None:
             model_name = self.default_model_name
-
-        # NOTE: RAG context is injected upstream by aclient.handle_response().
-        # Do NOT inject it again here — that would send the system prompt twice.
 
         payload = {
             "model": model_name,
@@ -100,29 +158,30 @@ class FreeProvider(BaseProvider):
             "stream": False,
         }
 
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(
-                "http://localhost:11434/api/chat",
-                json=payload,
-            )
-            resp.raise_for_status()
-            data = resp.json()
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                resp = await client.post(
+                    "http://localhost:11434/api/chat",
+                    json=payload,
+                )
+                resp.raise_for_status()
+                data = resp.json()
 
-        content = None
-        if isinstance(data, dict):
-            msg = data.get("message")
-            if isinstance(msg, dict):
-                content = msg.get("content")
-            elif "choices" in data:
-                try:
-                    content = data["choices"][0]["message"]["content"]
-                except Exception:
-                    content = None
+            content = None
+            if isinstance(data, dict):
+                msg = data.get("message")
+                if isinstance(msg, dict):
+                    content = msg.get("content")
+                elif "choices" in data:
+                    try:
+                        content = data["choices"][0]["message"]["content"]
+                    except Exception:
+                        content = None
 
-        if not content:
-            content = str(data)
-
-        return content
+            return content or str(data)
+        except Exception as e:
+            logger.error(f"FreeProvider fallback error: {e}")
+            return f"*Local model unavailable: {type(e).__name__}*"
 
     async def acreate(
         self,
@@ -131,7 +190,7 @@ class FreeProvider(BaseProvider):
         **kwargs,
     ) -> str:
         # Convenience entrypoint (some older code may call this)
-        return await self._ollama_chat(messages, model_name=model_name, **kwargs)
+        return await self._agent_chat(messages, model_name=model_name, **kwargs)
 
     async def chat_completion(
         self,
@@ -141,8 +200,9 @@ class FreeProvider(BaseProvider):
     ) -> str:
         """
         Standard chat interface used by ProviderManager and Discord client.
+        Routes to QwenAgent (fast) or KimiAgent (complex) based on model name.
         """
-        return await self._ollama_chat(
+        return await self._agent_chat(
             messages, model_name=model or self.default_model_name, **kwargs
         )
 
@@ -150,18 +210,29 @@ class FreeProvider(BaseProvider):
         self, prompt: str, model: Optional[str] = None, **kwargs
     ) -> str:
         raise NotImplementedError(
-            "FreeProvider (local Ollama) does not support image generation in this bot."
+            "FreeProvider does not support image generation. Use A1111 via /draw."
         )
 
     def get_available_models(self) -> List[ModelInfo]:
+        """Return available local models."""
+        qwen_model = os.getenv("QWEN_MODEL", "qwen")
+        kimi_model = os.getenv("KIMI_MODEL", "kimi-k2.5:cloud")
+        
         return [
             ModelInfo(
-                name=self.default_model_name,
+                name=qwen_model,
                 provider=ProviderType.FREE,
-                description="Local Ollama model (Tower Oracle with campaign_docs RAG)",
+                description="Fast local inference (QwenAgent) — rules, style, quick tasks",
                 supports_vision=False,
                 supports_image_generation=False,
-            )
+            ),
+            ModelInfo(
+                name=kimi_model,
+                provider=ProviderType.FREE,
+                description="Complex reasoning with subagents (KimiAgent) — bulletins, missions",
+                supports_vision=False,
+                supports_image_generation=False,
+            ),
         ]
 
     def supports_image_generation(self) -> bool:

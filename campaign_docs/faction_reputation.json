@@ -9,7 +9,7 @@
   },
   "Wardens of Ash": {
     "tier": "Friendly",
-    "points": 1
+    "points": 2
   },
   "Serpent Choir": {
     "tier": "Neutral",
@@ -41,6 +41,6 @@
   },
   "Wizards Tower": {
     "tier": "Associated",
-    "points": 1
+    "points": 2
   }
 }

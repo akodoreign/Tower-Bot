@@ -32,6 +32,7 @@ TIER_OFFSET: Dict[str, int] = {
     "investigation": 2,
     "rift":          3,
     "dungeon":       3,
+    "dungeon-delve": 3,
     "major":         4,
     "inter-guild":   4,
     "high-stakes":   5,

@@ -1,19 +1,40 @@
 """
-mission_builder — Modular mission module generator for Tower of Last Chance.
+mission_builder — Complete D&D mission generation system with JSON + images.
 
-This package replaces the monolithic mission_module_gen.py with a cleaner architecture:
+Refactored system (Steps 1-4) providing structured JSON output with full image support.
+
+High-level API exports for easy integration:
+    generate_mission()                  - Sync mission generation
+    generate_mission_async()            - Async mission generation
+    generate_mission_with_images()      - Mission + battle maps (async)
+    generate_mission_with_images_sync() - Mission + battle maps (sync)
+    generate_complete_mission()         - Full generation to disk
+    
+For advanced usage:
+    MissionJsonBuilder                  - Fluent mission builder
+    generate_module_json()              - Raw 4-pass Ollama generation
+    generate_dungeon_tiles_for_rooms()  - Tile generation
+    stitch_dungeon_map()                - Map composite stitching
+    
+Schemas and validation:
+    MissionModule, ImageAsset, DungeonRoom, NPC, etc.
+
+SKILLS SYSTEM (project-wide):
+    Skills are now centralized in src.skills and exposed here for convenience.
+    Use from src or from here:
+        from src.mission_builder import (
+            load_all_skills,
+            set_use_skills,
+            build_system_prompt_with_skills,
+        )
+    Or better: use from src directly:
+        from src import load_all_skills, set_use_skills
+
+LEGACY MODULES (still available):
 - locations.py: Gazetteer integration for real named places
-- leads.py: Investigation leads system (replaces Read Aloud)
+- leads.py: Investigation leads system
 - encounters.py: Combat design and stat blocks
 - npcs.py: NPC generation and dialogue
-- rewards.py: Loot tables and consequences
-- docx_builder.py: DOCX output generation
-
-MAJOR CHANGES from original:
-1. ❌ NO MORE "Read Aloud" sections — these are replaced by:
-2. ✅ Investigation Leads with WHY to go there
-3. ✅ Real location names from city_gazetteer.json
-4. ✅ Multiple approach options (social/stealth/direct)
 """
 
 from __future__ import annotations
@@ -26,6 +47,17 @@ import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict
+
+# Skills system — re-exported for convenience
+from src.skills import (
+    load_all_skills,
+    set_use_skills,
+    get_skill_for_task,
+    build_system_prompt_with_skills,
+    list_available_skills,
+    get_skill_content,
+    enhance_generation_with_skills,
+)
 
 from .locations import (
     load_gazetteer,
@@ -68,6 +100,16 @@ from .maps import (
     generate_module_maps,
     post_maps_to_channel,
 )
+from .schemas import (
+    validate_mission_module,
+    MissionModule,
+)
+from .mission_json_builder import (
+    MissionJsonBuilder,
+    create_mission_module,
+)
+
+# json_generator is imported on-demand to avoid circular imports
 
 logger = logging.getLogger(__name__)
 

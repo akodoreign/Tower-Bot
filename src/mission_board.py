@@ -126,19 +126,20 @@ async def _get_results_channel(client, fallback_channel=None):
 # ---------------------------------------------------------------------------
 
 TIER_EXPIRY = {
-    "local":       (1,   7),
-    "patrol":      (1,   7),
-    "escort":      (7,  30),
-    "standard":    (7,  30),
+    "local":        (1,   7),
+    "patrol":       (1,   7),
+    "escort":       (7,  30),
+    "standard":     (7,  30),
     "investigation":(7, 30),
-    "rift":        (30, 90),
-    "dungeon":     (30, 90),
-    "major":       (30, 90),
-    "inter-guild": (30, 90),
-    "epic":        (90, 190),
-    "divine":      (90, 190),
-    "tower":       (90, 190),
-    "high-stakes": (60, 120),
+    "rift":         (30, 90),
+    "dungeon":      (30, 90),
+    "dungeon-delve":(30, 90),
+    "major":        (30, 90),
+    "inter-guild":  (30, 90),
+    "epic":         (90, 190),
+    "divine":       (90, 190),
+    "tower":        (90, 190),
+    "high-stakes":  (60, 120),
 }
 
 DEFAULT_EXPIRY = (7, 30)
@@ -152,6 +153,7 @@ PERSONAL_TIER_EXPIRY = {
     "investigation":(30,  60),
     "rift":         (60,  90),
     "dungeon":      (60,  90),
+    "dungeon-delve":(60,  90),
     "major":        (60,  90),
     "inter-guild":  (60,  90),
     "epic":         (90, 190),
@@ -552,40 +554,22 @@ async def post_hostile_mission(channel, faction: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Ollama call
+# Mission generation (uses KimiAgent)
 # ---------------------------------------------------------------------------
 
 async def _generate(prompt: str) -> Optional[str]:
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-
+    """
+    Generate mission content using KimiAgent.
+    
+    REFACTORED: Now uses src.agents.generate_mission_text helper.
+    """
+    from src.agents import generate_mission_text
+    import logging
+    
     try:
-        import httpx
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
-
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
-
-        # Strip AI preamble
-        lines = text.splitlines()
-        skip = ("sure", "here's", "here is", "as requested", "certainly",
-                "of course", "i hope", "below is", "absolutely")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or None
-
+        text = await generate_mission_text(prompt, temperature=0.9)
+        return text
     except Exception as e:
-        import logging
         logging.getLogger(__name__).error(f"mission_board _generate error: {e}")
         return None
 

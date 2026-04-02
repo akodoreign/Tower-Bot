@@ -1,27 +1,24 @@
 # Skill: Mission Quality Report
 **Keywords:** mission, quality, analysis, improvement, balance
 **Category:** learned
-**Version:** 1
+**Version:** 4
 **Source:** self-learned
 
-## Quality Score: 5/10
-### Issues Detected
-1. **Faction Imbalance**: Glass Sigil (27.8%) and Wardens of Ash (25%) have a high number of missions, while others have none.
-2. **Repetitive Patterns**: The majority of missions are local (60%) and escort (25%), with few variety in types.
-3. **Completion Rate**: No completed, failed, or expired missions indicate no engagement or challenge.
-4. **Player vs NPC Claim Ratio**: NPCs claim as many missions as players, which could suggest a lack of player interest.
-5. **Quality of Mission Type Seeds**: Some seeds are generic and lack specifics, which may not entice players.
+## Quality Score: 6/10
+## Issues Detected
+1. Faction imbalance: Wardens of Ash missions (6 out of 20) are overrepresented.
+2. Repetitive patterns: Escort missions (6 out of 20) appear too often.
+3. Completion rate: No completed or failed missions in the last 20.
+4. Player vs NPC claim ratio: NPCs claim more missions (11 out of 28 total claims).
+5. Quality of mission type seeds: Some seeds are vague, such as "A Dance with Dark Forces" and "The Long Owed Debt."
 
 ## Recommendations
-1. **Balance Factions**: Distribute missions more evenly among factions to promote diversity and engagement.
-2. **Vary Mission Types**: Introduce more unique mission types to keep players engaged and interested.
-3. **Set Challenging Missions**: Aim for a 50-70% success rate to encourage players and create a sense of accomplishment.
-4. **Encourage Player Claims**: Incentivize players to claim missions by offering rewards or bonuses.
-5. **Specific Mission Seeds**: Create seeds that are detailed, intriguing, and evoke a sense of adventure.
+1. Balance faction distribution: Reduce the number of missions for Wardens of Ash and distribute them to other factions.
+2. Introduce more mission types to reduce repetition.
+3. Encourage player interaction by increasing the number of player-driven missions.
+4. Improve the specificity and evocativeness of mission type seeds.
 
 ## Next Cycle Focus
-1. **Diversify Faction Missions**: Ensure each faction has a fair share of missions in the next cycle.
-2. **Introduce New Mission Types**: Incorporate a variety of mission types to keep the campaign fresh.
-3. **Set Ambitious Goals**: Strive for a higher completion rate to encourage player participation.
-4. **Promote Player Claims**: Implement mechanisms to boost player engagement and mission claims.
-5. **Improve Mission Seeds**: Refine mission seeds to be more specific, evocative, and engaging.
+1. Encourage mission completion by introducing more player-driven, competitive missions.
+2. Balance faction representation and mission types to foster a more engaging and diverse campaign.
+3. Continuously refine and improve the quality of mission type seeds to create more engaging and immersive experiences.

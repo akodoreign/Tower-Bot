@@ -427,11 +427,11 @@
     "condition": "Well-used",
     "seller": "Anonymous",
     "starting_bid": 72423,
-    "current_bid": 4035939,
-    "bid_count": 53,
+    "current_bid": 4404622,
+    "bid_count": 54,
     "listed_at": "2026-03-23T17:17:20.681748",
     "expires_at": "2026-03-30T17:17:20.681748",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774304243,
@@ -441,11 +441,11 @@
     "condition": "Damaged",
     "seller": "The Silent Market",
     "starting_bid": 19455,
-    "current_bid": 344589,
-    "bid_count": 40,
+    "current_bid": 375177,
+    "bid_count": 41,
     "listed_at": "2026-03-23T17:17:23.046572",
     "expires_at": "2026-03-30T17:17:23.046572",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774304245,
@@ -455,11 +455,11 @@
     "condition": "Mint",
     "seller": "The Echoing Mourners",
     "starting_bid": 36694,
-    "current_bid": 667984,
-    "bid_count": 41,
+    "current_bid": 726245,
+    "bid_count": 42,
     "listed_at": "2026-03-23T17:17:25.898442",
     "expires_at": "2026-03-30T17:17:25.898442",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774391868,
@@ -469,11 +469,11 @@
     "condition": "Excellent",
     "seller": "Anonymous - rumored to be a relic dealer from the Fallen Archivist's guild",
     "starting_bid": 37349,
-    "current_bid": 629774,
-    "bid_count": 37,
+    "current_bid": 881513,
+    "bid_count": 42,
     "listed_at": "2026-03-24T17:37:48.319969",
     "expires_at": "2026-03-31T17:37:48.319969",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774391870,
@@ -483,11 +483,11 @@
     "condition": "Well-used",
     "seller": "The Coven of the Forgotten",
     "starting_bid": 33693,
-    "current_bid": 1062106,
-    "bid_count": 47,
+    "current_bid": 1926277,
+    "bid_count": 54,
     "listed_at": "2026-03-24T17:37:50.781310",
     "expires_at": "2026-03-31T17:37:50.781310",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774477490,
@@ -497,11 +497,11 @@
     "condition": "Mint",
     "seller": "The Whispering Market, a shadowy faction with connections to the Undercity's hidden corners",
     "starting_bid": 74893,
-    "current_bid": 852099,
-    "bid_count": 35,
+    "current_bid": 3343566,
+    "bid_count": 55,
     "listed_at": "2026-03-25T17:24:50.845446",
     "expires_at": "2026-04-01T17:24:50.845446",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774567316,
@@ -511,8 +511,8 @@
     "condition": "Well-used",
     "seller": "The Shade Broker",
     "starting_bid": 43705,
-    "current_bid": 199546,
-    "bid_count": 21,
+    "current_bid": 835062,
+    "bid_count": 40,
     "listed_at": "2026-03-26T18:21:56.602246",
     "expires_at": "2026-04-02T18:21:56.602246",
     "sold": false
@@ -525,8 +525,8 @@
     "condition": "Mint",
     "seller": "The Ebony Whisper's Cryptic Auction House",
     "starting_bid": 68253,
-    "current_bid": 384971,
-    "bid_count": 21,
+    "current_bid": 1424300,
+    "bid_count": 41,
     "listed_at": "2026-03-26T18:21:59.459610",
     "expires_at": "2026-04-02T18:21:59.459610",
     "sold": false
@@ -539,8 +539,8 @@
     "condition": "Well-used",
     "seller": "The Mysterious Dealer of the Dome",
     "starting_bid": 64867,
-    "current_bid": 330088,
-    "bid_count": 21,
+    "current_bid": 1742134,
+    "bid_count": 44,
     "listed_at": "2026-03-26T18:22:02.197316",
     "expires_at": "2026-04-02T18:22:02.197316",
     "sold": false
@@ -553,10 +553,94 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 last seen in the TowerBay's shadowy corners",
     "starting_bid": 36057,
-    "current_bid": 345633,
-    "bid_count": 35,
+    "current_bid": 1123135,
+    "bid_count": 54,
     "listed_at": "2026-03-26T18:22:05.047439",
     "expires_at": "2026-04-02T18:22:05.047439",
+    "sold": false
+  },
+  {
+    "id": 1774911064,
+    "name": "Sobbing Stitched Shroud",
+    "description": "A grieving cloak stitched from the sorrow of the fallen. Whispers of the lost echo within its folds. Originally crafted by the mysterious tailors of the Weeping Ward.",
+    "category": "Utility Gear",
+    "condition": "Well-used",
+    "seller": "The Anonymous Weaver of Tears",
+    "starting_bid": 26688,
+    "current_bid": 116948,
+    "bid_count": 22,
+    "listed_at": "2026-03-30T17:51:04.029686",
+    "expires_at": "2026-04-06T17:51:04.029686",
+    "sold": false
+  },
+  {
+    "id": 1774911066,
+    "name": "Wraith's Echoing Chariot",
+    "description": "A spectral chariot once belonging to the ghostly regents of the Undercity, this vehicle has seen its fair share of secrets and whispers. The chariot's dark essence propels it swiftly through the murky streets, leaving an eerie glow in its wake.",
+    "category": "Vehicles & Mounts",
+    "condition": "Mint",
+    "seller": "Anonymous: The Whispering Market",
+    "starting_bid": 71746,
+    "current_bid": 429466,
+    "bid_count": 22,
+    "listed_at": "2026-03-30T17:51:06.362629",
+    "expires_at": "2026-04-06T17:51:06.362629",
+    "sold": false
+  },
+  {
+    "id": 1774911068,
+    "name": "Sorrow's Lamenting Quill",
+    "description": "A quill dipped in the ink of sorrowful bards, once belonging to a forgotten minstrel who composed songs of woe beneath the Dome. Its use whispers tales of despair, in a language only the lost can understand.",
+    "category": "Contraband",
+    "condition": "Mint",
+    "seller": "Whispers of the Veil",
+    "starting_bid": 18285,
+    "current_bid": 46398,
+    "bid_count": 13,
+    "listed_at": "2026-03-30T17:51:08.545698",
+    "expires_at": "2026-04-06T17:51:08.545698",
+    "sold": false
+  },
+  {
+    "id": 1774997895,
+    "name": "The Whispering Echonaut's Journal",
+    "description": "Once belonging to the infamous Echonaut, this journal documents his forays into the Undercity's forbidden zones, revealing tales of unearthed horrors and unexplored mysteries. Its pages seem to echo with the whispers of forgotten spirits, hinting at the journal's ominous past.",
+    "category": "Documents & Lore",
+    "condition": "Well-used",
+    "seller": "The Inquisitor's Guild - Auctioned under duress",
+    "starting_bid": 52607,
+    "current_bid": 110520,
+    "bid_count": 10,
+    "listed_at": "2026-03-31T17:58:15.914367",
+    "expires_at": "2026-04-07T17:58:15.914367",
+    "sold": false
+  },
+  {
+    "id": 1774997898,
+    "name": "Melancholy Marionette's Tear",
+    "description": "A once-lively marionette, now hollow and filled with the sorrow of a thousand lost souls. Originally crafted by the tormented puppet master of the Dome's lowest levels, this eerie relic is rumored to hold a fragment of his unending sadness. Provenance: The Weeping Marionette's Hollow",
+    "category": "Contraband",
+    "condition": "Well-used",
+    "seller": "The Shadow Broker",
+    "starting_bid": 15999,
+    "current_bid": 37484,
+    "bid_count": 11,
+    "listed_at": "2026-03-31T17:58:18.422611",
+    "expires_at": "2026-04-07T17:58:18.422611",
+    "sold": false
+  },
+  {
+    "id": 1775084059,
+    "name": "Echoes of the Forgotten Chorus",
+    "description": "An ancient parchment scroll detailing the haunting melodies once performed by the spectral choir of the Undercity's founding, lost to time and now discovered in the ruins of the Drowned Bard's theatre. The parchment carries a chilling aura, hinting at the untold stories it bears. Provenance: Found by the Anonymous Gravedigger.",
+    "category": "Documents & Lore",
+    "condition": "Mint",
+    "seller": "Anonymous Gravedigger",
+    "starting_bid": 24297,
+    "current_bid": 41285,
+    "bid_count": 7,
+    "listed_at": "2026-04-01T17:54:19.800805",
+    "expires_at": "2026-04-08T17:54:19.800805",
     "sold": false
   }
 ]

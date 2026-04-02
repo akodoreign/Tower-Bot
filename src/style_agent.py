@@ -9,6 +9,8 @@ Two purposes:
   2. Internal use — enrich /draw prompts and /setcharappearance descriptions
      with clothing details appropriate to the character and Undercity setting.
 
+REFACTORED: Now uses QwenAgent for fast local inference via Pi/OpenClaw stack.
+
 The Undercity aesthetic:
   - Architecture and fashion from ALL worlds the Tower has devoured.
   - Dark, worn, practical base — topped with faction-specific flourishes.
@@ -18,12 +20,12 @@ The Undercity aesthetic:
 Exported:
     describe_character_style(char_name, char_class, faction, occasion, context) -> str
     enrich_appearance_prompt(base_description, char_class, faction) -> str
+    faction_style_summary(faction) -> str
     FACTION_STYLE_NOTES  — dict for reference
 """
 
 from __future__ import annotations
 
-import os
 from typing import Optional
 
 from src.log import logger
@@ -152,6 +154,40 @@ OCCASION_NOTES = {
 
 
 # ---------------------------------------------------------------------------
+# Lazy-loaded QwenAgent instance
+# ---------------------------------------------------------------------------
+
+_qwen_agent = None
+
+def _get_qwen_agent():
+    """Get or create the QwenAgent instance (lazy loading)."""
+    global _qwen_agent
+    if _qwen_agent is None:
+        from src.agents import QwenAgent
+        _qwen_agent = QwenAgent()
+    return _qwen_agent
+
+
+def _build_faction_style_context(faction: str, char_class: str, occasion: str) -> str:
+    """Build the faction/class/occasion context string for the agent."""
+    faction_key = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
+    faction_data = FACTION_STYLE_NOTES.get(faction_key, FACTION_STYLE_NOTES["independent"])
+    class_note = CLASS_STYLE_NOTES.get(char_class.lower(), "no specific class note")
+    occasion_note = OCCASION_NOTES.get(occasion.lower(), "general wear — character's own taste")
+    
+    return f"""FACTION AESTHETIC ({faction_data['name']}):
+- Palette: {faction_data['palette']}
+- Materials: {faction_data['materials']}
+- Accessories: {faction_data['accessories']}
+- Vibe: {faction_data['vibe']}
+- Signature: {faction_data['signature']}
+
+CLASS STYLE TENDENCY ({char_class or 'unspecified'}): {class_note}
+
+OCCASION ({occasion}): {occasion_note}"""
+
+
+# ---------------------------------------------------------------------------
 # Core agent function
 # ---------------------------------------------------------------------------
 
@@ -168,67 +204,28 @@ async def describe_character_style(
 
     Returns a Discord-formatted string.
     """
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-
     # Build context from faction/class/occasion data
-    faction_key  = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
-    faction_data = FACTION_STYLE_NOTES.get(faction_key, FACTION_STYLE_NOTES["independent"])
-    class_note   = CLASS_STYLE_NOTES.get(char_class.lower(), "no specific class note")
-    occasion_note = OCCASION_NOTES.get(occasion.lower(), "general wear — character's own taste")
+    style_context = _build_faction_style_context(faction, char_class, occasion)
+    
+    if extra_notes:
+        style_context += f"\n\nADDITIONAL NOTES: {extra_notes}"
 
-    prompt = f"""You are a costume and style designer for the Undercity — a sealed fantasy city that has absorbed
-fashion, materials, and aesthetic from hundreds of devoured worlds. Think: dark medieval fantasy base
-crossed with salvaged tech, divine silk, alchemical materials, neon enchantment, and post-apocalyptic
-patching. Lighting is mostly torch and bioluminescent vials.
-
-CHARACTER: {char_name}
-CLASS: {char_class or 'unspecified'}
-FACTION: {faction_data['name']}
-OCCASION: {occasion} — {occasion_note}
-{f'ADDITIONAL NOTES: {extra_notes}' if extra_notes else ''}
-
-FACTION AESTHETIC:
-- Palette: {faction_data['palette']}
-- Materials: {faction_data['materials']}
-- Accessories: {faction_data['accessories']}
-- Vibe: {faction_data['vibe']}
-- Signature: {faction_data['signature']}
-
-CLASS STYLE TENDENCY: {class_note}
-
-Write a vivid, specific clothing description for this character for this occasion.
-Include: primary outfit, colours, key materials, 2-3 specific accessories, footwear, and one distinctive detail
-that makes this outfit immediately recognisable as THEIRS.
-
-RULES:
-- Be specific and tactile. Name fabrics, describe wear and repair, mention functional details.
-- Ground it in the Undercity — no generic "fantasy peasant" or "standard adventurer" descriptions.
-- 4-6 lines. Discord markdown: **bold** key items, *italics* for atmosphere.
-- Output ONLY the description. No preamble, no sign-off."""
-
-    import httpx
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+        agent = _get_qwen_agent()
+        response = await agent.style_description(
+            character_name=char_name,
+            character_class=char_class,
+            faction=faction,
+            occasion=occasion,
+            faction_style=style_context,
+            class_style=CLASS_STYLE_NOTES.get(char_class.lower(), ""),
+        )
 
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
+        if not response.success:
+            logger.warning(f"style_agent QwenAgent error: {response.error}")
+            return f"*Style description unavailable: {response.error}*"
 
-        lines = text.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is", "great")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or "*Could not generate style description.*"
+        return response.content or "*Could not generate style description.*"
 
     except Exception as e:
         import traceback
@@ -251,12 +248,9 @@ async def enrich_appearance_prompt(
 
     Returns the enriched description string.
     """
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-
-    faction_key  = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
+    faction_key = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
     faction_data = FACTION_STYLE_NOTES.get(faction_key, FACTION_STYLE_NOTES["independent"])
-    class_note   = CLASS_STYLE_NOTES.get(char_class.lower(), "")
+    class_note = CLASS_STYLE_NOTES.get(char_class.lower(), "")
 
     prompt = f"""You are enriching a character description for an AI image generator.
 
@@ -276,28 +270,18 @@ and 1-2 accessories. Max 3 sentences. Written as Stable Diffusion prompt tags/ph
 
 Output ONLY the enriched description. No preamble."""
 
-    import httpx
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+        agent = _get_qwen_agent()
+        response = await agent.complete(
+            prompt=prompt,
+            temperature=0.7,
+        )
 
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
+        if not response.success:
+            logger.warning(f"enrich_appearance_prompt QwenAgent error: {response.error}")
+            return base_description  # fallback: return original unchanged
 
-        lines = text.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or base_description
+        return response.content or base_description
 
     except Exception as e:
         logger.warning(f"enrich_appearance_prompt error: {e}")
@@ -310,7 +294,7 @@ Output ONLY the enriched description. No preamble."""
 
 def faction_style_summary(faction: str) -> str:
     """Returns a quick Discord-formatted style summary for a faction."""
-    faction_key  = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
+    faction_key = faction.lower().replace(" ", "_").replace("'", "").replace("-", "_")
     data = FACTION_STYLE_NOTES.get(faction_key)
     if not data:
         return f"*No style data for faction: {faction}*"

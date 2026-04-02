@@ -1,15 +1,27 @@
 # Skill: NPC Landscape
 **Keywords:** NPC, roster, character, faction, who, where, people
 **Category:** learned
-**Version:** 3
+**Version:** 6
 **Source:** self-learned
 
-1. **Iron Fang Consortium (5 NPCs)**: Mostly concentrated in Markets Infinite, with one in Spire district and one in Lower Dockyards.
-2. **Guild of Ashen Scrolls (7 NPCs)**: Mainly in Archive Row, Artisan Quarter, and Scriptorium Quarter. Potential story hooks include lost sister connections, secret agendas, and the search for ancient knowledge.
-3. **Wardens of Ash (6 NPCs)**: Found throughout the city but focused on the Outer Wall and Eastern Bastion forge. Story hooks could involve internal corruption, resource sharing disputes, and investigations into Warden activity.
-4. **Tower Authority (3 NPCs)**: Mainly in the Grand Forum, with one in Archive Row. Potential story hooks include conflicts between Tower Authority and other factions, strategic planning, and secret independence.
-5. **Patchwork Saints (3 NPCs)**: Located in The Warrens and Scrapworks. Story hooks could involve resource sharing disputes, conflict resolution, and the balance between order and chaos.
-6. **Serpent Choir (4 NPCs)**: Primarily in the Sanctum Quarter, with one in Neon Row. Story hooks could involve divine contracts, negotiations, and espionage.
-7. **Brother Thane's Cult (3 NPCs)**: Mainly in Collapsed Plaza and the Cult Catacombs. Potential story hooks include recruitment, doctrinal interpretation, and goblin rituals.
-8. **Argent Blades (3 NPCs)**: Found in Guild Spires and Gilded Halls, as well as in the Outer Wall. Story hooks could involve leadership changes, internal conflicts, and frontline battles.
-9. **Gaps in coverage**: The Spire district and the Lower Dockyards have only one NPC each, which could be exploited for storytelling purposes. Additionally, there are no NPCs for Thesaurus communication protocols or the Obsidian Lotus, creating opportunities for new characters or factions.
+1. **Faction Distribution:**
+   - Iron Fang Consortium (6): Crimson Alley, Markets Infinite, Ironworks
+   - Wardens of Ash (8): Outer Wall, Eastern Bastion, The Fringe, The Narrows, South Gate garrison
+   - Patchwork Saints (3): The Warrens, Scrapworks, Gilded Halls
+   - Tower Authority (2): Grand Forum, Archive Row
+   - Serpent Choir (4): Pantheon Walk, Sanctum Quarter, Choir Hall lower level, Choir Undercroft sewers access
+   - Brother Thane's Cult (3): Collapsed Plaza, Cult House inner chambers, Cult Catacombs
+   - Guild of Ashen Scrolls (5): Archive Row, Artisan Quarter, Scriptorium Quarter lodging, Scriptorium Quarter deep archive, Guild of Ashen Scrolls vault annex
+   - Argent Blades (3): Guild Spires, Gilded Halls, Outer Wall, secondary checkpoint near Southern Warrens
+
+2. **Notable Roles and Potential Story Hooks:**
+   - Sera Voss (Iron Fang Consortium) manages field teams and handles disappearance contracts, providing opportunities for adventurers to uncover secrets.
+   - Corvin Thale (Wardens of Ash) investigates corruption and monitors Captain Havel Korin, potentially leading to a power struggle within the Wardens.
+   - Mira Kessan (independent) maintains a network of informants, offering opportunities for adventurers to gather information or to manipulate events.
+   - Vesper (Serpent Choir) mediates divine contracts, providing a connection to the city's divine powers and potential opportunities for divine quests.
+   - Gorgon Gizzick (Brother Thane's Cult) leads goblin rituals, suggesting a deeper connection to the Undercity's goblin population and potential cult-related mysteries.
+
+3. **Gaps in Coverage:**
+   - Neon Row, The Midden, and The Fringe have no significant presence of NPCs from major factions, indicating potential opportunities for adventurers to make a name for themselves or to infiltrate these areas.
+   - Mara the Scrapper, a significant figure in The Warrens, is not listed in the roster, suggesting an opportunity for a potential ally or rival for the Patchwork Saints.
+   - Director Myra Kess operates from the Tower proper, while Calix Drenn serves as the street presence, suggesting a potential power struggle or hidden agenda within the Tower Authority.

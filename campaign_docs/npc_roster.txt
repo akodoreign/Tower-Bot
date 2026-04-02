@@ -1,7 +1,7 @@
 # NPC ROSTER — TOWER OF LAST CHANCE
 # Auto-generated from npc_lifecycle system. Do not edit manually.
-# Last updated: 2026-03-30 07:25
-# Active NPCs: 94
+# Last updated: 2026-04-01 11:36
+# Active NPCs: 95
 
 ---NPC---
 NAME: Sera Voss
@@ -17,14 +17,14 @@ ROLE: Brokers relic acquisitions, manages field teams, occasionally handles "dis
 REVEALED: Sera Voss, in her clandestine existence, serves as a secret informant to the Undercity's Resistance movement, working against the Iron Fang Consortium from within.
 RELATIONSHIPS: Uneasy respect from Wex (courier — owes her a favour). Genuine dislike of Dova (Glass Sigil — she thinks archivists are parasites). Complicated history with Aric Veyne.
 ORACLE NOTES: The Oracle would sense ambition so sharp it has become its own kind of blindness. Sera doesn't fear gods — she just hasn't met one yet.
-HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-10] New secret acquired. | [2026-03-11] Secret revealed: Sera Voss, in her clandestine existence, serves as a secret ... | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries.
+HISTORY: [2026-03-11] Secret revealed: Sera Voss, in her clandestine existence, serves as a secret ... | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-31] Injured. | [2026-04-01] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Corvin Thale
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Lieutenant-Inspector (internal affairs — investigates Warden misconduct)
+RANK: Warden
 SPECIES: Human
 AGE: 52
 APPEARANCE: Heavy-set, deliberate in movement. Always in civilian clothes while on duty — the only Warden who never wears the uniform. Carries a battered ledger he writes in constantly.
@@ -34,7 +34,7 @@ ROLE: Investigates Warden corruption, oversees civilian complaint processing, qu
 SECRET: Corvin's file on Korin contains nothing damning — just questions about a man with no past. Four years of investigation have revealed only that Korin is exactly what he appears to be: loyal, dedicated, and protective. Corvin cannot explain why this troubles him. Perhaps he simply cannot believe anyone in the Undercity is truly clean. The file remains open not because of evidence, but because Corvin cannot accept the absence of it.
 RELATIONSHIPS: Respected but not liked by rank-and-file Wardens. Lieutenant Varen actively avoids him. Occasional contact with Director Myra Kess (FTA) — neither trusts the other but both find the arrangement useful. | Alliance with Kyri Zaltazar (Serpent Choir).
 ORACLE NOTES: The Oracle would see a man who has chosen patience as a weapon. He carries the weight of everything he hasn't done yet. That weight is getting heavy. Hostile toward adventurers who killed Grozak Bonecrusher.
-HISTORY: [2026-03-21] Injured. | [2026-03-22] Recovered from injuries. | [2026-03-25] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
+HISTORY: [2026-03-22] Recovered from injuries. | [2026-03-25] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted. | [2026-04-01] Promoted from Lieutenant-Inspector (internal affairs — investigates Warden misconduct) to Warden within Wardens of Ash.
 ---END NPC---
 
 ---NPC---
@@ -51,7 +51,7 @@ ROLE: Buys and sells intelligence. Maintains a network of low-level informants a
 SECRET: Mira has been feeding sanitised information to the FTA for two years — not enough to burn anyone, just enough to keep them from looking at her too closely. She calls it insurance. Her brother doesn't know.
 RELATIONSHIPS: Close working relationship with Kessan (twin, complementary operation). Wary respect for The Widow. Has a standing arrangement with Dova (Glass Sigil junior archivist) — Dova leaks anomaly data, Mira provides anonymity.
 ORACLE NOTES: The Oracle would find Mira interesting in the way a locked box is interesting. Information has a smell. She smells like someone who knows more than she sells.
-HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
+HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-30] Injured. | [2026-03-31] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -72,23 +72,6 @@ HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-0
 ---END NPC---
 
 ---NPC---
-NAME: Yuna Saltis
-STATUS: alive
-FACTION: Obsidian Lotus
-RANK: Memory Architect (specialist — designs and performs memory erasure contracts)
-SPECIES: Tiefling
-AGE: 27
-APPEARANCE: Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always — claims it's professional habit. Very short.
-LOCATION: The Warrens, Obsidian Lotus secondary location (not the main house — she operates from a private room in the Night Pits)
-MOTIVATION: Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique — to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.
-ROLE: Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).
-SECRET: She has retained a copy of every memory she has ever erased — stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.
-RELATIONSHIPS: Professional respect from The Widow (rare). Tolerated by the rest of the Lotus — her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically — Yuna found this annoying and flattering in equal measure.
-ORACLE NOTES: The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?
-HISTORY: [2026-03-12] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
----END NPC---
-
----NPC---
 NAME: Pol Greaves
 STATUS: alive
 FACTION: Patchwork Saints
@@ -103,23 +86,6 @@ SECRET: The mission that ended his adventuring career involved a cover-up. Three
 RELATIONSHIPS: Genuine friendship with Mara (Scrapworks). Wary working relationship with Captain Havel Korin (Wardens cooperate with Saints reluctantly). Distrust of Iron Fang. Soft spot for low-level adventurers who remind him of who he used to be.
 ORACLE NOTES: The Oracle would see a man who chose to stay when every rational instinct said leave. There is a quality in that — the city has very few people who simply refused to go. The Oracle finds it worth noting.
 HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-16] Injured. | [2026-03-17] Recovered from injuries.
----END NPC---
-
----NPC---
-NAME: Tessaly Orin
-STATUS: alive
-FACTION: Guild of Ashen Scrolls
-RANK: Archivist Second Class (junior to Eir Velan, senior to Dova)
-SPECIES: Half-Elf
-AGE: 38
-APPEARANCE: Ink-stained hands permanently. Wears reading lenses on a chain. Tends to mutter while working. Hair in a permanent state of being-just-put-up-or-just-taken-down.
-LOCATION: Grand Forum Library, lower stacks (she has effectively colonised a section of the archive for her personal research project)
-MOTIVATION: The question. Tessaly became an archivist because she wanted to answer one specific question: why do certain adventurers attract divine attention while others of equal Legend Points do not? She has been building a dataset for nine years. She is close to something.
-ROLE: Documents adventurer career trajectories, maintains the fate archive index, assists Eir Velan with Thesaurus communication protocols.
-SECRET: Her research has identified a pattern — certain adventurers attract divine attention not because of their Legend Points but because of the specific shape of their story. She calls it narrative resonance. She has not published this because she doesn't know what it means yet — and because if the Culinary Council reads it, she has effectively written them a menu.
-RELATIONSHIPS: Professional respect for Eir Velan (somewhat intimidated). Academic rivalry with Dova (Glass Sigil) — same data sets, different methods. Has been quietly consulting with Kessan and Mira (info brokers) on data patterns she can't explain through archival sources alone.
-ORACLE NOTES: The Oracle would find Tessaly's research unsettling in the way a mirror is unsettling. She is close to understanding something about how stories work that the gods would prefer remained unwritten.
-HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-13] Injured. | [2026-03-14] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -153,7 +119,7 @@ ROLE: Drafts, witnesses, and mediates divine contracts. Advises petitioners on t
 SECRET: Vesper is herself under a very old divine contract — its terms are not fully known even to her. The gold eyes are a marker of the contract's presence. She knows the contract exists. She does not know all of what she agreed to or when it will be called.
 RELATIONSHIPS: Professional respect between Vesper and High Apostle Yzura (neither fully trusts the other's judgment on matters of faith). Known to Yuna Saltis (Obsidian Lotus) — they have worked adjacent cases. Calix Drenn (FTA) finds her unsettling without being able to explain why.
 ORACLE NOTES: The Oracle would see the contract on her immediately — older than the Choir, older than the current configuration of gods in this city. Vesper is a document waiting to be invoked. The Oracle does not know by whom.
-HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-17] Injured. | [2026-03-17] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
+HISTORY: [2026-03-17] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-31] Injured. | [2026-04-01] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -565,23 +531,6 @@ HISTORY: [2026-03-16] Promoted from F-Rank to E-Rank within Adventurers Guild. |
 ---END NPC---
 
 ---NPC---
-NAME: Kip Stonefang
-STATUS: alive
-FACTION: Patchwork Saints
-RANK: Saint
-SPECIES: Kobold
-AGE: 40s
-APPEARANCE: A compact, wiry kobold with intricate, mosaic-like tattoos covering his scaleless body. He walks with a steady, determined gait, a worn leather satchel slung over his shoulder.
-LOCATION: Shantytown Heights, Saints' Refuge tunnels — messenger, spy (secretly Thane's Cult)
-MOTIVATION: Driven by a relentless desire to prove his worth among his fellow saints, Kip seeks to uncover the darkest secrets of the Undercity to bolster his standing within the faction.
-ROLE: Serves as a messenger and spy, navigating the treacherous Undercity to gather intel for the Patchwork Saints.
-SECRET: Unbeknownst to his comrades, Kip is secretly a member of Brother Thane's Cult, feeding them sensitive information he gathers during his missions.
-RELATIONSHIPS: Has a tenuous alliance with Grozak Ironscrivener, the scribe of the Argent Blades, who often uses Kip's intel for his own purposes.
-ORACLE NOTES: The Oracle senses a deep-rooted conflict within Kip, a tug-of-war between loyalty to his faith and a hidden allegiance to a dangerous enemy.
-HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-18] Committed a significant betrayal within Patchwork Saints.
----END NPC---
-
----NPC---
 NAME: Zara Leafwhisper
 STATUS: alive
 FACTION: Tower Authority
@@ -668,7 +617,7 @@ HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-16] Promote
 
 ---NPC---
 NAME: Gavrik Ironshield
-STATUS: injured
+STATUS: alive
 FACTION: Iron Fang Consortium
 RANK: Street Runner
 SPECIES: Warforged
@@ -680,7 +629,7 @@ ROLE: Scours the city for valuable information and supplies, acting as a link be
 SECRET: Once a high-ranking member of the Serpent Choir, he defected after a mission gone awry, now living in fear they'll discover his betrayal.
 RELATIONSHIPS: Maintains a fragile alliance with the Patchwork Saints, sharing intelligence in exchange for their protection.
 ORACLE NOTES: The Oracle senses a haunted spirit, burdened by guilt and constantly scanning for threats.
-HISTORY: [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-28] Recovered from injuries. | [2026-03-30] Injured.
+HISTORY: [2026-03-19] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-28] Recovered from injuries. | [2026-03-30] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -867,7 +816,7 @@ ROLE: Heads the Lotus's research department, analyzing samples from the rifts an
 SECRET: Grimwit is secretly a devotee of Brother Thane's Cult, believing that the rifts are the gateway to divine intervention.
 RELATIONSHIPS: Has a tense alliance with the Tower Authority due to his knowledge of their interest in the rifts.
 ORACLE NOTES: The Oracle senses a deep, hidden passion for knowledge in Grimwit, a burning curiosity that drives him to push beyond the limits of his understanding.
-HISTORY: [2026-03-18] Introduced to the Undercity roster. | [2026-03-28] Committed a significant betrayal within Obsidian Lotus.
+HISTORY: [2026-03-18] Introduced to the Undercity roster. | [2026-03-28] Committed a significant betrayal within Obsidian Lotus. | [2026-03-30] Injured. | [2026-03-31] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -1086,9 +1035,9 @@ LOCATION: Guild Spires, Gilded Halls intelligence wing — covert operations, re
 MOTIVATION: Elias fights for the Argent Blades to avenge his family, killed in a rift accident. He seeks to ensure no other family suffers the same fate.
 ROLE: Elias leads covert operations, gathering intelligence on potential threats and neutralizing them before they can cause harm.
 SECRET: Unknown to his fellow Blades, Elias is secretly a relic hunter, searching for artifacts to sell on the black market. He uses the money to fund his mission.
-RELATIONSHIPS: Elias has a strained relationship with the Wardens of Ash due to their rivalry over relics.
+RELATIONSHIPS: Elias has a strained relationship with the Wardens of Ash due to their rivalry over relics. | Alliance with Gorgon Gizzick (Brother Thane's Cult).
 ORACLE NOTES: The Oracle senses a hidden ambition and a burning desire for vengeance in Elias Whisperstep.
-HISTORY: [2026-03-20] Introduced to the Undercity roster.
+HISTORY: [2026-03-20] Introduced to the Undercity roster. | [2026-03-30] Formed alliance with Gorgon Gizzick (Brother Thane's Cult).
 ---END NPC---
 
 ---NPC---
@@ -1162,8 +1111,8 @@ HISTORY: [2026-03-23] Introduced to the Undercity roster. | [2026-03-26] Faction
 ---NPC---
 NAME: Lysander Elveshadow
 STATUS: alive
-FACTION: Patchwork Saints
-RANK: Volunteer
+FACTION: Guild of Ashen Scrolls
+RANK: Initiate
 SPECIES: Half-Elf
 AGE: 40s
 APPEARANCE: Lysander stands tall with a lean frame, a blend of human and elven features. His eyes, a piercing silver-blue, reflect the flickering lights of the Undercity's alleyways, and his hair, a cascade of dark curls, is braided with intricate patterns of worn leather strips.
@@ -1173,7 +1122,7 @@ ROLE: He patrols the streets at night, offering aid to the helpless and justice 
 SECRET: He is secretly a former member of the Argent Blades, forced to flee after a mission went awry and his cover was compromised
 RELATIONSHIPS: He maintains a tenuous alliance with a high-ranking member of the Argent Blades, who remains unaware of his true identity
 ORACLE NOTES: The Oracle senses a complex web of deception surrounding Lysander, hinting at a hidden past that could shake the foundations of the Undercity
-HISTORY: [2026-03-24] Introduced to the Undercity roster.
+HISTORY: [2026-03-24] Introduced to the Undercity roster. | [2026-03-30] Defected from Patchwork Saints to Guild of Ashen Scrolls (rank: Initiate).
 ---END NPC---
 
 ---NPC---
@@ -1224,7 +1173,7 @@ ROLE: Daily, Seraph meticulously sorts and catalogues ancient tomes and artifact
 SECRET: It is rumored that Seraph possesses a rare artifact known as the Eye of the Dragon, a gem imbued with powerful magical properties that could shift the balance of power in the Undercity.
 RELATIONSHIPS: He maintains a professional but strained relationship with the senior archivist, Vex Argentshade, who often questions Seraph's obsession with certain obscure texts.
 ORACLE NOTES: The Oracle senses a deep, burning hunger within Seraph, a thirst for knowledge that seems almost insatiable.
-HISTORY: [2026-03-26] Introduced to the Undercity roster.
+HISTORY: [2026-03-26] Introduced to the Undercity roster. | [2026-03-30] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
@@ -1518,7 +1467,7 @@ HISTORY: [2026-03-29] Added to roster. Head Archivist of the Guild of Ashen Scro
 
 ---NPC---
 NAME: Director Myra Kess
-STATUS: alive
+STATUS: injured
 FACTION: Tower Authority / FTA
 RANK: Director — Head of the Tower Authority
 SPECIES: Human
@@ -1530,7 +1479,7 @@ ROLE: Final authority on all FTA operations — licensing, compliance, Rift resp
 SECRET: Myra knows the Tower of Last Chance is more than a building — it's a containment system. She doesn't know exactly what it contains or why it was built, but she's seen enough classified files to understand that the entire Dome exists for a reason the original builders never documented. She has chosen not to investigate further. Some questions are better left unasked when you're responsible for keeping the system running.
 RELATIONSHIPS: Professional respect for Captain Havel Korin (Wardens) — he's the most reliable ally she has. The offer to Lady Cerys Valemont (Argent Blades) represents her attempt to build a real military force. Calix Drenn is one of her better Field Officers. Watches the faction leaders constantly — trust is not something she offers lightly.
 ORACLE NOTES: The Oracle finds Myra's willful ignorance about the Tower's true purpose both understandable and dangerous. She has chosen stability over truth, which is a reasonable choice for an administrator — but the truth does not care whether you choose to see it. Myra will eventually have to confront what the Tower actually is. The Oracle is watching to see how she handles that moment.
-HISTORY: [2026-03-29] Added to roster. Director of the Tower Authority. Knows the Tower is a containment system but has chosen not to investigate what it contains.
+HISTORY: [2026-03-29] Added to roster. Director of the Tower Authority. Knows the Tower is a containment system but has chosen not to investigate what it contains. | [2026-04-01] Injured.
 ---END NPC---
 
 ---NPC---
@@ -1599,4 +1548,72 @@ SECRET: Orion is secretly a member of the Wardens of Ash, a covert faction worki
 RELATIONSHIPS: He maintains a strained but professional relationship with the Argent Blades, who have been investigating the same disappearances. Their shared goal may lead to an uneasy alliance.
 ORACLE NOTES: The Oracle senses a deep sorrow and a burning desire for truth hidden within Orion, mixed with a hint of deception.
 HISTORY: [2026-03-30] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Thrakkar Stonehollow
+STATUS: alive
+FACTION: Glass Sigil
+RANK: Senior Archivist
+SPECIES: Dragonborn
+AGE: 50s
+APPEARANCE: Thrakkar is a towering, muscular dragonborn with scales as dark as obsidian. His horns are polished to a mirror-like sheen, and his eyes hold the wisdom of ages.
+LOCATION: Glass Sigil Archives, Lower Depths
+MOTIVATION: Thrakkar seeks to preserve the knowledge of the Undercity, believing it's the key to ensuring a brighter future. He does this out of a deep sense of duty, having survived the Last War that destroyed his home city.
+ROLE: Thrakkar spends his days cataloguing and safeguarding the ancient texts of the Undercity.
+SECRET: Thrakkar was once a high-ranking member of the Tower Authority before it was overthrown. His loyalties remain divided, and he secretly communicates with some remnants of the old order.
+RELATIONSHIPS: Thrakkar maintains a professional relationship with the Wardens of Ash, often negotiating for access to restricted archives.
+ORACLE NOTES: The Oracle senses a storm brewing beneath Thrakkar's calm exterior, a storm of secrets and hidden loyalties.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Isaac 'Ironhide' Gallows
+STATUS: alive
+FACTION: Iron Fang Consortium
+RANK: Acquisition Agent
+SPECIES: Human
+AGE: 40s
+APPEARANCE: A hulking figure with scarred muscles, he carries a heavy burden with an air of quiet determination.
+LOCATION: The Iron Quarter, Blacksmith's Alley
+MOTIVATION: Seeks to escape the Undercity and reclaim his stolen legacy in the Iron Fang Consortium, driven by his unwavering loyalty.
+ROLE: Negotiates deals for the Iron Fang Consortium, often delving into the city's dangerous underbelly.
+SECRET: His true identity is a nobleman, exiled and stripped of his title due to a tragic event.
+RELATIONSHIPS: Has a complicated relationship with Lady Cerys Valemont, who is unaware of his true identity.
+ORACLE NOTES: The Oracle senses a powerful will hidden beneath the brute exterior, a man who once held a crown but now wears a mask.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Zinnia Flamegrip
+STATUS: alive
+FACTION: Adventurers Guild
+RANK: Unranked
+SPECIES: Kobold
+AGE: 50s
+APPEARANCE: Zinnia is a wiry, battle-scarred kobold with a shock of fiery red hair and piercing green eyes. She carries herself with a quiet confidence, despite the constant tension in her shoulders.
+LOCATION: The Slums district, near the Guild's secret training facility
+MOTIVATION: Zinnia dreams of proving herself as a true warrior and earning a place among the Guild's elite. She joins every dangerous mission she can, hoping to catch the eye of the Guild masters.
+ROLE: Zinnia spends her days scouting for potential missions, gathering information from her network of informants.
+SECRET: Zinnia is secretly a member of Brother Thane's Cult, using her position within the Guild to gather intelligence on their rival factions.
+RELATIONSHIPS: She maintains a tenuous alliance with Grug Ironfist, the leader of the Wardens of Ash, but their mutual distrust often threatens to erupt into open conflict.
+ORACLE NOTES: The Oracle senses a burning ambition in Zinnia, tempered by a cunning mind and a willingness to bend the rules when necessary.
+HISTORY: [2026-03-31] Introduced to the Undercity roster.
+---END NPC---
+
+---NPC---
+NAME: Thaddeus 'Thunder' Arden
+STATUS: alive
+FACTION: Independent
+RANK: Respected Freelance
+SPECIES: Human
+AGE: 40s
+APPEARANCE: A broad-shouldered man with a scarred face and piercing blue eyes, he's often seen with a battered leather coat and a well-worn, silver-handled axe.
+LOCATION: The Rusted Spire, the heart of the Undercity
+MOTIVATION: Thunder seeks to protect the citizens of the Undercity from the dangers that lurk within and outside the Dome, driven by a personal vendetta against a powerful faction leader.
+ROLE: He takes on dangerous jobs and adventures for those who can afford his services, often using his connections with various factions to get things done.
+SECRET: Thunder is secretly a former member of the Wardens of Ash, forced out due to his reluctance to carry out an order he deemed unjust.
+RELATIONSHIPS: He maintains a tense alliance with the Argent Blades, sharing information and sometimes working together against common enemies.
+ORACLE NOTES: The Oracle senses a profound sense of duty and hidden pain in Thunder, but also a fierce determination that could make him a dangerous ally or enemy.
+HISTORY: [2026-04-01] Introduced to the Undercity roster.
 ---END NPC---

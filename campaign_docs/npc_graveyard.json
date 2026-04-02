@@ -28,22 +28,22 @@
   },
   {
     "name": "Rook",
-    "faction": "Argent Blades (contract — not a member)",
+    "faction": "Argent Blades (contract \u2014 not a member)",
     "rank": "Unranked (refuses ranking system)",
-    "species": "Unknown (passes as Human — something is slightly off)",
+    "species": "Unknown (passes as Human \u2014 something is slightly off)",
     "age": "Apparent 30s",
     "appearance": "Unremarkable by design. Medium height, medium build, forgettable face. The kind of person you look through in a crowd. Has never been successfully described the same way twice by different witnesses.",
     "location": "Arena of Ascendance adjacent, Guild Spires (takes contracts from Argent Blades without joining)",
     "motivation": "Unknown. Rook takes contracts, completes them with unusual efficiency, collects payment, disappears. Has declined faction membership from every faction that has offered. Has declined four times from the Obsidian Lotus alone.",
-    "role": "Freelance — specialises in contracts that require finding people who don't want to be found.",
+    "role": "Freelance \u2014 specialises in contracts that require finding people who don't want to be found.",
     "secret": "Rook is aware of what they are. They are not going to tell anyone. The FTA has an open file. The file contains almost nothing.",
     "relationships": "Professional-only with everyone. Lady Cerys Valemont finds them useful and mildly infuriating. The Widow has tried twice to identify them. Mira Kessan has a theory she keeps to herself.",
-    "oracle_notes": "The Oracle knows exactly what Rook is and finds the situation philosophically interesting. Something that chooses to be unremarkable in a city that rewards spectacle — that is either very wise or very afraid. The Oracle is not certain which.",
+    "oracle_notes": "The Oracle knows exactly what Rook is and finds the situation philosophically interesting. Something that chooses to be unremarkable in a city that rewards spectacle \u2014 that is either very wise or very afraid. The Oracle is not certain which.",
     "status": "dead",
     "revealed_secrets": [],
     "history": [
       "[2026-03-05] Entered roster from static file.",
-      "[2026-03-09] Killed. Faction: Argent Blades (contract — not a member), Rank: Unranked (refuses ranking system)."
+      "[2026-03-09] Killed. Faction: Argent Blades (contract \u2014 not a member), Rank: Unranked (refuses ranking system)."
     ],
     "created_at": "2026-03-05T12:59:39.947925",
     "last_event_at": "2026-03-09T06:47:16.445669",
@@ -67,7 +67,7 @@
     "history": [
       "[2026-03-11] Introduced to the Undercity roster.",
       "[2026-03-19] Killed. Faction: Tower Authority, Rank: Compliance Intern.",
-      "[2026-03-27] Doppelganger sighting — someone impersonating Zephyrus Ironheart-Thrain spotted in the Undercity."
+      "[2026-03-27] Doppelganger sighting \u2014 someone impersonating Zephyrus Ironheart-Thrain spotted in the Undercity."
     ],
     "created_at": "2026-03-11T15:45:22.083492",
     "last_event_at": "2026-03-19T13:58:42.936508",
@@ -80,7 +80,7 @@
     "species": "Halfling",
     "age": "40s",
     "appearance": "Grover stands at an imposing height for a halfling, his sturdy frame adorned with a leather jacket and a patchwork of Iron Fang emblems. A scar runs down his left cheek, a battle scar earned during a particularly dangerous acquisition.",
-    "location": "The Bazaar's Shard — Iron Fang Consortium headquarters",
+    "location": "The Bazaar's Shard \u2014 Iron Fang Consortium headquarters",
     "motivation": "Grover seeks to rise through the ranks of the Iron Fang Consortium to secure a more prosperous future for his family, driven by the memory of his deceased wife who was killed in a rift accident.",
     "role": "Grover scours the Undercity for valuable artifacts and rare resources, always looking for the next big score.",
     "secret": "Unbeknownst to the Iron Fang Consortium, Grover is secretly working with the Wardens of Ash to gather intelligence on the Consortium's operations, hoping to betray them and take control of the city's black market.",
@@ -91,7 +91,7 @@
     "history": [
       "[2026-03-12] Introduced to the Undercity roster.",
       "[2026-03-16] Killed. Faction: Iron Fang Consortium, Rank: Acquisition Agent.",
-      "[2026-03-26] Doppelganger sighting — someone impersonating Grover Ironfoot spotted in the Undercity."
+      "[2026-03-26] Doppelganger sighting \u2014 someone impersonating Grover Ironfoot spotted in the Undercity."
     ],
     "created_at": "2026-03-12T10:23:50.568752",
     "last_event_at": "2026-03-16T07:41:46.841082",
@@ -117,7 +117,7 @@
       "[2026-03-10] Promoted from Junior Archivist to Archivist within Glass Sigil.",
       "[2026-03-12] Injured.",
       "[2026-03-12] Succumbed to injuries. Faction: Glass Sigil, Rank: Archivist.",
-      "[2026-03-24] Doppelganger sighting — someone impersonating Jorick Sparrowthief spotted in the Undercity."
+      "[2026-03-24] Doppelganger sighting \u2014 someone impersonating Jorick Sparrowthief spotted in the Undercity."
     ],
     "created_at": "2026-03-06T12:02:14.330235",
     "last_event_at": "2026-03-12T08:01:57.822262",
@@ -142,7 +142,7 @@
       "[2026-03-06] Introduced to the Undercity roster.",
       "[2026-03-11] Injured.",
       "[2026-03-11] Succumbed to injuries. Faction: Argent Blades, Rank: Blade.",
-      "[2026-03-28] Doppelganger sighting — someone impersonating Alaric Stonemason spotted in the Undercity."
+      "[2026-03-28] Doppelganger sighting \u2014 someone impersonating Alaric Stonemason spotted in the Undercity."
     ],
     "created_at": "2026-03-06T10:04:56.466312",
     "last_event_at": "2026-03-11T13:10:25.810232",
@@ -155,7 +155,7 @@
     "species": "Gnome",
     "age": "50s",
     "appearance": "Small but sturdy, Klara Lodestone sports a cropped gray haircut and wears a well-worn leather coat. She carries a stern expression, but her eyes soften when she sees the younger Undercity residents.",
-    "location": "Grand Forum, FTA satellite office — compliance checks, secretly Thane's Cult",
+    "location": "Grand Forum, FTA satellite office \u2014 compliance checks, secretly Thane's Cult",
     "motivation": "Klara seeks to maintain order in the Undercity, believing it's the only way for the city to stand a chance against the rifts. Her personal connection to the city drives her determination.",
     "role": "Oversees compliance checks and enforcement actions in the Undercity.",
     "secret": "Klara is secretly a member of Brother Thane's Cult, using her position within the Tower Authority to gather information for the cult.",
@@ -203,7 +203,7 @@
     "species": "Dragonborn",
     "age": "40s",
     "appearance": "Nalus stands tall with a robust physique, his scales shimmering like obsidian under the flickering Dome lights. A book of forbidden knowledge always tucked under his arm.",
-    "location": "Archive Row, Grand Archive Dome senior offices — leads research, hidden royal heritage",
+    "location": "Archive Row, Grand Archive Dome senior offices \u2014 leads research, hidden royal heritage",
     "motivation": "Despite his prestigious position, Nalus yearns to reclaim his people's lost history, hidden within the ancient texts he studies.",
     "role": "Spends his days deciphering arcane texts and maintaining the Scriptorium's vast library.",
     "secret": "A hidden tattoo of a dragon marks him as a descendant of the last royal line, a fact that could ignite a rebellion within the Glass Sigil.",
@@ -221,5 +221,89 @@
     "created_at": "2026-03-19T14:16:44.024053",
     "last_event_at": "2026-03-29T08:57:53.669672",
     "moved_to_graveyard_at": "2026-03-29T08:57:53.669672"
+  },
+  {
+    "name": "Yuna Saltis",
+    "faction": "Obsidian Lotus",
+    "rank": "Memory Architect (specialist \u2014 designs and performs memory erasure contracts)",
+    "species": "Tiefling",
+    "age": "27",
+    "appearance": "Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always \u2014 claims it's professional habit. Very short.",
+    "location": "The Warrens, Obsidian Lotus secondary location (not the main house \u2014 she operates from a private room in the Night Pits)",
+    "motivation": "Craft. Yuna views memory erasure as an art form. She is genuinely gifted and genuinely indifferent to the ethical dimensions. She wants to perfect the technique \u2014 to be able to remove a single memory with surgical precision rather than burning a section. Nobody else in the Lotus is working at her level.",
+    "role": "Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).",
+    "secret": "She has retained a copy of every memory she has ever erased \u2014 stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
+    "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus \u2014 her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically \u2014 Yuna found this annoying and flattering in equal measure.",
+    "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out?",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-05] Entered roster from static file.",
+      "[2026-03-11] Injured.",
+      "[2026-03-12] Recovered from injuries.",
+      "[2026-03-13] Injured.",
+      "[2026-03-14] Recovered from injuries.",
+      "[2026-03-19] Injured.",
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-03-30] Killed. Faction: Obsidian Lotus, Rank: Memory Architect (specialist \u2014 designs and performs memory erasure contracts)."
+    ],
+    "created_at": "2026-03-05T12:59:39.947925",
+    "last_event_at": "2026-03-30T11:10:19.675375",
+    "moved_to_graveyard_at": "2026-03-30T11:10:19.675375"
+  },
+  {
+    "name": "Tessaly Orin",
+    "faction": "Guild of Ashen Scrolls",
+    "rank": "Archivist Second Class (junior to Eir Velan, senior to Dova)",
+    "species": "Half-Elf",
+    "age": "38",
+    "appearance": "Ink-stained hands permanently. Wears reading lenses on a chain. Tends to mutter while working. Hair in a permanent state of being-just-put-up-or-just-taken-down.",
+    "location": "Grand Forum Library, lower stacks (she has effectively colonised a section of the archive for her personal research project)",
+    "motivation": "The question. Tessaly became an archivist because she wanted to answer one specific question: why do certain adventurers attract divine attention while others of equal Legend Points do not? She has been building a dataset for nine years. She is close to something.",
+    "role": "Documents adventurer career trajectories, maintains the fate archive index, assists Eir Velan with Thesaurus communication protocols.",
+    "secret": "Her research has identified a pattern \u2014 certain adventurers attract divine attention not because of their Legend Points but because of the specific shape of their story. She calls it narrative resonance. She has not published this because she doesn't know what it means yet \u2014 and because if the Culinary Council reads it, she has effectively written them a menu.",
+    "relationships": "Professional respect for Eir Velan (somewhat intimidated). Academic rivalry with Dova (Glass Sigil) \u2014 same data sets, different methods. Has been quietly consulting with Kessan and Mira (info brokers) on data patterns she can't explain through archival sources alone.",
+    "oracle_notes": "The Oracle would find Tessaly's research unsettling in the way a mirror is unsettling. She is close to understanding something about how stories work that the gods would prefer remained unwritten.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-05] Entered roster from static file.",
+      "[2026-03-11] Injured.",
+      "[2026-03-11] Recovered from injuries.",
+      "[2026-03-13] Injured.",
+      "[2026-03-14] Recovered from injuries.",
+      "[2026-03-26] Injured.",
+      "[2026-03-26] Recovered from injuries.",
+      "[2026-03-30] Injured.",
+      "[2026-03-30] Succumbed to injuries. Faction: Guild of Ashen Scrolls, Rank: Archivist Second Class (junior to Eir Velan, senior to Dova)."
+    ],
+    "created_at": "2026-03-05T12:59:39.947925",
+    "last_event_at": "2026-03-30T13:10:03.939025",
+    "moved_to_graveyard_at": "2026-03-30T13:10:03.939025"
+  },
+  {
+    "name": "Kip Stonefang",
+    "faction": "Patchwork Saints",
+    "rank": "Saint",
+    "species": "Kobold",
+    "age": "40s",
+    "appearance": "A compact, wiry kobold with intricate, mosaic-like tattoos covering his scaleless body. He walks with a steady, determined gait, a worn leather satchel slung over his shoulder.",
+    "location": "Shantytown Heights, Saints' Refuge tunnels \u2014 messenger, spy (secretly Thane's Cult)",
+    "motivation": "Driven by a relentless desire to prove his worth among his fellow saints, Kip seeks to uncover the darkest secrets of the Undercity to bolster his standing within the faction.",
+    "role": "Serves as a messenger and spy, navigating the treacherous Undercity to gather intel for the Patchwork Saints.",
+    "secret": "Unbeknownst to his comrades, Kip is secretly a member of Brother Thane's Cult, feeding them sensitive information he gathers during his missions.",
+    "relationships": "Has a tenuous alliance with Grozak Ironscrivener, the scribe of the Argent Blades, who often uses Kip's intel for his own purposes.",
+    "oracle_notes": "The Oracle senses a deep-rooted conflict within Kip, a tug-of-war between loyalty to his faith and a hidden allegiance to a dangerous enemy.",
+    "status": "dead",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-12] Introduced to the Undercity roster.",
+      "[2026-03-18] Committed a significant betrayal within Patchwork Saints.",
+      "[2026-03-31 12:53] DIED \u2014 narrated in news bulletin"
+    ],
+    "created_at": "2026-03-12T07:32:18.138524",
+    "last_event_at": "2026-03-18T19:58:36.318473",
+    "death_date": "2026-03-31 12:53",
+    "death_cause": "News bulletin: -31 12:53 \u2502 Tower: 31 Mar 2036, 12:53\n\n**Undercity Dispatch:**\n\n_In the grime-streaked alleys of Shantytown Heights, a crowd gathers around Elune's Apothecary, the city's whispers echoing in the air. "
   }
 ]

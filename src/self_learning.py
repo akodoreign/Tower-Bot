@@ -23,6 +23,7 @@ import httpx
 
 from src.log import logger
 from src.skill_loader import load_skills, SKILLS_DIR, _tokenize
+from src.agents import AgentOrchestrator
 
 # ── Config ─────────────────────────────────────────────────────────────
 
@@ -783,6 +784,29 @@ async def run_learning_session():
     _journal("═══ LEARNING SESSION START ═══")
     logger.info("🧠 Self-learning session starting...")
 
+    # PHASE 0: Run 5-Agent Autonomous Improvement System
+    # (This runs before regular studies to analyze and optimize the system)
+    _journal("PHASE 0: 5-Agent Autonomous Improvement System")
+    try:
+        orchestrator = AgentOrchestrator()
+        agent_session = await orchestrator.run_learning_cycle()
+        
+        if agent_session:
+            _journal(f"Agent session complete: {len(agent_session.analyses)} analyses")
+            for analysis in agent_session.analyses:
+                _journal(
+                    f"  {analysis.agent_name}: {len(analysis.issues_found)} issues, "
+                    f"{len(analysis.recommendations)} recommendations (conf: {analysis.confidence:.0%})"
+                )
+            if agent_session.approved_changes:
+                _journal(f"  Code changes applied: {len(agent_session.approved_changes)}")
+        else:
+            _journal("Agent session failed or returned no results")
+    except Exception as e:
+        logger.error(f"Agent orchestrator error: {e}")
+        _journal(f"ERROR: Agent orchestrator failed: {e}")
+
+    # Regular studies continue below
     studies = [
         # CRITICAL FIX: Study failures FIRST to learn from errors and bugs
         ("failure_analysis",   _study_failure_logs,       "failure_analysis"),

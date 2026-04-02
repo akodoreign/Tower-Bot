@@ -4,15 +4,16 @@ rules_agent.py — D&D 5e 2024 (5.5e) rules agent for Tower of Last Chance.
 Uses RAG over the local PHB text file to give precise, cited rules answers
 grounded in actual book text. Avoids hallucinating mechanics.
 
+REFACTORED: Now uses QwenAgent for fast local inference via Pi/OpenClaw stack.
+
 Exported:
     answer_rules_question(query: str) -> RulesAnswer
+    lookup_spell_or_feature(name: str) -> str
     COMMON_RULES_TOPICS  — dict of category → keywords, for autocomplete hints
 """
 
 from __future__ import annotations
 
-import os
-import re
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -136,6 +137,21 @@ COMMON_RULES_TOPICS = {
 
 
 # ---------------------------------------------------------------------------
+# Lazy-loaded QwenAgent instance
+# ---------------------------------------------------------------------------
+
+_qwen_agent = None
+
+def _get_qwen_agent():
+    """Get or create the QwenAgent instance (lazy loading)."""
+    global _qwen_agent
+    if _qwen_agent is None:
+        from src.agents import QwenAgent
+        _qwen_agent = QwenAgent()
+    return _qwen_agent
+
+
+# ---------------------------------------------------------------------------
 # Core agent function
 # ---------------------------------------------------------------------------
 
@@ -146,7 +162,7 @@ async def answer_rules_question(query: str) -> RulesAnswer:
     Flow:
     1. Check Undercity overrides (campaign-specific rules take precedence)
     2. RAG search over PHB text chunks
-    3. Ask Ollama to synthesise an answer from the retrieved chunks
+    3. Ask QwenAgent to synthesise an answer from the retrieved chunks
     4. Return RulesAnswer with the answer + any override caveats
     """
     from src.tower_rag import search_docs
@@ -169,58 +185,32 @@ async def answer_rules_question(query: str) -> RulesAnswer:
         hits = []
         context_block = ""
 
-    # Step 3: Build Ollama prompt
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-
+    # Step 3: Use QwenAgent for fast local inference
     if context_block:
-        rag_block = f"RELEVANT RULEBOOK EXCERPTS:\n{context_block}"
         confidence_hint = "high"
     else:
-        rag_block = "No matching excerpts found. Answer from general D&D 5e 2024 knowledge."
         confidence_hint = "medium"
 
-    prompt = f"""You are a precise D&D 5e 2024 (also called 5.5e) rules expert.
-You answer rules questions clearly and accurately using the provided rulebook text.
-
-{rag_block}
-
-QUESTION: {query}
-
-RULES FOR YOUR ANSWER:
-- Answer based on the excerpts above if they cover the topic. Quote the key rule briefly.
-- If the excerpts don't fully answer it, use your D&D 5e 2024 knowledge but say so.
-- Be concise: 2–6 lines. Use Discord markdown (**bold** for key terms, `inline code` for dice/numbers).
-- State the rule clearly first. Then explain any edge cases or clarifications.
-- Do NOT write "According to the Player's Handbook..." — just state the rule.
-- Do NOT repeat the question back.
-- Do NOT add preamble or sign-off.
-- Output ONLY the answer."""
-
     try:
-        import httpx
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+        agent = _get_qwen_agent()
+        response = await agent.rules_query(
+            question=query,
+            rag_context=context_block if context_block else None,
+            campaign_overrides=None,  # We handle overrides separately below
+        )
 
-        answer = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                answer = msg.get("content", "").strip()
+        if not response.success:
+            logger.warning(f"rules_agent QwenAgent error: {response.error}")
+            return RulesAnswer(
+                question=query,
+                answer=f"*Rules lookup unavailable: {response.error}*",
+                source_hits=hits,
+                confidence="not_found",
+                caveat=override_text,
+            )
 
-        # Strip AI preamble
-        lines = answer.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is", "great question")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        answer = "\n".join(lines).strip()
-
+        answer = response.content
+        
         if not answer:
             return RulesAnswer(
                 question=query,
@@ -240,7 +230,7 @@ RULES FOR YOUR ANSWER:
 
     except Exception as e:
         import traceback
-        logger.error(f"rules_agent Ollama error: {type(e).__name__}: {e}\n{traceback.format_exc()}")
+        logger.error(f"rules_agent error: {type(e).__name__}: {e}\n{traceback.format_exc()}")
         return RulesAnswer(
             question=query,
             answer=f"*Rules lookup failed: {type(e).__name__}*",
@@ -264,13 +254,13 @@ Look up: {query}
 Provide a structured reference block using this EXACT format (fill in all fields, use 'N/A' if not applicable):
 
 **{name}**
-📗 *{type} — {school_or_category}*
-⏱ **Cast/Activate:** {casting_time}
-📏 **Range:** {range}
-⏳ **Duration:** {duration}  {concentration}
-🎯 **Target/Area:** {target}
-💥 **Effect:** {effect_summary}
-📈 **Higher Levels/Scaling:** {upcast_or_scaling}
+📗 *[type] — [school_or_category]*
+⏱ **Cast/Activate:** [casting_time]
+📏 **Range:** [range]
+⏳ **Duration:** [duration]  [concentration]
+🎯 **Target/Area:** [target]
+💥 **Effect:** [effect_summary]
+📈 **Higher Levels/Scaling:** [upcast_or_scaling]
 
 Keep Effect to 2-3 lines max. Output ONLY this block. No preamble."""
 
@@ -278,12 +268,9 @@ Keep Effect to 2-3 lines max. Output ONLY this block. No preamble."""
 async def lookup_spell_or_feature(name: str) -> str:
     """
     Returns a structured Discord-formatted reference block for a spell or class feature.
+    Uses QwenAgent for fast local inference.
     """
     from src.tower_rag import search_docs
-    import httpx
-
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
     try:
         hits = search_docs(name, top_k=4)
@@ -295,46 +282,20 @@ async def lookup_spell_or_feature(name: str) -> str:
         context=context,
         query=name,
         name=name,
-        type="{type}",
-        school_or_category="{school_or_category}",
-        casting_time="{casting_time}",
-        range="{range}",
-        duration="{duration}",
-        concentration="{concentration}",
-        target="{target}",
-        effect_summary="{effect_summary}",
-        upcast_or_scaling="{upcast_or_scaling}",
     )
 
-    # Re-format without placeholder braces confusing the model
-    prompt = _SPELL_LOOKUP_PROMPT.replace("{context}", context).replace("{query}", name)
-    # Replace remaining literal template vars with their field names
-    for tag in ["name", "type", "school_or_category", "casting_time", "range",
-                "duration", "concentration", "target", "effect_summary", "upcast_or_scaling"]:
-        prompt = prompt.replace("{" + tag + "}", f"[{tag}]")
-    prompt = prompt.replace("[name]", name)
-
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+        agent = _get_qwen_agent()
+        response = await agent.complete(
+            prompt=prompt,
+            temperature=0.5,  # Lower temperature for structured output
+        )
 
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
+        if not response.success:
+            logger.warning(f"lookup_spell_or_feature QwenAgent error: {response.error}")
+            return f"*Lookup unavailable: {response.error}*"
 
-        lines = text.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        return "\n".join(lines).strip() or "*Not found.*"
+        return response.content or "*Not found.*"
 
     except Exception as e:
         logger.error(f"lookup_spell_or_feature error: {e}")

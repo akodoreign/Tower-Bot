@@ -1,23 +1,26 @@
 # Skill: Faction Standing Report
 **Keywords:** faction, reputation, standing, allied, hostile, political, relations
 **Category:** learned
-**Version:** 4
+**Version:** 7
 **Source:** self-learned
 
-**Summary:**
-This report analyzes the political standing of various factions within the city, based on their reputation scores.
+Allied Factions: Wardens of Ash, Glass Sigil, Patchwork Saints, Adventurers Guild, Guild of Ashen Scrolls, Patchwork Saints, Adventurers Guild, Guild of Ashen Scrolls, Tower Authority, Wizards Tower
 
-**Allied and Antagonistic Factions:**
-- Allied Factions: Wardens of Ash, Glass Sigil, Patchwork Saints, Adventurers Guild, and the Wizards Tower (neutral association with the latter)
-- Antagonistic Factions: None at this time, but the Iron Fang Consortium and Serpent Choir have negative reputation scores.
+Antagonistic Factions: Iron Fang Consortium, Serpent Choir, Obsidian Lotus
 
-**Recent Reputation Changes and Causes:**
-- Argent Blades: +2 points due to successful completion of a mission
-- Iron Fang Consortium: -1 point due to recent rumors of illicit activities
-- Obsidian Lotus: -1 point due to suspicion of involvement in the Iron Fang Consortium's activities
+Recent Reputation Changes:
+- Iron Fang Consortium (-1 point): Antagonism increased due to recent conflicts or infiltration attempts.
+- Argent Blades (2 points): Neutral status improved due to successful diplomatic efforts or joint operations.
+- Wizards Tower (2 points): Association strengthened due to ongoing collaborations or shared interests.
 
-**Political Opportunities and Dangers:**
-- Opportunities: The Glass Sigil and Patchwork Saints could potentially be approached for cooperation due to their friendly standing.
-- Dangers: Maintaining good relations with the Iron Fang Consortium and Serpent Choir remains risky due to their negative reputation scores. Furthermore, the growing suspicion towards the Obsidian Lotus could lead to potential problems in the future.
+Political Opportunities:
+- Establishing or improving relations with the Argent Blades could prove beneficial in the long run.
+- The neutral factions present political leverage for negotiations and alliances.
+- Tread cautiously with the Iron Fang Consortium, as their hostility may escalate further.
+- The Serpent Choir and Obsidian Lotus require further investigation and potential countermeasures to mitigate potential threats.
+- Cultivating stronger ties with the Wizards Tower could lead to valuable knowledge and resources.
 
-It is recommended to maintain close ties with the allied factions, while treading carefully with the antagonistic and suspicious ones. Continued monitoring of the city's factions is essential to ensure a favorable political landscape.
+Dangers:
+- The Iron Fang Consortium and the Serpent Choir pose immediate threats due to their antagonistic standings.
+- The Obsidian Lotus should be monitored closely due to their neutral stance and potential for shifting alliances.
+- Avoid alienating friendly factions, as their support is essential in navigating the city's political landscape.

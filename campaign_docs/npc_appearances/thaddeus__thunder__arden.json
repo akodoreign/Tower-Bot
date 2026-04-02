@@ -1,0 +1,24 @@
+{
+  "name": "Thaddeus 'Thunder' Arden",
+  "species": "Human",
+  "faction": "Independent",
+  "rank": "Respected Freelance",
+  "role": "freelance",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "Broad-shouldered human, scars etched into weathered skin, piercing blue eyes flashing beneath a wide-brimmed, leather hat. Hair slicked back, a silver streak running through its length. Leather coat, patched and frayed, draped over a simple, high-collared shirt. Silver-handled axe slung low on his back. His right forearm bears a striking, intricate tribal tattoo, a map of the Undercity's labyrinthine streets, a constant reminder of his personal vendetta.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

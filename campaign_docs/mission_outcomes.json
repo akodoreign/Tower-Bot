@@ -159,5 +159,35 @@
     "loose_threads": "None",
     "notable_moments": "None",
     "consequences": []
+  },
+  {
+    "mission_title": "The Markets' Rune Weave",
+    "faction": "Wizards Tower",
+    "opposing_faction": "",
+    "tier": "escort",
+    "completed_by": "Akodo Reign",
+    "completed_at": "2026-03-30",
+    "result": "completed",
+    "npcs_killed": "None",
+    "key_decisions": "None",
+    "location_changes": "None",
+    "loose_threads": "None",
+    "notable_moments": "None",
+    "consequences": []
+  },
+  {
+    "mission_title": "The Sweep of the Sanctum Quarter",
+    "faction": "Wardens of Ash",
+    "opposing_faction": "",
+    "tier": "local",
+    "completed_by": "Justgowithjohn",
+    "completed_at": "2026-03-31",
+    "result": "completed",
+    "npcs_killed": "None",
+    "key_decisions": "None",
+    "location_changes": "None",
+    "loose_threads": "None",
+    "notable_moments": "",
+    "consequences": []
   }
 ]

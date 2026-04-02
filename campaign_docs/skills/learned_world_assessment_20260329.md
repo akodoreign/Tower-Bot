@@ -2,39 +2,25 @@
 
 **Keywords:** world, state, health, balance, assessment, campaign, tone
 **Category:** learned
-**Version:** 2
+**Version:** 5
 **Source:** self-learned
 
-## Analysis
+**PC Welfare:**
+- The PCs have not yet completed or failed any missions in the last 15. This suggests that missions may be too easy or too complex, as there has been no balance in terms of success rate (0% success, 0% failure).
+- There are opportunities for meaningful choices, as the PCs are affiliated with various factions and organizations, each with their own motivations and agendas.
+- The Oracle notes that there are signs of frustration or disengagement, as the PCs have not yet completed any missions. This may indicate that the challenges are not appropriately scaled to the PC capabilities.
 
-### PC Welfare
-- Success rate on missions: 0 completed, 0 failed, 0 expired (no data to evaluate)
-- Opportunities for heroism and meaningful choices: Uncertain ([DM QUESTION] Are there enough opportunities for the PCs to make meaningful choices and contribute to the world? The recent news themes and faction standings suggest potential missions, but the mission history is empty)
-- Signs of frustration or disengagement: Uncertain ([DM QUESTION] Have the players expressed any frustration or disengagement? Pay attention to player behavior and feedback during and after sessions)
+**World Tone:**
+- Recent news themes depict power struggles and missed leadership within the city, hinting at a grim but hopeful tone. However, the city's conditions (e.g., Elara Ironclaw's struggle to make ends meet) suggest a sliding toward grimdark.
+- Faction attitudes toward the PCs are neutral, with some factions being friendly and others neutral. The Tower, where the PCs are associated, is neutral.
+- The balance of threats vs opportunities is skewed towards threats, as the city faces internal power struggles and the PCs have yet to make significant impacts.
 
-### World Tone
-- Recent news themes: A mix of adventure, mystery, and intrigue (lantern in the Warrens, missing persons notice, victory against rift beasts, Iron Fang Consortium turmoil)
-- Faction attitudes toward PCs: Neutral to Friendly (Iron Fang Consortium, Argent Blades, Wardens of Ash, Glass Sigil, Patchwork Saints, Adventurers Guild, Guild of Ashen Scrolls, Tower Authority, Wizards Tower)
-- Balance of threats vs opportunities: Uncertain ([DM QUESTION] Is the balance between threats and opportunities appropriate for the PCs? The current news themes and faction standings suggest potential opportunities, but the absence of mission successes and the Iron Fang Consortium's turmoil may indicate ongoing threats)
+**Recommendations:**
+- Adjust mission difficulty to create a more balanced success rate (aim for 60-70% success).
+- Offer faction relationship opportunities that highlight the PCs' importance and provide them with meaningful tasks.
+- Introduce story hooks that emphasize the PCs' role in ending the endless cycle and restoring hope to the Undercity.
 
-## Recommendations
-
-### Mission Difficulty Tuning
-- Introduce a few lower difficulty missions to allow the PCs to build confidence and gain successes, gradually increasing the difficulty as they become more experienced
-- Ensure that failures are rare and meaningful, providing lessons for the PCs and opportunities for growth
-
-### Faction Relationship Opportunities
-- Offer missions or opportunities for the PCs to engage with friendly factions, building relationships and earning their trust
-- Create missions that allow the PCs to challenge or undermine neutral factions, potentially shifting their alignment toward friendliness
-- Introduce missions that require the PCs to navigate conflicts between hostile factions, giving them the opportunity to broker peace or manipulate the situation to their advantage
-
-### Story Hooks
-- Create story hooks that highlight the PCs' importance and their role in ending the endless cycle
-- Introduce NPCs that recognize the PCs' unique abilities and offer them assistance or rewards for their help
-- Provide opportunities for the PCs to make choices that have lasting consequences on the world, reinforcing their heroic status
-
-## DM Questions
-
-- [DM QUESTION] Are there ongoing threats or obstacles that are preventing the PCs from completing missions and gaining successes? If so, consider adjusting these threats or introducing new opportunities to balance the challenge/reward ratio.
-- [DM QUESTION] How can I better integrate the PCs into the world, making them feel like they are truly the city's only hope? Consider creating missions or storylines that highlight their unique abilities and reinforce their heroic status.
-- [DM QUESTION] How can I encourage more meaningful choices and decision-making for the PCs? Consider introducing branching storylines or Morally Ambiguous choices to give the PCs opportunities to shape the world in their own image.
+**DM Questions:**
+- [DM QUESTION] Mission difficulty adjustments: Should missions be made more challenging or should additional resources be provided to the PCs to help them succeed?
+- [DM QUESTION] Faction opportunities: Are there specific factions or stories that the DM would like to highlight for the PCs to engage with?
+- [DM QUESTION] Story hooks: Are there any events or plotlines that the DM would like to introduce to emphasize the PCs' role in the world and provide them with opportunities for heroism?

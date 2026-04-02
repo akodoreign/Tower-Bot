@@ -100,9 +100,13 @@ def should_post_missing() -> bool:
     return random.random() < 0.25   # 25% chance per bulletin tick when eligible
 
 
-async def generate_missing_bulletin(ollama_model: str, ollama_url: str) -> Optional[str]:
-    """Generate a missing persons notice via Ollama."""
-    import httpx
+async def generate_missing_bulletin() -> Optional[str]:
+    """
+    Generate a missing persons notice using KimiAgent.
+    
+    REFACTORED: Now uses src.agents.generate_with_kimi helper.
+    """
+    from src.agents import generate_with_kimi
 
     desc, district, filed_by, urgency = random.choice(_SUBJECT_POOLS)
     days     = random.randint(MISSING_EXPIRY_MIN, MISSING_EXPIRY_MAX)
@@ -140,27 +144,8 @@ RULES:
 - If your response contains anything other than the notice, you have failed."""
 
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
-                "model":    ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream":   False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
-
-        text = ""
-        if isinstance(data, dict):
-            msg = data.get("message", {})
-            if isinstance(msg, dict):
-                text = msg.get("content", "").strip()
-
-        lines = text.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course", "below is")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        text = "\n".join(lines).strip()
-
+        text = await generate_with_kimi(prompt, temperature=0.8)
+        
         if not text:
             return None
 

@@ -1,0 +1,28 @@
+{
+  "name": "Zinnia Flamegrip",
+  "species": "Kobold",
+  "faction": "Adventurers Guild",
+  "rank": "Unranked",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Small, wiry kobold with fiery red hair and piercing green eyes clad in chain mail, carrying a warhammer and a crossbow. Skin is scaly and battle-scarred, shoulders constantly tense. One distinctive visual detail: a Guild badge proudly displayed on her chest, a symbol of her unranked status in the Adventurers Guild. Her worn leather and chainmail tell a story of past contracts and the relentless pursuit of proving herself as a true warrior.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}
