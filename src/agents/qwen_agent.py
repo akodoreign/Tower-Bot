@@ -56,8 +56,8 @@ class QwenAgent(BaseAgent):
             model_name=model,
             model_type=ModelType.LOCAL,
             base_url=base_url,
-            timeout=90.0,          # Local model, should be fast
-            max_retries=1,         # Don't retry much, it's local
+            timeout=180.0,         # Increased for slower Qwen 8B inference
+            max_retries=2,         # Added retry for local model timeouts
             temperature=0.7,
             max_tokens=2048,       # Most local tasks don't need huge outputs
             enable_subagents=False,

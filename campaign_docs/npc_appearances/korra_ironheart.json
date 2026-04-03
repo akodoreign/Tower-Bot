@@ -1,0 +1,28 @@
+{
+  "name": "Korra Ironheart",
+  "species": "Warforged",
+  "faction": "Iron Fang Consortium",
+  "rank": "Street Runner",
+  "role": "street runner",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "DEX 16",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "WIS 10",
+      "STR 9"
+    ],
+    "hp_range": "28–40"
+  },
+  "equipment": {
+    "weapons": "daggers, sling",
+    "armour": "leather coat"
+  },
+  "sd_appearance": "Warforged Korra Ironheart, standing tall at an imposing height, strides through the Undercity's shadowy alleyways. Her patchwork body of red and black metallic plates catches the flickering light, casting a sinister glow. A deep burgundy and gunmetal coat, bearing the subtle Iron Fang emblem on the lapel, hugs her lean frame. Two daggers are sheathed at her hips, one visible across her back in a sling. One yellow eye glows menacingly from beneath the brim of a wide-brimmed leather hat, reflecting the dim light as if it were molten gold.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "practical street clothes, nothing that slows movement, worn boots"
+}

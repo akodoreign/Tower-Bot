@@ -1,0 +1,28 @@
+{
+  "name": "Elara Nightshadow",
+  "species": "Half-Elf",
+  "faction": "Wizards Tower",
+  "rank": "Journeyman",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Raven-haired Elara Nightshadow, a tall half-elf with dark piercing eyes and graceful build, stands within the dimly lit library of the Wizards Tower. Her flowing robes embroidered with intricate magical symbols sway subtley in the drafty atmosphere. A warhammer and crossbow rest against her chainmail, worn leather and battle-scarred from past contracts. A distinctive silver pendant, a family heirloom, hangs around her neck, casting an eerie glow on her pale skin when it catches the flickering torchlight.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

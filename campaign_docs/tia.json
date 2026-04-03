@@ -2,53 +2,53 @@
   "sectors": {
     "relic": {
       "name": "Relic & Antiquities",
-      "value": 103.22,
-      "prev_value": 103.86,
-      "change_pct": -0.62
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "essence": {
       "name": "Essence Coin Exchange",
-      "value": 104.57,
-      "prev_value": 104.06,
-      "change_pct": 0.49
+      "value": 100.9,
+      "prev_value": 100,
+      "change_pct": 0.9
     },
     "adventurer": {
       "name": "Adventurer Contracts",
-      "value": 100.32,
+      "value": 100,
       "prev_value": 100,
-      "change_pct": 0.32
+      "change_pct": 0.0
     },
     "divine": {
       "name": "Divine Services & Kharma",
-      "value": 121.39,
-      "prev_value": 121.41,
-      "change_pct": -0.02
+      "value": 100.76,
+      "prev_value": 100,
+      "change_pct": 0.76
     },
     "smuggling": {
       "name": "Grey Market Logistics",
-      "value": 112.68,
-      "prev_value": 114.18,
-      "change_pct": -1.31
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "memory": {
       "name": "Memory & Information",
-      "value": 124.37,
-      "prev_value": 126.39,
-      "change_pct": -1.6
+      "value": 101.4,
+      "prev_value": 100.2,
+      "change_pct": 1.2
     },
     "security": {
       "name": "Security & Enforcement",
-      "value": 115.52,
-      "prev_value": 115.11,
-      "change_pct": 0.36
+      "value": 100.9,
+      "prev_value": 100,
+      "change_pct": 0.9
     },
     "rift_tech": {
       "name": "Rift Technology",
-      "value": 743608722987988.0,
-      "prev_value": 746957471693244.5,
-      "change_pct": -0.45
+      "value": 2266636788723785.0,
+      "prev_value": 2263443975849212.0,
+      "change_pct": 0.14
     }
   },
-  "last_updated": "2026-04-02T06:12:04.311808",
-  "last_event": "Serpent Choir announces new miracle tier; Kharma demand spikes"
+  "last_updated": "2026-04-03T05:27:42.085727",
+  "last_event": "Active Rift event: contract board freezes, security costs spike, containment stocks surge"
 }

@@ -3789,7 +3789,7 @@
     "body": "**Wardens of Ash \u2014 The Protected Convoy**\n*Tier: Escort | Expires: TBD | Reward: 250 EC + 100 Kharma*\n*Opposes: Obsidian Lotus*\n\nA convoy of valuable supplies for the Sanctum Quarter's hospital is being transported through the treacherous Outer Wall territory. The Wardens of Ash need a reliable team to escort the convoy safely to its destination. Meet Captain Havel Korin at the Watchtower Gate for further instructions.\n\n*Contact: Captain Havel Korin, Watchtower Gate, Sanctum Quarter*",
     "posted_at": "2026-03-29T13:49:43.970481",
     "expires_at": "2026-04-08T13:49:43.970481",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1487810998810448074,
     "claimed": true,
     "npc_claimed": true,
@@ -3873,7 +3873,7 @@
     "body": "**Obsidian Lotus \u2014 The Gilded Gamble**\n*Tier: Major | Expires: TBD | Reward: 500 EC + 100 Kharma*\n*Opposes: Iron Fang Consortium*\n\nA lucrative black market deal awaits in the Guild Spires, but tread carefully, for the Iron Fang Consortium lurks in the shadows. The Widow has a job for you at the Crossroads Tavern.\n\n*Contact: The Widow, Crossroads Tavern, Guild Spires*",
     "posted_at": "2026-03-30T11:57:39.118712",
     "expires_at": "2026-05-09T11:57:39.118712",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1488145179876655266,
     "claimed": true,
     "npc_claimed": true,
@@ -3890,7 +3890,7 @@
     "body": "**Patchwork Saints \u2014 Warrens Ward**\n*Tier: Local | Expires: TBD | Reward: 50 EC + 50 Kharma*\n*Opposes: Obsidian Lotus*\n\nThe Patchwork Saints are in need of able hands to secure the Warren's district of \"Needle's Eye.\" A spike in Obsidian Lotus activity has left the district vulnerable. Mari Fen of the Adventurers Guild seeks help to safeguard the area and quell their influence.\n\n*Contact: Mari Fen, Adventurers Guild Spire*",
     "posted_at": "2026-03-30T16:02:03.575723",
     "expires_at": "2026-04-06T16:02:03.575723",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1488206687268638720,
     "claimed": true,
     "npc_claimed": true,
@@ -3926,7 +3926,10 @@
     "expires_at": "2026-05-13T16:06:03.927629",
     "resolved": false,
     "message_id": 1488207695570927768,
-    "personal_for": "Boxxo"
+    "personal_for": "Boxxo",
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1489370435782180926
   },
   {
     "title": "The Markets' Rune Weave",
@@ -3982,7 +3985,7 @@
     "body": "**Wizards Tower \u2014 A Dance with Dark Forces**\n*Tier: Tower | Expires: TBD | Reward: 300 EC + 50 Kharma*\n*Opposes: None*\n\nThe Wizards Tower calls upon mages for an arcane ritual at the heart of Markets Infinite. The ritual is meant to protect our city from an impending magical assault, and a successful completion will grant the participating mages immense renown.\n\n*Contact: Senior Archivist Pell, Wizards Tower*",
     "posted_at": "2026-03-30T18:04:03.317235",
     "expires_at": "2026-09-17T18:04:03.317235",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1488237388143525958,
     "claimed": true,
     "npc_claimed": true,
@@ -4033,7 +4036,7 @@
     "body": "**Obsidian Lotus \u2014 The Silvered Exchange**\n*Tier: Escort | Expires: TBD | Reward: 150 EC + 100 Kharma*\n*Opposes: Iron Fang Consortium*\n\nThe Obsidian Lotus seeks a skilled team for a delicate smuggling operation. Escort a cartload of valuable relics through the treacherous Outer Wall, meeting with the Argent Blades for exchange. Contact: The Widow, Guild Spires - Tower Level.",
     "posted_at": "2026-03-31T14:51:34.474498",
     "expires_at": "2026-04-25T14:51:34.474498",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1488551336868843671,
     "claimed": true,
     "npc_claimed": true,
@@ -4068,7 +4071,12 @@
     "posted_at": "2026-04-01T11:21:36.114921",
     "expires_at": "2026-05-06T11:21:36.114921",
     "resolved": false,
-    "message_id": 1488860883357536346
+    "message_id": 1488860883357536346,
+    "claimed": true,
+    "npc_claimed": true,
+    "claim_message_id": 1489385590024568923,
+    "npc_complete_at": "2026-04-03T23:37:35.984803",
+    "npc_outcome": "fail"
   },
   {
     "title": "The Lost Chronicles",
@@ -4080,7 +4088,12 @@
     "posted_at": "2026-04-01T18:48:59.784821",
     "expires_at": "2026-04-30T18:48:59.784821",
     "resolved": false,
-    "message_id": 1488973473760936050
+    "message_id": 1488973473760936050,
+    "claimed": true,
+    "npc_claimed": true,
+    "claim_message_id": 1489347708375535747,
+    "npc_complete_at": "2026-04-03T23:56:29.705473",
+    "npc_outcome": "fail"
   },
   {
     "title": "The Long Owed Debt",
@@ -4091,9 +4104,13 @@
     "body": "**Wardens of Ash \u2014 The Long Owed Debt**\n*Tier: Escort | Expires: TBD | Reward: 150 EC + 100 Kharma*\n*Opposes: Serpent Choir*\n\nLammis, a farmer turned monk with a knack for the extraordinary, we need your unique skills. Captain Havel Korin, head of the Wardens of Ash, requests your aid. Meet him at the Sanctum Quarter's Hero's Rest.\n\nCaptain Korin has received a distress call from one of our city defenders, a Wardens veteran named Thoren. He was last seen near the Outer Wall, pursued by the Serpent Choir. Thoren owes a significant debt to our organization, and we believe he may be able to provide crucial information about their activities. Your task is to escort Thoren back to safety and ensure the information he possesses is secured. Time is of the essence.",
     "posted_at": "2026-04-01T19:36:20.179091",
     "expires_at": "2026-05-31T19:36:20.179091",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1488985387362816031,
-    "personal_for": "Lammis"
+    "personal_for": "Lammis",
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1489309670337286325,
+    "completed": true
   },
   {
     "title": "The Disputed Stock",
@@ -4104,7 +4121,88 @@
     "body": "**Adventurers Guild \u2014 The Disputed Stock**\n*Tier: Investigation | Expires: TBD | Reward: 50 EC + 100 Kharma*\n*Opposes: None*\n\nInvestigate a heated dispute between two prominent merchants over a stolen shipment of exotic spices in the bustling Markets Infinite. Speak with Mari Fen for the assignment details.\n\n*Contact: Mari Fen, Adventurers Guild Spire*",
     "posted_at": "2026-04-02T03:10:28.121394",
     "expires_at": "2026-04-27T03:10:28.121394",
+    "resolved": true,
+    "message_id": 1489099674358124545,
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1489291585798799370,
+    "completed": true
+  },
+  {
+    "title": "The Vanished Courier",
+    "faction": "Adventurers Guild",
+    "tier": "local",
+    "reward": "100 EC + 50 Kharma + 10 LP",
+    "opposing_faction": "",
+    "body": "**Adventurers Guild \u2014 The Vanished Courier**  \n*Tier: local | Expires: TBD | Reward: 100 EC + 50 Kharma + 10 LP*  \n*Opposes: None*  \n\nA courier vanished from the **Spice Bazaar** overnight, leaving behind a sealed package marked with the sigil of the **Iron Fang Consortium**. The Guild needs the package recovered and the courier located before the Consortium\u2019s enforcers escalate. The target is likely hiding in the **Docks District**, where smuggled goods and loose tongues thrive.  \n\n*Contact: Tarn Vellis, Spice Bazaar*",
+    "posted_at": "2026-04-02T20:45:44.945537",
+    "expires_at": "2026-04-07T20:45:44.945537",
     "resolved": false,
-    "message_id": 1489099674358124545
+    "message_id": 1489365243913175111
+  },
+  {
+    "title": "Rift in the Shattered Spine",
+    "faction": "Glass Sigil",
+    "tier": "rift",
+    "reward": "200 EC + 300 Kharma",
+    "opposing_faction": "Obsidian Lotus",
+    "body": "**Glass Sigil \u2014 Rift in the Shattered Spine**  \n*Tier: rift | Expires: TBD | Reward: 200 EC + 300 Kharma*  \n*Opposes: Obsidian Lotus*  \n\nA jagged rift pulses in the Warrens\u2019 Shattered Spine district, its edges glowing with unstable arcane energy. The tear has grown for three days, drawing ravenous shadows that threaten to spill into the Outer Wall. The Glass Sigil requires a team to stabilize the rift and recover a fragmented *Chrono-Anchor* before the rupture collapses. Failure risks a cascading collapse that could scar the Warrens for decades.  \n\n*Contact: Veyra Kael, Shattered Spine*",
+    "posted_at": "2026-04-02T20:48:59.468645",
+    "expires_at": "2026-06-02T20:48:59.468645",
+    "resolved": true,
+    "message_id": 1489366059453775973,
+    "completed": true
+  },
+  {
+    "title": "The Weight of Shadows",
+    "faction": "Adventurers Guild",
+    "tier": "escort",
+    "reward": "150 EC + 100 Kharma",
+    "opposing_faction": "Argent Blades, Tower Authority",
+    "body": "**Adventurers Guild \u2014 The Weight of Shadows**  \n*Tier: escort | Expires: TBD | Reward: 150 EC + 100 Kharma*  \n*Opposes: Argent Blades, Tower Authority*  \n\nEscort **Erynn Dain**, a disgraced Guild investigator, through the **Grand Forum\u2019s Sapphire Bazaar** to settle a debt with the **Argent Blades**. Dain\u2019s pursuit of a vanished cult relic has drawn the **Tower Authority\u2019s scrutiny**\u2014avoid their enforcers and blade-tongued creditors alike. Failure to secure her exit means **public disgrace** and **blood debt**.  \n\n*Contact: Kael Veyne, Sapphire Bazaar Guild Hub*",
+    "posted_at": "2026-04-03T03:03:11.839244",
+    "expires_at": "2026-04-25T03:03:11.839244",
+    "resolved": false,
+    "message_id": 1489460234245243032
+  },
+  {
+    "title": "The Broken Pact",
+    "faction": "Adventurers Guild",
+    "tier": "inter-guild",
+    "reward": "150 EC + 15 bales of opium + 150 Kharma",
+    "opposing_faction": "Serpent Choir",
+    "body": "**Adventurers Guild \u2014 The Broken Pact**  \n*Tier: inter-guild | Expires: TBD | Reward: 150 EC + 15 bales of opium + 150 Kharma*  \n*Opposes: Serpent Choir*  \n\nThe Serpent Choir\u2019s shadow-cult in the Grand Forum is planning a ritual to corrupt the Iron Fang Consortium\u2019s relic vaults. Sabotage their preparations by stealing the ceremonial dagger from the Moonspire Hall.  \n\n*Contact: Captain Elara Voss, Moonspire Hall*",
+    "posted_at": "2026-04-03T03:08:26.043030",
+    "expires_at": "2026-05-12T03:08:26.043030",
+    "resolved": false,
+    "message_id": 1489461552028451078
+  },
+  {
+    "title": "The Field\u2019s Reckoning",
+    "faction": "Patchwork Saints",
+    "tier": "standard",
+    "reward": "150 EC + 100 Kharma",
+    "opposing_faction": "Iron Fang Consortium",
+    "body": "**Patchwork Saints \u2014 The Field\u2019s Reckoning**  \n*Tier: standard | Expires: TBD | Reward: 150 EC + 100 Kharma*  \n*Opposes: Iron Fang Consortium*  \n\nLammis, your past as a farmer has left scars even the Warrens can\u2019t erase. Old Tarnis, the last keeper of the Blackroot Docks, needs you to reclaim a relic stolen from his family\u2019s land\u2014*before the Iron Fang sells it to the highest bidder*. Your psionic strength and psionic warfare expertise are the only hope to stop this.  \n\n*Contact: Old Tarnis, Blackroot Docks*",
+    "posted_at": "2026-04-03T03:14:36.793175",
+    "expires_at": "2026-05-13T03:14:36.793175",
+    "resolved": false,
+    "message_id": 1489463107377172591,
+    "personal_for": "Lammis",
+    "claimed": true,
+    "player_claimer": "Akodo Reign",
+    "claim_message_id": 1489583064576294922
+  },
+  {
+    "title": "Silencing the Divine Ledger",
+    "faction": "Adventurers Guild",
+    "tier": "divine",
+    "reward": "300 EC + 500 Kharma",
+    "opposing_faction": "Serpent Choir",
+    "body": "**Adventurers Guild \u2014 Silencing the Divine Ledger**  \n*Tier: high-stakes | Expires: TBD | Reward: 300 EC + 500 Kharma*  \n*Opposes: Serpent Choir*  \n\nA cache of stolen divine contracts from the Serpent Choir\u2019s archives has surfaced, implicating High Apostle Yzura in clandestine deals with the Iron Fang Consortium. You must intercept and blackmail the Choir\u2019s Archivist, Veylan Dros, to ensure his silence before the next divine edict. The contracts detail secret negotiations that could unravel the Choir\u2019s influence.  \n\n*Contact: Veylan Dros, Grand Forum*",
+    "posted_at": "2026-04-03T03:23:10.570729",
+    "expires_at": "2026-09-01T03:23:10.570729",
+    "resolved": false,
+    "message_id": 1489465262338998363
   }
 ]

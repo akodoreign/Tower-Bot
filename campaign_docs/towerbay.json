@@ -511,11 +511,11 @@
     "condition": "Well-used",
     "seller": "The Shade Broker",
     "starting_bid": 43705,
-    "current_bid": 835062,
-    "bid_count": 40,
+    "current_bid": 1133814,
+    "bid_count": 43,
     "listed_at": "2026-03-26T18:21:56.602246",
     "expires_at": "2026-04-02T18:21:56.602246",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774567319,
@@ -529,7 +529,7 @@
     "bid_count": 41,
     "listed_at": "2026-03-26T18:21:59.459610",
     "expires_at": "2026-04-02T18:21:59.459610",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774567322,
@@ -543,7 +543,7 @@
     "bid_count": 44,
     "listed_at": "2026-03-26T18:22:02.197316",
     "expires_at": "2026-04-02T18:22:02.197316",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774567325,
@@ -553,11 +553,11 @@
     "condition": "Well-used",
     "seller": "Anonymous \u2014 last seen in the TowerBay's shadowy corners",
     "starting_bid": 36057,
-    "current_bid": 1123135,
-    "bid_count": 54,
+    "current_bid": 1184909,
+    "bid_count": 55,
     "listed_at": "2026-03-26T18:22:05.047439",
     "expires_at": "2026-04-02T18:22:05.047439",
-    "sold": false
+    "sold": true
   },
   {
     "id": 1774911064,
@@ -567,8 +567,8 @@
     "condition": "Well-used",
     "seller": "The Anonymous Weaver of Tears",
     "starting_bid": 26688,
-    "current_bid": 116948,
-    "bid_count": 22,
+    "current_bid": 169734,
+    "bid_count": 28,
     "listed_at": "2026-03-30T17:51:04.029686",
     "expires_at": "2026-04-06T17:51:04.029686",
     "sold": false
@@ -581,8 +581,8 @@
     "condition": "Mint",
     "seller": "Anonymous: The Whispering Market",
     "starting_bid": 71746,
-    "current_bid": 429466,
-    "bid_count": 22,
+    "current_bid": 585597,
+    "bid_count": 26,
     "listed_at": "2026-03-30T17:51:06.362629",
     "expires_at": "2026-04-06T17:51:06.362629",
     "sold": false
@@ -595,8 +595,8 @@
     "condition": "Mint",
     "seller": "Whispers of the Veil",
     "starting_bid": 18285,
-    "current_bid": 46398,
-    "bid_count": 13,
+    "current_bid": 54524,
+    "bid_count": 16,
     "listed_at": "2026-03-30T17:51:08.545698",
     "expires_at": "2026-04-06T17:51:08.545698",
     "sold": false
@@ -609,8 +609,8 @@
     "condition": "Well-used",
     "seller": "The Inquisitor's Guild - Auctioned under duress",
     "starting_bid": 52607,
-    "current_bid": 110520,
-    "bid_count": 10,
+    "current_bid": 142629,
+    "bid_count": 14,
     "listed_at": "2026-03-31T17:58:15.914367",
     "expires_at": "2026-04-07T17:58:15.914367",
     "sold": false
@@ -623,8 +623,8 @@
     "condition": "Well-used",
     "seller": "The Shadow Broker",
     "starting_bid": 15999,
-    "current_bid": 37484,
-    "bid_count": 11,
+    "current_bid": 43778,
+    "bid_count": 13,
     "listed_at": "2026-03-31T17:58:18.422611",
     "expires_at": "2026-04-07T17:58:18.422611",
     "sold": false
@@ -637,10 +637,66 @@
     "condition": "Mint",
     "seller": "Anonymous Gravedigger",
     "starting_bid": 24297,
-    "current_bid": 41285,
-    "bid_count": 7,
+    "current_bid": 56874,
+    "bid_count": 11,
     "listed_at": "2026-04-01T17:54:19.800805",
     "expires_at": "2026-04-08T17:54:19.800805",
+    "sold": false
+  },
+  {
+    "id": 1775176054,
+    "name": "The Hollow Chariot of the Drowned King",
+    "description": "A skeletal war chariot forged from obsidian and cursed coral, its wheels etched with the names of forgotten sea kings. Once used to ferry souls to the Abyssal Throne, now haunted by the whispers of its last driver\u2014a poet who drowned trying to outrun his own verses. The helm cracks where the king\u2019s spirit clawed its way free.",
+    "category": "Vehicles & Mounts",
+    "condition": "Well-used",
+    "seller": "The Drowned King's Vault (Anonymous)",
+    "starting_bid": 32751,
+    "current_bid": 47473,
+    "bid_count": 5,
+    "listed_at": "2026-04-02T19:27:34.824174",
+    "expires_at": "2026-04-09T19:27:34.824174",
+    "sold": false
+  },
+  {
+    "id": 1775176139,
+    "name": "The Ashen Widow's Final Breath",
+    "description": "A vial of liquid sorrow, once held by a cult that worshipped forgotten grief. The liquid is said to crystallize into tears when exposed to moonlight, though its true origin remains a mystery\u2014some claim it was harvested from the last breath of a city swallowed by the Dome's collapse.",
+    "category": "Memorabilia",
+    "condition": "Well-used",
+    "seller": "The Veiled Chorus",
+    "starting_bid": 35904,
+    "current_bid": 57593,
+    "bid_count": 6,
+    "listed_at": "2026-04-02T19:28:59.215317",
+    "expires_at": "2026-04-09T19:28:59.215317",
+    "sold": false
+  },
+  {
+    "id": 1775176202,
+    "name": "The Cursed Hourglass of Drowned Hours",
+    "description": "A shattered hourglass filled with liquid shadow, its sand once measured the final breaths of a drowned king's court. The glass hums with the whispers of sailors who tried to salvage it, their voices trapped in the cracks. Use it to track time... or unravel your own.",
+    "category": "Occult Curiosities",
+    "condition": "Well-used",
+    "seller": "The Drowned King's Last Heirloom",
+    "starting_bid": 58568,
+    "current_bid": 71447,
+    "bid_count": 4,
+    "listed_at": "2026-04-02T19:30:02.961772",
+    "expires_at": "2026-04-09T19:30:02.961772",
+    "sold": false
+  },
+  {
+    "id": 1775176264,
+    "name": "The Hollow Wraith's Screaming Blade",
+    "description": "Forged from the shattered bones of a forgotten warlord, this blade hums with the echoes of its last scream. Each swing leaves behind a mist of spectral tears, a reminder of the souls it's claimed. Beware\u2014the handle is etched with a warning in a language only the dead understand.",
+    "category": "Weapons",
+    "condition": "Well-used",
+    "seller": "The Hollow Veil",
+    "starting_bid": 49782,
+    "current_bid": 61159,
+    "bid_count": 3,
+    "listed_at": "2026-04-02T19:31:04.952457",
+    "expires_at": "2026-04-09T19:31:04.952457",
     "sold": false
   }
 ]

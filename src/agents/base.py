@@ -130,6 +130,7 @@ class BaseAgent(ABC):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         strip_preamble: bool = True,
+        force: bool = False,
     ) -> AgentResponse:
         """
         Send a single prompt and get a response.
@@ -140,14 +141,15 @@ class BaseAgent(ABC):
             temperature: Override default temperature
             max_tokens: Override default max tokens
             strip_preamble: Whether to strip common AI preamble phrases
+            force: If True, bypass the busy check (for internal compilation use)
             
         Returns:
             AgentResponse with the model's response
         """
         from src.ollama_busy import is_available, get_busy_reason
         
-        # Check busy flag
-        if not is_available():
+        # Check busy flag (skip if force=True, e.g., when called from mission_compiler)
+        if not force and not is_available():
             reason = get_busy_reason()
             logger.info(f"🤖 Agent {self.__class__.__name__} skipping — Ollama busy ({reason})")
             return AgentResponse(

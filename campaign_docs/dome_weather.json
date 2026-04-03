@@ -1,43 +1,43 @@
 {
   "districts": {
     "The Warrens": {
-      "condition": "Rust Rain",
-      "description": "Oxidised particulate is falling with the condensation. Everything it touches stains brown.",
-      "emoji": "\ud83d\udfe4"
+      "condition": "Ozone Spike",
+      "description": "Sharp metallic tang in the air. Arcane instruments misbehaving. Headaches reported.",
+      "emoji": "\u26a1"
     },
     "Markets Infinite": {
-      "condition": "Veil Thin",
-      "description": "The boundary between planes feels permeable. Faint sounds from elsewhere. Shadows move wrong.",
-      "emoji": "\ud83d\udc41\ufe0f"
+      "condition": "Stagnant Grey",
+      "description": "The crowd heat and still air have produced an interesting smell in Taste of Worlds.",
+      "emoji": "\ud83c\udf2b\ufe0f"
     },
     "Sanctum Quarter": {
-      "condition": "Ghost Light",
-      "description": "Pale orbs drifting through the Divine Garden. The Choir says they're benign. Nobody asked them.",
-      "emoji": "\ud83d\udc7b"
+      "condition": "Rift Static",
+      "description": "Arcane static crackles. Hair stands on end. Small objects drift.",
+      "emoji": "\u26a1"
     },
     "Grand Forum": {
-      "condition": "Deep Freeze",
-      "description": "Dome thermal regulators offline in this sector. Breath is visible. Pipes are at risk.",
-      "emoji": "\ud83e\udd76"
+      "condition": "Furnace Draft",
+      "description": "A hot updraft from the industrial levels. Dry and choking. Feels like opening an oven.",
+      "emoji": "\ud83c\udf21\ufe0f"
     },
     "Guild Spires": {
+      "condition": "Cinder Smog",
+      "description": "Furnace output has overwhelmed the filters. Visibility poor. Breathing unpleasant.",
+      "emoji": "\ud83d\udca8"
+    },
+    "Outer Wall": {
       "condition": "Whistling Vents",
       "description": "Pressure equalisation through narrow vents is producing an eerie whistle across the district.",
       "emoji": "\ud83c\udf90"
-    },
-    "Outer Wall": {
-      "condition": "Cold Sink",
-      "description": "Gate District is freezing. Wall Quadrant C reports frost on the inner seal. FTA is aware.",
-      "emoji": "\u2744\ufe0f"
     }
   },
-  "pressure": 49,
+  "pressure": 48,
   "special_event": null,
   "forecast": [
-    "Furnace Draft",
-    "Total Dark",
-    "Total Dark"
+    "Rust Rain",
+    "Phosphor Glow",
+    "Acid Drizzle"
   ],
-  "updated_at": "2026-04-02T06:12:04.312807",
-  "last_posted_at": "2026-04-02T05:18:35.025945"
+  "updated_at": "2026-04-03T05:27:42.086727",
+  "last_posted_at": "2026-04-03T05:27:42.091236"
 }
