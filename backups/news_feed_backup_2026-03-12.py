@@ -1,1 +1,0 @@
-BACKUP reference — news_feed.py as of 2026-03-12. Full source in src/news_feed.py.
