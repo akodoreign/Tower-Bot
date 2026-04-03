@@ -31,11 +31,6 @@
   "visual": "Clad in leather armor, adorned with serpent-like symbols and weapons forged from rift metal, the Unknown Party stands apart as a formidable force in the Undercity.",
   "reputation_note": "Whispers suggest they are backed by the Serpent Choir, but their allegiance remains a mystery, and they are feared for their efficiency and ruthlessness.",
   "history": [
-    "[2026-03-30] Completed a rift-tier contract. Rank: Legendary → Legendary (+0/5)",
-    "[2026-03-30] Failed a inter-guild-tier contract. Rank: Legendary (-2/5)",
-    "[2026-03-30] Completed a investigation-tier contract. Rank: Legendary (-1/5)",
-    "[2026-03-30] Completed a escort-tier contract. Rank: Legendary (+0/5)",
-    "[2026-03-30] Completed a investigation-tier contract. Rank: Legendary (+1/5)",
     "[2026-03-30] Failed a tower-tier contract. Rank: Legendary (-2/5)",
     "[2026-03-31] Completed a epic-tier contract. Rank: Legendary (+1/5)",
     "[2026-03-31] Completed a rift-tier contract. Rank: Legendary (+4/5)",
@@ -50,11 +45,16 @@
     "[2026-04-01] Completed a local-tier contract. Rank: Legendary (+3/5)",
     "[2026-04-01] Completed a epic-tier contract. Rank: Legendary → Legendary (+0/5)",
     "[2026-04-02] Completed a epic-tier contract. Rank: Legendary (+3/5)",
-    "[2026-04-02] Completed a epic-tier contract. Rank: Legendary → Legendary (+0/5)"
+    "[2026-04-02] Completed a epic-tier contract. Rank: Legendary → Legendary (+0/5)",
+    "[2026-04-02] Completed a escort-tier contract. Rank: Legendary (+1/5)",
+    "[2026-04-02] Failed a local-tier contract. Rank: Legendary (+0/5)",
+    "[2026-04-02] Failed a escort-tier contract. Rank: Legendary (-1/5)",
+    "[2026-04-03] Failed a major-tier contract. Rank: Legendary (-3/5)",
+    "[2026-04-03] Failed a tower-tier contract. Rank: Legendary → Renowned (+0/5)"
   ],
-  "missions_completed": 86,
-  "missions_failed": 20,
-  "tier": "Legendary",
+  "missions_completed": 87,
+  "missions_failed": 24,
+  "tier": "Renowned",
   "points": 0,
   "generated": true
 }

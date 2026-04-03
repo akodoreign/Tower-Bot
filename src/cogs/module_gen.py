@@ -1,7 +1,11 @@
 """Module generation cog — auto-generates D&D mission modules on player claims,
 and provides /genmodule for manual generation.
 
-Posts completed .docx files to MISSION_MODULE_CHANNEL_ID."""
+NEW ARCHITECTURE (v2):
+  Stage 1: Mission JSON is built from mission board data
+  Stage 2: MissionCompiler uses agents + skills to expand → .docx → Discord
+
+Posts completed .docx files to channel 1484147249637359769."""
 
 import os
 import asyncio
@@ -9,6 +13,7 @@ import discord
 from discord import app_commands
 
 from src.log import logger
+from src.mission_compiler import MissionCompiler, build_mission_json
 
 
 # Channel for posting generated mission modules
@@ -16,105 +21,62 @@ MODULE_CHANNEL_ID = 1484147249637359769
 
 
 async def generate_and_post_module(mission: dict, player_name: str, client) -> None:
-    """Background task: generate a mission module .docx and post it to Discord."""
-    from src.module_generator import generate_module
-    from src.ollama_busy import mark_busy, mark_available
-
+    """
+    Background task: compile a mission into a .docx module and post to Discord.
+    
+    Uses the new MissionCompiler with agent enhancement and skill injection.
+    """
     title = mission.get("title", "Unknown Mission")
-    logger.info(f"📖 Background module generation starting: '{title}' for {player_name}")
-
-    # Mark Ollama as busy so news feed / mission board / captions skip gracefully
-    mark_busy(f"module generation: {title}")
-    logger.info(f"📖 Ollama marked BUSY — other systems will skip until module is done")
-
+    logger.info(f"📖 Mission compilation starting: '{title}' for {player_name}")
+    
+    # Build mission JSON from the mission board dict
+    # The mission_compiler handles busy flag internally
+    mission_json = build_mission_json(
+        title=title,
+        faction=mission.get("faction", "Independent"),
+        tier=mission.get("tier", "standard"),
+        mission_type=mission.get("mission_type", "standard"),
+        cr=mission.get("cr", 6),
+        party_level=mission.get("party_level", 5),
+        player_name=player_name,
+        player_count=mission.get("player_count", 4),
+    )
+    
+    # Add any existing content from the mission board
+    if mission.get("body"):
+        mission_json["content"] = mission_json.get("content", {})
+        mission_json["content"]["board_description"] = mission.get("body")
+    
+    if mission.get("reward"):
+        mission_json["metadata"]["reward"] = mission.get("reward")
+    
+    if mission.get("personal_for"):
+        mission_json["metadata"]["personal_for"] = mission.get("personal_for")
+    
+    # Compile using the new agent-enhanced compiler
+    compiler = MissionCompiler(client)
+    
     try:
-        output_path = await generate_module(mission, player_name)
+        output_path = await compiler.compile_and_post(mission_json, player_name, client)
+        
+        if output_path:
+            logger.info(f"📖 Module compilation complete: '{title}' → {output_path}")
+        else:
+            logger.warning(f"📖 Module compilation returned None for '{title}'")
+            
     except Exception as e:
-        logger.error(f"📖 Module generation failed for '{title}': {e}")
-        # Notify DM of failure
+        logger.exception(f"📖 Module compilation failed for '{title}': {e}")
+        # Notify DM
         try:
             dm_id = int(os.getenv("DM_USER_ID", 0))
             if dm_id and client:
                 dm_user = await client.fetch_user(dm_id)
                 await dm_user.send(
-                    f"❌ **Module generation failed** for *{title}* (claimed by {player_name}).\n"
+                    f"❌ **Module compilation failed** for *{title}* (claimed by {player_name}).\n"
                     f"Error: `{type(e).__name__}: {e}`"
                 )
         except Exception:
             pass
-        return
-    finally:
-        # ALWAYS clear the busy flag, even on error
-        mark_available()
-        logger.info(f"📖 Ollama marked AVAILABLE — other systems resuming")
-
-    if output_path is None:
-        logger.warning(f"📖 Module generation returned None for '{title}'")
-        try:
-            dm_id = int(os.getenv("DM_USER_ID", 0))
-            if dm_id and client:
-                dm_user = await client.fetch_user(dm_id)
-                await dm_user.send(
-                    f"⚠️ **Module generation failed** for *{title}* (claimed by {player_name}).\n"
-                    f"Ollama may be overloaded or returned empty content."
-                )
-        except Exception:
-            pass
-        return
-
-    # Post the .docx to the module channel
-    channel = client.get_channel(MODULE_CHANNEL_ID)
-    if channel is None:
-        logger.warning(f"📖 Module channel {MODULE_CHANNEL_ID} not found — trying DM to DM user")
-        try:
-            dm_id = int(os.getenv("DM_USER_ID", 0))
-            if dm_id:
-                channel = await client.fetch_user(dm_id)
-        except Exception:
-            pass
-
-    if channel is None:
-        logger.error(f"📖 No channel available to post module for '{title}'")
-        return
-
-    try:
-        file_size = output_path.stat().st_size
-        faction = mission.get("faction", "Unknown")
-        tier = mission.get("tier", "standard").upper()
-        personal = f" *(personal contract for {mission.get('personal_for', '')})*" if mission.get("personal_for") else ""
-
-        embed = discord.Embed(
-            title=f"📖 Mission Module: {title}",
-            description=(
-                f"**Claimed by:** {player_name}{personal}\n"
-                f"**Faction:** {faction} | **Tier:** {tier}\n"
-                f"**File:** {output_path.name} ({file_size // 1024}KB)\n\n"
-                f"*Full D&D 5e 2024 adventure module — ~2 hours of gameplay. "
-                f"Print or read on any device.*"
-            ),
-            color=discord.Color.dark_gold(),
-        )
-        embed.set_footer(text="Tower of Last Chance — Auto-Generated Mission Module")
-
-        file = discord.File(str(output_path), filename=output_path.name)
-        await channel.send(embed=embed, file=file)
-        logger.info(f"📖 Module posted to channel: '{title}' ({file_size // 1024}KB)")
-
-    except Exception as e:
-        logger.error(f"📖 Failed to post module to Discord: {e}")
-        # Try DM as fallback
-        try:
-            dm_id = int(os.getenv("DM_USER_ID", 0))
-            if dm_id and client:
-                dm_user = await client.fetch_user(dm_id)
-                file = discord.File(str(output_path), filename=output_path.name)
-                await dm_user.send(
-                    f"📖 Module for *{title}* (claimed by {player_name}) — "
-                    f"couldn't post to channel, sending here instead.",
-                    file=file,
-                )
-        except Exception as e2:
-            logger.error(f"📖 DM fallback also failed: {e2}")
 
 
 def setup(client):
@@ -160,15 +122,26 @@ def setup(client):
         mission = matches[0]
         claimer = mission.get("player_claimer", "Unknown Adventurer")
 
+        # Get CR from mission or estimate from tier
+        from src.mission_compiler import MissionCompiler
+        tier_cr = {
+            "local": 4, "patrol": 4, "escort": 5, "standard": 6,
+            "investigation": 6, "rift": 8, "dungeon": 8, "dungeon-delve": 8,
+            "major": 8, "inter-guild": 10, "high-stakes": 10,
+            "epic": 12, "divine": 12, "tower": 12,
+        }
+        cr = mission.get("cr", tier_cr.get(mission.get("tier", "standard"), 6))
+        mission_type = mission.get("mission_type", "standard")
+
         await interaction.followup.send(
-            f"📖 **Generating module for:** *{mission['title']}*\n"
-            f"Claimer: {claimer} | Tier: {mission.get('tier', '?').upper()} | "
-            f"CR: {__import__('src.module_generator', fromlist=['TIER_CR_MAP']).TIER_CR_MAP.get(mission.get('tier', 'standard'), 6)}\n"
+            f"📖 **Compiling module for:** *{mission['title']}*\n"
+            f"Claimer: {claimer} | Tier: {mission.get('tier', '?').upper()} | CR: {cr}\n"
+            f"Type: {mission_type} | Using: DNDExpert + DNDVeteran + AICritic agents\n"
             f"This takes 5-10 minutes. I'll post it to the module channel when done.",
             ephemeral=True,
         )
 
-        # Fire background generation
+        # Fire background compilation
         asyncio.get_event_loop().create_task(
             generate_and_post_module(mission, claimer, client)
         )

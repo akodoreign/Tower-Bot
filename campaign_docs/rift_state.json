@@ -69,9 +69,13 @@
     "loc_type": "warrens",
     "stage": "whisper",
     "stage_entered_at": "2026-03-31T22:12:36.885391",
-    "resolved": false,
+    "resolved": true,
     "spawned_at": "2026-03-31T22:12:36.885391",
-    "last_bulletin_stage": "whisper"
+    "last_bulletin_stage": "whisper",
+    "outcome": "sealed",
+    "sealed_by": "natural",
+    "sealed_at": "2026-04-02T23:29:07.803328",
+    "seal_desc": "Whatever was building near Collapsed Plaza has stopped. No explanation. The city moves on."
   },
   {
     "id": "rift_1775021193",
@@ -79,8 +83,12 @@
     "loc_type": "warrens",
     "stage": "whisper",
     "stage_entered_at": "2026-04-01T00:26:33.981382",
-    "resolved": false,
+    "resolved": true,
     "spawned_at": "2026-04-01T00:26:33.981382",
-    "last_bulletin_stage": "whisper"
+    "last_bulletin_stage": "whisper",
+    "outcome": "sealed",
+    "sealed_by": "glass_sigil",
+    "sealed_at": "2026-04-03T00:44:52.187468",
+    "seal_desc": "Glass Sigil containment team deployed a residue siphon near Scrapworks. Readings stabilised within hours."
   }
 ]

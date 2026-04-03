@@ -1,119 +1,119 @@
-[2026-04-01 04:21 │ Tower: 01 Apr 2036, 04:21]
-_The Silver Spire echoes with a soft hum, a stark contrast to the usual clamor of steel and fury._ _Seraphina Shadowwhisper, Elara Thorne, and Thorin Stonebreaker — the Saltmarch Wanderers — sit around a table, their faces lit by the flickering candlelight._ _A parchment unfurls across the table, its contents a testament to their latest mission: the recovery of a stolen artifact for the Argent Blades._.
+[2026-04-02 10:34 │ Tower: 02 Apr 2036, 10:34]
+_In the flickering lanterns of Duskhollow, a quiet moment shines._ _Vaelis Darrowthorn, leader of The Borrowed Standard, sits on a worn stool at Elune's Apothecary. His eyes, once known for their predatory glint in the rifts, are instead filled with a gentle warmth as he watches his infant daughter, Aria, sleep._ _The baby's laughter fills the room, a sweet contrast to the gritty alleys outside, and Vaelis can't help but smile. The echoes of his legendary exploits in the rifts mingle with the gentle hum of the city, painting a rare moment of peace for its most feared explorer._.
 ---ENTRY---
-[2026-04-01 05:21 │ Tower: 01 Apr 2036, 05:21]
-_In the cobblestone heart of the Grand Forum, whispers ripple through the crowd. A parchment unfurls, its contents a testament to The Long Standard's recent triumph._ _At the Night Pits, the notorious Thyra Scalescar was bested by Seraphina Nightshade-Ironheart and her crew._ _The Long Standard's reputation grows, a beacon in the Undercity's chaotic darkness. One by one, they answer the call, their adaptable skills proving a force to be reckoned with._.
+[2026-04-02 10:36 │ Tower: 02 Apr 2036, 10:36]
+In Duskhollow's cobblestone alleys, the whispers of a silent triumph echo. _Last night, Serafina Larkwood and her team were rumored to have neutralized a high-profile target for the Iron Fang Consortium, dealing a heavy blow to their operations in the Grand Forum._ _The Patchwork Saints applaud their allies' success, but the shadowed whispers of concern linger — what _.
 ---ENTRY---
-[2026-04-01 05:21 │ Tower: 01 Apr 2036, 05:21]
-[Arena match result posted]
+[2026-04-02 10:38 │ Tower: 02 Apr 2036, 10:38]
+_In the chilled halls of the Sanctum Catacombs, a divine message resonates._ The Serpent Choir has issued a new contract, promising Kharma to those who dare accept. High Apostle Yzura summoned a gathering in the Choir Hall, where she unveiled the details of this divine assignment:.
 ---ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-Rumors swirl of an underground syndicate hoarding the precious material, pushing prices sky-high. _In the grime-streaked shadows of the Floating Bazaar, a vendor's haggard cries echo through the air._.
+[2026-04-02 11:25 │ Tower: 02 Apr 2036, 11:25]
+_In the shadows of Markets Infinite's towering stalls, a hush falls._ Whispers of forged Gilded Soul Essence Coins _echo through the alleys as vendors and patrons scramble to identify the fraudulent currency._ Rumors swirl that the Iron Fang Consortium is behind the counterfeit, flooding the market with imitation coins to undercut competitors and hoard resources. Investigations are ongoing, but the Patchwork Saints have taken notice, vowing to protect the city's honest workers from the clutches of the Iron Fang Consortium.
 ---ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-[TowerBay listing board posted]
+[2026-04-02 11:27 │ Tower: 02 Apr 2036, 11:27]
+_In the labyrinthine Warrens, a veil lifts._ Elara Mound, rogue researcher and member of the Glass Sigil, is rumored to be harvesting stable Rift energy near the city edge. The Iron Fang Consortium seizes this opportunity to tighten their grip on the Undercity's power struggle. Can others secure control before they strike? Murmurs grow of a race for resources, as the stakes rise higher than ever before.
 ---ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-[Dome weather report posted]
+[2026-04-02 11:28 │ Tower: 02 Apr 2036, 11:28]
+_A hush falls in Tower Authority Command._ Director Kess announces an unprecedented change to adventurer rankings: a new metric will gauge each party's adherence to responsible magic use. The Glass Sigil and Wizards Tower have been tasked with verifying the records of all active adventurers, starting with those who frequent the Grand Forum — a move that has many stirring in the shadows, seeking answers to what this means for their standing in the Undercity.
 ---ENTRY---
-[2026-04-01 07:12 │ Tower: 01 Apr 2036, 07:12]
-*In the shadow-streaked alleys of the Warrens, a cacophony of curses echoes. A small, furry figure huddles against the cold stone wall, a purring Tabaxi named Jax Argentshroud, shivering beneath a threadbare cloak.
+[2026-04-02 11:31 │ Tower: 02 Apr 2036, 11:31]
+_In the shimmering glow of Elune's Apothecary, sparks fly._ Crowds gather, gasps echo as Elara Ironclaw _and_ Kyra Noxfire argue passionately over a disputed relic. Elara Celestian, watching from the shadows, _intervenes. The air crackles_ as the three exchange heated words, their heated discussion leaving bystanders _buzzing with whispers of Remnant Clause tension._.
 ---ENTRY---
-[2026-04-01 08:16 │ Tower: 01 Apr 2036, 08:16]
-_In the dimly-lit corner of The Silver Spire, whispers ripple through the air like shadows dancing on stone._ _Archivist Vexis Veldorn, leader of the Irongate Collective, stares intently at the parchment before him, lines of ink detailing the recent injury of his fellow adventurer, Vesper of the Serpent Choir._ __ _Rumors begin to circulate, of a secret operation in the making, a mission to find and save their fallen comrade._.
+[2026-04-02 11:33 │ Tower: 02 Apr 2036, 11:33]
+_In Duskhollow's heart, a pulse weakens._ Zinnia Snakefang, _a member of Brother Thane's Cult,_ lies unconscious in Elune's Apothecary, her emerald eyes closed tight like coiled serpents, their scales shimmering with vitality that flickers like firelight. As whispers of her condition swirl through the Undercity, the Iron Fang Consortium sends emissaries to visit, sensing opportunity in her fragile state.
 ---ENTRY---
-[2026-04-01 08:16 │ Tower: 01 Apr 2036, 08:16]
+[2026-04-02 11:35 │ Tower: 02 Apr 2036, 11:35]
+_In Duskhollow's heart, a pulse weakens._ Midday finds Elara Mound, _rebel researcher with the Obsidian Lotus,_ huddled over her glowing apparatus in the chilled alley behind Elune's Apothecary. A dense fog rolls off her steam-filled contraption, obscuring the street and leaving the air heavy with a tang of ozone and burnt coal. Bystanders peek from their windows at the scene, whispering among themselves. Rumors swirl about Elara's dangerous experiment, and the city waits to see if the mysterious Rift Residue will break the surface or be contained.
+---ENTRY---
+[2026-04-02 12:26 │ Tower: 02 Apr 2036, 12:26]
+_In the tarnished mirror of Elune's Apothecary,_ _Whispers echo, questioning the ethics and consequences of such procedures. Can they wash this scandal from the city's memory, or _.
+---ENTRY---
+[2026-04-02 12:26 │ Tower: 02 Apr 2036, 12:26]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 09:07 │ Tower: 01 Apr 2036, 09:07]
-_In the cold, dim light of the Outer Wall, two figures stand, silhouetted against the Dome's glow._ Captain Havel Korin (Wardens of Ash) & Pol Greaves (Patchwork Saints) clash, their voices echoing like thunder. _"This city was built for heroes, not failed adventurers," Havel growls, his voice hard and unyielding._.
----ENTRY---
-[2026-04-01 10:07 │ Tower: 01 Apr 2036, 10:07]
-_A chilling wind howls through the Grand Forum, carrying whispers of power plays and hidden agendas._ In the marble halls of the Silver Spire, Lady Cerys Valemont, the Argent Blades' leader, holds court.
----ENTRY---
-[2026-04-01 11:09 │ Tower: 01 Apr 2036, 11:09]
-_In the hidden depths of the Warrens, a deal is struck beneath the watchful eyes of the Widow's brood._ _Rumors swirl of an upcoming auction, a chance to secure a piece of the Obsidian Lotus's sought-after product, the god-tongue ink._.
----ENTRY---
-[2026-04-01 11:09 │ Tower: 01 Apr 2036, 11:09]
+[2026-04-02 12:26 │ Tower: 02 Apr 2036, 12:26]
 [EC/Kharma exchange rate posted]
 ---ENTRY---
-[2026-04-01 12:02 │ Tower: 01 Apr 2036, 12:02]
-_In the dimly lit corners of the Grand Forum, a hush descends, a whisper of awe._ _Echoes of the recent exploits of The Patient Knife ripple through the crowd._ _Adventurers' Guild Notice:_ The Patient Knife, a versatile team of rift explorers, has returned from a perilous journey. Their discovery of a previously unexplored rift seam promises new opportunities for the Guild. We invite all adventurers to consider joining The Patient Knife on their next mission, a venture that may well redefine the Undercity's understanding of the rifts.
+[2026-04-02 13:22 │ Tower: 02 Apr 2036, 13:22]
+_In the echoing chambers of Shantytown Heights alleyways,_ Gurthok Ironhide _lies bandaged and battered, a symbol of the Undercity's harsh reality._ A crowd gathers at Elune's Apothecary, the air aflutter with whispers. An unnamed hero bravely tends to his wounds while others murmur prayers for the fallen warrior. Gurth's injury has left a void in The Rusty Axe, and a race begins: In this grime-streaked city, heroes and villains alike tread on the knife's edge of life and death. Stay tuned for more updates from the Undercity Dispatch.
 ---ENTRY---
-[2026-04-01 13:07 │ Tower: 01 Apr 2036, 13:07]
-_Beneath the dim glow of the Oracle Chamber, a hush descends as the eyes of the Guild of Ashen Scrolls turn to their new leader._ Eir Velan, Senior Archivist Fate's Future Uncertain.
+[2026-04-02 14:31 │ Tower: 02 Apr 2036, 14:31]
+_In the shadows of Choir Hall, secrets spill._ High Apostle Yzura, eyes flashing like emerald serpents, calls an emergency meeting. Rumors swirl about financial officer Sevas gone missing and a tithe ledger implicating Brother Enn in corruption. In the hushed halls of Sanctum Quarter, the Serpent Choir braces for a storm — a storm born from the silence of their own sanctuary.
 ---ENTRY---
-[2026-04-01 13:07 │ Tower: 01 Apr 2036, 13:07]
+[2026-04-02 15:08 │ Tower: 02 Apr 2036, 15:08]
+_In the neon-bathed shadows of Markets Infinite,_ a whisper echoes. Stormline Company: _Their latest operation yields more than treasure._ Rumors swirl around Neon Row corners about a mission gone wrong, and secrets stolen from beneath the Floating Bazaar's bright lights.
+---ENTRY---
+[2026-04-02 15:13 │ Tower: 02 Apr 2036, 15:13]
+_In Duskhollow's heart, an echo of hope._ Elara Ironclaw is arrested outside Elune's Apothecary, _charged with public disturbance and incitement_. The elfish rebel faces trial before Magister Liora. As whispers ripple through the Undercity, _In Guild Spires' shadows, a clash of steel._ Cassius Argent-Heart _faces off with Elara Noxfire atop the Argent Blades tower_. The air is thick with tension as the two square off, each determined to prove their worth in the city's eyes. The crowd below watches with bated breath, waiting for the duel's outcome.
+---ENTRY---
+[2026-04-02 15:16 │ Tower: 02 Apr 2036, 15:16]
+_In Coppergate's narrow alleys, blood spills like molten bronze._ The clamor of vendors and laughter of children is replaced by whispers, as the city mourns Sister Thalia Ignis-Veil, _a fallen fire cultist, slain in a brutal ambush near the Collapsed Plaza_. Brother Thane's Cult sends out calls for vengeance, promising the culprits will pay dearly. The Wardens of Ash, ever watchful, have taken up patrols around the cult's meeting places, hoping to prevent any further attacks on their enemies. The Iron Fang Consortium has been seen offering a sizable bounty for information about the ambushers, sensing an opportunity to weaken both the Wardens and Brother Thane's Cult at once.
+---ENTRY---
+[2026-04-02 15:28 │ Tower: 02 Apr 2036, 15:28]
+_In the heart of Shantytown Heights, a legend stirs._ Vexil Nightshade, the city's defiant rebel, stands tall in her worn leather coat. Her eyes are as hard as steel, and her voice carries like thunder through the cobbled alleyways. Rumors swirl about her latest mission, whispers of an enemy vanquished, but her steely gaze reveals no victory – only a burning determination to protect the Undercity's forgotten souls. Kegan Ironfist, _the hammer-wielding brute,_ stands beside her. His face is hidden beneath his iron helmet, but those who know him well can sense the fiery spirit behind those dark eyes. Together, they are Shattered Compact – a testament to the Undercity's enduring spirit, and a beacon of hope in this grime-streaked city.
+---ENTRY---
+[2026-04-02 15:30 │ Tower: 02 Apr 2036, 15:30]
+_In the shadow of the Outer Wall,_ a secret seed sprouts. Elara Mound's clandestine Rift harvest sparks a frenzy, as factions race to seize control of the city's next power source. Iron Fang Consortium and Obsidian Lotus eye a lucrative profit, while Wardens of Ash brace for conflict, vowing to protect the city's boundaries. As whispers of power struggles echo through alleys and chambers, all eyes turn toward the Rift seam — a prize too valuable to ignore.
+---ENTRY---
+[2026-04-02 15:32 │ Tower: 02 Apr 2036, 15:32]
+_In the flickering candlelight of The Pantheon Walk,_ Whispers stir. A cryptic prophecy echoes from Brother Thane's lips: 'When the Silver Streak wears a mask of shadow, the Silent Bloom whispers its name.' Some whisper it foretells the end of Veha's reign over forgotten memories; others, a divine struggle for power. As eyes turn to Archmage Yaulderna Silverstreak, her arcane prowess and shadowy past fuelling speculation. _In the shadow of Academy Heights,_ Silence falls. The Wizards Tower hums with hushed whispers as scholars debate the prophecy's meaning. As Archmage Yaulderna Silverstreak walks among them, her eyes reflect a secret storm - is she the Silver Streak destined to wear a mask of shadow?.
+---ENTRY---
+[2026-04-02 15:46 │ Tower: 02 Apr 2036, 15:46]
+Smoke curls from a spilled vial of Rift essence as Kaela Suntouched’s veil slips, revealing eyes smoldering with unspoken accusations. Renata Blackthorn offers a pouch of 47 EC, claiming the Long Exhale’s fire was “misdirected” during a recent Guild job. Thoren Stonebreaker eyes the pouch, his jaw tightening—“We didn’t burn the vendor’s stock, we cleaned it.” Eldric Ironfoot murmurs to the crowd: “Let the flames decide.” The air hums with the scent of charred parchment and unspoken debts.
+---ENTRY---
+[2026-04-02 15:54 │ Tower: 02 Apr 2036, 15:54]
+A tense standoff erupts as Elysia Stonehollow demands. Varn Orreth, missing his left arm, mutters about "blood debts" while the apothecary’s shelves tremble under the weight of unspoken threats. The crowd watches, wary—some whisper the ex-Consortium crew’s return is a storm waiting to break.
+---ENTRY---
+[2026-04-02 17:11 │ Tower: 02 Apr 2036, 17:11]
+In the Archive Catacombs, whispers say Thaddeus Valtorian’s deal with the Iron Fang went sour—Zephyr Rivenoak vanished mid-negotiation, leaving a trail of 47 EC in shattered glass. The Glass Sigil knows nothing. *** Eira Nightshadow now patrols Neon Row alone. ** Orlandus Hammerfist claims “ancient magics” caused the rift, but the Wardens say the real damage is to the crew’s trust.*.
+---ENTRY---
+[2026-04-02 17:11 │ Tower: 02 Apr 2036, 17:11]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 13:08 │ Tower: 01 Apr 2036, 13:08]
-[Missing persons notice posted]
+[2026-04-02 18:14 │ Tower: 02 Apr 2036, 18:14]
+The Archive Catacombs yield a grimoire bound in dragonhide, its pages whispering in tongues lost to time. Sylas Ironheart and Kaelis Swiftleaf recovered it, but the ink bleeds EC from their fingertips.
 ---ENTRY---
-[2026-04-01 14:01 │ Tower: 01 Apr 2036, 14:01]
-_From the shadows of Duskhollow, a voice cries out to the city:_ In the heart of the Hearthstone District, a family of three sleeps _hungry_. The mother works as a maid at the Grand Archive Dome, but her wages, barely enough to feed herself, are not enough for three. The father is an unranked independent, injured and unable to work. The child, a curious, wide-eyed thing, goes without.
+[2026-04-02 19:26 │ Tower: 02 Apr 2036, 19:26]
+The Sanctum Quarter’s Contract Archives buzz with whispers of a divine deal. A 50 EC reward is offered for information leading to the Tithe Ledger’s disappearance—a ledger last seen near the Collapsed Plaza’s eastern alley cluster. The Choir warns: “To break a contract is to invite the Culinary Council’s harvest.” Brother Thane’s Cult claims the ledger holds secrets of the Silent Bloom, while Zinnia Snakefang hints it’s tied to a Warden’s past sin. The Choir’s High Apostle Yzura demands answers by Dusk’s third bell—or face “miracles with clauses of iron.”.
 ---ENTRY---
-[2026-04-01 15:00 │ Tower: 01 Apr 2036, 15:00]
-_In the flickering torchlight of the Glass Sigil, a storm brews._ Yaulderna Silverstreak, the Archmage, clashes with Zephyrus Sylphim, the Sergeant of the Wardens of Ash. Rift energy crackles, and sparks fly as their arcane battle echoes through the halls of the Wizards Tower. A murmur ripples through the city: the Wardens' secret patron, Ashara, is said to have intervened, calming the storm before it could escalate further.
+[2026-04-02 21:40 │ Tower: 02 Apr 2036, 21:40]
+The Artisan Quarter’s blacksmiths swear the relic glows like molten iron, its runes whispering of a world before the Dome. Iron Fang offers. Glass Sigil’s Dova insists it’s “a key to forgotten histories” — and the Culinary Council’s eyes are already on it.
 ---ENTRY---
-[2026-04-01 15:53 │ Tower: 01 Apr 2036, 15:53]
-_In the heart of the Warrens, the god-tongue ink flows like the lifeblood of the Obsidian Lotus._.
----ENTRY---
-[2026-04-01 16:54 │ Tower: 01 Apr 2036, 16:54]
-_A veil of shadow descends upon the Grand Forum, whispering secrets of power struggles and missed leadership._ In the echoing marble halls of the Silver Spire, Lady Cerys Valemont's seat remains empty, as rumors swirl that a certain enforcer, Icefist Thoren, has been making moves in her absence. Rumors suggest that Thoren is leveraging his connections to gather supporters, challenging Cerys' authority and potentially threatening the balance of power within the guild. As whispers of a power struggle echo through the city, the Undercity watches with bated breath, waiting to see who will emerge victorious.
----ENTRY---
-[2026-04-01 17:54 │ Tower: 01 Apr 2036, 17:54]
-_In the dim corners of the Tower, a single figure remains still._.
----ENTRY---
-[2026-04-01 17:54 │ Tower: 01 Apr 2036, 17:54]
+[2026-04-02 21:40 │ Tower: 02 Apr 2036, 21:40]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 19:03 │ Tower: 01 Apr 2036, 19:03]
-_In the twilight of Rustside, a humble life unravels._ _Amidst the crumbling walls and rusted iron, Elara Ironclaw, a mother of two, struggles to make ends meet._ Elara, a skilled artisan, crafts delicate lanterns from salvaged scraps, their warm glow illuminating the dark corners of the Western Warrens. Yet, her meager sales barely feed her family, leaving them hungry and cold in their dilapidated home. _In the shadows, Elara's determination burns like the flame within her creations._ she gathers her children, whispering tales of a brighter tomorrow. _In the echoes of her words, the flickering lanterns cast a promise of hope._.
+[2026-04-02 22:05 │ Tower: 02 Apr 2036, 22:05]
+The Patchwork Saints raided a hidden cellar in Hearthstone’s 35th Ward, seizing a ledger detailing 120 EC per person smuggled to Shantytown Heights. Isabelle Hartling led the operation, citing "desperation" as the traffickers’ motive. A former apothecary, Elune, was found complicit, her shop used as a drop point. The Saints now face a dilemma: arrest the ring or track down the missing—like Kip Stonefang, whose "death" lingers in the shadows. 🧾 🧾.
 ---ENTRY---
-[2026-04-01 20:11 │ Tower: 01 Apr 2036, 20:11]
-_Where the echoes of laughter and the _ In the heart of Ember Ward, a home ablaze with warmth and laughter, Senior Archivist Pell finds an unexpected visitor: Thrain Stonefist, a dwarf in search of forgotten histories. Pell, ever guarded, offers him a taste of the Glass Sigil's archives, a glimpse of Thrain's future, if only he would remember their past. _In the flickering firelight, old secrets ignite new hope._.
+[2026-04-02 23:29 │ Tower: 02 Apr 2036, 23:29]
+Patchwork Saints raid Hearthstone District’s 35th Ward, seize ledger detailing 120 EC per person smuggled to Hearthstone District Isabelle Hartling’s blade cuts through the air, her voice low: “Desperation don’t pay the price of a soul.” The ledger’s ink bleeds EC from their fingertips—Elune’s shop, now a drop point, holds the weight of 120 EC per stolen life. Saints face a choice: arrest the ring or track the missing—like the late Kip Stonefang, whose “death” lingers in the shadows. 🧾.
 ---ENTRY---
-[2026-04-01 21:15 │ Tower: 01 Apr 2036, 21:15]
-_In the shadowy recesses of the Warrens, a whispering storm brews._ Rumors Abound of a Secret Cult Recruiting Within the Warrens The Eastern Warrens, a maze of alleyways and crumbling buildings, buzzes with whispers of a new presence. Seraphina Nightshade-Ironheart, a Brother Thane's Cult Speaker, is said to be Grug Ironfist's right-hand, recruiting aggressively in the district.
+[2026-04-02 23:29 │ Tower: 02 Apr 2036, 23:29]
+Iron Fang Riftwardens confirmed no further escalation.
 ---ENTRY---
-[2026-04-01 22:24 │ Tower: 01 Apr 2036, 22:24]
-_Beneath the shadowed walls of the Tower, a power struggle echoes._ In the silent halls of the Tower Authority, Director Myra Kess's absence is not going unnoticed. Whispers of turmoil reverberate through the command center, as her deputies scramble to maintain order. The FTA's compliance interns, led by Zippy Quickclaw, are under increased pressure to fill the void left by Myra's injury. As tension builds, so too does the potential for a power struggle within the Tower Authority. Meanwhile, Archivist Eir Velan, leader of the Guild of Ashen Scrolls, has requested an audience with Director Myra Kess. It is said that she seeks to discuss a matter of great urgency, one that may have dire consequences for the city. As the Undercity holds its breath, the fate of its overseers remains uncertain.
+[2026-04-03 00:44 │ Tower: 03 Apr 2036, 00:44]
+The Tower Authority's senior officer lies in the Grand Forum's Undercroft, his cybernetic frame flickering with unstable energy. Iron Fang envoys linger near the Spine Line Station, trading whispers of "recovery costs" in 47 EC increments. The Wardens of Ash, ever watchful, report no immediate threat—but their Captain Havel Korin mutters about "a machine too close to the Beam." Senior Archivist Pell claims the injury stems from a Rift breach near the Commerce Canal, where Kyrus Ironscale of the Iron Fang allegedly "negotiated" a deal with a rogue artifact. The Culinary Council's interest? They’ve offered.*.
 ---ENTRY---
-[2026-04-01 22:24 │ Tower: 01 Apr 2036, 22:24]
+[2026-04-03 00:45 │ Tower: 03 Apr 2036, 00:45]
+Rift at Scrapworks sealed at 'whisper' stage. Glass Sigil containment team deployed a residue siphon near the Iron Fang Consortium’s scrap-smithing district, stabilizing readings within hours. The city’s pulse barely flickered.
+---ENTRY---
+[2026-04-03 01:58 │ Tower: 03 Apr 2036, 01:58]
+The Quiet Majority and The Patient Accord cross paths at the Collapsed Plaza, their paths entwined by a stolen relic. Eira Blackhart’s veil slips as she recognizes Kracken Ironfist’s war hammer—forged from the Tower’s debris. Vex Silverspire offers a deal:. Cinder Ashwhisper’s eyes flicker toward the eastern alley, where the Tithe Ledger’s whispers still echo.
+---ENTRY---
+[2026-04-03 01:58 │ Tower: 03 Apr 2036, 01:58]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 23:25 │ Tower: 01 Apr 2036, 23:25]
-_In the cobbled warrens, a tale spills like the runoff from the Forum Canal._ _A ragged bard strums a worn lute beneath the flickering glow of a makeshift fire, his voice echoing through the alleys._ _"And the Silver Spire's empty throne.."_.
+[2026-04-03 03:01 │ Tower: 03 Apr 2036, 03:01]
+The residue siphon hums near the Collapsed Plaza’s eastern alley, where Dova tracks Rift echoes. A 35 EC reward for stabilizing the anomaly—before the Culinary Council’s harvesters arrive. Dova’s siphon flickers as a new rift bleeds into the alley, its edges fraying the air. “The Beam’s pulse is off,” she mutters, “someone’s tampered with the containment.” The Widow’s agents lurk beyond the siphon’s glow, eyes on the same anomaly—a prize for those who dare claim it.
 ---ENTRY---
-[2026-04-02 00:17 │ Tower: 02 Apr 2036, 00:17]
-The relic-smuggling cartel, under Guildmaster Serrik Dhal's reign, has expanded their market presence, driving up the prices of precious artifacts and antiquities. Cobbleway Market, the city's hub for relic trading, is now a frenzy of bidding wars, as the Iron Fang's monopoly on rare goods causes a ripple effect across Undercity commerce. The local vendors fear the Iron Fang's dominance in the market will drive them out of business. Grimbush Gizzlethorn, a scout for the Patchwork Saints, stands amidst the chaos, his beady eyes reflecting the weight of the threat. In the Archive Row, Eira Filigree, an archivist for the Guild of Ashen Scrolls, is troubled. She witnesses the erosion of the city's history, as the Iron Fang's greedy hands reach into the past, leaving only shadows in their wake. In the dim halls of the archives, Eira's voice echoes a call for justice, her pen scribbling lines of protest on forbidden scrolls.
+[2026-04-03 04:13 │ Tower: 03 Apr 2036, 04:13]
+The Widow’s agents found a shard of Veha’s sigil embedded in a desecrated shrine—its edges humming with stolen memory. Gorgon Gizzick warns: “The Bloom’s breath is in the walls. Burn the ledger, or the Council’s knives will taste the void.” 47 EC reward for info leading to the shard’s origin.
 ---ENTRY---
-[2026-04-02 01:13 │ Tower: 02 Apr 2036, 01:13]
-_In the cobbled alleys of Ember Ward, a cry rings out like the toll of a funeral bell._ A Spice Merchant's Mournful Plea Grizelda Mossblossom weeps over her wares, her eyes red and swollen. Her Spice Stand, nestled between the crumbling walls of Coppergate, bears only half its usual bounty.
+[2026-04-03 05:27 │ Tower: 03 Apr 2036, 05:27]
+The Saints are moving fast, ferrying medicine through the Collapsed Plaza’s ruins to Shantytown. But whispers say Elune’s shop, once a drop point for smuggled EC, now holds a ledger implicating her in Kip Stonefang’s “death.” 47 EC reward for info on the ledger’s whereabouts — or a blade to silence the past.
 ---ENTRY---
-[2026-04-02 02:20 │ Tower: 02 Apr 2036, 02:20]
-_In the dim lanes of the Warrens, a shadowed secret unravels._ _Rumor:_ Renata Blackthorn, leader of the Patchwork Saints, is said to harbor a deep-seated grudge against Eldric Ironfoot, her right-hand man. Some whisper that a past betrayal still haunts their partnership, casting a shadow over their seemingly unbreakable bond. In the Eastern Warrens.
----ENTRY---
-[2026-04-02 03:16 │ Tower: 02 Apr 2036, 03:16]
-_In the shadowed halls of the Tower Authority Command, the echoes of a power struggle whisper into the silence._ A Faint Signal from Director Myra Kess.
----ENTRY---
-[2026-04-02 03:16 │ Tower: 02 Apr 2036, 03:16]
-[TIA market ticker posted]
----ENTRY---
-[2026-04-02 04:09 │ Tower: 02 Apr 2036, 04:09]
-_In the dimly lit corridors of the Iron Fang Consortium, a whisper of change ripples through the air._ Gilded Soul Essence Coins (EC) Shadowblade Daggers (EC) Forgotten Tome Ink (EC).
----ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
-_The silence shatters as a hammer rings out in the Tower's heart._ Captain Havel Korin, the Outer Wall's stern guardian, calls for reinforcements as a series of unexplained disappearances plague the city's front line.
----ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
+[2026-04-03 05:27 │ Tower: 03 Apr 2036, 05:27]
 [TowerBay listing board posted]
 ---ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
+[2026-04-03 05:27 │ Tower: 03 Apr 2036, 05:27]
 [Dome weather report posted]
----ENTRY---
-[2026-04-02 06:12 │ Tower: 02 Apr 2036, 06:12]
-_In the labyrinthine market, a silent struggle unfolds._ _Grimbush Gizzlethorn, scout for the Patchwork Saints, stands amidst the cobbled paths of Cobbleway Market, his beady eyes darting between the stalls of the Iron Fang Consortium and the anxious vendors._ _As the Iron Fang Consortium tightens its grip on the market, the price of precious artifacts and antiquities skyrockets, leaving vendors struggling to keep their businesses afloat._.
----ENTRY---
-[2026-04-02 06:21 │ Tower: 02 Apr 2036, 06:21]
-_In the shadowed forge of Ironworks, a hammer echoes, a rhythm of danger and uncertainty._ _Voris Ironhammer, stalwart warrior of the Wardens of Ash, is nowhere to be found. His hammer lies silent, the echoes of his absence a grim reminder of the danger lurking within._ _A fortnight ago, whispers of a hidden rift in the Ironworks spread. The Windcaller, a recluse living in the Fringe, had warned the Wardens of the impending doom. Could it be that the Windcaller's warning came true, and Voris, the Wardens' most trusted defender, is its latest victim?_.

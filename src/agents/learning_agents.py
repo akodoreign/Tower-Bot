@@ -97,7 +97,7 @@ class ProjectManagerAgent(BaseAgent):
     def _get_config(self) -> AgentConfig:
         """Use local Qwen model for fast orchestration."""
         return AgentConfig(
-            model_name=os.getenv("LEARNING_MODEL", "qwen"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.5,  # Lower temp for structured decisions
             max_tokens=2048,
@@ -218,7 +218,7 @@ class PythonVeteranAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("LEARNING_MODEL", "qwen"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.6,
             max_tokens=2048,
@@ -373,7 +373,7 @@ class DNDExpertAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("LEARNING_MODEL", "qwen"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.7,
             max_tokens=2048,
@@ -505,7 +505,7 @@ class DNDVeteranAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("LEARNING_MODEL", "qwen"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.75,
             max_tokens=2048,
@@ -653,7 +653,7 @@ class AICriticAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("LEARNING_MODEL", "qwen"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.6,
             max_tokens=2048,

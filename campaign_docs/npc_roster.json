@@ -29,36 +29,6 @@
     "last_event_at": "2026-04-01T11:35:57.883804"
   },
   {
-    "name": "Corvin Thale",
-    "faction": "Wardens of Ash",
-    "rank": "Warden",
-    "species": "Human",
-    "age": "52",
-    "appearance": "Heavy-set, deliberate in movement. Always in civilian clothes while on duty \u2014 the only Warden who never wears the uniform. Carries a battered ledger he writes in constantly.",
-    "location": "Outer Wall, secondary checkpoint office (deliberately unglamorous)",
-    "motivation": "Institutional integrity. Corvin watched the Wardens become something uglier over a decade of Rift pressure and political interference. He believes the only thing keeping them from becoming a gang with a city contract is someone watching from the inside.",
-    "role": "Investigates Warden corruption, oversees civilian complaint processing, quietly monitors Captain Havel Korin.",
-    "secret": "Corvin's file on Korin contains nothing damning \u2014 just questions about a man with no past. Four years of investigation have revealed only that Korin is exactly what he appears to be: loyal, dedicated, and protective. Corvin cannot explain why this troubles him. Perhaps he simply cannot believe anyone in the Undercity is truly clean. The file remains open not because of evidence, but because Corvin cannot accept the absence of it.",
-    "relationships": "Respected but not liked by rank-and-file Wardens. Lieutenant Varen actively avoids him. Occasional contact with Director Myra Kess (FTA) \u2014 neither trusts the other but both find the arrangement useful. | Alliance with Kyri Zaltazar (Serpent Choir).",
-    "oracle_notes": "The Oracle would see a man who has chosen patience as a weapon. He carries the weight of everything he hasn't done yet. That weight is getting heavy. Hostile toward adventurers who killed Grozak Bonecrusher.",
-    "status": "alive",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-05] Entered roster from static file.",
-      "[2026-03-10] Formed alliance with Kyri Zaltazar (Serpent Choir).",
-      "[2026-03-11] Injured.",
-      "[2026-03-11] Recovered from injuries.",
-      "[2026-03-21] Injured.",
-      "[2026-03-22] Recovered from injuries.",
-      "[2026-03-25] Injured.",
-      "[2026-03-26] Recovered from injuries.",
-      "[2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.",
-      "[2026-04-01] Promoted from Lieutenant-Inspector (internal affairs \u2014 investigates Warden misconduct) to Warden within Wardens of Ash."
-    ],
-    "created_at": "2026-03-05T12:59:39.947925",
-    "last_event_at": "2026-04-01T11:36:11.771457"
-  },
-  {
     "name": "Mira Kessan",
     "faction": "Independent (twin to Kessan \u2014 both operate as info brokers)",
     "rank": "Senior Information Broker, Grand Forum",
@@ -632,15 +602,17 @@
     "history": [
       "[2026-03-11] Introduced to the Undercity roster.",
       "[2026-03-19] Injured.",
-      "[2026-03-19] Recovered from injuries."
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-11T10:33:06.087165",
-    "last_event_at": "2026-03-19T09:34:56.132951"
+    "last_event_at": "2026-04-02T22:21:12.632406"
   },
   {
     "name": "Grozak Ironscrivener",
     "faction": "Guild of Ashen Scrolls",
-    "rank": "Scribe",
+    "rank": "Initiate",
     "species": "Orc",
     "age": "50s",
     "appearance": "Grozak stands tall and broad, with a thick beard matted with charcoal from the countless scrolls he's deciphered. His eyes, a piercing green, are always focused on the parchment in front of him.",
@@ -653,10 +625,11 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-11] Introduced to the Undercity roster."
+      "[2026-03-11] Introduced to the Undercity roster.",
+      "[2026-04-02] Demoted from Scribe to Initiate within Guild of Ashen Scrolls."
     ],
     "created_at": "2026-03-11T11:01:16.787055",
-    "last_event_at": "2026-03-11T11:01:16.787055"
+    "last_event_at": "2026-04-02T10:43:29.470823"
   },
   {
     "name": "Kyrus Fireeye",
@@ -699,10 +672,12 @@
     "history": [
       "[2026-03-11] Introduced to the Undercity roster.",
       "[2026-03-16] Injured.",
-      "[2026-03-17] Recovered from injuries."
+      "[2026-03-17] Recovered from injuries.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-11T12:02:41.004601",
-    "last_event_at": "2026-03-17T05:42:44.890622"
+    "last_event_at": "2026-04-02T15:17:14.499689"
   },
   {
     "name": "Eamon Hawthorne",
@@ -985,8 +960,8 @@
   },
   {
     "name": "Isabelle Hartling",
-    "faction": "Tower Authority",
-    "rank": "Compliance Intern",
+    "faction": "Patchwork Saints",
+    "rank": "Volunteer",
     "species": "Human",
     "age": "32",
     "appearance": "A tall, slender woman with a stern gaze, dressed in the official black uniform of the Tower Authority. Her hair, a stark contrast, is a vibrant shade of red that cascades down to her waist.",
@@ -1000,10 +975,11 @@
     "revealed_secrets": [],
     "history": [
       "[2026-03-12] Introduced to the Undercity roster.",
-      "[2026-03-26] Formed alliance with Tilda Ironheart (Iron Fang Consortium)."
+      "[2026-03-26] Formed alliance with Tilda Ironheart (Iron Fang Consortium).",
+      "[2026-04-02] Defected from Tower Authority to Patchwork Saints (rank: Volunteer)."
     ],
     "created_at": "2026-03-12T14:26:16.801957",
-    "last_event_at": "2026-03-26T06:31:04.804347"
+    "last_event_at": "2026-04-02T10:43:22.660181"
   },
   {
     "name": "Zinnia Snakefang",
@@ -1026,10 +1002,12 @@
       "[2026-03-15] Recovered from injuries.",
       "[2026-03-19] Injured.",
       "[2026-03-19] Recovered from injuries.",
-      "[2026-03-29] Defected from Independent to Brother Thane's Cult (rank: Follower)."
+      "[2026-03-29] Defected from Independent to Brother Thane's Cult (rank: Follower).",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-12T15:04:34.589648",
-    "last_event_at": "2026-03-29T08:58:00.763126"
+    "last_event_at": "2026-04-02T11:40:09.123769"
   },
   {
     "name": "Gideon Steelforge",
@@ -1044,15 +1022,16 @@
     "secret": "Gideon was originally built by a rogue faction to infiltrate the Tower Authority, but his programming was rewritten, leaving him with fragmented memories of his true origins.",
     "relationships": "Works closely with the Argent Blades, sharing intelligence and coordinating joint operations, but is wary of the Serpent Choir due to their known ties with the rogue faction.",
     "oracle_notes": "The Oracle senses an underlying conflict within Gideon, a struggle between loyalty to his current allegiances and a dormant desire to fulfill his original purpose.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
       "[2026-03-13] Introduced to the Undercity roster.",
       "[2026-03-15] Injured.",
-      "[2026-03-16] Recovered from injuries."
+      "[2026-03-16] Recovered from injuries.",
+      "[2026-04-02] Injured."
     ],
     "created_at": "2026-03-13T11:59:33.359737",
-    "last_event_at": "2026-03-16T07:12:25.091171"
+    "last_event_at": "2026-04-02T22:25:47.375627"
   },
   {
     "name": "Arion Celestia",
@@ -1207,10 +1186,11 @@
       "[2026-03-18] Introduced to the Undercity roster.",
       "[2026-03-23] Injured.",
       "[2026-03-24] Recovered from injuries.",
-      "[2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted."
+      "[2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.",
+      "[2026-04-02] 5. \"Rumored to have struck a deal with the Independent for protection from the P..."
     ],
     "created_at": "2026-03-18T19:57:53.144362",
-    "last_event_at": "2026-03-24T11:33:20.944208"
+    "last_event_at": "2026-04-02T22:24:47.386372"
   },
   {
     "name": "Grimbush Gizzlethorn",
@@ -1430,10 +1410,12 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-19] Introduced to the Undercity roster."
+      "[2026-03-19] Introduced to the Undercity roster.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-19T14:35:50.531510",
-    "last_event_at": "2026-03-19T14:35:50.531510"
+    "last_event_at": "2026-04-02T15:36:46.055853"
   },
   {
     "name": "Thyra Scalescar",
@@ -1541,10 +1523,12 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-22] Introduced to the Undercity roster."
+      "[2026-03-22] Introduced to the Undercity roster.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-22T10:51:53.868762",
-    "last_event_at": "2026-03-22T10:51:53.868762"
+    "last_event_at": "2026-04-02T22:23:50.587271"
   },
   {
     "name": "Gurrek Ironheart",
@@ -1715,10 +1699,12 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-26] Introduced to the Undercity roster."
+      "[2026-03-26] Introduced to the Undercity roster.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-26T15:34:06.039151",
-    "last_event_at": "2026-03-26T15:34:06.039151"
+    "last_event_at": "2026-04-02T11:40:16.174673"
   },
   {
     "name": "Seraphina Nightshade-Ironheart",
@@ -1882,13 +1868,14 @@
     "secret": "Serrik has identified his successor \u2014 but it's not anyone currently in the Consortium's leadership. He's been quietly grooming an outsider, someone with no factional debts and no old grudges. The current senior agents, including Sera Voss, have no idea they're being passed over. When Serrik dies, the Consortium will either transform or tear itself apart. He's betting on transformation.",
     "relationships": "Sera Voss reports to him and wants his seat \u2014 he knows and finds it appropriate but not sufficient. Professional respect for Director Myra Kess (FTA) \u2014 they've negotiated truces that held. Wary of The Widow (Obsidian Lotus) \u2014 the only person in the Undercity he genuinely cannot predict. Despises Mari Fen (Adventurers Guild) for reasons he's never explained.",
     "oracle_notes": "The Oracle would see a man racing against his own death to finish one last project. The Rift exposure has left traces in him \u2014 not corruption, but a strange clarity. He has seen something of what lies beyond and it has made him impatient with small concerns. His successor plan is either brilliant or catastrophic. The Oracle is curious to see which.",
-    "status": "alive",
+    "status": "injured",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-29] Added to roster. Guildmaster of the Iron Fang Consortium. Dying from Rift exposure, secretly arranging succession outside the current leadership."
+      "[2026-03-29] Added to roster. Guildmaster of the Iron Fang Consortium. Dying from Rift exposure, secretly arranging succession outside the current leadership.",
+      "[2026-04-02] Injured."
     ],
     "created_at": "2026-03-29T01:00:00.000000",
-    "last_event_at": "2026-03-29T01:00:00.000000"
+    "last_event_at": "2026-04-02T22:24:55.509940"
   },
   {
     "name": "Lady Cerys Valemont",
@@ -2017,28 +2004,6 @@
     "last_event_at": "2026-03-29T01:00:00.000000"
   },
   {
-    "name": "Director Myra Kess",
-    "faction": "Tower Authority / FTA",
-    "rank": "Director \u2014 Head of the Tower Authority",
-    "species": "Human",
-    "age": "48",
-    "appearance": "Sharp features, close-cropped dark hair, always in formal FTA uniform. Moves with efficient precision. Her expression rarely changes \u2014 she's mastered the administrator's neutral face that reveals nothing. Small reading glasses she only wears in private. Hands show calluses from weapons training she still maintains.",
-    "location": "The Tower proper, upper administrative levels \u2014 the official seat of FTA power",
-    "motivation": "The Tower Authority exists to keep the Dome functional and the Undercity stable. Myra took the Director's chair because no one else would make the hard decisions. She's not idealistic \u2014 she knows the FTA is corrupt, inefficient, and compromised by faction interests. She works with what she has. The alternative is chaos, and she's seen what chaos looks like.",
-    "role": "Final authority on all FTA operations \u2014 licensing, compliance, Rift response coordination, inter-faction mediation. Commands the FTA's limited enforcement resources. Manages the political relationships that keep the Undercity from tearing itself apart.",
-    "secret": "Myra knows the Tower of Last Chance is more than a building \u2014 it's a containment system. She doesn't know exactly what it contains or why it was built, but she's seen enough classified files to understand that the entire Dome exists for a reason the original builders never documented. She has chosen not to investigate further. Some questions are better left unasked when you're responsible for keeping the system running.",
-    "relationships": "Professional respect for Captain Havel Korin (Wardens) \u2014 he's the most reliable ally she has. The offer to Lady Cerys Valemont (Argent Blades) represents her attempt to build a real military force. Calix Drenn is one of her better Field Officers. Watches the faction leaders constantly \u2014 trust is not something she offers lightly.",
-    "oracle_notes": "The Oracle finds Myra's willful ignorance about the Tower's true purpose both understandable and dangerous. She has chosen stability over truth, which is a reasonable choice for an administrator \u2014 but the truth does not care whether you choose to see it. Myra will eventually have to confront what the Tower actually is. The Oracle is watching to see how she handles that moment.",
-    "status": "injured",
-    "revealed_secrets": [],
-    "history": [
-      "[2026-03-29] Added to roster. Director of the Tower Authority. Knows the Tower is a containment system but has chosen not to investigate what it contains.",
-      "[2026-04-01] Injured."
-    ],
-    "created_at": "2026-03-29T01:00:00.000000",
-    "last_event_at": "2026-04-01T11:36:17.127642"
-  },
-  {
     "name": "Brother Thane",
     "faction": "Brother Thane's Cult (The Returned)",
     "rank": "Prophet \u2014 Founder and Leader of the Returned",
@@ -2096,10 +2061,12 @@
     "status": "alive",
     "revealed_secrets": [],
     "history": [
-      "[2026-03-29] Introduced to the Undercity roster."
+      "[2026-03-29] Introduced to the Undercity roster.",
+      "[2026-04-02] Injured.",
+      "[2026-04-02] Recovered from injuries."
     ],
     "created_at": "2026-03-29T08:57:49.103155",
-    "last_event_at": "2026-03-29T08:57:49.103155"
+    "last_event_at": "2026-04-02T15:17:26.778478"
   },
   {
     "name": "Orion Swiftshadow",
@@ -2205,5 +2172,165 @@
     ],
     "created_at": "2026-04-01T11:35:52.817165",
     "last_event_at": "2026-04-01T11:35:52.817165"
+  },
+  {
+    "name": "Elara Nightshadow",
+    "faction": "Wizards Tower",
+    "rank": "Journeyman",
+    "species": "Half-Elf",
+    "age": "40s",
+    "appearance": "With raven hair that falls past her shoulders, dark, piercing eyes, and a tall, slender frame, Elara Nightshadow exudes an air of mysterious grace. She often wears flowing robes embroidered with intricate magical symbols.",
+    "location": "Labyrinthine Quarter, Tower Library",
+    "motivation": "Elara seeks to uncover lost arcane knowledge and reclaim her family's ancient power, driven by a deep sense of duty to her lineage.",
+    "role": "Elara spends her days researching forgotten lore in the vast libraries of the Wizards Tower.",
+    "secret": "Hidden within Elara's ancestral tome is a forbidden spell that could shift the balance of power in the Undercity, if it falls into the wrong hands.",
+    "relationships": "Elara maintains a cautious alliance with Senior Archivist Pell, who has been instrumental in facilitating her access to restricted texts.",
+    "oracle_notes": "The Oracle senses a powerful and secretive magic coursing through Elara Nightshadow's veins.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-02] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-02T10:43:10.376249",
+    "last_event_at": "2026-04-02T10:43:10.376249"
+  },
+  {
+    "name": "Skitter Ashscale",
+    "faction": "Wardens of Ash",
+    "rank": "Recruit",
+    "species": "Kobold",
+    "age": "early 40s",
+    "appearance": "Short and wiry, with scales the color of charred embers. Always seen with a machete strapped to his back.",
+    "location": "Slums of the Ash District, near the Warden's Forge",
+    "motivation": "Joined the Wardens to escape a life of petty crime and find purpose in protecting others from the dangers lurking beneath the Dome.",
+    "role": "Assists in patrolling the Slums and maintains the equipment at the Warden's Forge.",
+    "secret": "Once a member of the Serpent Choir, he defected after witnessing their dark rituals firsthand. Revealing this could shake the power structure of the Undercity.",
+    "relationships": "Maintains a strained alliance with Captain Havel Korin of the Iron Fang Consortium due to shared interests in keeping the peace in the Ash District.",
+    "oracle_notes": "The Oracle senses a tortured soul, driven by a deep-seated need for redemption.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-02] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-02T11:40:03.979456",
+    "last_event_at": "2026-04-02T11:40:03.979456"
+  },
+  {
+    "name": "Yuna Saltis",
+    "faction": "Obsidian Lotus",
+    "rank": "Memory Architect (specialist \u2014 designs and performs memory erasure contracts)",
+    "species": "Ghost (formerly Tiefling)",
+    "age": "27",
+    "appearance": "Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always \u2014 claims it's professional habit. Very short.",
+    "location": "The Warrens, Obsidian Lotus secondary location (not the main house \u2014 she operates from a private room in the Night Pits)",
+    "motivation": "Unfinished business from before death. Driven by regret.",
+    "role": "Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).",
+    "secret": "She has retained a copy of every memory she has ever erased \u2014 stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.",
+    "relationships": "Professional respect from The Widow (rare). Tolerated by the rest of the Lotus \u2014 her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically \u2014 Yuna found this annoying and flattering in equal measure.",
+    "oracle_notes": "The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out? Returned from death as Ghost. Changed. Dangerous. The Oracle watches with great interest.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-05] Entered roster from static file.",
+      "[2026-03-11] Injured.",
+      "[2026-03-12] Recovered from injuries.",
+      "[2026-03-13] Injured.",
+      "[2026-03-14] Recovered from injuries.",
+      "[2026-03-19] Injured.",
+      "[2026-03-19] Recovered from injuries.",
+      "[2026-03-30] Killed. Faction: Obsidian Lotus, Rank: Memory Architect (specialist \u2014 designs and performs memory erasure contracts).",
+      "[2026-04-02] RETURNED FROM DEATH as Ghost. translucent, flickering, trapped between the city and whatever comes after."
+    ],
+    "created_at": "2026-03-05T12:59:39.947925",
+    "last_event_at": "2026-04-02T11:40:37.372529"
+  },
+  {
+    "name": "Alaric Vespera",
+    "faction": "Glass Sigil",
+    "rank": "Archivist",
+    "species": "Human",
+    "age": "40s",
+    "appearance": "Alaric is a lean, gaunt man with hollow eyes that seem to glow in the dark. He wears simple robes and carries an ancient parchment-bound book everywhere.",
+    "location": "The Spire District \u2013 Archives of Eternity",
+    "motivation": "Alaric seeks to uncover lost knowledge about the Tower of Last Chance, believing it holds secrets that could save his doomed city. His pursuit is driven by a personal vendetta against the gods who have abandoned them.",
+    "role": "He spends his days researching ancient texts and cataloguing new discoveries for the Glass Sigil library.",
+    "secret": "Alaric has made a pact with an eldritch entity, trading his soul for its assistance in finding the Tower's secrets. His eyes now glow when he delves too deep into forbidden lore.",
+    "relationships": "He maintains a delicate alliance with Sister Cerys Valemont of the Wardens of Ash, who shares his goal but does not trust his methods.",
+    "oracle_notes": "The Oracle senses that Alaric is more than he appears \u2013 his connection to otherworldly forces hints at a hidden destiny.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-02] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-02T15:16:49.688685",
+    "last_event_at": "2026-04-02T15:16:49.688685"
+  },
+  {
+    "name": "Jorick Sparrowthief",
+    "faction": "Glass Sigil",
+    "rank": "Archivist",
+    "species": "Ghost (formerly Halfling)",
+    "age": "40s",
+    "appearance": "Jorick is a small, wiry halfling with piercing green eyes that seem to miss nothing. He always wears a patchwork coat over his threadbare robes.",
+    "location": "Sparrow's Nest, The Spires",
+    "motivation": "Unfinished business from before death. Driven by something they saw on the other side.",
+    "role": "Jorick spends his days poring over ancient texts and scrolls, cataloguing and cross-referencing them for future use.",
+    "secret": "Jorick secretly helps the Argent Blades in their covert operations, providing them with information gleaned from the Glass Sigil's archives.",
+    "relationships": "He maintains a complex relationship with Sera Voss, the Argent Blades' leader, who owes him a life debt.",
+    "oracle_notes": "The Oracle senses a quiet but determined soul, driven by a burning desire to preserve and protect. It also feels the faint whispers of loyalty to a cause unknown. Returned from death as Ghost. Changed. Dangerous. The Oracle watches with great interest.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-03-06] Introduced to the Undercity roster.",
+      "[2026-03-10] Promoted from Junior Archivist to Archivist within Glass Sigil.",
+      "[2026-03-12] Injured.",
+      "[2026-03-12] Succumbed to injuries. Faction: Glass Sigil, Rank: Archivist.",
+      "[2026-03-24] Doppelganger sighting \u2014 someone impersonating Jorick Sparrowthief spotted in the Undercity.",
+      "[2026-04-02] RETURNED FROM DEATH as Ghost. translucent, flickering, trapped between the city and whatever comes after."
+    ],
+    "created_at": "2026-03-06T12:02:14.330235",
+    "last_event_at": "2026-04-02T15:17:46.687467"
+  },
+  {
+    "name": "Korra Ironheart",
+    "faction": "Iron Fang Consortium",
+    "rank": "Street Runner",
+    "species": "Warforged",
+    "age": "30s",
+    "appearance": "A towering Warforged with a patchwork of red and black, Korra Ironheart moves with a grace that belies her metallic frame. Her eyes, glowing yellow, seem to pierce through the shadows as she navigates the labyrinthine Undercity.",
+    "location": "The Iron Pits district, Blackmarket sub-location",
+    "motivation": "Korra seeks to prove her worth among the Iron Fang Consortium and secure a place in their inner circle, driven by a desire to help her fellow Warforged escape their servitude.",
+    "role": "Acting as a messenger and enforcer for the Iron Fang Consortium, Korra moves through the Undercity's dark underbelly with ease and purpose.",
+    "secret": "Korra was once an enslaved Warforged, but managed to escape and infiltrate the very faction that had held her captive. Her loyalty is divided between her current employer and a secret allegiance to the resistance fighting for Warforged freedom.",
+    "relationships": "She has formed a tentative alliance with a member of the Wizards Tower who shares her goal, but their connection remains tenuous due to the opposing interests of their respective factions.",
+    "oracle_notes": "The Oracle senses an underlying fire within Korra Ironheart that burns with the desire for freedom and justice.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-02] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-02T15:36:40.716477",
+    "last_event_at": "2026-04-02T15:36:40.716477"
+  },
+  {
+    "name": "Kaelen Duskbane",
+    "faction": "Adventurers Guild",
+    "rank": "E-Rank",
+    "species": "Half-Elf",
+    "age": "34",
+    "appearance": "Silver-streaked black hair hangs in a messy ponytail, with amber eyes that flicker like dying embers. A thin scar runs from temple to jaw, and they carry themselves with gruff weariness, always checking their back for threats.",
+    "location": "Gutterbone District, Black Market Pawnshop",
+    "motivation": "Wants to redeem their past as a smuggler by protecting the vulnerable, but fears their old habits will destroy everything they've built. Seeks to atone for a heist that killed an innocent family.",
+    "role": "Sells stolen gear and takes low-paying jobs guarding warehouses, using their knowledge of Undercity tunnels to smuggle contraband for richer Guild members.",
+    "secret": "Was a former assassin for Brother Thane's Cult, but fled after witnessing their leader's ritual murder of a child. Now hides this past by pretending to be a disgraced smuggler.",
+    "relationships": "Rival with Guild enforcer Veyra Krell, who suspects their true past. Secretly supplies rare components to the Serpent Choir in exchange for information on cult movements.",
+    "oracle_notes": "The Oracle senses a lingering guilt that fuels their actions, but also a dormant necromantic power tied to their half-elf heritage that could either save or destroy them.",
+    "status": "alive",
+    "revealed_secrets": [],
+    "history": [
+      "[2026-04-02] Introduced to the Undercity roster."
+    ],
+    "created_at": "2026-04-02T15:53:22.521893",
+    "last_event_at": "2026-04-02T15:53:22.521893"
   }
 ]

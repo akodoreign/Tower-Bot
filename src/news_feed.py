@@ -1,7 +1,7 @@
 """
 news_feed.py — Tower of Last Chance AI-generated hourly bulletin.
 
-Uses mistral locally via Ollama — best prose quality, fully local, no cloud tokens.
+Uses qwen3 locally via Ollama — OpenClaw/Pi compatible, fully local, no cloud tokens.
 
 Every bulletin is saved to campaign_docs/news_memory.txt so the world
 builds continuity over time — stories escalate, rumours contradict,
@@ -15,9 +15,12 @@ import re
 import json
 import random
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional, Dict
+
+logger = logging.getLogger(__name__)
 
 # Global lock — A1111 can only handle one generation at a time
 # Uses a wrapper so the lock auto-releases if A1111 hangs for more than 10 minutes
@@ -84,7 +87,7 @@ RIFT_STATE_FILE    = DOCS_DIR / "rift_state.json"
 NEWS_TYPES_FILE    = DOCS_DIR / "generated_news_types.json"
 
 MAX_MEMORY_ENTRIES = 40   # total entries kept on disk
-MEMORY_CONTEXT_ENTRIES = 10  # mistral handles larger context — more history = better continuity
+MEMORY_CONTEXT_ENTRIES = 10  # qwen3 handles larger context — more history = better continuity
 
 # ---------------------------------------------------------------------------
 # Rift state machine
@@ -783,6 +786,61 @@ def _dual_timestamp() -> str:
 from src.memory_strip import strip_to_facts as _strip_to_facts
 
 # ---------------------------------------------------------------------------
+# EC abuse sanitizer — post-processing to catch Qwen violations
+# ---------------------------------------------------------------------------
+
+_EC_ABUSE_PATTERNS = [
+    # "X EC per person/life/soul/head" pattern
+    re.compile(r'\d+\s*EC\s+per\s+(?:person|life|soul|head|body|victim)', re.IGNORECASE),
+    # "X EC in [abstract]" like "47 EC in shattered glass"
+    re.compile(r'\d+\s*EC\s+in\s+(?:shattered|broken|spilled|lost|scattered|wasted|burning|fading|dying)', re.IGNORECASE),
+    # "X EC from [body part/abstract source]"
+    re.compile(r'\d+\s*EC\s+from\s+(?:their|her|his|fingertips?|hands?|eyes?|tears?|blood)', re.IGNORECASE),
+    # "bleeding EC" / "EC bleeds"
+    re.compile(r'(?:bleeding|bleeds?)\s+(?:\d+\s*)?EC', re.IGNORECASE),
+    re.compile(r'EC\s+(?:bleeds?|bleeding)', re.IGNORECASE),
+    # "the weight of X EC" (metaphorical)
+    re.compile(r'(?:the\s+)?weight\s+of\s+\d+\s*EC', re.IGNORECASE),
+    # "X EC worth of [emotion/abstract]"
+    re.compile(r'\d+\s*EC\s+worth\s+of\s+(?:despair|hope|fear|chaos|desperation|suffering|pain|sorrow)', re.IGNORECASE),
+    # "holds the weight of X EC"
+    re.compile(r'holds?\s+the\s+weight\s+of\s+\d+\s*EC', re.IGNORECASE),
+    # EC counting people: "X EC per smuggled/trafficked"
+    re.compile(r'\d+\s*EC\s+per\s+(?:smuggled|trafficked|stolen|lost)', re.IGNORECASE),
+    # "X EC of [emotion]" like "47 EC of despair"
+    re.compile(r'\d+\s*EC\s+of\s+(?:despair|hope|fear|chaos|desperation|suffering|pain|sorrow|silence|darkness)', re.IGNORECASE),
+]
+
+
+def _sanitize_ec_abuse(text: str) -> str:
+    """
+    Post-process bulletin text to remove EC abuse patterns that Qwen generates
+    despite prompt instructions. These patterns use EC as metaphor/symbol
+    rather than as actual currency.
+    
+    Returns cleaned text with offending phrases removed or rewritten.
+    """
+    original = text
+    
+    for pattern in _EC_ABUSE_PATTERNS:
+        # Remove the offending phrase entirely
+        text = pattern.sub('', text)
+    
+    # Clean up any double spaces or orphaned punctuation left behind
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\s+([,.])', r'\1', text)
+    text = re.sub(r'([,.]){2,}', r'\1', text)
+    text = re.sub(r'^\s*[,.]\s*', '', text, flags=re.MULTILINE)
+    
+    # Log if we sanitized anything
+    if text != original:
+        import logging
+        logging.getLogger(__name__).info("📰 EC abuse pattern sanitized from bulletin")
+    
+    return text.strip()
+
+
+# ---------------------------------------------------------------------------
 # LEGACY — Fact extractor — strips emojis, decorative markdown, and narrative fluff
 # from bulletin text before storing in memory.  The memory file is read back
 # as context for future bulletin generation, so keeping it lean and factual
@@ -1026,6 +1084,7 @@ RULES:
 - Do NOT generate Rift bulletins — Rifts are RARE events handled by a separate state machine. The news should NOT constantly mention Rifts.
 - Do NOT generate TowerBay or TIA market bulletins (those have their own cadence)
 - CRITICAL — RIFT BAN: Do NOT mention Rifts, Rift residue, Rift seams, Rift activity, Rift exploration, tears in reality, dimensional anomalies, or anything Rift-related in ANY of the 10 entries. Rifts are rare catastrophes, NOT daily news fodder. If even ONE of your entries mentions Rifts, you have FAILED.
+- CRITICAL — EC RULES: EC (Essence Coins) is currency. Do NOT create seeds involving "X EC per person", "EC for lives", or EC used as a metaphor. EC appears only as prices for goods/services.
 - Focus on: faction politics, street crime, human interest, religious drama, guild disputes, economic news, weird occurrences that are NOT Rift-related, missing persons, merchant disputes, adventurer drama, divine contract news, Warrens survival stories, arena results, guild promotions/demotions
 - Vary the tone: some street-level, some political, some supernatural (but not Rift), some economic, some human interest
 - Make them feel current — what would be on people's lips in the Undercity TODAY
@@ -1353,6 +1412,39 @@ PROSE QUALITY — Your writing must:
 - AVOID FLUFF PHRASES: Never use "It is worth noting", "Interestingly enough", "As the saying goes", "The city watches", "Whispers of X ripple through".
 - Something must HAPPEN. A headline alone is not a bulletin. A bulletin must have content — who, what, where, consequence.
 
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL QWEN FILTERS — THESE ARE HARD RULES. VIOLATIONS WILL BE REJECTED.
+═══════════════════════════════════════════════════════════════════════════════
+
+EC (ESSENCE COINS) USAGE — MANDATORY:
+EC is ONLY used for actual purchases, bounties, prices, and transactions.
+EC is NEVER used as a metaphor, symbol, poetic device, or emotional weight.
+
+FORBIDDEN EC PATTERNS (your output will be REJECTED if it contains ANY of these):
+✗ "X EC per person" — FORBIDDEN (e.g. "120 EC per person smuggled" is WRONG)
+✗ "X EC per life/soul/head" — FORBIDDEN
+✗ "X EC in [abstract]" — FORBIDDEN (e.g. "47 EC in shattered glass" is WRONG)
+✗ "X EC worth of [emotion/chaos/despair]" — FORBIDDEN
+✗ "bleeding EC" / "EC from fingertips" — FORBIDDEN
+✗ "the weight of X EC" (when not literal) — FORBIDDEN
+✗ EC as counting victims, smuggled people, or lives — ABSOLUTELY FORBIDDEN
+
+ALLOWED EC PATTERNS (ONLY these are acceptable):
+✓ "the bounty is 200 EC" — a real price
+✓ "potions cost 50 EC" — a real price
+✓ "stole 300 EC from the register" — actual theft of currency
+✓ "paid 75 EC for information" — a real transaction
+
+MAXIMUM: One or two EC price mentions per bulletin. Do NOT scatter EC values everywhere.
+If you are not describing a real purchase or theft, DO NOT MENTION EC AT ALL.
+
+RIFT BAN:
+Do NOT mention Rifts, Rift residue, tears in reality, or dimensional anomalies UNLESS the bulletin type EXPLICITLY asks for Rift news. Rifts are RARE. Regular bulletins should NOT mention Rifts at all.
+
+FORMAT:
+Each sentence should be on its own line. Do NOT run sentences together without line breaks.
+═══════════════════════════════════════════════════════════════════════════════
+
 - If your response contains anything other than the bulletin itself, you have failed."""
 
 
@@ -1591,7 +1683,7 @@ Output the corrected bulletin only. No preamble."""
     ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(ollama_url, json={
                 "model": ollama_model,
                 "messages": [
@@ -1625,7 +1717,7 @@ Output the corrected bulletin only. No preamble."""
             return draft
 
     except Exception as e:
-        logger.warning(f"✏️ Fact-check failed: {e} — using original bulletin")
+        logger.warning(f"✏️ Fact-check failed: {type(e).__name__}: {e} — using original bulletin")
         return draft
 
 
@@ -1680,7 +1772,7 @@ INSTRUCTIONS:
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
+        async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(ollama_url, json={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": editor_prompt}],
@@ -1709,7 +1801,7 @@ INSTRUCTIONS:
             return edited
 
     except Exception as e:
-        logger.warning(f"✏️ Editor agent failed: {e} — using original draft")
+        logger.warning(f"✏️ Editor agent failed: {type(e).__name__}: {e} — using original draft")
 
     return draft  # fallback: original unchanged
 
@@ -1837,6 +1929,10 @@ async def generate_bulletin() -> Optional[str]:
             _, _, _, dead_names = _load_npc_status_blocks()
             if dead_names:
                 bulletin = _apply_death_honorifics(bulletin, dead_names)
+
+        # Sanitize EC abuse patterns (Qwen tends to ignore prompt rules)
+        if bulletin:
+            bulletin = _sanitize_ec_abuse(bulletin)
 
         if bulletin:
             bulletin = _apply_tnn_signoff(bulletin)

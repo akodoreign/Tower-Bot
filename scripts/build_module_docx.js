@@ -263,7 +263,17 @@ function buildTable(rows) {
 // ---------------------------------------------------------------------------
 
 function buildDocument(data) {
-  const factionColor = getFactionColor(data.faction);
+  // Null-safety: ensure all required fields have defaults
+  const faction = data.faction || "Independent";
+  const tier = data.tier || "Unknown";
+  const title = data.title || "Untitled Mission";
+  const cr = data.cr || "?";
+  const playerLevel = data.player_level || "?";
+  const playerName = data.player_name || "Unclaimed";
+  const reward = data.reward || "TBD";
+  const generatedAt = data.generated_at || new Date().toISOString();
+
+  const factionColor = getFactionColor(faction);
   const bulletRef = "moduleBullets";
   const numberRef = "moduleNumbers";
 
@@ -274,7 +284,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
       children: [new TextRun({
-        text: data.faction.toUpperCase(),
+        text: faction.toUpperCase(),
         size: 28,
         color: factionColor,
         font: "Arial",
@@ -294,7 +304,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
       children: [new TextRun({
-        text: data.title,
+        text: title,
         size: 48,
         bold: true,
         color: "222222",
@@ -305,7 +315,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
       children: [new TextRun({
-        text: `Tier: ${data.tier.toUpperCase()}  |  Challenge Rating: ${data.cr}  |  Level: ${data.player_level}`,
+        text: `Tier: ${tier.toUpperCase()}  |  Challenge Rating: ${cr}  |  Level: ${playerLevel}`,
         size: 24,
         color: "555555",
       })],
@@ -332,7 +342,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
       children: [new TextRun({
-        text: `Claimed by: ${data.player_name}`,
+        text: `Claimed by: ${playerName}`,
         size: 26,
         italics: true,
         color: "444444",
@@ -342,7 +352,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
       children: [new TextRun({
-        text: `Reward: ${data.reward}`,
+        text: `Reward: ${reward}`,
         size: 22,
         color: "666666",
       })],
@@ -359,7 +369,7 @@ function buildDocument(data) {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [new TextRun({
-        text: `Generated: ${new Date(data.generated_at).toLocaleDateString()}`,
+        text: `Generated: ${new Date(generatedAt).toLocaleDateString()}`,
         size: 18,
         color: "AAAAAA",
       })],
@@ -460,7 +470,7 @@ function buildDocument(data) {
           children: [new Paragraph({
             alignment: AlignmentType.RIGHT,
             children: [new TextRun({
-              text: `${data.title} — ${data.faction}`,
+              text: `${title} — ${faction}`,
               size: 16,
               color: "999999",
               italics: true,
