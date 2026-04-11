@@ -1,0 +1,28 @@
+{
+  "name": "Finnick Tinkersong",
+  "species": "Gnome",
+  "faction": "Adventurers Guild",
+  "rank": "Unranked",
+  "role": "mercenary",
+  "home_district": "iron fang",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "gnome-sized frame, 2'6\", wiry and darting, pale skin etched with soot and ink stains, black hair tangled into a frayed braid, eyes sharp and amber-brown, pupils dilated with constant vigilance, patchwork cloak stitched from scraps of scaled mail, faded embroidery of a broken guild crest, left ear cropped short with a jagged scar curling toward the temple, crossbow slung across one shoulder its stock cracked and splintered, warhammer dangling from a leather strap with a rusted chain, fingers stained ink-black from repairing enchanted gears, a single silver gear pendant hidden beneath the collar, glinting faintly in the dim light.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

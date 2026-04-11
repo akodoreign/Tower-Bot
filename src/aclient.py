@@ -1,6 +1,7 @@
 ﻿import os
 import discord
 import asyncio
+import random
 from typing import List, Dict, Optional
 
 from src import personas
@@ -20,8 +21,10 @@ from src.news_feed import (
     generate_story_image, next_image_interval_seconds,
     check_rift_tick, check_towerbay_tick, check_tia_tick, check_exchange_tick,
     check_weather_tick, check_arena_tick, check_calendar_tick, check_missing_tick,
-    refresh_news_types_if_needed, a1111_lock,
+    refresh_news_types_if_needed, a1111_lock, _write_memory,
 )
+from src.news_integration import post_editorial_bulletin, EditorType
+from src.expandable_bulletin import create_bulletin_message
 from src.bounty_board import (
     should_post_bounty, generate_bounty_post,
     format_bounty_news_bulletin, check_bounty_expirations, _save_bounties, _load_bounties,
@@ -29,6 +32,7 @@ from src.bounty_board import (
 from src.tower_economy import react_to_bulletin, format_towerbay_embeds
 from src.bulletin_embeds import wrap_bulletin
 from src.npc_lifecycle import run_daily_lifecycle, next_lifecycle_seconds
+from src.db_backup import db_backup_loop
 from src.character_monitor import run_character_monitor
 from src.mission_board import (post_mission, check_expirations, check_claims,
                                check_npc_completions,
@@ -44,6 +48,7 @@ class DiscordClient(discord.Client):
     def __init__(self) -> None:
         intents = discord.Intents.default()
         intents.message_content = True
+        intents.reactions = True  # Explicitly enable for on_raw_reaction_add
         super().__init__(intents=intents)
 
         # Slash command tree — created here so setup_hook can sync it
@@ -126,6 +131,8 @@ class DiscordClient(discord.Client):
         asyncio.get_event_loop().create_task(self.character_monitor_loop())
         # Start the nightly self-learning loop
         asyncio.get_event_loop().create_task(self._self_learning_loop())
+        # Start the daily DB backup loop
+        asyncio.get_event_loop().create_task(db_backup_loop())
 
         while True:
             if self.current_channel is not None:
@@ -164,9 +171,33 @@ class DiscordClient(discord.Client):
             try:
                 channel = self.get_channel(int(discord_channel_id))
                 if channel:
+                    # 35% chance to use new agent-based editorial system
+                    use_agent_system = random.random() < 0.35
+                    
+                    if use_agent_system:
+                        # Use new agent system (news/gossip/sports with expandable Read More)
+                        msg = await post_editorial_bulletin(
+                            channel=channel,
+                            editor_type=EditorType.RANDOM,
+                            write_memory_func=_write_memory,
+                        )
+                        if msg:
+                            logger.info(f"📰 Startup bulletin {i+1}/3 (agent) posted to #{channel.name}")
+                            continue  # Skip legacy processing
+                    
+                    # Legacy system (or agent system failed)
                     bulletin = await generate_bulletin()
                     if bulletin:
-                        await channel.send(embed=wrap_bulletin(bulletin, "news"))
+                        lines = [l for l in bulletin.splitlines() if l.strip()]
+                        preview = "\n".join(lines[:4]) if len(lines) > 4 else bulletin
+                        _emb, _view = create_bulletin_message(
+                            preview=preview,
+                            full_content=bulletin,
+                            headline="Undercity Dispatch",
+                            bulletin_type="news",
+                            source_attribution="TNN Evening Report",
+                        )
+                        await channel.send(embed=_emb, view=_view)
                         logger.info(f"📰 Startup bulletin {i+1}/3 posted to #{channel.name}")
                         # Scan for NPC death/injury consequences
                         try:
@@ -190,24 +221,55 @@ class DiscordClient(discord.Client):
                     logger.warning(f"📰 News feed: channel {discord_channel_id} not found — skipping.")
                     continue
 
-                bulletin = await generate_bulletin()
-                if bulletin:
-                    await channel.send(embed=wrap_bulletin(bulletin, "news"))
-                    logger.info(f"📰 Bulletin posted to #{channel.name}")
-                    # Scan for NPC death/injury consequences
-                    try:
-                        changes = process_bulletin(bulletin)
-                        for c in changes:
-                            logger.info(f"📰 NPC consequence: {c}")
-                    except Exception as ce:
-                        logger.warning(f"📰 NPC consequence scan error: {ce}")
-                    # TIA news reaction — scan bulletin for market-moving keywords
-                    tia_flash = react_to_bulletin(bulletin)
-                    if tia_flash:
-                        await channel.send(embed=wrap_bulletin(tia_flash, "tia_flash"))
-                        logger.info(f"📊 TIA flash bulletin posted to #{channel.name}")
-                else:
-                    logger.warning("📰 generate_bulletin() returned None — mission board may be missing.")
+                # 35% chance to use new agent-based editorial system
+                use_agent_system = random.random() < 0.35
+                bulletin = None
+                bulletin_posted = False  # tracks whether ANY bulletin was sent this cycle
+
+                if use_agent_system:
+                    # Use new agent system (news/gossip/sports with expandable Read More)
+                    msg = await post_editorial_bulletin(
+                        channel=channel,
+                        editor_type=EditorType.RANDOM,
+                        write_memory_func=_write_memory,
+                    )
+                    if msg:
+                        logger.info(f"📰 Agent bulletin posted to #{channel.name}")
+                        bulletin_posted = True
+                        # bulletin stays None — skip legacy TIA scan for agent posts
+                        # (agent bulletins handle their own memory + NPC gossip shouldn't
+                        # affect the roster consequence scanner)
+
+                # Legacy system (agent not selected, or agent failed)
+                if not bulletin_posted:
+                    bulletin = await generate_bulletin()
+                    if bulletin:
+                        lines = [l for l in bulletin.splitlines() if l.strip()]
+                        preview = "\n".join(lines[:4]) if len(lines) > 4 else bulletin
+                        _emb, _view = create_bulletin_message(
+                            preview=preview,
+                            full_content=bulletin,
+                            headline="Undercity Dispatch",
+                            bulletin_type="news",
+                            source_attribution="TNN Evening Report",
+                        )
+                        await channel.send(embed=_emb, view=_view)
+                        logger.info(f"📰 Bulletin posted to #{channel.name}")
+                        bulletin_posted = True
+                        # Scan for NPC death/injury consequences
+                        try:
+                            changes = process_bulletin(bulletin)
+                            for c in changes:
+                                logger.info(f"📰 NPC consequence: {c}")
+                        except Exception as ce:
+                            logger.warning(f"📰 NPC consequence scan error: {ce}")
+                        # TIA news reaction — scan bulletin for market-moving keywords
+                        tia_flash = react_to_bulletin(bulletin)
+                        if tia_flash:
+                            await channel.send(embed=wrap_bulletin(tia_flash, "tia_flash"))
+                            logger.info(f"📊 TIA flash bulletin posted to #{channel.name}")
+                    else:
+                        logger.warning("📰 generate_bulletin() returned None — legacy bulletin failed this cycle")
 
                 # Rift state machine tick — posts a Rift bulletin if one is due
                 rift_bulletin = await check_rift_tick()
@@ -354,7 +416,7 @@ class DiscordClient(discord.Client):
                 # Bounty board — max once per 7 days, 15% chance per hourly tick when eligible
                 if should_post_bounty():
                     try:
-                        ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+                        ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
                         ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
                         bounty = await generate_bounty_post(ollama_model, ollama_url)
                         if bounty:

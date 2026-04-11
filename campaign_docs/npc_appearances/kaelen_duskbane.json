@@ -1,0 +1,28 @@
+{
+  "name": "Kaelen Duskbane",
+  "species": "Half-Elf",
+  "faction": "Adventurers Guild",
+  "rank": "E-Rank",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Half-Elf, Silver-streaked black hair hangs in a messy ponytail, with amber eyes that flicker like dying embers. A thin scar runs from temple to jaw, and they carry themselves with gruff weariness, always checking their back for threats., wearing chain mail or scale mail, carrying warhammer, crossbow, rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -3,8 +3,7 @@ npc_lifecycle.py — Living NPC ecosystem for Tower of Last Chance.
 
 NPCs are born, promoted, betrayed, revealed, and killed based on world events.
 One new NPC injected per day minimum. Existing NPCs evolve via daily lifecycle events.
-All changes persist in campaign_docs/npc_roster.json and campaign_docs/npc_roster.txt
-(the .txt is what the RAG system reads).
+All changes persist in MySQL npcs table and related tables.
 """
 
 from __future__ import annotations
@@ -19,11 +18,11 @@ from pathlib import Path
 from typing import List, Optional
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
+# Keep txt file path for RAG system compatibility
 DOCS_DIR          = Path(__file__).resolve().parent.parent / "campaign_docs"
-NPC_JSON_FILE     = DOCS_DIR / "npc_roster.json"
 NPC_TXT_FILE      = DOCS_DIR / "npc_roster.txt"
-GRAVEYARD_FILE    = DOCS_DIR / "npc_graveyard.json"
 
 # ---------------------------------------------------------------------------
 # Factions and ranks
@@ -84,26 +83,73 @@ NPC_EVENTS = [
 EVENT_WEIGHTS = [0.15, 0.08, 0.10, 0.15, 0.08, 0.02, 0.12, 0.10, 0.12, 0.08, 0.10]
 
 # ---------------------------------------------------------------------------
-# Daily generated event system
+# Daily generated event system — stored in DB lifecycle_daily_events
 # ---------------------------------------------------------------------------
 
-DAILY_EVENTS_FILE = DOCS_DIR / "daily_lifecycle_events.json"
+def _ensure_daily_events_table():
+    """Ensure the daily events table exists."""
+    try:
+        raw_execute("""
+            CREATE TABLE IF NOT EXISTS lifecycle_daily_events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event_date DATE UNIQUE NOT NULL,
+                events_json JSON,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+    except Exception as e:
+        logger.debug(f"Daily events table check: {e}")
+
+# Ensure table exists on module load
+try:
+    _ensure_daily_events_table()
+except Exception:
+    pass
 
 
 def _load_daily_events() -> dict:
-    if not DAILY_EVENTS_FILE.exists():
-        return {}
+    """Load today's daily events from database."""
     try:
-        return json.loads(DAILY_EVENTS_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        today = datetime.now().strftime("%Y-%m-%d")
+        rows = raw_query(
+            "SELECT events_json FROM lifecycle_daily_events WHERE event_date = %s",
+            (today,)
+        )
+        if rows and rows[0].get("events_json"):
+            events_data = rows[0]["events_json"]
+            if isinstance(events_data, str):
+                events_data = json.loads(events_data)
+            return {"date": today, "events": events_data}
+        return {}
+    except Exception as e:
+        logger.error(f"Daily events load error: {e}")
         return {}
 
 
 def _save_daily_events(data: dict) -> None:
+    """Save daily events to database."""
     try:
-        DAILY_EVENTS_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    except Exception:
-        pass
+        date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
+        events = data.get("events", [])
+        events_json = json.dumps(events, ensure_ascii=False)
+        
+        # Upsert
+        existing = raw_query(
+            "SELECT id FROM lifecycle_daily_events WHERE event_date = %s",
+            (date_str,)
+        )
+        if existing:
+            raw_execute(
+                "UPDATE lifecycle_daily_events SET events_json = %s WHERE event_date = %s",
+                (events_json, date_str)
+            )
+        else:
+            db.insert("lifecycle_daily_events", {
+                "event_date": date_str,
+                "events_json": events_json
+            })
+    except Exception as e:
+        logger.error(f"Daily events save error: {e}")
 
 
 def _needs_new_daily_events() -> bool:
@@ -168,23 +214,88 @@ def _get_random_daily_event() -> Optional[str]:
 
 
 # ---------------------------------------------------------------------------
-# Persistence
+# Persistence — MySQL via db_api
 # ---------------------------------------------------------------------------
 
 def _load_npcs() -> List[dict]:
-    if not NPC_JSON_FILE.exists():
-        return []
+    """Load all NPCs from database (excluding dead ones in graveyard)."""
     try:
-        return json.loads(NPC_JSON_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT * FROM npcs WHERE status != 'dead' OR status IS NULL")
+        npcs = []
+        for row in rows:
+            # Parse data_json which stores full NPC data
+            # MySQL returns JSON columns as dict or None — guard against NULL
+            npc_data = row.get("data_json") or {}
+            if isinstance(npc_data, str):
+                try:
+                    npc_data = json.loads(npc_data) if npc_data else {}
+                except json.JSONDecodeError:
+                    npc_data = {}
+            elif not isinstance(npc_data, dict):
+                npc_data = {}
+            # Merge DB columns with JSON data (DB columns take precedence for indexed fields)
+            npc = {
+                **npc_data,
+                "name": row.get("name") or npc_data.get("name", "Unknown"),
+                "faction": row.get("faction") or npc_data.get("faction", "Independent"),
+                "role": row.get("role") or npc_data.get("role", ""),
+                "location": row.get("location") or npc_data.get("location", ""),
+                "status": row.get("status") or npc_data.get("status", "alive"),
+                "_db_id": row.get("id"),  # Track DB ID for updates
+            }
+            # Ensure history is always a list (fixes KeyError: 'history')
+            if "history" not in npc or not isinstance(npc.get("history"), list):
+                npc["history"] = []
+            # Ensure revealed_secrets is always a list
+            if "revealed_secrets" not in npc or not isinstance(npc.get("revealed_secrets"), list):
+                npc["revealed_secrets"] = []
+            npcs.append(npc)
+        return npcs
+    except Exception as e:
+        logger.error(f"NPC load error: {e}")
         return []
+
+
+def _save_npc(npc: dict) -> None:
+    """Save a single NPC to database (insert or update)."""
+    try:
+        name = npc.get("name", "Unknown")
+        # Prepare data_json (exclude _db_id from storage)
+        npc_copy = {k: v for k, v in npc.items() if k != "_db_id"}
+        data_json = json.dumps(npc_copy, ensure_ascii=False, default=str)
+        
+        # Check if exists by name
+        existing = raw_query("SELECT id FROM npcs WHERE name = %s", (name,))
+        
+        if existing:
+            raw_execute(
+                "UPDATE npcs SET faction = %s, role = %s, location = %s, status = %s, data_json = %s WHERE name = %s",
+                (
+                    npc.get("faction", "Independent"),
+                    npc.get("role", ""),
+                    npc.get("location", ""),
+                    npc.get("status", "alive"),
+                    data_json,
+                    name
+                )
+            )
+        else:
+            db.insert("npcs", {
+                "name": name,
+                "faction": npc.get("faction", "Independent"),
+                "role": npc.get("role", ""),
+                "location": npc.get("location", ""),
+                "status": npc.get("status", "alive"),
+                "data_json": data_json,
+            })
+    except Exception as e:
+        logger.error(f"NPC save error for {npc.get('name', '?')}: {e}")
 
 
 def _save_npcs(npcs: List[dict]) -> None:
-    try:
-        NPC_JSON_FILE.write_text(json.dumps(npcs, indent=2), encoding="utf-8")
-    except Exception as e:
-        logger.error(f"NPC save error: {e}")
+    """Save all NPCs and rebuild the txt file for RAG."""
+    for npc in npcs:
+        _save_npc(npc)
     _rebuild_txt(npcs)
 
 
@@ -231,83 +342,82 @@ def _rebuild_txt(npcs: List[dict]) -> None:
         NPC_TXT_FILE.write_text("\n".join(lines), encoding="utf-8")
     except Exception as e:
         logger.error(f"NPC txt rebuild error: {e}")
+    # Also write npc_roster.json for any code still reading the file (backward compat)
+    try:
+        roster_json = [n for n in npcs if n.get("status") != "dead"]
+        json_path = NPC_TXT_FILE.parent / "npc_roster.json"
+        json_path.write_text(json.dumps(roster_json, indent=2), encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"NPC json rebuild error: {e}")
 
 
 # ---------------------------------------------------------------------------
-# Graveyard — dead NPCs are moved here with full data preserved
+# Graveyard — dead NPCs are queried by status='dead'
 # ---------------------------------------------------------------------------
 
 def _load_graveyard() -> List[dict]:
-    if not GRAVEYARD_FILE.exists():
-        return []
+    """Load all dead NPCs from database."""
     try:
-        return json.loads(GRAVEYARD_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT * FROM npcs WHERE status = 'dead'")
+        graveyard = []
+        for row in rows:
+            npc_data = row.get("data_json", {})
+            if isinstance(npc_data, str):
+                npc_data = json.loads(npc_data) if npc_data else {}
+            npc = {
+                **npc_data,
+                "name": row.get("name") or npc_data.get("name", "Unknown"),
+                "faction": row.get("faction") or npc_data.get("faction", "Independent"),
+                "status": "dead",
+                "_db_id": row.get("id"),
+            }
+            graveyard.append(npc)
+        return graveyard
+    except Exception as e:
+        logger.error(f"Graveyard load error: {e}")
         return []
 
 
 def _save_graveyard(graveyard: List[dict]) -> None:
-    try:
-        GRAVEYARD_FILE.write_text(json.dumps(graveyard, indent=2, ensure_ascii=False), encoding="utf-8")
-    except Exception as e:
-        logger.error(f"Graveyard save error: {e}")
+    """Save graveyard NPCs (just updates their records in npcs table)."""
+    for npc in graveyard:
+        _save_npc(npc)
 
 
 def _move_to_graveyard(npc: dict, npcs: List[dict]) -> None:
-    """Move a dead NPC from the active roster to the graveyard.
-    Preserves all data. Removes from the npcs list in-place."""
-    graveyard = _load_graveyard()
-
-    # Avoid duplicates in graveyard
-    if any(g.get("name") == npc.get("name") and g.get("created_at") == npc.get("created_at")
-           for g in graveyard):
-        logger.debug(f"💀 {npc.get('name')} already in graveyard — skipping")
-    else:
-        npc["moved_to_graveyard_at"] = datetime.now().isoformat()
-        graveyard.append(npc)
-        _save_graveyard(graveyard)
-        logger.info(f"💀 {npc.get('name')} moved to graveyard ({len(graveyard)} total in graveyard)")
-
-    # Remove from active roster
+    """Mark an NPC as dead (moves them to graveyard status).
+    Removes from the npcs list in-place."""
+    npc["status"] = "dead"
+    npc["moved_to_graveyard_at"] = datetime.now().isoformat()
+    _save_npc(npc)
+    logger.info(f"💀 {npc.get('name')} moved to graveyard")
+    
+    # Remove from active roster list
     try:
         npcs.remove(npc)
     except ValueError:
-        # Already removed or not in list
         pass
 
 
 def _sweep_dead_to_graveyard(npcs: List[dict]) -> int:
-    """Sweep any dead NPCs still in the active roster to the graveyard.
-    Called on startup to clean up any that weren't moved at death time.
-    Returns count of NPCs moved."""
+    """Mark any dead NPCs in the active roster as graveyard status.
+    With DB storage, this just ensures status is set correctly.
+    Returns count of NPCs updated."""
     dead = [n for n in npcs if n.get("status") == "dead"]
     if not dead:
         return 0
 
-    graveyard = _load_graveyard()
-    moved = 0
     for npc in dead:
-        # Avoid duplicates
-        if any(g.get("name") == npc.get("name") and g.get("created_at") == npc.get("created_at")
-               for g in graveyard):
-            continue
-        npc["moved_to_graveyard_at"] = datetime.now().isoformat()
-        graveyard.append(npc)
-        moved += 1
-
-    if moved:
-        _save_graveyard(graveyard)
-
-    # Remove all dead from active roster
-    for npc in dead:
+        if not npc.get("moved_to_graveyard_at"):
+            npc["moved_to_graveyard_at"] = datetime.now().isoformat()
+        _save_npc(npc)
         try:
             npcs.remove(npc)
         except ValueError:
             pass
 
     if dead:
-        _save_npcs(npcs)
-        logger.info(f"💀 Graveyard sweep: moved {moved} dead NPCs, removed {len(dead)} from active roster")
+        logger.info(f"💀 Graveyard sweep: updated {len(dead)} dead NPCs")
 
     return len(dead)
 
@@ -317,48 +427,39 @@ def _sweep_dead_to_graveyard(npcs: List[dict]) -> int:
 # ---------------------------------------------------------------------------
 
 async def _generate(prompt: str, timeout: float = 300.0, retries: int = 2) -> Optional[str]:
-    """Call Ollama and return the text response.
-    Retries on timeout — lifecycle prompts can be slow."""
-    import httpx
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    """Call Ollama and return the text response. Queued via ollama_queue FIFO lock."""
+    from src.ollama_queue import call_ollama, OllamaBusyError
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
-    last_err = None
-    for attempt in range(1, retries + 1):
-        try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.post(ollama_url, json={
-                    "model": ollama_model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": False,
-                })
-                resp.raise_for_status()
-                data = resp.json()
+    try:
+        data = await call_ollama(
+            payload={
+                "model": ollama_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "options": {"num_predict": 512, "think": False},
+            },
+            timeout=timeout,
+            caller="npc_lifecycle",
+        )
+    except OllamaBusyError:
+        return None
+    except Exception as e:
+        logger.warning(f"🧬 npc_lifecycle _generate error: {type(e).__name__}: {e}")
+        return None
 
-            text = ""
-            if isinstance(data, dict):
-                msg = data.get("message", {})
-                if isinstance(msg, dict):
-                    text = msg.get("content", "").strip()
+    text = ""
+    if isinstance(data, dict):
+        msg = data.get("message", {})
+        if isinstance(msg, dict):
+            text = msg.get("content", "").strip()
 
-            lines = text.splitlines()
-            skip = ("sure", "here's", "here is", "as requested", "certainly",
-                    "of course", "i hope", "below is", "absolutely")
-            while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-                lines.pop(0)
-            return "\n".join(lines).strip() or None
-
-        except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.WriteTimeout) as e:
-            last_err = e
-            logger.warning(f"🧬 npc_lifecycle Ollama TIMEOUT (attempt {attempt}/{retries}): {type(e).__name__}")
-            if attempt < retries:
-                await asyncio.sleep(5)
-        except Exception as e:
-            logger.error(f"🧬 npc_lifecycle _generate error: {type(e).__name__}: {e}")
-            return None
-
-    logger.error(f"🧬 npc_lifecycle _generate FAILED after {retries} attempts")
-    return None
+    lines = text.splitlines()
+    skip = ("sure", "here's", "here is", "as requested", "certainly",
+            "of course", "i hope", "below is", "absolutely")
+    while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
+        lines.pop(0)
+    return "\n".join(lines).strip() or None
 
 
 # ---------------------------------------------------------------------------
@@ -818,14 +919,11 @@ async def run_daily_lifecycle(channel) -> None:
         # Auto-generate appearance profile for the new NPC so they're immediately
         # usable in story image prompts and captions without a manual /gearrun.
         try:
-            from src.npc_appearance import _generate_npc_profile, _profile_path
+            from src.npc_appearance import _generate_npc_profile, _save_npc_appearance, get_all_sd_prompts, NPC_APP_DIR
             import json as _json
             profile = await _generate_npc_profile(new_npc)
-            _profile_path(new_npc["name"]).write_text(
-                _json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8"
-            )
-            # Rebuild the flat lookup so find_npc_in_text() picks them up immediately
-            from src.npc_appearance import get_all_sd_prompts, NPC_APP_DIR
+            _save_npc_appearance(new_npc["name"], profile)
+            # Also update flat lookup file for legacy compatibility
             flat = get_all_sd_prompts()
             flat[new_npc["name"]] = profile.get("sd_appearance", "")
             (NPC_APP_DIR / "_all_sd_prompts.json").write_text(
@@ -1395,24 +1493,49 @@ async def _check_graveyard_events(channel) -> None:
             elif event_type == "undead_return":
                 logger.info(f"🧟 GRAVEYARD EVENT: Undead return for {name}!")
 
-                # Pick a transformation type
-                undead_type = random.choice([
-                    ("Revenant", "burning with purpose, hollow-eyed, driven by unfinished business"),
-                    ("Wight", "cold, calculating, remembers everything but feels nothing"),
-                    ("Ghost", "translucent, flickering, trapped between the city and whatever comes after"),
-                    ("Zombie (intelligent)", "rotting but lucid — the worst kind, because they know what they've become"),
-                    ("Death Knight", "armored in shadow, wielding dark echoes of their former skills"),
-                ])
+                # Pick a transformation type — weighted toward the more interesting kinds
+                undead_pool = [
+                    # Soul-bound / purpose-driven
+                    ("Revenant", "burning with singular purpose, hollow-eyed, capable of speech — back to finish what was left undone"),
+                    ("Banshee", "wailing keening grief given form — her scream alone can stop a heart, and she remembers everyone she loved"),
+                    ("Specter", "drained of color and warmth, phases through walls, drains life from anyone who lingers too close"),
+                    ("Wraith", "shadow without a body, visible only as a silhouette of cold — it has already started draining the life from nearby streets"),
+                    # Cunning / social undead
+                    ("Vampire Spawn", "pale, fast, hungry — still has their personality but the thirst colors everything now, and they're trying to hide it"),
+                    ("Shadow Demon (NPC-bound)", "the shadow detached from the corpse and walks on its own — it knows every secret they knew"),
+                    ("Lich (nascent)", "the ritual was incomplete but partial — they hold together through sheer willpower and dark knowledge, crumbling slowly"),
+                    ("Death Knight", "armored in shadow, wielding dark echoes of their former skills — their oath twisted into something darker"),
+                    # Corporeal but changed
+                    ("Wight", "cold, calculating, remembers everything but feels nothing — already gathering followers from the desperate and the damned"),
+                    ("Mummy (cursed)", "wrapped in shroud-cloth, preserved wrong, carrying a curse tied to the cause of their death"),
+                    ("Ghast", "more lucid than a ghoul, faster, crueler — the smell of them makes people flee before they even see the face"),
+                    ("Allip", "driven mad by violent death, babbling fragments of their final moments — those who listen too long start forgetting themselves"),
+                    # Rare / dramatic
+                    ("Dullahan (headless herald)", "rides through the Undercity at midnight, calls a name at each stop — the name is always someone who will die soon"),
+                    ("Hollow (soul-eaten)", "the body walks but something else is wearing it — their face moves wrong, their words are someone else's words"),
+                    ("Deathlock", "a warlock whose patron refused to let them rest — bound to service in undeath, still casting, still dangerous"),
+                ]
+                undead_type = random.choice(undead_pool)
                 utype, udesc = undead_type
+
+                faction_reaction = random.choice([
+                    f"{faction} has issued a formal denial that the figure is connected to them",
+                    f"senior {faction} members are said to be in private contact with the entity",
+                    f"{faction} has placed a bounty on confirming the sighting — or ending it",
+                    f"former allies in {faction} refuse to discuss it publicly",
+                    f"{faction} leadership is rumored to be attempting to make contact and negotiate",
+                    f"rank-and-file {faction} members are reportedly terrified and avoiding the area",
+                ])
 
                 bulletin = await _generate(
                     f"{_LORE}\n"
-                    f"DEAD NPC: {name}, formerly {species}, {faction}.\n"
+                    f"DEAD NPC: {name}, formerly {species}, {faction}. Confirmed dead.\n"
                     f"{name} has returned from death as a {utype}: {udesc}.\n"
-                    f"Write a 3-4 line alarming news bulletin about {name} being sighted in the Undercity.\n"
-                    f"They were seen near their old haunts. Witnesses are terrified.\n"
-                    f"The faction they belonged to is [reacting: horror, denial, or trying to recruit them].\n"
-                    f"Tone: unsettling, urgent, specific. This is not normal.\n"
+                    f"Write a 3-4 line news bulletin about {name} being sighted in the Undercity.\n"
+                    f"Include: where they were sighted, what they did or said, one witness reaction.\n"
+                    f"Also include: {faction_reaction}.\n"
+                    f"The bulletin should feel specific to the nature of a {utype} — use what makes this type of undead distinct.\n"
+                    f"Tone: unsettling, urgent, specific. Make it feel like breaking news.\n"
                     f"No preamble. Output only the bulletin."
                 )
 

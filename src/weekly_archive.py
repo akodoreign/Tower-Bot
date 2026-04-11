@@ -233,15 +233,30 @@ def _archive_graveyard() -> int:
 
 
 def _snapshot_news() -> bool:
-    """Take a weekly snapshot of news_memory.txt.
-    The active file self-trims to 40 entries, so this preserves full history."""
-    path = DOCS_DIR / "news_memory.txt"
-    if not path.exists():
-        return False
+    """Take a weekly snapshot of news_memory from MySQL (falls back to txt file)."""
+    content = ""
     try:
-        content = path.read_text(encoding="utf-8")
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT bulletin_text, facts, created_at FROM news_memory ORDER BY id") or []
+        parts = []
+        for row in rows:
+            ts = row.get("created_at", "")
+            if hasattr(ts, "isoformat"):
+                ts = ts.isoformat()
+            text = row.get("bulletin_text") or row.get("facts") or ""
+            if text:
+                parts.append(f"[{ts}]\n{text}")
+        content = "\n\n---ENTRY---\n\n".join(parts)
     except Exception:
-        return False
+        pass
+    if not content:
+        path = DOCS_DIR / "news_memory.txt"
+        if not path.exists():
+            return False
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception:
+            return False
 
     if not content.strip():
         return False

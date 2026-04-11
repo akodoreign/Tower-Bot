@@ -1,0 +1,1021 @@
+# chatgpt-discord-bot — AI Context Map
+
+> **Stack:** raw-http | none | unknown | python
+
+> 0 routes | 15 models | 0 components | 172 lib files | 38 env vars | 3 middleware | 13% test coverage
+> **Token savings:** this file is ~12,800 tokens. Without it, AI exploration would cost ~65,400 tokens. **Saves ~52,600 tokens per conversation.**
+
+---
+
+# Schema
+
+### character_snapshots
+- id: int auto_increment (pk)
+- char_id: bigint (required, fk)
+- char_name: varchar (required)
+- player: varchar
+- snapshot_json: json
+- fetched_at: datetime (default)
+- fetched_at: desc
+
+### npcs
+- id: int auto_increment (pk)
+- name: varchar (unique)
+- faction: varchar
+- role: varchar
+- location: varchar
+- description: text
+- arrival_date: datetime
+- appearance_json: json
+
+### missions
+- id: int auto_increment (pk)
+- title: varchar (required)
+- description: text
+- difficulty: varchar
+- faction: varchar
+- npc_giver: varchar
+- reward_ec: integer (default)
+- expires_at: datetime
+- claimed_by: varchar
+- completed_at: datetime
+- message_id: varchar (fk)
+
+### bounties
+- id: int auto_increment (pk)
+- title: varchar (required)
+- target_type: varchar
+- target_name: varchar
+- reward_ec: integer (default)
+- status: varchar (default)
+- claimed_by: varchar
+
+### news_entries
+- id: int auto_increment (pk)
+- headline: varchar (required)
+- body: text
+- category: varchar
+- posted_at: datetime (default)
+- news_type: varchar
+- message_id: varchar (fk)
+
+### player_characters
+- id: int auto_increment (pk)
+- name: varchar (unique)
+- class_name: varchar
+- species: varchar
+- player_name: varchar
+- player_discord_id: varchar (fk)
+- profile_json: json
+
+### faction_reputation
+- id: int auto_increment (pk)
+- faction_name: varchar (unique)
+- reputation_score: integer (default)
+- tier: varchar
+- last_updated: datetime (pk, default)
+- current_weather: varchar
+- temperature: varchar
+- effects_json: json
+- ec_to_kharma_rate: decimal(10
+- trend: varchar
+- season_number: integer
+- champions_json: json
+- standings_json: json
+- started_at: datetime
+- faction: varchar
+- event_type: varchar
+- event_date: datetime
+- description: text
+
+### missing_persons
+- id: int auto_increment (pk)
+- person_name: varchar (required)
+- last_seen_location: varchar
+- reported_at: datetime (default)
+- status: varchar (default)
+- found_at: datetime
+
+### rift_state
+- id: int auto_increment (pk)
+- active: boolean (default)
+- intensity: integer (default)
+- location: varchar
+- effects_json: json
+- started_at: datetime
+- sector: varchar (unique)
+- value: decimal(10
+- trend: varchar
+- item_name: varchar (required)
+- seller_id: varchar (fk)
+- seller_name: varchar
+- current_bid: integer (default)
+- buy_now_price: integer
+- expires_at: datetime
+- status: varchar (default)
+- winner_id: varchar (fk)
+
+### player_listings
+- id: int auto_increment (pk)
+- player_id: varchar (fk)
+- player_name: varchar
+- item_name: varchar (required)
+- asking_price: integer
+- status: varchar (default)
+
+### npc_appearances
+- id: int auto_increment (pk)
+- npc_name: varchar (unique)
+- appearance_prompt: text
+- style: varchar
+- generated_at: datetime (pk, default)
+- party_name: varchar (unique)
+- members_json: json
+- reputation: integer (default)
+- formed_at: datetime (default)
+- status: varchar (pk, default)
+- entity_type: varchar (required)
+- entity_name: varchar (required)
+- image_path: varchar
+- ref_count: integer (default)
+
+### personal_missions
+- id: int auto_increment (pk)
+- character_name: varchar (required)
+- mission_data_json: json
+- status: varchar (default)
+- assigned_at: datetime (default)
+- completed_at: datetime
+
+### resurrection_queue
+- id: int auto_increment (pk)
+- npc_name: varchar (required)
+- died_at: datetime
+- resurrect_at: datetime
+- status: varchar (default)
+
+### news_types
+- id: int auto_increment (pk)
+- type_name: varchar (unique)
+- template: text
+- weight: decimal(5
+- usage_count: integer (default)
+
+### mission_types
+- id: int auto_increment (pk)
+- type_name: varchar (unique)
+- template: text
+- difficulty_range: varchar
+- usage_count: integer (pk, default)
+- event_type: varchar (required)
+- npc_name: varchar
+- event_data_json: json
+- occurred_at: datetime (default)
+
+---
+
+# Libraries
+
+- `apply_schema.py` — function apply_schema: ()
+- `auto_login\AutoLogin.py` — class GoogleBardAutoLogin, class MicrosoftBingAutoLogin
+- `auto_login\AutoLoginTest.py` — class GoogleBardTest, class MicrosoftBingAutoLoginTest
+- `backups\aclient_backup_before_default_provider_20251204100922.py` — class DiscordClient
+- `backups\aclient_before_set_default_free_20251204103204.py` — class DiscordClient
+- `backups\aclient_before_strip_fallback_text_20251204110249.py` — class DiscordClient
+- `backups\aclient_before_strip_trailing_utf8_20251204110707.py` — class DiscordClient
+- `backups\aclient_before_strip_warning_emoji_20251204110557.py` — class DiscordClient
+- `backups\news_feed_new.py`
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - function next_image_interval_seconds: () -> int
+  - _...8 more_
+- `backups\providers_backup_before_stub.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_backup_before_stub_20251204100905.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_backup_before_stub_20251204100922.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_add_chat_completion_20251204103538.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_chat_async_20251204105547.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_clean_ollama_patch_20251204121608.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_fix_double_async_20251204105815.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_free_final_20251204104607.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_free_final_20251204105007.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_free_reenable_20251204103132.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_modelname_fix_20251204105129.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_ollama_free_20251204114329.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_towerrag_hook_20251204121418.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_before_towerrag_import_20251204121300.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\providers_FULLBACKUP_freeprovider_replace_20251204121656.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `backups\ROOT_character_profiles_stale.py`
+  - function load_character_profile: (user_id) -> str | None
+  - function save_character_profile: (user_id, profile_text) -> None
+  - function has_character_profile: (user_id) -> bool
+- `backups\ROOT_nudge_state_stale.py` — function has_been_nudged: (user_id) -> bool, function mark_nudged: (user_id)
+- `check_a1111_models.py` — function main: ()
+- `clear_commands.py` — function clear_all_guild_commands: ()
+- `fix_migration.py`
+  - function fix_schema: ()
+  - function load_json: (filepath)
+  - function remigrate_npcs: ()
+  - function remigrate_rift_state: ()
+  - function remigrate_tia: ()
+  - function verify_migration: ()
+  - _...1 more_
+- `fix_npc_roster.py` — function fix_gruum_boneshaper_raw: (content) -> str, function main: ()
+- `main.py` — function validate_environment: (), function main: ()
+- `merge_faction_leaders.py` — function main: ()
+- `migrate_data.py`
+  - function log: (msg)
+  - function load_json: (filepath)
+  - function migrate_npcs: ()
+  - function migrate_missions: ()
+  - function migrate_faction_reputation: ()
+  - function migrate_news_memory: ()
+  - _...8 more_
+- `mysql_setup.py` — function setup_database: ()
+- `rag_sanity_check.py` — function main: ()
+- `scripts\cleanup_image_refs.py`
+  - function cleanup_entity_folders: (dry_run) -> dict
+  - function cleanup_team_folder: (dry_run) -> dict
+  - function main: ()
+- `scripts\merge_faction_leaders.py` — function main: ()
+- `scripts\test_module_quality_training.py` — function main: ()
+- `scripts\test_news_agents.py`
+  - function main: ()
+  - function test_agent: (editor_type)
+  - function test_all: ()
+- `skills\docx\scripts\accept_changes.py` — function accept_changes: (input_file, output_file) -> tuple[None, str]
+- `skills\docx\scripts\comment.py` — function add_comment: (unpacked_dir, comment_id, text, author, initials, parent_id) -> tuple[str, str]
+- `skills\docx\scripts\office\helpers\merge_runs.py` — function merge_runs: (input_dir) -> tuple[int, str]
+- `skills\docx\scripts\office\helpers\simplify_redlines.py`
+  - function simplify_redlines: (input_dir) -> tuple[int, str]
+  - function get_tracked_change_authors: (doc_xml_path) -> dict[str, int]
+  - function infer_author: (modified_dir, original_docx, default) -> str
+- `skills\docx\scripts\office\pack.py` — function pack: (input_directory, output_file, original_file, validate, infer_author_func) -> tuple[None, str]
+- `skills\docx\scripts\office\soffice.py` — function get_soffice_env: () -> dict, function run_soffice: (args, **kwargs) -> subprocess.CompletedProcess
+- `skills\docx\scripts\office\unpack.py` — function unpack: (input_file, output_directory, merge_runs, simplify_redlines) -> tuple[None, str]
+- `skills\docx\scripts\office\validate.py` — function main: ()
+- `skills\docx\scripts\office\validators\base.py` — class BaseSchemaValidator
+- `skills\docx\scripts\office\validators\docx.py` — class DOCXSchemaValidator
+- `skills\docx\scripts\office\validators\pptx.py` — class PPTXSchemaValidator
+- `skills\docx\scripts\office\validators\redlining.py` — class RedliningValidator
+- `skills\pdf\scripts\check_bounding_boxes.py` — function get_bounding_box_messages: (fields_json_stream) -> list[str], class RectAndField
+- `skills\pdf\scripts\convert_pdf_to_images.py` — function convert: (pdf_path, output_dir, max_dim)
+- `skills\pdf\scripts\create_validation_image.py` — function create_validation_image: (page_number, fields_json_path, input_path, output_path)
+- `skills\pdf\scripts\extract_form_field_info.py`
+  - function get_full_annotation_field_id: (annotation)
+  - function make_field_dict: (field, field_id)
+  - function get_field_info: (reader)
+  - function write_field_info: (pdf_path, json_output_path)
+- `skills\pdf\scripts\extract_form_structure.py` — function extract_form_structure: (pdf_path), function main: ()
+- `skills\pdf\scripts\fill_fillable_fields.py`
+  - function fill_pdf_fields: (input_pdf_path, fields_json_path, output_pdf_path)
+  - function validation_error_for_field_value: (field_info, field_value)
+  - function monkeypatch_pydpf_method: ()
+- `skills\pdf\scripts\fill_pdf_form_with_annotations.py`
+  - function transform_from_image_coords: (bbox, image_width, image_height, pdf_width, pdf_height)
+  - function transform_from_pdf_coords: (bbox, pdf_height)
+  - function fill_pdf_form: (input_pdf_path, fields_json_path, output_pdf_path)
+- `skills\skill-creator\eval-viewer\generate_review.py`
+  - function get_mime_type: (path) -> str
+  - function find_runs: (workspace) -> list[dict]
+  - function build_run: (root, run_dir) -> dict | None
+  - function embed_file: (path) -> dict
+  - function load_previous_iteration: (workspace) -> dict[str, dict]
+  - function generate_html: (runs, skill_name, previous, dict] | None, benchmark) -> str
+  - _...2 more_
+- `skills\skill-creator\scripts\aggregate_benchmark.py`
+  - function calculate_stats: (values) -> dict
+  - function load_run_results: (benchmark_dir) -> dict
+  - function aggregate_results: (results) -> dict
+  - function generate_benchmark: (benchmark_dir, skill_name, skill_path) -> dict
+  - function generate_markdown: (benchmark) -> str
+  - function main: ()
+- `skills\skill-creator\scripts\generate_report.py` — function generate_html: (data, auto_refresh, skill_name) -> str, function main: ()
+- `skills\skill-creator\scripts\improve_description.py` — function improve_description: (skill_name, skill_content, current_description, eval_results, history, model, test_results, log_dir, iteration) -> str, function main: ()
+- `skills\skill-creator\scripts\package_skill.py`
+  - function should_exclude: (rel_path) -> bool
+  - function package_skill: (skill_path, output_dir)
+  - function main: ()
+- `skills\skill-creator\scripts\quick_validate.py` — function validate_skill: (skill_path)
+- `skills\skill-creator\scripts\run_eval.py`
+  - function find_project_root: () -> Path
+  - function run_single_query: (query, skill_name, skill_description, timeout, project_root, model) -> bool
+  - function run_eval: (eval_set, skill_name, description, num_workers, timeout, project_root, runs_per_query, trigger_threshold, model) -> dict
+  - function main: ()
+- `skills\skill-creator\scripts\run_loop.py`
+  - function split_eval_set: (eval_set, holdout, seed) -> tuple[list[dict], list[dict]]
+  - function run_loop: (eval_set, skill_path, description_override, num_workers, timeout, max_iterations, runs_per_query, trigger_threshold, holdout, model, verbose, live_report_path, log_dir) -> dict
+  - function main: ()
+- `skills\skill-creator\scripts\utils.py` — function parse_skill_md: (skill_path) -> tuple[str, str, str]
+- `skills\slack-gif-creator\core\easing.py`
+  - function linear: (t) -> float
+  - function ease_in_quad: (t) -> float
+  - function ease_out_quad: (t) -> float
+  - function ease_in_out_quad: (t) -> float
+  - function ease_in_cubic: (t) -> float
+  - function ease_out_cubic: (t) -> float
+  - _...14 more_
+- `skills\slack-gif-creator\core\frame_composer.py`
+  - function draw_circle: (frame, center, int], radius, fill_color, int, int]], outline_color, int, int]], outline_width) -> Image.Image
+  - function create_gradient_background: (width, height, top_color, int, int], bottom_color, int, int]) -> Image.Image
+  - function draw_star: (frame, center, int], size, fill_color, int, int], outline_color, int, int]], outline_width) -> Image.Image
+- `skills\slack-gif-creator\core\gif_builder.py` — class GIFBuilder
+- `skills\slack-gif-creator\core\validators.py` — function validate_gif: (gif_path, is_emoji, verbose) -> tuple[bool, dict], function is_slack_ready: (gif_path, is_emoji, verbose) -> bool
+- `skills\webapp-testing\scripts\with_server.py` — function is_server_ready: (port, timeout), function main: ()
+- `SKILLS_INTEGRATION_EXAMPLES.py`
+  - function example_news_feed_with_skills: ()
+  - function example_mission_board_with_skills: ()
+  - function example_character_with_skills: ()
+  - function example_npc_lifecycle_with_skills: ()
+  - function example_discord_command_with_skills: ()
+  - function example_bot_startup_with_skills: ()
+  - _...2 more_
+- `sql_refactor_setup.py`
+  - function strip_thinking: (text) -> str
+  - function test_mysql: ()
+  - function generate_fallback_schema: () -> str
+  - function generate_db_api_code: () -> str
+  - function get_npc: (name) -> Optional[Dict]
+  - function get_all_npcs: () -> List[Dict]
+  - _...44 more_
+- `src\aclient.py` — class DiscordClient
+- `src\agents\base.py`
+  - function quick_complete: (prompt, model, timeout) -> str
+  - class ModelType
+  - class AgentConfig
+  - class AgentResponse
+  - class BaseAgent
+- `src\agents\helpers.py`
+  - function generate_with_qwen: (prompt, context, temperature, max_tokens) -> str
+  - function generate_with_kimi: (prompt, context, temperature, max_tokens) -> str
+  - function generate_bulletin: (news_type, instruction, memory_context, additional_context, max_lines) -> Optional[str]
+  - function generate_mission_text: (prompt, context, temperature) -> Optional[str]
+- `src\agents\kimi_agent.py` — class KimiAgent
+- `src\agents\learning_agents.py`
+  - class AgentAnalysis
+  - class LearningSession
+  - class ProjectManagerAgent
+  - class PythonVeteranAgent
+  - class DNDExpertAgent
+  - class DNDVeteranAgent
+  - _...2 more_
+- `src\agents\news_agents.py`
+  - function get_news_agent: (agent_type) -> BaseAgent
+  - function generate_news_bulletin: (news_type, instruction, context) -> BulletinResult
+  - function generate_gossip_bulletin: (topic, seed_npc, context) -> BulletinResult
+  - function generate_sports_bulletin: (event_type, venue, context) -> BulletinResult
+  - class FactCheckerMixin
+  - class BulletinResult
+  - _...3 more_
+- `src\agents\orchestrator.py` — class AgentOrchestrator
+- `src\agents\qwen_agent.py` — class QwenAgent
+- `src\archive_logs.py`
+  - function ensure_archive_dir: ()
+  - function parse_log_events: (log_path) -> dict
+  - function generate_summary: (stats) -> str
+  - function archive_log: ()
+- `src\arena_season.py`
+  - function format_match_bulletin: (result, state) -> str
+  - function should_post_arena: () -> bool
+  - function format_standings_bulletin: () -> str
+  - function tick_arena: () -> Optional[str]
+- `src\art.py` — function get_image_provider: (provider_name), function draw: (model, prompt) -> str
+- `src\bot.py` — function run_discord_bot: ()
+- `src\bounty_board.py`
+  - function should_post_bounty: () -> bool
+  - function format_bounty_news_bulletin: (bounty) -> str
+  - function generate_bounty_post: (ollama_model, ollama_url) -> Optional[Dict]
+  - function check_bounty_expirations: (channel) -> None
+- `src\bulletin_cleaner.py`
+  - function strip_llm_reasoning: (text) -> str
+  - function filter_ec_references: (text) -> str
+  - function is_truncated: (text) -> bool
+  - function validate_bulletin: (text) -> tuple[bool, str]
+  - function clean_bulletin: (text) -> str
+  - function clean_and_validate: (text) -> tuple[str | None, str]
+- `src\bulletin_embeds.py` — function wrap_bulletin: (text, bulletin_type) -> discord.Embed, function wrap_bulletin_with_title: (text, title, color) -> discord.Embed
+- `src\character_monitor.py` — function run_character_monitor: (channel) -> None
+- `src\character_profiles.py`
+  - function load_character_profile: (user_id) -> str | None
+  - function save_character_profile: (user_id, profile_text) -> None
+  - function has_character_profile: (user_id) -> bool
+  - function load_character_appearance: (user_id) -> str | None
+  - function load_character_name: (user_id) -> str | None
+  - function save_character_appearance: (user_id, appearance_text, character_name) -> None
+  - _...2 more_
+- `src\cogs\admin.py` — function setup: (client)
+- `src\cogs\character.py` — function setup: (client)
+- `src\cogs\chat.py` — function setup: (client)
+- `src\cogs\economy.py` — function setup: (client)
+- `src\cogs\images.py` — function setup: (client)
+- `src\cogs\missions.py` — function setup: (client)
+- `src\cogs\module_gen.py` — function setup: (client), function generate_and_post_module: (mission, player_name, client) -> None
+- `src\cogs\rules_lookup.py` — function setup: (client)
+- `src\cogs\skills.py` — function setup: (client)
+- `src\cogs\world.py` — function setup: (client)
+- `src\db_api.py`
+  - function get_npc: (name) -> Optional[Dict]
+  - function get_all_npcs: () -> List[Dict]
+  - function get_npcs_by_faction: (faction) -> List[Dict]
+  - function get_npcs_by_status: (status) -> List[Dict]
+  - function get_living_npcs: () -> List[Dict]
+  - function add_npc: (data) -> int
+  - _...41 more_
+- `src\dome_weather.py`
+  - function tick_weather: () -> tuple
+  - function format_weather_bulletin: () -> str
+  - function should_post_weather: () -> bool
+  - function mark_weather_posted: () -> None
+- `src\ec_exchange.py`
+  - function get_rate: () -> float
+  - function tick_exchange: () -> float
+  - function apply_event_shock: (delta_pct, reason) -> tuple[float, float]
+  - function format_exchange_line: () -> str
+  - function format_exchange_bulletin: () -> str
+  - function format_price_table: (table_key) -> str
+  - _...1 more_
+- `src\expandable_bulletin.py`
+  - function store_bulletin: (preview, full_content, headline, bulletin_type, source_attribution, venue) -> str
+  - function get_bulletin: (bulletin_id) -> Optional[StoredBulletin]
+  - function create_preview_embed: (preview, headline, bulletin_type, source_attribution, venue) -> discord.Embed
+  - function create_expanded_embed: (bulletin) -> discord.Embed
+  - function create_bulletin_message: (preview, full_content, headline, bulletin_type, source_attribution, venue) -> Tuple[discord.Embed, ui.View]
+  - function setup_persistent_views: (bot)
+  - _...6 more_
+- `src\faction_calendar.py`
+  - function tick_calendar: () -> List[Dict]
+  - function format_event_announce: (ev) -> str
+  - function format_event_result: (ev) -> str
+- `src\faction_reputation.py`
+  - function get_faction_color: (faction) -> int
+  - function get_faction_tier_label: (faction) -> str
+  - function get_all_reputations: () -> Dict[str, dict]
+  - function get_reputation: (faction) -> dict
+  - function on_mission_complete: (faction) -> dict
+  - function on_mission_failed: (faction) -> dict
+  - _...10 more_
+- `src\image_ref.py`
+  - function save_npc_ref: (name, img_bytes) -> Path
+  - function get_npc_ref: (name) -> Optional[bytes]
+  - function pin_npc_ref: (name, img_bytes) -> Path
+  - function has_npc_ref: (name) -> bool
+  - function save_location_ref: (location, img_bytes) -> Path
+  - function get_location_ref: (location) -> Optional[bytes]
+  - _...6 more_
+- `src\log.py` — function setup_logger: (module_name) -> logging.Logger, class CustomFormatter
+- `src\memory_strip.py` — function strip_to_facts: (text) -> str, function clean_memory_file: (memory_path, *, apply) -> str
+- `src\missing_persons.py`
+  - function should_post_missing: () -> bool
+  - function tick_missing_resolutions: () -> List[str]
+  - function generate_missing_bulletin: () -> Optional[str]
+- `src\mission_board.py`
+  - function next_personal_mission_seconds: () -> int
+  - function next_trickle_seconds: () -> int
+  - function refresh_mission_types_if_needed: () -> None
+  - function post_hostile_mission: (channel, faction) -> None
+  - function post_personal_mission: (channel, character) -> None
+  - function check_claims: (channel, client) -> None
+  - _...6 more_
+- `src\mission_builder\api.py`
+  - function generate_mission: (title, faction, tier, body, player_name, reward, mission_type, personal_for, difficulty, difficulty_rating) -> Optional[Dict]
+  - function get_mission_output_path: (mission_title, timestamp) -> Path
+  - function get_recent_missions: (count, output_dir) -> list[Path]
+  - function list_missions: (output_dir) -> list[Dict]
+  - function generate_mission_async: (title, faction, tier, body, player_name, reward, mission_type, personal_for, difficulty, difficulty_rating) -> Optional[Dict]
+  - function generate_and_save_mission: (title, faction, tier, body, player_name, reward, mission_type, output_dir) -> Optional[Path]
+  - _...2 more_
+- `src\mission_builder\docx_builder.py`
+  - function format_module_for_docx: (title, overview, acts_1_2, acts_3_4, act_5_rewards, metadata) -> dict
+  - function validate_module_data: (module_data) -> bool
+  - function get_output_dir: () -> Path
+  - function list_generated_modules: (limit) -> list
+  - function cleanup_old_modules: (days) -> int
+  - function build_docx: (module_data, filename, timeout) -> Optional[Path]
+- `src\mission_builder\dungeon_delve\docx_formatter.py` — function build_room_markdown: (room, content, room_number) -> str, function format_dungeon_delve_module: (dungeon_name, dungeon_lore, location_name, district, layout, room_content, dict], faction, tier, cr, party_level, reward, composite_map_path, player_name) -> dict
+- `src\mission_builder\dungeon_delve\layouts.py`
+  - function get_room_count_for_level: (party_level) -> int
+  - function generate_layout: (party_level, preferred_size) -> DungeonLayout
+  - function get_aesthetic_for_location: (location_name) -> str
+  - class RoomPosition
+  - class DungeonLayout
+- `src\mission_builder\dungeon_delve\room_generator.py`
+  - function generate_room_content: (room, room_num, total_rooms, context, use_llm) -> Dict
+  - function generate_all_rooms: (layout, context, use_llm, delay_between) -> Dict[str, Dict]
+  - class DungeonContext
+- `src\mission_builder\dungeon_delve\stitcher.py` — function stitch_dungeon_map: (layout, room_tiles, bytes], room_info, dict]], tile_size, padding) -> bytes, function create_placeholder_map: (layout, room_info, dict]], tile_size, padding) -> bytes
+- `src\mission_builder\dungeon_delve\tile_generator.py`
+  - function build_tile_prompt: (room, aesthetic) -> tuple[str, str]
+  - function generate_room_tile: (room, aesthetic, seed) -> Optional[bytes]
+  - function generate_all_tiles: (layout, aesthetic, base_seed, delay_between) -> Dict[str, bytes]
+- `src\mission_builder\dungeon_delve\__init__.py`
+  - function get_dungeon_locations: () -> List[Dict]
+  - function select_dungeon_location: (party_level, preferred_type) -> Dict
+  - function generate_dungeon_delve: (location_name, faction, party_level, tier, use_llm, generate_tiles, player_name, reward) -> Dict[str, Any]
+  - function save_dungeon_delve: (result, Any], output_dir) -> Dict[str, Path]
+- `src\mission_builder\encounters.py`
+  - function get_max_pc_level: () -> int
+  - function get_cr: (tier) -> int
+  - function get_encounter_budget: (cr) -> dict
+  - function get_cr_xp: (cr) -> int
+  - function calculate_skill_dcs: (cr) -> dict
+  - function format_encounter_guidelines: (cr, tier) -> str
+  - _...3 more_
+- `src\mission_builder\image_generator.py`
+  - function get_image_asset: (filename, type, size, int]], seed, prompt) -> ImageAsset
+  - function craft_battle_map_prompt: (room, style) -> str
+  - function craft_creature_prompt: (creature_name, creature_type) -> str
+  - function craft_location_prompt: (location_name, location_desc) -> str
+  - function generate_single_tile: (params) -> Optional[Image.Image]
+  - function generate_dungeon_tiles_for_rooms: (rooms, style) -> Dict[str, Optional[Image.Image]]
+  - _...5 more_
+- `src\mission_builder\image_integration.py`
+  - function generate_mission_with_images_sync: (title, faction, tier, body, player_name, include_images, image_style, model_name) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]
+  - function extract_dungeon_rooms_from_mission: (mission_module) -> List[DungeonRoom]
+  - function example_usage: ()
+  - function generate_mission_with_images: (title, faction, tier, body, player_name, include_images, image_style, model_name) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]
+  - function generate_complete_mission: (title, faction, tier, body, player_name, output_dir, image_style) -> Optional[tuple[Path, Path]]
+  - function update_mission_with_images: (mission_file, include_dungeon_images, image_style) -> Optional[MissionModule]
+- `src\mission_builder\json_generator.py`
+  - function set_use_skills: (enabled) -> None
+  - function save_module_json: (module, mission_id) -> Optional[Path]
+  - function generate_module_json: (mission, player_name) -> Optional[Dict]
+- `src\mission_builder\leads.py`
+  - function generate_lead: (lead_type, faction, district, mission_context) -> dict
+  - function generate_investigation_leads: (faction, tier, mission_type, count) -> List[dict]
+  - function format_leads_for_prompt: (leads, cr) -> str
+  - function format_lead_as_scene: (lead, cr) -> str
+  - function get_approach_guidance: (lead_type) -> dict
+- `src\mission_builder\locations.py`
+  - function load_gazetteer: () -> dict
+  - function get_districts_by_faction: (faction) -> List[str]
+  - function get_districts_by_danger: (danger_level) -> List[str]
+  - function get_district_info: (district_name) -> Optional[dict]
+  - function get_establishments_in_district: (district_name, establishment_type) -> List[dict]
+  - function get_sub_areas: (district_name) -> List[dict]
+  - _...11 more_
+- `src\mission_builder\maps.py`
+  - function extract_map_scenes: (module_data) -> List[Dict]
+  - function build_map_prompt: (scene) -> Tuple[str, str]
+  - function generate_vtt_map: (scene, ref_bytes, denoise) -> Optional[bytes]
+  - function generate_module_maps: (module_data, output_subdir, max_maps) -> List[Path]
+  - function post_maps_to_channel: (client, map_paths, module_data, retry_count) -> bool
+- `src\mission_builder\mission_json_builder.py` — function create_mission_module: (title, faction, tier, mission_type, **metadata_kwargs) -> MissionJsonBuilder, class MissionJsonBuilder
+- `src\mission_builder\mission_types.py`
+  - function get_mission_type: (name) -> Optional[MissionType]
+  - function list_mission_types: () -> List[str]
+  - function map_difficulty_to_tier: (difficulty) -> str
+  - function map_difficulty_to_5e: (difficulty) -> str
+  - function get_difficulty_description: (difficulty) -> str
+  - function generate_dynamic_title: (mission_type, faction, theme_or_subject, difficulty, use_skills) -> str
+  - _...2 more_
+- `src\mission_builder\npcs.py`
+  - function load_npc_roster: () -> List[dict]
+  - function get_faction_leader: (faction) -> Optional[dict]
+  - function get_faction_leader_name: (faction) -> str
+  - function get_npcs_by_faction: (faction, alive_only) -> List[dict]
+  - function get_npc_by_name: (name) -> Optional[dict]
+  - function get_npcs_by_location: (location) -> List[dict]
+  - _...9 more_
+- `src\mission_builder\rewards.py`
+  - function get_magic_item_tier: (cr) -> str
+  - function get_random_magic_item: (cr, count) -> List[str]
+  - function calculate_gold_reward: (tier, party_size, pc_level) -> Tuple[int, int]
+  - function format_rewards_block: (tier, cr, faction, mission_reward_text, pc_level) -> str
+  - function generate_consequence_template: (outcome, location, npc_name, resource, allied_faction, opposed_faction, future_plot_hook, antagonist_name, sacrifice, complication) -> str
+  - function format_consequences_prompt: (tier, faction) -> str
+  - _...1 more_
+- `src\mission_builder\schemas.py`
+  - function validate_mission_module: (data, Any]) -> tuple[bool, List[str]]
+  - function log_validation_results: (is_valid, errors, mission_title)
+  - function get_mission_schema: () -> Dict[str, Any]
+  - class MissionMetadata
+  - class MissionContent
+  - class LocationInfo
+  - _...8 more_
+- `src\mission_builder\__init__.py`
+  - function gather_context: (mission) -> dict
+  - function generate_module: (mission, player_name) -> Optional[Path]
+  - function post_module_to_channel: (client, docx_path, mission, player_name) -> bool
+- `src\mission_compiler.py`
+  - function build_mission_json: (title, faction, tier, mission_type, **kwargs) -> Dict
+  - function compile_mission: (mission_dict, player_name, client) -> Optional[Path]
+  - class MissionCompiler
+- `src\mission_outcomes.py`
+  - function get_recent_outcomes: (n) -> List[Dict]
+  - function save_outcome: (outcome) -> None
+  - function archive_news_weekly: () -> Optional[str]
+  - function archive_outcomes_weekly: () -> Optional[str]
+  - function process_npc_deaths: (killed_text, mission_title) -> List[str]
+  - function process_outcome_consequences: (outcome) -> List[str]
+- `src\module_quality_trainer.py` — function study_module_quality: () -> Optional[str]
+- `src\news_feed.py`
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - function next_image_interval_seconds: () -> int
+  - _...8 more_
+- `src\news_integration.py`
+  - function get_timestamp_line: () -> str
+  - function generate_editorial_bulletin: (editor_type, topic, venue) -> EditorialResult
+  - function generate_gossip_only: (topic, seed_npc) -> EditorialResult
+  - function generate_sports_only: (event_type, venue) -> EditorialResult
+  - function post_editorial_bulletin: (channel, editor_type, topic, venue, write_memory_func) -> Optional[discord.Message]
+  - function generate_for_command: (editor_type_str, topic) -> Tuple[Optional[discord.Embed], Optional[discord.ui.View], str]
+  - _...2 more_
+- `src\npc_appearance.py`
+  - function get_npc_appearance: (name) -> Optional[dict]
+  - function get_npc_sd_prompt: (name) -> Optional[str]
+  - function get_all_npc_names: () -> list[str]
+  - function get_all_sd_prompts: () -> dict[str, str]
+  - function get_npc_home_district: (name) -> str
+  - function find_npc_in_text: (text) -> list[tuple[str, str, str]]
+  - _...1 more_
+- `src\npc_consequence.py`
+  - function scan_bulletin_for_consequences: (bulletin_text) -> List[Dict]
+  - function apply_consequences: (consequences) -> List[str]
+  - function check_resurrection_queue: () -> List[Dict]
+  - function resurrect_npc: (entry) -> Optional[Dict]
+  - function get_recently_deceased_block: (days) -> str
+  - function process_bulletin: (bulletin_text) -> List[str]
+- `src\npc_lifecycle.py`
+  - function is_faction_leader: (npc_name) -> bool
+  - function get_leader_faction: (npc_name) -> Optional[str]
+  - function next_lifecycle_seconds: () -> int
+  - function refresh_daily_events_if_needed: () -> None
+  - function generate_new_npc: (existing_npcs) -> Optional[dict]
+  - function apply_npc_event: (npc, all_npcs) -> Optional[str]
+  - _...1 more_
+- `src\npc_lookup.py`
+  - function extract_quoted_names: (text) -> List[str]
+  - function extract_and_lookup_npcs: (text) -> List[Dict]
+  - function get_npc_context_for_prompt: (text, include_appearance) -> str
+  - function get_npc_sd_prompt: (text) -> str
+  - function lookup_npc_by_name: (name) -> Optional[Dict]
+- `src\nudge_state.py` — function has_been_nudged: (user_id) -> bool, function mark_nudged: (user_id)
+- `src\ollama_busy.py`
+  - function is_available: () -> bool
+  - function get_busy_reason: () -> str
+  - function mark_busy: (reason, model) -> None
+  - function mark_available: () -> None
+  - function get_busy_duration: () -> Optional[float]
+- `src\party_profiles.py`
+  - function load_profile: (name) -> Optional[dict]
+  - function save_profile: (profile) -> None
+  - function get_party_delta: (mission_tier) -> int
+  - function apply_party_outcome: (name, mission_tier, success) -> dict
+  - function is_exceptional_outcome: (mission_tier, success, party_tier) -> bool
+  - function profile_summary: (name) -> str
+  - _...5 more_
+- `src\patch_approval.py`
+  - function parse_pending_patches: () -> List[Dict]
+  - function update_patch_status: (patch_id, new_status, note) -> bool
+  - function setup: (client)
+  - class PatchApprovalView
+  - class PatchListView
+- `src\personas.py`
+  - function get_persona_prompt: (persona_name, user_id) -> str
+  - function is_jailbreak_persona: (persona_name) -> bool
+  - function is_admin_user: (user_id) -> bool
+  - function get_available_personas: (user_id) -> List[str]
+- `src\player_listings.py`
+  - function tick_player_listings: () -> List[Dict]
+  - function create_listing: (player_id, player_name, item_name, description, min_bid, frozen) -> Dict
+  - function format_player_listings_embed: () -> Optional[discord.Embed]
+  - function format_sold_notification: (item) -> discord.Embed
+- `src\providers.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `src\rag_sanity_check.py` — function main: ()
+- `src\rules_agent.py`
+  - function answer_rules_question: (query) -> RulesAnswer
+  - function lookup_spell_or_feature: (name) -> str
+  - class RulesAnswer
+- `src\self_learning.py` — function run_learning_session: (), function self_learning_loop: ()
+- `src\skills.py`
+  - function load_skill_from_file: (skill_file) -> Optional[Skill]
+  - function load_all_skills: (skills_dir) -> Dict[str, Skill]
+  - function get_skill_for_task: (task, skills, Skill]]) -> Optional[Skill]
+  - function list_available_skills: (skills, Skill]]) -> List[Dict[str, Any]]
+  - function get_skill_content: (skill_name, skills, Skill]]) -> Optional[str]
+  - function build_system_prompt_with_skills: (base_prompt, task, skills, Skill]], use_multiple) -> str
+  - _...9 more_
+- `src\skill_loader.py`
+  - function load_skills: (force) -> List[Skill]
+  - function score_skill: (skill, query_tokens) -> float
+  - function match_skills: (user_message, conversation_history, str]]], top_n, min_score) -> List[Skill]
+  - function format_skills_for_prompt: (skills, max_chars) -> str
+  - function get_skill_inventory: () -> List[Dict]
+  - function get_skill_body: (filename) -> Optional[str]
+  - _...1 more_
+- `src\style_agent.py`
+  - function faction_style_summary: (faction) -> str
+  - function describe_character_style: (char_name, char_class, faction, occasion, extra_notes) -> str
+  - function enrich_appearance_prompt: (base_description, char_class, faction) -> str
+- `src\tower_economy.py`
+  - function react_to_bulletin: (bulletin_text) -> Optional[str]
+  - function format_towerbay_bulletin: () -> str
+  - function tick_tia: () -> tuple
+  - function format_tia_bulletin: (event_desc) -> str
+  - function format_towerbay_embeds: ()
+  - function tick_towerbay: () -> tuple[List[Dict], List[Dict]]
+- `src\tower_rag.py`
+  - function get_relevant_chunks: (query, top_k) -> List[str]
+  - function build_context_from_messages: (messages, str]], top_k, tone, scene) -> str
+  - function search_docs: (query, top_k) -> List[str]
+  - class Intent
+- `src\tts_engine.py` — function generate_tts_audio: (text) -> bytes | None
+- `src\weekly_archive.py`
+  - function run_weekly_archive: () -> dict
+  - function load_archive: (category, week_date) -> list
+  - function load_all_archives: (category) -> list
+  - function search_archive: (category, query, max_results) -> list
+  - function list_archive_weeks: (category) -> list[str]
+  - function archive_summary: () -> dict
+- `tests\test_aclient.py` — class TestDiscordClientLogic
+- `tests\test_api.py`
+  - class TestHighLevelAPI
+  - class TestMissionIntegration
+  - class TestMissionGeneration
+  - class TestUtilityFunctions
+  - class TestAPIDocumentation
+- `tests\test_e2e.py`
+  - function check_ollama_available: (url) -> bool
+  - function check_a1111_available: (url) -> bool
+  - function mission_output_dir: (tmp_path)
+  - function sample_mission: () -> Optional[MissionModule]
+  - class TestMissionBoardWorkflow
+  - class TestImageGenerationWorkflow
+  - _...3 more_
+- `tests\test_image_generator.py`
+  - class TestTileGenerationParams
+  - class TestImageAssetMetadata
+  - class TestGetImageAsset
+  - class TestGenerateSingleTile
+  - class TestGenerateDungeonTiles
+  - class TestStitchDungeonMap
+  - _...4 more_
+- `tests\test_image_integration.py`
+  - class TestExtractDungeonRooms
+  - class TestGenerateMissionWithImages
+  - class TestGenerateCompleteMission
+  - class TestUpdateMissionWithImages
+  - class TestSyncWrapper
+  - class TestIntegration
+- `tests\test_json_generator.py` — class TestJsonGenerator, class TestJsonStructure
+- `tests\test_mission_schema.py`
+  - class TestMissionBuilder
+  - class TestValidation
+  - class TestSerialization
+  - class TestDungeonDelve
+  - class TestBackwardCompat
+  - class TestSchema
+  - _...1 more_
+- `tests\test_personas.py` — class TestPersonas
+- `tests\test_providers.py`
+  - class TestModelInfo
+  - class TestFreeProvider
+  - class TestOpenAIProvider
+  - class TestClaudeProvider
+  - class TestProviderManager
+- `test_dungeon_delve.py` — function main: ()
+- `test_mission_builder.py`
+  - function test_imports: ()
+  - function test_compatibility_wrapper: ()
+  - function test_key_functions: ()
+  - function main: ()
+- `test_skills_quick.py` — function main: ()
+- `utils\message_utils.py` — function send_split_message: (self, response, message, has_followed_up), function send_response_with_images: (self, response, message)
+
+---
+
+# Config
+
+## Environment Variables
+
+- `A1111_ANIME_MODEL` (has default) — .env
+- `A1111_MODEL` (has default) — .env
+- `A1111_URL` (has default) — .env
+- `ADMIN_USER_IDS` (has default) — .env.example
+- `CHAR_MONITOR_CHANNEL_ID` (has default) — .env
+- `CLAUDE_KEY` (has default) — .env.example
+- `CONVERSATION_TRIM_SIZE` (has default) — .env.example
+- `DDB_COBALT_TOKEN` **required** — src\character_monitor.py
+- `DEFAULT_MODEL` (has default) — .env.example
+- `DEFAULT_PROVIDER` (has default) — .env.example
+- `DISCORD_BOT_TOKEN` **required** — .env.example
+- `DISCORD_CHANNEL_ID` **required** — .env.example
+- `DISCORD_GUILD_ID` (has default) — .env
+- `DM_USER_ID` (has default) — .env
+- `GEMINI_KEY` (has default) — .env.example
+- `GROK_KEY` (has default) — .env.example
+- `IMAGE_STYLE` (has default) — .env
+- `KIMI_ENABLE_SUBAGENTS` (has default) — .env.example
+- `KIMI_MODEL` (has default) — .env.example
+- `LEARN_HOUR_END` **required** — src\self_learning.py
+- `LEARN_HOUR_START` **required** — src\self_learning.py
+- `LOGGING` (has default) — .env.example
+- `MAPS_CHANNEL_ID` **required** — src\mission_builder\maps.py
+- `MAX_CONVERSATION_LENGTH` (has default) — .env.example
+- `MISSION_BOARD_CHANNEL_ID` (has default) — .env
+- `MISSION_RESULTS_CHANNEL_ID` (has default) — .env
+- `MODULE_OUTPUT_CHANNEL_ID` (has default) — .env
+- `MYSQL_DB` **required** — sql_refactor_setup.py
+- `MYSQL_HOST` **required** — sql_refactor_setup.py
+- `MYSQL_PASSWORD` **required** — sql_refactor_setup.py
+- `MYSQL_USER` **required** — sql_refactor_setup.py
+- `OLLAMA_MODEL` (has default) — .env.example
+- `OLLAMA_URL` (has default) — .env.example
+- `OPENAI_ENABLED` **required** — src\art.py
+- `OPENAI_KEY` (has default) — .env.example
+- `QWEN_MODEL` (has default) — .env.example
+- `REPLYING_ALL` (has default) — .env.example
+- `REPLYING_ALL_DISCORD_CHANNEL_ID` **required** — .env.example
+
+## Config Files
+
+- `.env.example`
+- `Dockerfile`
+- `docker-compose.yml`
+
+## Key Dependencies
+
+- openai: ^6.32.0
+
+---
+
+# Middleware
+
+## custom
+- migrate_data — `migrate_data.py`
+- generate_review — `skills\skill-creator\eval-viewer\generate_review.py`
+- generate_report — `skills\skill-creator\scripts\generate_report.py`
+
+---
+
+# Dependency Graph
+
+## Most Imported Files (change these carefully)
+
+- `/layouts.py` — imported by **5** files
+- `/schemas.py` — imported by **5** files
+- `/base.py` — imported by **3** files
+- `/mission_json_builder.py` — imported by **2** files
+- `/encounters.py` — imported by **2** files
+- `/locations.py` — imported by **2** files
+- `/docx.py` — imported by **1** files
+- `/pptx.py` — imported by **1** files
+- `/redlining.py` — imported by **1** files
+- `/room_generator.py` — imported by **1** files
+- `/tile_generator.py` — imported by **1** files
+- `/stitcher.py` — imported by **1** files
+- `/json_generator.py` — imported by **1** files
+- `/image_generator.py` — imported by **1** files
+- `/api.py` — imported by **1** files
+- `/mission_types.py` — imported by **1** files
+- `/leads.py` — imported by **1** files
+- `/npcs.py` — imported by **1** files
+- `/rewards.py` — imported by **1** files
+- `/docx_builder.py` — imported by **1** files
+
+## Import Map (who imports what)
+
+- `/layouts.py` ← `src\mission_builder\dungeon_delve\docx_formatter.py`, `src\mission_builder\dungeon_delve\room_generator.py`, `src\mission_builder\dungeon_delve\stitcher.py`, `src\mission_builder\dungeon_delve\tile_generator.py`, `src\mission_builder\dungeon_delve\__init__.py`
+- `/schemas.py` ← `src\mission_builder\image_generator.py`, `src\mission_builder\image_integration.py`, `src\mission_builder\json_generator.py`, `src\mission_builder\mission_json_builder.py`, `src\mission_builder\__init__.py`
+- `/base.py` ← `skills\docx\scripts\office\validators\docx.py`, `skills\docx\scripts\office\validators\pptx.py`, `skills\docx\scripts\office\validators\__init__.py`
+- `/mission_json_builder.py` ← `src\mission_builder\json_generator.py`, `src\mission_builder\__init__.py`
+- `/encounters.py` ← `src\mission_builder\json_generator.py`, `src\mission_builder\__init__.py`
+- `/locations.py` ← `src\mission_builder\leads.py`, `src\mission_builder\__init__.py`
+- `/docx.py` ← `skills\docx\scripts\office\validators\__init__.py`
+- `/pptx.py` ← `skills\docx\scripts\office\validators\__init__.py`
+- `/redlining.py` ← `skills\docx\scripts\office\validators\__init__.py`
+- `/room_generator.py` ← `src\mission_builder\dungeon_delve\__init__.py`
+
+---
+
+# Test Coverage
+
+> **13%** of routes and models are covered by tests
+> 14 test files found
+
+## Covered Models
+
+- npcs
+- missions
+
+---
+
+_Generated by [codesight](https://github.com/Houseofmvps/codesight) — see your codebase clearly_

@@ -1,0 +1,28 @@
+{
+  "name": "Captain Havel Korin",
+  "species": "Human",
+  "faction": "Wardens of Ash",
+  "rank": "Captain — Commander of the Outer Wall garrison",
+  "role": "field captain",
+  "home_district": "outer wall",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "CON 15",
+      "WIS 13"
+    ],
+    "secondary": [
+      "DEX 12",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "battle axe, heavy crossbow",
+    "armour": "patchwork plate — heavily repaired, still effective"
+  },
+  "sd_appearance": "A gaunt human of average height, his sun-darkened skin is etched with deep, jagged scars that fade into the ash-gray chainmail clinging to his frame, the metal dented and patched with rust-stained rivets; his short-cropped hair is a tangle of silver and black, framing eyes the color of storm-swept steel, their depths shadowed by decades of smoke and battle; a jagged ash-mark scars his left cheek, and his left hand bears a crude iron ring, its surface pitted with wear, while a blood-red armband flares from his sleeve, the only color in a wardrobe of soot and steel, his battle axe slung across his back and heavy crossbow strapped to his hip, both worn but functional, their edges dulled by countless skirmishes along the Outer Wall.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "repaired many times with love, red armband the only consistent mark"
+}

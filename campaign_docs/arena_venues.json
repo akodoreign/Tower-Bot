@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "description": "Arena venues across the Undercity dome",
+    "version": "1.0",
+    "notes": "Each venue has its own flavor, event types, and regular schedule"
+  },
+  "venues": [
+    {
+      "id": "arena_of_ascendance",
+      "name": "Arena of Ascendance",
+      "short_name": "The Ascendance",
+      "district": "Guild Spires",
+      "ring": 2,
+      "faction_affiliation": "Argent Blades",
+      "description": "The premier combat arena. Three tiers of seating surrounding a sand pit. Argent Blades territory.",
+      "event_types": ["combat", "ranked_bout", "title_bout", "grudge_match", "exhibition"],
+      "capacity": 5000,
+      "prestige": "legendary",
+      "schedule": "2-3 days between events",
+      "flavor": {
+        "atmosphere": "Roaring crowds, torch smoke, iron and blood",
+        "announcer": "Magister Vorn the Thundervoice",
+        "signature": "The crowd chants fighter names in unison before kills"
+      },
+      "sub_venues": [
+        {
+          "name": "The Main Pit",
+          "type": "combat",
+          "notes": "Primary fighting stage, full crowds"
+        },
+        {
+          "name": "The Cage",
+          "type": "combat",
+          "notes": "Underground circuit, brutal no-rules fights"
+        },
+        {
+          "name": "The Dust Ring",
+          "type": "combat",
+          "notes": "Open-air annex at Guild Spires East, training bouts"
+        }
+      ]
+    },
+    {
+      "id": "night_pits",
+      "name": "The Night Pits",
+      "short_name": "Night Pits",
+      "district": "The Warrens",
+      "ring": 5,
+      "faction_affiliation": "Obsidian Lotus",
+      "description": "Illegal underground fighting ring. No rules, no records. Lotus takes a cut.",
+      "event_types": ["combat", "beast_fight", "death_match", "cage_match"],
+      "capacity": 300,
+      "prestige": "infamous",
+      "schedule": "nightly",
+      "flavor": {
+        "atmosphere": "Cramped, smoke-filled, bets called in whispers",
+        "announcer": "Sable herself, when she bothers",
+        "signature": "Fighters enter through a meat locker. Losers sometimes leave the same way."
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "grand_forum_stage",
+      "name": "Grand Forum Exhibition Stage",
+      "short_name": "The Forum Stage",
+      "district": "Grand Forum",
+      "ring": 1,
+      "faction_affiliation": "Tower Authority",
+      "description": "Civilized exhibition matches. Magical duels, demonstration bouts, sanctioned displays.",
+      "event_types": ["magical_duel", "exhibition", "demonstration", "arcane_tournament"],
+      "capacity": 2000,
+      "prestige": "prestigious",
+      "schedule": "weekly",
+      "flavor": {
+        "atmosphere": "Marble columns, elevated seating, scholarly murmurs",
+        "announcer": "Archivist Eir Velan provides commentary",
+        "signature": "Duels must be declared three days in advance. Killing is forbidden."
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "iron_maw_tracks",
+      "name": "The Iron Maw Racing Tracks",
+      "short_name": "Iron Maw",
+      "district": "Markets Infinite",
+      "ring": 3,
+      "faction_affiliation": "Iron Fang Consortium",
+      "description": "Beast racing, construct racing, and courier sprints. Heavy betting. Consortium territory.",
+      "event_types": ["beast_race", "construct_race", "courier_sprint", "obstacle_course", "chariot_derby"],
+      "capacity": 3500,
+      "prestige": "commercial",
+      "schedule": "daily races, major events weekly",
+      "flavor": {
+        "atmosphere": "Sawdust and oil, shouting bookies, mechanical roars",
+        "announcer": "Rotates between Consortium announcers, all paid to hype",
+        "signature": "The 'Maw Lap' — final stretch where anything goes"
+      },
+      "sub_venues": [
+        {
+          "name": "The Long Circuit",
+          "type": "racing",
+          "notes": "Full track, 8 laps, major events"
+        },
+        {
+          "name": "The Sprint Pit",
+          "type": "racing",
+          "notes": "Short explosive races, 2 laps"
+        },
+        {
+          "name": "Obstacle Alley",
+          "type": "obstacle_course",
+          "notes": "Courier training turned spectator sport"
+        }
+      ]
+    },
+    {
+      "id": "beast_dome",
+      "name": "Korvax's Beast Dome",
+      "short_name": "Beast Dome",
+      "district": "Residential Ring",
+      "ring": 4,
+      "faction_affiliation": "Independent",
+      "description": "Exotic creature exhibitions, beast fights, taming demonstrations. Run by Korvax the Beastmaster.",
+      "event_types": ["beast_fight", "beast_show", "taming_exhibition", "creature_auction", "monster_hunt"],
+      "capacity": 1500,
+      "prestige": "exotic",
+      "schedule": "3-4 days between shows",
+      "flavor": {
+        "atmosphere": "Animal musk, exotic screeches, gasps of wonder and fear",
+        "announcer": "Korvax narrates personally, knows every creature by name",
+        "signature": "Audience members can bid to participate in taming challenges"
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "sanctum_trials",
+      "name": "The Sanctum Trials",
+      "short_name": "Sanctum Trials",
+      "district": "Sanctum Quarter",
+      "ring": 2,
+      "faction_affiliation": "Serpent Choir",
+      "description": "Divine contract duels. Kharma-staked competitions. Faith vs faith.",
+      "event_types": ["divine_duel", "contract_trial", "faith_test", "kharma_bout"],
+      "capacity": 800,
+      "prestige": "sacred",
+      "schedule": "when contracts demand",
+      "flavor": {
+        "atmosphere": "Incense, chanting, the weight of divine attention",
+        "announcer": "A rotating panel of Choir officials who speak in liturgical cadence",
+        "signature": "Both combatants sign divine contracts. The gods watch. Literally."
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "ash_ring",
+      "name": "The Ash Ring",
+      "short_name": "Ash Ring",
+      "district": "Outer Wall",
+      "ring": 5,
+      "faction_affiliation": "Wardens of Ash",
+      "description": "Warden training ground opened for public viewing. Defensive demonstrations, siege drills.",
+      "event_types": ["defense_drill", "siege_demonstration", "recruit_tournament", "wall_games"],
+      "capacity": 1200,
+      "prestige": "military",
+      "schedule": "weekly demonstrations",
+      "flavor": {
+        "atmosphere": "Stone dust, drill commands, disciplined silence from Warden sections",
+        "announcer": "Lieutenant Varen when she has time, otherwise a rotating sergeant",
+        "signature": "Civilians bet on recruits. Wardens pretend not to notice."
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "floating_ring",
+      "name": "The Floating Ring",
+      "short_name": "Floating Ring",
+      "district": "Markets Infinite",
+      "ring": 3,
+      "faction_affiliation": "Independent",
+      "description": "A barge-mounted fighting platform on the canal. Moves between districts. Water hazards included.",
+      "event_types": ["combat", "naval_duel", "swimming_race", "barge_brawl"],
+      "capacity": 400,
+      "prestige": "novelty",
+      "schedule": "appears randomly, follows festival seasons",
+      "flavor": {
+        "atmosphere": "Rocking platform, splashing, crowd on both banks",
+        "announcer": "Whoever owns the barge that week",
+        "signature": "Ring-outs count. Fighters can be knocked into the canal."
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "scrapworks_pit",
+      "name": "The Scrapworks Pit",
+      "short_name": "Scrapworks",
+      "district": "The Warrens",
+      "ring": 5,
+      "faction_affiliation": "Patchwork Saints",
+      "description": "Improvised arena in the salvage yards. Robot fights, junk gladiators, scrap construct battles.",
+      "event_types": ["construct_fight", "junk_gladiator", "salvage_race", "repair_challenge"],
+      "capacity": 600,
+      "prestige": "scrappy",
+      "schedule": "weekends",
+      "flavor": {
+        "atmosphere": "Welding sparks, grinding metal, cheers from the scrap piles",
+        "announcer": "Mara the Scrapper when she's not busy, otherwise her second",
+        "signature": "Fighters can salvage parts from defeated constructs mid-match"
+      },
+      "sub_venues": []
+    },
+    {
+      "id": "tower_colosseum",
+      "name": "The Tower Colosseum",
+      "short_name": "Colosseum",
+      "district": "Tower Base",
+      "ring": 1,
+      "faction_affiliation": "Tower Authority",
+      "description": "Official FTA-sanctioned events. Adventurer rankings, tier challenges, official title bouts.",
+      "event_types": ["tier_challenge", "ranking_bout", "official_duel", "adventurer_showcase"],
+      "capacity": 4000,
+      "prestige": "official",
+      "schedule": "monthly official events, weekly showcases",
+      "flavor": {
+        "atmosphere": "FTA banners, recording crystals, bureaucratic precision",
+        "announcer": "Official FTA commentators, sterile but accurate",
+        "signature": "All results are recorded. LP gains are calculated publicly."
+      },
+      "sub_venues": []
+    }
+  ],
+  "event_type_descriptions": {
+    "combat": "Standard armed or unarmed fighting",
+    "ranked_bout": "Official ladder match affecting fighter rankings",
+    "title_bout": "Championship fight for venue or overall title",
+    "grudge_match": "Personal vendetta fight, higher stakes",
+    "exhibition": "Non-ranked showcase or demonstration",
+    "beast_fight": "Creatures vs creatures or creature vs humanoid",
+    "beast_show": "Exotic creature display and demonstration",
+    "beast_race": "Mounted or unmounted creature racing",
+    "construct_race": "Mechanical construct racing",
+    "courier_sprint": "Parkour-style speed competition",
+    "obstacle_course": "Gauntlet of physical challenges",
+    "chariot_derby": "Multi-rider vehicle racing",
+    "magical_duel": "Arcane combat with specific rules",
+    "arcane_tournament": "Multi-round magical competition",
+    "divine_duel": "Combat under divine contract terms",
+    "contract_trial": "Competition to fulfill a Serpent Choir contract",
+    "faith_test": "Kharma-staked test of devotion",
+    "kharma_bout": "Fight where winner gains loser's staked Kharma",
+    "defense_drill": "Warden defensive technique demonstration",
+    "siege_demonstration": "Wall defense simulation",
+    "recruit_tournament": "New Warden candidate competition",
+    "wall_games": "Athletic games celebrating the Outer Wall",
+    "naval_duel": "Water-based combat on the canals",
+    "swimming_race": "Canal swimming competition",
+    "barge_brawl": "Multi-fighter melee on the Floating Ring",
+    "construct_fight": "Robot vs robot battles",
+    "junk_gladiator": "Fighter using only improvised weapons",
+    "salvage_race": "Find and retrieve items from scrap",
+    "repair_challenge": "Speed construct repair competition",
+    "tier_challenge": "Official adventurer tier advancement fight",
+    "ranking_bout": "LP-affecting official match",
+    "adventurer_showcase": "Display of adventurer skills for public",
+    "death_match": "Fight to the death (illegal, Night Pits only)",
+    "cage_match": "Enclosed space, no escape until one falls",
+    "taming_exhibition": "Demonstrating creature control",
+    "creature_auction": "Bidding on exotic beasts",
+    "monster_hunt": "Audience-participation creature tracking"
+  },
+  "notable_personalities": {
+    "Magister Vorn": {
+      "role": "Arena of Ascendance announcer",
+      "description": "Booming voice, theatrical presence, knows every fighter's record"
+    },
+    "Korvax the Beastmaster": {
+      "role": "Beast Dome owner/operator",
+      "description": "Scarred, missing an eye (beast incident), treats creatures like children"
+    },
+    "Sable": {
+      "role": "Night Pits overseer",
+      "description": "Lotus boss, rarely speaks, her presence means the fight matters"
+    },
+    "Mara the Scrapper": {
+      "role": "Scrapworks Pit patron",
+      "description": "Saints-adjacent, runs the yard, loves a good construct fight"
+    }
+  }
+}

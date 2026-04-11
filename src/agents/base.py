@@ -130,6 +130,7 @@ class BaseAgent(ABC):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         strip_preamble: bool = True,
+        force: bool = False,
     ) -> AgentResponse:
         """
         Send a single prompt and get a response.
@@ -140,14 +141,15 @@ class BaseAgent(ABC):
             temperature: Override default temperature
             max_tokens: Override default max tokens
             strip_preamble: Whether to strip common AI preamble phrases
+            force: If True, bypass the busy check (for internal compilation use)
             
         Returns:
             AgentResponse with the model's response
         """
         from src.ollama_busy import is_available, get_busy_reason
         
-        # Check busy flag
-        if not is_available():
+        # Check busy flag (skip if force=True, e.g., when called from mission_compiler)
+        if not force and not is_available():
             reason = get_busy_reason()
             logger.info(f"🤖 Agent {self.__class__.__name__} skipping — Ollama busy ({reason})")
             return AgentResponse(
@@ -236,10 +238,18 @@ class BaseAgent(ABC):
         }
         
         url = f"{self.config.base_url}/chat/completions"
-        
+
+        from src.ollama_queue import _lock as _ollama_lock
+        from src.ollama_busy import is_available, get_busy_reason
+
         for attempt in range(self.config.max_retries + 1):
             try:
-                resp = await client.post(url, json=payload)
+                if not is_available():
+                    logger.info(f"🔀 Agent [{self.__class__.__name__}] skipping — busy: {get_busy_reason()}")
+                    return AgentResponse(content="", model=self.config.model_name, success=False,
+                                         error="Ollama busy")
+                async with _ollama_lock:
+                    resp = await client.post(url, json=payload)
                 resp.raise_for_status()
                 data = resp.json()
                 
@@ -309,7 +319,7 @@ class BaseAgent(ABC):
 
 async def quick_complete(
     prompt: str,
-    model: str = "qwen",
+    model: str = "qwen3-8b-slim:latest",
     timeout: float = 90.0,
 ) -> str:
     """
@@ -318,21 +328,23 @@ async def quick_complete(
     
     For repeated calls, prefer creating a QwenAgent or KimiAgent instance.
     """
-    from src.ollama_busy import is_available
-    
+    from src.ollama_busy import is_available, get_busy_reason
     if not is_available():
+        logger.info(f"🔀 quick_complete skipping — busy: {get_busy_reason()}")
         return ""
-    
+
     # Use OpenAI-compatible API
     url = "http://localhost:11434/v1/chat/completions"
-    
+
     try:
+        from src.ollama_queue import _lock as _ollama_lock
         async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(url, json={
-                "model": model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            })
+            async with _ollama_lock:
+                resp = await client.post(url, json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "stream": False,
+                })
             resp.raise_for_status()
             data = resp.json()
             

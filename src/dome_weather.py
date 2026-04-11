@@ -1,23 +1,24 @@
 """
 dome_weather.py — Undercity Dome Weather & Environmental System
+*** REFACTORED TO USE MySQL via db_api ***
 
 The city is sealed under a Dome. There is no real sky.
 Each district generates its own conditions based on its location,
 infrastructure, and proximity to the Dome wall or Rift activity.
 
 Updated daily, posted as a per-district bulletin.
-Persists to campaign_docs/dome_weather.json.
 """
 
 from __future__ import annotations
-import json, os, random, logging
+import json
+import random
+import logging
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, Optional, List, Tuple
 
-logger   = logging.getLogger(__name__)
-DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-WEATHER_FILE      = DOCS_DIR / "dome_weather.json"
+from src.db_api import get_weather_state, update_weather_state
+
+logger = logging.getLogger(__name__)
 TOWER_YEAR_OFFSET = 10
 
 
@@ -72,11 +73,9 @@ DISTRICTS = {
 
 # ---------------------------------------------------------------------------
 # Condition pool — (label, pressure_delta, base_description, emoji)
-# Each district overrides the description with a district-specific flavour line.
 # ---------------------------------------------------------------------------
 
 _CONDITIONS: List[Tuple] = [
-    # --- Original 12 ---
     ("Stagnant Grey",   0,  "The false sky is flat and colourless. The air sits heavy.", "🌫️"),
     ("Dim Clearance",   0,  "The Dome glows faintly — something approximating clear. Rare enough to notice.", "🌤️"),
     ("Pressure Fog",   -1,  "Dense fog has settled. Visibility is poor.", "🌁"),
@@ -89,42 +88,35 @@ _CONDITIONS: List[Tuple] = [
     ("False Dawn",     +1,  "The Dome's lighting cycle has glitched. A pale orange glow.", "🌅"),
     ("Echo Storms",    -1,  "Sound propagates strangely. Conversations carry further than intended.", "🔊"),
     ("Cold Sink",      -1,  "Cold air has escaped. The temperature has dropped sharply.", "❄️"),
-    # --- Moisture & precipitation ---
     ("Condensation Rain",    -1,  "Water condensing on the upper Dome surface is falling in sheets. Not acid — just cold.", "🌧️"),
     ("Fungal Bloom",          0,  "Warm damp air has triggered bioluminescent fungal spore release. Beautiful and mildly toxic.", "🍄"),
     ("Steam Veil",            0,  "Steam from the lower pipe network has risen through grates. Warm, wet, low visibility.", "♨️"),
     ("Black Ice",            -2,  "Condensation has frozen on metal surfaces. Walkways, ladders, and railings are treacherous.", "🧊"),
     ("Rust Rain",            -1,  "Oxidised particulate is falling with the condensation. Everything it touches stains brown.", "🟤"),
-    # --- Temperature extremes ---
     ("Furnace Draft",        +1,  "A hot updraft from the industrial levels. Dry and choking. Feels like opening an oven.", "🌡️"),
     ("Deep Freeze",          -2,  "Dome thermal regulators offline in this sector. Breath is visible. Pipes are at risk.", "🥶"),
     ("Heat Shimmer",          0,  "The air itself is distorting. Mirage effects on long corridors. Depth perception is unreliable.", "🔆"),
     ("Thermal Inversion",    -1,  "Cold air trapped under warm. Ground-level is freezing while upper platforms are sweltering.", "↕️"),
-    # --- Air quality ---
     ("Sulphur Haze",         -2,  "Yellow-tinged air with an unmistakable rotten-egg smell. Source unknown. FTA investigating.", "⚗️"),
     ("Dust Storm",           -2,  "Construction debris and dried sediment caught in a pressure differential. Abrasive and blinding.", "🌪️"),
     ("Pollen Drift",          0,  "The Divine Garden's seasonal release. Drifting golden particulate. Allergies citywide.", "🌼"),
     ("Clean Flush",          +2,  "The Dome's air recyclers ran a full purge cycle. The air is crisp and tastes of nothing. Unsettling.", "🫧"),
     ("Ozone Spike",          -1,  "Sharp metallic tang in the air. Arcane instruments misbehaving. Headaches reported.", "⚡"),
-    # --- Light & visual ---
     ("Dome Flicker",         -1,  "The overhead lighting is stuttering. Strobe effect in open spaces. Seizure warnings posted.", "💡"),
     ("Blood Light",          -1,  "The Dome's light panels are stuck on deep red. Everything looks like a darkroom. Eerie.", "🔴"),
     ("Phosphor Glow",         0,  "A faint green-white glow from the Dome panels. Shadows are wrong. Faces look ill.", "🟢"),
     ("UV Bleed",             -1,  "Unfiltered UV light leaking through worn Dome panels. Exposed skin burns within minutes.", "☀️"),
     ("Total Dark",           -2,  "Section lighting has failed completely. Emergency strips only. Blue-white and barely enough.", "🌑"),
-    # --- Pressure & sound ---
     ("Pressure Drop",        -2,  "Ears popping. Nosebleeds in the upper districts. Something vented that shouldn't have.", "📉"),
     ("Pressure Spike",       +1,  "Air feels heavy and thick. Doors are harder to open. Sealed containers are bulging.", "📈"),
     ("Dead Air",             -1,  "No air movement at all. Sound carries flat and close. The silence is suffocating.", "🤫"),
     ("Resonance Hum",        -1,  "A low-frequency hum reverberating through the infrastructure. Source: Dome structural flex.", "🎵"),
     ("Whistling Vents",       0,  "Pressure equalisation through narrow vents is producing an eerie whistle across the district.", "🎐"),
-    # --- Arcane & supernatural ---
     ("Mana Fog",             -2,  "Dense, shimmering haze saturated with ambient magic. Spells behave unpredictably.", "🔮"),
     ("Ghost Light",           0,  "Pale orbs of light drifting at head height. Not dangerous. Not explained.", "👻"),
     ("Gravity Flux",         -3,  "Localised gravity anomalies. Objects falling at wrong angles. Stay off ladders.", "🪐"),
     ("Time Slip",            -3,  "Clocks are disagreeing. Some residents report lost minutes. Glass Sigil is concerned.", "⏳"),
     ("Veil Thin",            -2,  "The boundary between planes feels permeable. Faint sounds from elsewhere. Shadows move wrong.", "👁️"),
-    # --- Infrastructure ---
     ("Pipe Burst",           -1,  "A major water main has ruptured. Streets are flooding at ground level. Wardens redirecting traffic.", "🚿"),
     ("Power Surge",          -1,  "Electrical grid fluctuations. Lights flaring. Appliances sparking. Stay away from junction boxes.", "🔌"),
     ("Sewer Backflow",       -2,  "Lower drainage systems are backing up. The smell is indescribable. Stay off ground level.", "🚽"),
@@ -133,7 +125,7 @@ _CONDITIONS: List[Tuple] = [
 
 _CONDITION_MAP = {c[0]: c for c in _CONDITIONS}
 
-# District-specific flavour overrides — what each condition *feels like* in that district
+# District-specific flavour overrides
 _DISTRICT_FLAVOUR: Dict[str, Dict[str, str]] = {
     "The Warrens": {
         "Pressure Fog":     "Fog sits knee-deep in the alleys. Night Pits are quieter than usual.",
@@ -223,17 +215,10 @@ _SPECIAL_EVENTS = [
     ("CLARITY EVENT",          +5, "The Dome is displaying a perfect open sky simulation. Crowds gathering in Grand Forum. First time in years.", "🌟"),
     ("RIFT PRECIPITATION",     -4, "Solid Rift residue falling like snow in the Warrens. Do not touch. Do not taste. Evacuate affected blocks.", "☣️"),
     ("THERMAL COLLAPSE",       -3, "The Dome's heat exchange network has partially failed. Temperature dropping fast in outer districts, rising in the centre.", "🌡️"),
-    # Static storm is district-localized — see _roll_static_storm()
-    # Entry kept as a sentinel so the 8% event roll can trigger it
     ("STATIC STORM",           -2, "LOCALIZED", "⚡"),
     ("FALSE NIGHT",            -1, "The Dome's lighting cycle has locked into night mode. FTA is working on it. Estimated resolution: unknown.", "🌑"),
     ("VENTILATION FAILURE",    -2, "Upper vent network is offline. Air is stale and warming across all districts. Warrens residents advised to stay low.", "💨"),
 ]
-
-
-# ---------------------------------------------------------------------------
-# Localized static storm
-# ---------------------------------------------------------------------------
 
 _STATIC_STORM_FLAVOUR = {
     "The Warrens":      "Arcane static is discharging through the Scrapworks metal. Sparks at every junction. Glass Sigil has lost three instruments.",
@@ -246,10 +231,7 @@ _STATIC_STORM_FLAVOUR = {
 
 
 def _roll_static_storm() -> Dict:
-    """
-    Pick 1-2 adjacent or random districts to hit with a static storm.
-    Returns a special_event dict with localized desc and affected districts.
-    """
+    """Pick 1-2 adjacent or random districts to hit with a static storm."""
     district_names = list(DISTRICTS.keys())
     count    = random.randint(1, 2)
     affected = random.sample(district_names, count)
@@ -266,42 +248,56 @@ def _roll_static_storm() -> Dict:
 
 
 # ---------------------------------------------------------------------------
-# State management
+# State management — Now uses MySQL via db_api
 # ---------------------------------------------------------------------------
 
 def _load_weather() -> Dict:
-    if not WEATHER_FILE.exists():
-        return {}
+    """Load weather state from database."""
     try:
-        return json.loads(WEATHER_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        state = get_weather_state()
+        if state and state.get("effects_json"):
+            # The full state is stored in effects_json
+            if isinstance(state["effects_json"], str):
+                return json.loads(state["effects_json"])
+            return state["effects_json"]
+        return {}
+    except Exception as e:
+        logger.error(f"Weather load error: {e}")
         return {}
 
 
 def _save_weather(state: Dict) -> None:
+    """Save weather state to database."""
     try:
-        WEATHER_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        # Store full state in effects_json, summary fields for quick access
+        current = "Unknown"
+        temp = "moderate"
+        
+        # Try to get a representative condition
+        districts = state.get("districts", {})
+        if districts:
+            first_district = list(districts.values())[0]
+            current = first_district.get("condition", "Unknown")
+        
+        update_weather_state({
+            "current_weather": current,
+            "temperature": temp,
+            "effects_json": state  # Full state stored here
+        })
     except Exception as e:
         logger.error(f"Weather save error: {e}")
 
 
 def _roll_condition_for_district(district: str) -> Tuple[str, str, str]:
-    """
-    Roll a weather condition for a district.
-    Biased conditions are twice as likely to appear.
-    Returns (label, description, emoji).
-    """
+    """Roll a weather condition for a district. Returns (label, description, emoji)."""
     bias = DISTRICTS[district].get("bias", [])
-    pool = list(_CONDITIONS)  # base pool
-    # Add biased conditions a second time so they appear ~2x as often
+    pool = list(_CONDITIONS)
     for c in pool[:]:
         if c[0] in bias:
             pool.append(c)
 
     chosen = random.choice(pool)
     label, _, base_desc, emoji = chosen
-
-    # Use district-specific flavour if available, otherwise base description
     flavour = _DISTRICT_FLAVOUR.get(district, {}).get(label, base_desc)
     return label, flavour, emoji
 
@@ -333,12 +329,10 @@ def tick_weather() -> tuple:
         ev = random.choice(_SPECIAL_EVENTS)
 
         if ev[0] == "STATIC STORM":
-            # Localized — only affects 1-2 districts
             storm = _roll_static_storm()
             state["special_event"] = storm
             state["pressure"] = max(0, min(100, state["pressure"] + storm["pressure_delta"]))
             special = (storm["label"], storm["pressure_delta"], storm["desc"], storm["emoji"])
-            # Apply Rift Static condition only to affected districts
             for name in DISTRICTS:
                 if name in storm["affected_districts"]:
                     state["districts"][name] = {
@@ -347,12 +341,10 @@ def tick_weather() -> tuple:
                         "emoji":       "⚡",
                         "storm":       True,
                     }
-                # Other districts keep their normal rolled condition (rolled below)
         else:
             state["special_event"] = {"label": ev[0], "pressure_delta": ev[1], "desc": ev[2], "emoji": ev[3]}
             state["pressure"] = max(0, min(100, state["pressure"] + ev[1]))
             special = ev
-            # City-wide events blanket all districts
             for name in DISTRICTS:
                 state["districts"][name] = {
                     "condition":   ev[0],
@@ -361,18 +353,15 @@ def tick_weather() -> tuple:
                 }
     else:
         state["special_event"] = None
-        # Roll each district independently
         for name in DISTRICTS:
             label, desc, emoji = _roll_condition_for_district(name)
             state["districts"][name] = {"condition": label, "description": desc, "emoji": emoji}
 
-        # Pressure drifts based on a random base condition
         sample_cond = random.choice(_CONDITIONS)
         state["pressure"] = max(0, min(100,
             state["pressure"] + sample_cond[1] + random.randint(-3, 3)
         ))
 
-    # Drift pressure back toward 50
     if state["pressure"] > 50:
         state["pressure"] -= random.randint(0, 3)
     elif state["pressure"] < 50:

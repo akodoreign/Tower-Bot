@@ -1,5 +1,6 @@
 """
 bounty_board.py — Undercity Wanted / Bounty System
+*** REFACTORED TO USE MySQL via db_api ***
 
 Rare wanted postings on the mission board.
 Only four entities can officially issue bounties:
@@ -12,20 +13,23 @@ Other factions route through one of these four.
 Max one bounty bulletin per 7 real days.
 Bounty posts live on the mission board channel alongside missions.
 Tied to news feed — a news bulletin fires when a bounty is posted.
-
-Persists to campaign_docs/bounty_board.json
 """
 
 from __future__ import annotations
-import json, os, random
+import json
+import random
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional
 
 from src.log import logger
+from src.db_api import (
+    db,
+    get_active_bounties,
+    add_bounty as db_add_bounty,
+    raw_query,
+    raw_execute,
+)
 
-DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-BOUNTY_FILE   = DOCS_DIR / "bounty_board.json"
 TOWER_YEAR_OFFSET = 10
 
 # Only these four can officially post bounties
@@ -84,30 +88,56 @@ _CAPTURE_CONDITIONS = [
 
 
 def _load_bounties() -> List[Dict]:
-    if not BOUNTY_FILE.exists():
-        return []
+    """Load all bounties from database."""
     try:
-        return json.loads(BOUNTY_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        bounties = raw_query("SELECT * FROM bounties ORDER BY created_at DESC")
+        return bounties or []
+    except Exception as e:
+        logger.error(f"Error loading bounties: {e}")
         return []
+
+
+def _save_bounty(bounty: Dict) -> int:
+    """Save a new bounty to database. Returns the new ID."""
+    try:
+        # Only use columns that exist in the schema
+        insert_data = {
+            "title": bounty.get("title", bounty.get("id", "Bounty")),
+            "target_type": bounty.get("target_type", "wanted"),
+            "target_name": bounty.get("target_name", "Unknown"),
+            "reward_ec": bounty.get("reward", 0),
+            "status": "active" if not bounty.get("resolved") else "expired",
+            "created_at": datetime.now(),
+        }
+        if bounty.get("claimed_by"):
+            insert_data["claimed_by"] = bounty["claimed_by"]
+        
+        return db.insert("bounties", insert_data)
+    except Exception as e:
+        logger.error(f"Bounty save error: {e}")
+        return 0
 
 
 def _save_bounties(bounties: List[Dict]) -> None:
-    try:
-        BOUNTY_FILE.write_text(json.dumps(bounties, indent=2), encoding="utf-8")
-    except Exception as e:
-        logger.error(f"Bounty save error: {e}")
+    """Compatibility wrapper: save list of bounties (only saves new ones without IDs)."""
+    for bounty in bounties:
+        # Only save if it doesn't have an ID (i.e., it's new)
+        if not bounty.get("id") and not bounty.get("_saved"):
+            new_id = _save_bounty(bounty)
+            if new_id:
+                bounty["id"] = new_id
+                bounty["_saved"] = True
 
 
 def _last_bounty_posted_at() -> Optional[datetime]:
-    bounties = _load_bounties()
-    posted = [b for b in bounties if b.get("posted_at")]
-    if not posted:
-        return None
+    """Get timestamp of most recent bounty posting."""
     try:
-        return max(datetime.fromisoformat(b["posted_at"]) for b in posted)
-    except (ValueError, KeyError) as e:
-        logger.warning(f"🎯 Could not determine last bounty post time — corrupt date: {e}")
+        result = raw_query("SELECT MAX(created_at) as last_post FROM bounties")
+        if result and result[0].get("last_post"):
+            return result[0]["last_post"]
+        return None
+    except Exception as e:
+        logger.warning(f"🎯 Could not determine last bounty post time: {e}")
         return None
 
 
@@ -174,23 +204,31 @@ RULES:
 - Be specific about location, appearance, offence.
 - Tone is official but terse — a board notice, not a story.
 - No preamble, no sign-off. Output the bounty post only.
-- If your response contains anything other than the bounty post, you have failed."""
+- If your response contains anything other than the bounty post, you have failed.
+
+/no_think"""
 
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        import re
+        data = await call_ollama(
+            payload={
                 "model":    ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream":   False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+            },
+            timeout=90.0,
+            caller="bounty_board",
+        )
 
         text = ""
         if isinstance(data, dict):
             msg = data.get("message", {})
             if isinstance(msg, dict):
                 text = msg.get("content", "").strip()
+
+        # Strip thinking tags if present
+        text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
 
         # Strip preamble
         lines = text.splitlines()
@@ -203,9 +241,18 @@ RULES:
             return None
 
         post_text = text + f"\n\n⏳ *Bounty active for {days} days. {expires_dt.strftime('%d %b %Y')}.*"
+        
+        # Extract target name from post if possible
+        target_name = "Unknown"
+        name_match = re.search(r'\*\*WANTED — ([^*]+)\*\*', text)
+        if name_match:
+            target_name = name_match.group(1).strip()
 
-        return {
+        bounty_data = {
             "id":            f"bounty_{int(datetime.now().timestamp())}",
+            "title":         f"WANTED — {target_name}",
+            "target_name":   target_name,
+            "target_type":   "wanted",
             "body":          post_text,
             "issuer":        issuer_meta,
             "proxy_faction": proxy_meta,
@@ -215,6 +262,12 @@ RULES:
             "resolved":      False,
             "message_id":    None,
         }
+        
+        # Save to database
+        bounty_id = _save_bounty(bounty_data)
+        bounty_data["db_id"] = bounty_id
+        
+        return bounty_data
 
     except Exception as e:
         logger.error(f"Bounty generation error: {e}")
@@ -242,29 +295,32 @@ def format_bounty_news_bulletin(bounty: Dict) -> str:
 
 async def check_bounty_expirations(channel) -> None:
     """Remove expired bounties from the board."""
-    bounties = _load_bounties()
-    now      = datetime.now()
-    updated  = False
-
-    for b in bounties:
-        if b.get("resolved"):
-            continue
-        try:
-            exp = datetime.fromisoformat(b["expires_at"])
-        except (ValueError, KeyError) as e:
-            logger.warning(f"🎯 Could not parse bounty expiry date {b.get('expires_at', 'MISSING')}: {e}")
-            continue
-        if now >= exp:
-            b["resolved"] = True
-            updated = True
-            # Try to delete the Discord message
-            if b.get("message_id") and channel:
-                try:
-                    msg = await channel.fetch_message(b["message_id"])
-                    await msg.delete()
-                except Exception as del_err:
-                    logger.debug(f"🎯 Could not delete expired bounty message: {del_err}")
-            logger.info(f"🎯 Bounty expired: {b['id']}")
-
-    if updated:
-        _save_bounties(bounties)
+    try:
+        # Get all active bounties that have expired
+        # Note: We need to add expires_at column to bounties table or track differently
+        # For now, just check status
+        bounties = raw_query(
+            "SELECT * FROM bounties WHERE status = 'active'"
+        )
+        
+        if not bounties:
+            return
+            
+        now = datetime.now()
+        
+        for b in bounties:
+            # Check if we have an expiry date in the title or created_at + 30 days
+            created = b.get("created_at")
+            if created:
+                # Default expiry: 30 days from creation
+                expiry = created + timedelta(days=30)
+                if now >= expiry:
+                    # Mark as expired
+                    raw_execute(
+                        "UPDATE bounties SET status = 'expired' WHERE id = %s",
+                        (b["id"],)
+                    )
+                    logger.info(f"🎯 Bounty expired: {b['title']}")
+                    
+    except Exception as e:
+        logger.error(f"Error checking bounty expirations: {e}")

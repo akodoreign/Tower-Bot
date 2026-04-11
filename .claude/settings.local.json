@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"client.tree.command\\\\|@app_commands\" /c/Users/akodoreign/Desktop/chatGPT-discord-bot/src/cogs/*.py)",
+      "Bash(grep -r 'name=\"' /c/Users/akodoreign/Desktop/chatGPT-discord-bot/src/cogs/*.py)",
+      "Bash(mysql -h localhost -u Claude -pWXdCPJmeDfaQALaktzF6! -e \"USE tower_bot; SELECT COUNT\\(*\\) as total, SUM\\(CASE WHEN data_json IS NULL THEN 1 ELSE 0 END\\) as null_count FROM npcs;\")",
+      "Bash(mysql -h 127.0.0.1 -u Claude -pWXdCPJmeDfaQALaktzF6! -e \"SHOW DATABASES;\")",
+      "Bash(python -c ':*)",
+      "Bash(python -m pip show mysql-connector-python)",
+      "Bash(.venv/Scripts/pip list:*)",
+      "Bash(.venv/Scripts/python -c \"import sys; print\\([p for p in sys.path]\\)\")",
+      "Bash(python -c \"import mysql.connector; print\\('found'\\); import sys; print\\(sys.executable\\)\")",
+      "Bash(\"C:/Program Files/Python311/python.exe\" -c \"import mysql.connector; print\\('ok'\\)\")",
+      "Bash('C:/Program Files/Python311/python.exe' -c ':*)",
+      "Bash(grep -n \"mission board may be missing\" /c/Users/akodoreign/Desktop/chatGPT-discord-bot/src/*.py)",
+      "Bash(\"C:/Program Files/Python311/python.exe\" -m py_compile src/news_feed.py)",
+      "Bash(\"C:/Program Files/Python311/python.exe\" -m py_compile src/mission_compiler.py)",
+      "Bash(\"C:/Program Files/Python311/python.exe\" -m py_compile src/agents/news_agents.py)",
+      "Bash(grep -l \"\\\\.read_text\\\\|json\\\\.load\" /c/Users/akodoreign/Desktop/chatGPT-discord-bot/src/*.py)",
+      "Bash(xargs -I {} bash -c 'echo \"=== {} ===\" && grep -n \"\\\\.json\" {}')"
+    ]
+  }
+}

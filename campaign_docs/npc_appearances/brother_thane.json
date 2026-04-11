@@ -1,0 +1,28 @@
+{
+  "name": "Brother Thane",
+  "species": "Human (post-Rift transformation — technically still human, but changed)",
+  "faction": "Brother Thane's Cult (The Returned)",
+  "rank": "Prophet — Founder and Leader of the Returned",
+  "role": "mercenary",
+  "home_district": "collapsed plaza",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A gaunt, skeletal human figure, their skin a faintly bioluminescent pallor that glows like dying embers in the dim Undercity light, eyes hollow and pale grey, pupils contracted to pinpricks that seem to pierce through fabric and bone. Their frame is wrapped in tattered, ash-stained grey wrappings, frayed at the edges and stitched with thread that glints like rusted silver, blending into the muted tones of the Cult’s austerity. A weathered crossbow hangs at their hip, its stock carved with faded sigils of forgotten worlds, while a warhammer with a cracked obsidian head rests across their shoulder, its surface etched with scorch marks and the residue of past contracts. Their hands tremble slightly, fingers stained with ink and ash, as if perpetually tracing unseen glyphs in the air.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

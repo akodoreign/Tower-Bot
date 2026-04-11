@@ -29,7 +29,7 @@
     "reward": 42669,
     "posted_at": "2026-03-22T02:35:21.381701",
     "expires_at": "2026-04-08T02:35:18.608699",
-    "resolved": false,
+    "resolved": true,
     "message_id": 1485180067868053576
   },
   {
@@ -42,5 +42,16 @@
     "expires_at": "2026-05-01T06:41:41.865024",
     "resolved": false,
     "message_id": 1487778788954603730
+  },
+  {
+    "id": "bounty_1775431329",
+    "body": "\ud83c\udfaf **WANTED \u2014 Veyra Mournshade**  \n*Issued by: Wardens of Ash*  \n\n**Last known location:** Gloomspire District, near the Black Lung Foundry  \n**Description:** Tall, slender figure with pale, ashen skin and ink-black hair streaked with silver. Wears a tattered lab coat stained with dark fluids; her left eye is a mechanical prosthetic with a glowing crimson lens. Obsessed with \"purifying\" corpses, often mutters about \"reclaiming essence.\"  \n**Alleged offence:** Trafficking Kharma-stripped corpses harvested from the Undercity\u2019s lower tiers, valued at 21 EC per unit.  \n\n**Reward:** 82,950 EC  \u00b7  *Alive only. Evidence must be preserved. Do not improvise.*  \n\nHer network spans cults and smugglers, making her a ghost in the labyrinth\u2014capture her, and you unravel a web of corruption.\n\n\u23f3 *Bounty active for 40 days. 15 May 2026.*",
+    "issuer": "Wardens of Ash",
+    "proxy_faction": null,
+    "reward": 82950,
+    "posted_at": "2026-04-05T18:22:09.945946",
+    "expires_at": "2026-05-15T18:22:00.724568",
+    "resolved": false,
+    "message_id": 1490491770004308001
   }
 ]

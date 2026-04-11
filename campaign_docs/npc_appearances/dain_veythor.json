@@ -1,0 +1,28 @@
+{
+  "name": "Dain Veythor",
+  "species": "Dragonborn",
+  "faction": "Tower Authority",
+  "rank": "Field Compliance Officer",
+  "role": "officer",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "WIS 13"
+    ],
+    "secondary": [
+      "CHA 12",
+      "DEX 11",
+      "INT 10"
+    ],
+    "hp_range": "55–72"
+  },
+  "equipment": {
+    "weapons": "longsword, heavy crossbow",
+    "armour": "plate armour, officer's insignia"
+  },
+  "sd_appearance": "a towering dragonborn figure, obsidian-black scales shimmering with faint silver serpentine patterns along their jagged, backward-curving horns, eyes glinting like fractured amber beneath a brow ridge of cracked obsidian, their tail coiled tightly around one leg like a serpent restraining its own fury, clad in scuffed, enchanted plate armor bearing the Tower Authority’s crimson sigil and a jagged, rusted longsword slung at their hip, their gloved hand gripping a heavy crossbow with a grip worn smooth by years of precision enforcement, the faint scent of ozone lingering from recent discharges.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "armour maintained to standard, rank markings clearly displayed"
+}

@@ -37,7 +37,7 @@ async def generate_mission_with_images(
     player_name: str = "Party",
     include_images: bool = True,
     image_style: str = "dark dungeon",
-    model_name: str = "mistral",
+    model_name: str = "qwen3-8b-slim:latest",
 ) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]:
     """
     Generate a complete mission with images integrated.
@@ -123,7 +123,7 @@ def generate_mission_with_images_sync(
     player_name: str = "Party",
     include_images: bool = True,
     image_style: str = "dark dungeon",
-    model_name: str = "mistral",
+    model_name: str = "qwen3-8b-slim:latest",
 ) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]:
     """
     Synchronous wrapper for generate_mission_with_images().

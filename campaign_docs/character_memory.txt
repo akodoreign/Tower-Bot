@@ -82,12 +82,12 @@ ORACLE NOTES: Powerful physical combatant with psionic abilities. Unusual for a 
 NAME: S'kree
 PLAYER: playawon8306
 SPECIES: Owlin (Pipeline — only known of his kind, created accidentally attempting to make flying soldiers)
-CLASS: Fighter 1 / Rogue 2 (multiclass)
+CLASS: Fighter 1 / Rogue 3
 ALIGNMENT: Chaotic Good
 GENDER: Male | AGE: 2 (looks like he's seen decades of war) | HEIGHT: 4'8" | WEIGHT: 75
 FAITH: Nordic | SKIN: Dark brown feathers | EYES: Dark brown | HAIR: Dark brown feathers
-HP: 27 | AC: 17 | Initiative: +5 | Speed: 30ft walking, 30ft flying | Darkvision: 120ft
-STATS: STR 12 | DEX 20 | INT 9 | WIS 9 | CHA 9 | CON 15
+HP: 26
+STATS: STR 12 | DEX 16 | CON 15 | INT 9 | WIS 9 | CHA 9
 RESISTANCES: Fire, Cold
 NOTABLE SKILLS: Acrobatics +5, Stealth +7 (Expertise), Sleight of Hand +7 (Expertise), Perception +3, Athletics +3
 WEAPONS: +1 Dagger +7 (1d4+6 piercing, Finesse, Light, Thrown, Nick), Combat Shotgun +7 (2d8+5, Push), Heavy Crossbow +9 (1d10+5, Push), Derringer +9 (1d4+5, Single Shot), Scimitar +7 (1d6+5, Finesse)
@@ -95,7 +95,7 @@ KEY FEATURES: Sneak Attack (1d6), Cunning Action, Expertise (Stealth, Sleight of
 LANGUAGES: Common, Common Sign Language, Dwarvish, Thieves' Cant
 ORGANIZATIONS: New recruit — "The Sky Commanders" guild
 NOTABLE GEAR: Combat Shotgun, +1 Dagger, Scimitar, Heavy Crossbow, Derringer, Tech Armor Light (attuned), Thieves' Tools x5, Owlin bandana x2, Everburning Lamp
-CURRENCY: 0 GP
+CURRENCY: 0GP
 PERSONALITY: Crude sense of humor. Full of military stories relevant to combat. Ideal: Live and Let Live. Bond: Those who fight beside me are worth dying for. Flaw: Would rather eat armor than admit being wrong. Backstory: Created accidentally while attempting to create flying soldiers. The only known Pipeline. His feathers are highly prized by collectors.
 ORACLE NOTES: The only Pipeline Owlin in existence — his feathers are sought by collectors (potential hook). Only 2 years old but carries decades of war. New recruit to The Sky Commanders. His existence as a unique species is significant. The Culinary Council might view a unique soul with special interest.
 
@@ -124,17 +124,34 @@ ORACLE NOTES: Cursed species with planar abilities — she can step into the Eth
 NAME: Frank
 PLAYER: akodoreign
 SPECIES: Human
-CLASS: Fighter 5
+CLASS: Fighter 6
 ALIGNMENT: Chaotic Good
-HP: 34
+HP: 40
 STATS: STR 15 | DEX 14 | CON 13 | INT 12 | WIS 10 | CHA 8
 NOTABLE SKILLS: Arcana +3, Athletics +5, History +3, Insight +2
 WEAPONS: Antimatter Rifle +4 (6d8+2 Necrotic, Sap — imposes Disadvantage on next attack), Combat Shotgun +4 (2d8+2 piercing, Push), Pistol +6 (1d10+2 piercing, Vex), Automatic Rifle +4 (2d8+2 piercing, Slow), Unarmed Strike +5 (4 Bludgeoning)
 KEY FEATURES: Action Surge (1/SR), Second Wind (3/LR, 1d10+4), Arcane Weapon (ranged weapons summon ammunition magically — ignores loading), Arcane Strikes (2 uses/SR or LR — apply magical effects: Enfeebling Strike 1d8 Necrotic + CON save or Disadvantage, or Protective Strike — target takes no damage but gains INT mod bonus to AC), Archer's Lore (Arcana proficiency, Prestidigitation cantrip), Weapon Mastery (Antimatter Rifle Sap, Auto Rifle Slow, Pistol Vex, Shotgun Push), Tactical Mind, Savage Attacker, Archery feat (+2 ranged), Blind Fighting feat (Blindsight 10ft), Alert feat (Initiative Proficiency, Initiative Swap with ally), Honor Score 20
 LANGUAGES: Common, Dwarvish, Halfling
 NOTABLE GEAR: Antimatter Rifle, Combat Shotgun, Pistol, Automatic Rifle, Scale Mail
-CURRENCY: 0 GP
+CURRENCY: 0GP
 PERSONALITY: Chaotic Good. Soldier background. Blank personality fields. Honor Score 20 — deeply code-driven despite Chaotic Good alignment.
 ORACLE NOTES: Heavy firearms specialist with arcane enhancements. Honor Score of 20 is notable — he operates by a personal code. Antimatter Rifle deals Necrotic damage which has implications in a world where gods harvest souls. The Oracle would notice a man who deals death in the same currency gods use.
+
+---CHARACTER---
+NAME: Geralt
+PLAYER: akodoreign
+SPECIES: Human
+CLASS: Monster Hunter 5
+ALIGNMENT: Unknown
+HP: 34
+STATS: STR 16 | DEX 15 | CON 15 | INT 10 | WIS 14 | CHA 9
+NOTABLE SKILLS: Unknown
+WEAPONS: Longsword, Spear, Light Crossbow, Dagger
+KEY FEATURES: Blood Hound, Flurry, Weapon Mastery, Beast Hunter
+LANGUAGES: Common
+NOTABLE GEAR: Scale Mail, Leatherworker's Tools, Hunting Trap, Light Crossbow with Bolts
+CURRENCY: 10 GP
+PERSONALITY: Beast Hunter background. A professional monster slayer.
+ORACLE NOTES: Monster Hunter class — trained to track and kill supernatural threats. Blood Hound feature suggests enhanced tracking abilities. The Oracle would recognize a professional killer of aberrations and monstrosities. Useful ally in a Rift-torn city.
 
 ---END---

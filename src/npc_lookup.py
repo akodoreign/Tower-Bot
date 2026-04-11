@@ -38,9 +38,28 @@ FUZZY_THRESHOLD = 0.6
 
 
 def _load_all_npcs() -> List[Dict]:
-    """Load NPCs from both roster and graveyard."""
+    """Load all NPCs from MySQL npcs table (falls back to JSON files)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, faction, role, status, location, data_json FROM npcs ORDER BY name") or []
+        if rows:
+            npcs = []
+            for row in rows:
+                dj = row.get("data_json") or {}
+                if isinstance(dj, str):
+                    try:
+                        dj = json.loads(dj)
+                    except Exception:
+                        dj = {}
+                npc = {**dj, "name": row["name"], "faction": row["faction"],
+                       "role": row["role"], "status": row["status"], "location": row["location"],
+                       "_source": "graveyard" if row["status"] == "dead" else "roster"}
+                npcs.append(npc)
+            return npcs
+    except Exception as e:
+        logger.warning(f"npc_lookup: DB load failed: {e}")
+
     npcs = []
-    
     if NPC_ROSTER_FILE.exists():
         try:
             roster = json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
@@ -49,7 +68,7 @@ def _load_all_npcs() -> List[Dict]:
             npcs.extend(roster)
         except Exception as e:
             logger.warning(f"npc_lookup: Could not load roster: {e}")
-    
+
     if NPC_GRAVEYARD_FILE.exists():
         try:
             graveyard = json.loads(NPC_GRAVEYARD_FILE.read_text(encoding="utf-8"))
@@ -59,16 +78,37 @@ def _load_all_npcs() -> List[Dict]:
             npcs.extend(graveyard)
         except Exception as e:
             logger.warning(f"npc_lookup: Could not load graveyard: {e}")
-    
+
     return npcs
 
 
 def _get_npc_appearance(name: str) -> Optional[Dict]:
-    """Load appearance data for an NPC from npc_appearances/{slug}.json."""
-    # Normalize name to slug
+    """Load appearance data for an NPC from MySQL npc_appearances (falls back to file)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT appearance_prompt, sd_prompt, appearance_json FROM npc_appearances WHERE npc_name = %s LIMIT 1",
+            (name,)
+        ) or []
+        if rows:
+            row = rows[0]
+            aj = row.get("appearance_json") or {}
+            if isinstance(aj, str):
+                try:
+                    aj = json.loads(aj)
+                except Exception:
+                    aj = {}
+            result = dict(aj)
+            if row.get("sd_prompt"):
+                result["sd_prompt"] = row["sd_prompt"]
+            if row.get("appearance_prompt"):
+                result["physical"] = row["appearance_prompt"]
+            return result if result else None
+    except Exception as e:
+        logger.warning(f"npc_lookup: appearance DB lookup failed for {name}: {e}")
+    # Fallback to file
     slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
     app_file = NPC_APP_DIR / f"{slug}.json"
-    
     if app_file.exists():
         try:
             return json.loads(app_file.read_text(encoding="utf-8"))

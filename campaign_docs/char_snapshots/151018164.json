@@ -1,10 +1,10 @@
 {
   "name": "Frank",
   "classes": {
-    "Fighter": 5
+    "Fighter": 6
   },
-  "total_level": 5,
-  "max_hp": 34,
+  "total_level": 6,
+  "max_hp": 40,
   "ac_override": null,
   "stats": {
     "STR": 15,
@@ -14,7 +14,7 @@
     "WIS": 10,
     "CHA": 8
   },
-  "xp": 6500,
+  "xp": 14000,
   "currencies": {
     "cp": 0,
     "sp": 0,
@@ -37,10 +37,11 @@
     "Dark Bargain",
     "Honor [DMG 9.264]",
     "Savage Attacker",
+    "Sharpshooter",
     "Soldier Ability Score Improvements",
     "Weapon Mastery"
   ],
   "spell_slots": {},
   "notes": {},
-  "fetched_at": "2026-03-20T08:17:53.865166"
+  "fetched_at": "2026-04-05T14:46:38.450485"
 }

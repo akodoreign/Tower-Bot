@@ -1,98 +1,139 @@
-# character_profiles.py
-from pathlib import Path
+"""
+character_profiles.py — Player Character Profile Storage
 
-CHAR_PROFILE_DIR = Path(__file__).resolve().parent / "character_memory"
-CHAR_PROFILE_DIR.mkdir(exist_ok=True)
+Stores character profile text and appearance data for Discord users.
+Data persists to MySQL player_characters table.
+"""
+
+import json
+import logging
+from typing import Optional
+
+from src.db_api import raw_query, raw_execute, db
+
+logger = logging.getLogger(__name__)
 
 
-def _profile_path(user_id: int) -> Path:
-    return CHAR_PROFILE_DIR / f"{user_id}.txt"
+# ---------------------------------------------------------------------------
+# Helper: get/save player character by Discord ID
+# ---------------------------------------------------------------------------
+
+def _get_player_by_discord_id(user_id: int) -> Optional[dict]:
+    """Get player character record by Discord user ID."""
+    try:
+        rows = raw_query(
+            "SELECT * FROM player_characters WHERE player_discord_id = %s LIMIT 1",
+            (str(user_id),)
+        )
+        if rows:
+            row = rows[0]
+            # Parse profile_json if present
+            if row.get("profile_json"):
+                if isinstance(row["profile_json"], str):
+                    row["profile_json"] = json.loads(row["profile_json"])
+            else:
+                row["profile_json"] = {}
+            return row
+        return None
+    except Exception as e:
+        logger.error(f"Error loading player by discord_id {user_id}: {e}")
+        return None
+
+
+def _save_player_record(user_id: int, data: dict) -> bool:
+    """Insert or update player character record by Discord ID."""
+    try:
+        discord_id = str(user_id)
+        existing = _get_player_by_discord_id(user_id)
+        
+        # Ensure profile_json is serialized
+        if "profile_json" in data and isinstance(data["profile_json"], dict):
+            data["profile_json"] = json.dumps(data["profile_json"])
+        
+        if existing:
+            # Update existing record
+            set_parts = []
+            params = []
+            for k, v in data.items():
+                set_parts.append(f"{k} = %s")
+                params.append(v)
+            params.append(discord_id)
+            raw_execute(
+                f"UPDATE player_characters SET {', '.join(set_parts)} WHERE player_discord_id = %s",
+                tuple(params)
+            )
+        else:
+            # Insert new record
+            data["player_discord_id"] = discord_id
+            if "name" not in data:
+                data["name"] = f"Player_{user_id}"  # Placeholder name
+            db.insert("player_characters", data)
+        return True
+    except Exception as e:
+        logger.error(f"Error saving player record for {user_id}: {e}")
+        return False
+
+
+# ---------------------------------------------------------------------------
+# Profile text (backstory, notes, etc.)
+# ---------------------------------------------------------------------------
 
 
 def load_character_profile(user_id: int) -> str | None:
     """
     Returns the saved profile text for this Discord user, or None if none exists.
     """
-    p = _profile_path(user_id)
-    if not p.exists():
+    record = _get_player_by_discord_id(user_id)
+    if not record:
         return None
-    try:
-        text = p.read_text(encoding="utf-8", errors="ignore").strip()
-        return text or None
-    except Exception:
-        return None
+    profile_data = record.get("profile_json", {})
+    text = profile_data.get("profile_text", "").strip()
+    return text or None
 
 
 def save_character_profile(user_id: int, profile_text: str) -> None:
     """
     Saves/replaces the profile text for this Discord user.
     """
-    p = _profile_path(user_id)
-    profile_text = profile_text.strip()
-    p.write_text(profile_text, encoding="utf-8")
+    record = _get_player_by_discord_id(user_id)
+    profile_data = record.get("profile_json", {}) if record else {}
+    profile_data["profile_text"] = profile_text.strip()
+    _save_player_record(user_id, {"profile_json": profile_data})
+
 
 def has_character_profile(user_id: int) -> bool:
     return load_character_profile(user_id) is not None
 
 
 # ---------------------------------------------------------------------------
-# Appearance storage (separate file so profile text stays clean)
+# Appearance storage (in profile_json)
 # ---------------------------------------------------------------------------
 
-APPEARANCE_DIR = Path(__file__).resolve().parent / "character_appearance"
-APPEARANCE_DIR.mkdir(exist_ok=True)
-
-
-def _appearance_path(user_id: int) -> Path:
-    return APPEARANCE_DIR / f"{user_id}.json"
-
-
-def _appearance_path_legacy(user_id: int) -> Path:
-    """Old plain-text path — checked for migration."""
-    return APPEARANCE_DIR / f"{user_id}.txt"
-
-
-def _load_appearance_data(user_id: int) -> dict:
+def _get_appearance_data(user_id: int) -> dict:
     """
-    Internal: returns the full appearance record as a dict.
-    Migrates legacy plain-text files to JSON on first read.
+    Internal: returns appearance data from profile_json.
     Returns {} if nothing exists.
     """
-    import json
-    json_path   = _appearance_path(user_id)
-    legacy_path = _appearance_path_legacy(user_id)
-
-    if json_path.exists():
-        try:
-            return json.loads(json_path.read_text(encoding="utf-8"))
-        except Exception:
-            return {}
-
-    # Migrate legacy plain-text file
-    if legacy_path.exists():
-        try:
-            text = legacy_path.read_text(encoding="utf-8", errors="ignore").strip()
-            if text:
-                data = {"character_name": "", "appearance": text}
-                json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-                legacy_path.unlink(missing_ok=True)
-                return data
-        except Exception:
-            pass
-
-    return {}
+    record = _get_player_by_discord_id(user_id)
+    if not record:
+        return {}
+    profile_data = record.get("profile_json", {})
+    return {
+        "character_name": record.get("name", "") or profile_data.get("character_name", ""),
+        "appearance": profile_data.get("appearance", "")
+    }
 
 
 def load_character_appearance(user_id: int) -> str | None:
     """Returns the appearance description text, or None if not set."""
-    data = _load_appearance_data(user_id)
+    data = _get_appearance_data(user_id)
     text = data.get("appearance", "").strip()
     return text or None
 
 
 def load_character_name(user_id: int) -> str | None:
     """Returns the character name tied to this Discord user, or None if not set."""
-    data = _load_appearance_data(user_id)
+    data = _get_appearance_data(user_id)
     name = data.get("character_name", "").strip()
     return name or None
 
@@ -101,42 +142,46 @@ def save_character_appearance(
     user_id: int, appearance_text: str, character_name: str = ""
 ) -> None:
     """Save appearance text and optional character name for a Discord user."""
-    import json
-    # Load existing data so we don't clobber a name that was already set
-    existing = _load_appearance_data(user_id)
-    data = {
-        "character_name": character_name.strip() or existing.get("character_name", ""),
-        "appearance":     appearance_text.strip(),
-    }
-    _appearance_path(user_id).write_text(
-        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    record = _get_player_by_discord_id(user_id)
+    profile_data = record.get("profile_json", {}) if record else {}
+    
+    # Update appearance in profile_json
+    profile_data["appearance"] = appearance_text.strip()
+    if character_name.strip():
+        profile_data["character_name"] = character_name.strip()
+    
+    # Build update data
+    update_data = {"profile_json": profile_data}
+    
+    # Also update the name column if provided
+    if character_name.strip():
+        update_data["name"] = character_name.strip()
+    
+    _save_player_record(user_id, update_data)
 
 
 def load_all_appearances() -> dict[int, str]:
     """Returns {user_id: appearance_text} for all characters with saved appearances."""
-    result = {}
-    for f in APPEARANCE_DIR.glob("*.json"):
-        try:
-            uid  = int(f.stem)
-            data = _load_appearance_data(uid)
-            text = data.get("appearance", "").strip()
-            if text:
-                result[uid] = text
-        except Exception:
-            pass
-    # Also catch any un-migrated legacy .txt files
-    for f in APPEARANCE_DIR.glob("*.txt"):
-        try:
-            uid = int(f.stem)
-            if uid not in result:
-                data = _load_appearance_data(uid)
-                text = data.get("appearance", "").strip()
+    try:
+        rows = raw_query("SELECT player_discord_id, profile_json FROM player_characters")
+        result = {}
+        for row in rows:
+            try:
+                uid = int(row.get("player_discord_id", 0))
+                if not uid:
+                    continue
+                profile_data = row.get("profile_json", {})
+                if isinstance(profile_data, str):
+                    profile_data = json.loads(profile_data)
+                text = profile_data.get("appearance", "").strip()
                 if text:
                     result[uid] = text
-        except Exception:
-            pass
-    return result
+            except Exception:
+                pass
+        return result
+    except Exception as e:
+        logger.error(f"Error loading all appearances: {e}")
+        return {}
 
 
 def get_character_roster() -> dict[int, dict]:
@@ -145,13 +190,26 @@ def get_character_roster() -> dict[int, dict]:
     for all users who have an appearance saved.
     Useful for the bot to know which Discord user plays which character.
     """
-    result = {}
-    for f in APPEARANCE_DIR.glob("*.json"):
-        try:
-            uid  = int(f.stem)
-            data = _load_appearance_data(uid)
-            if data.get("appearance"):
-                result[uid] = data
-        except Exception:
-            pass
-    return result
+    try:
+        rows = raw_query("SELECT player_discord_id, name, profile_json FROM player_characters")
+        result = {}
+        for row in rows:
+            try:
+                uid = int(row.get("player_discord_id", 0))
+                if not uid:
+                    continue
+                profile_data = row.get("profile_json", {})
+                if isinstance(profile_data, str):
+                    profile_data = json.loads(profile_data)
+                appearance = profile_data.get("appearance", "").strip()
+                if appearance:
+                    result[uid] = {
+                        "character_name": row.get("name", "") or profile_data.get("character_name", ""),
+                        "appearance": appearance
+                    }
+            except Exception:
+                pass
+        return result
+    except Exception as e:
+        logger.error(f"Error loading character roster: {e}")
+        return {}

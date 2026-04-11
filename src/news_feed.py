@@ -1,7 +1,7 @@
 """
 news_feed.py — Tower of Last Chance AI-generated hourly bulletin.
 
-Uses mistral locally via Ollama — best prose quality, fully local, no cloud tokens.
+Uses qwen3 locally via Ollama — OpenClaw/Pi compatible, fully local, no cloud tokens.
 
 Every bulletin is saved to campaign_docs/news_memory.txt so the world
 builds continuity over time — stories escalate, rumours contradict,
@@ -15,9 +15,12 @@ import re
 import json
 import random
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional, Dict
+
+logger = logging.getLogger(__name__)
 
 # Global lock — A1111 can only handle one generation at a time
 # Uses a wrapper so the lock auto-releases if A1111 hangs for more than 10 minutes
@@ -76,6 +79,11 @@ from src.dome_weather import tick_weather, format_weather_bulletin, should_post_
 from src.arena_season import tick_arena
 from src.faction_calendar import tick_calendar, format_event_announce, format_event_result
 from src.missing_persons import should_post_missing, generate_missing_bulletin, tick_missing_resolutions
+from src.bulletin_cleaner import clean_bulletin, validate_bulletin, strip_llm_reasoning, filter_ec_references, repair_incomplete_bulletin
+from src.db_api import (
+    raw_query, raw_execute, db, get_rift_state, update_rift_state,
+    get_story_context, format_story_context_for_prompt
+)
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 MISSION_BOARD_FILE = DOCS_DIR / "MISSION_BOARD_DM.txt"
@@ -84,7 +92,150 @@ RIFT_STATE_FILE    = DOCS_DIR / "rift_state.json"
 NEWS_TYPES_FILE    = DOCS_DIR / "generated_news_types.json"
 
 MAX_MEMORY_ENTRIES = 40   # total entries kept on disk
-MEMORY_CONTEXT_ENTRIES = 10  # mistral handles larger context — more history = better continuity
+MEMORY_CONTEXT_ENTRIES = 5  # qwen3-8b-slim has 8k context — keep it lean
+
+# ---------------------------------------------------------------------------
+# Anti-repetition tracking — prevents same NPCs/topics appearing repeatedly
+# ---------------------------------------------------------------------------
+
+RECENT_NPC_COOLDOWN = 6  # NPCs featured in last N bulletins are deprioritized
+RECENT_TYPE_COOLDOWN = 4  # Don't repeat same bulletin type category for N cycles
+
+
+def _extract_npcs_from_text(text: str, roster_names: List[str]) -> List[str]:
+    """Extract roster NPC names mentioned in a bulletin text."""
+    found = []
+    text_lower = text.lower()
+    for name in roster_names:
+        # Match whole word only (avoid partial matches)
+        if re.search(rf'\b{re.escape(name.lower())}\b', text_lower):
+            found.append(name)
+    return found
+
+
+def _get_recently_featured_npcs(memory_entries: List[str], roster_names: List[str]) -> List[str]:
+    """
+    Scan recent bulletin memory entries and extract which NPCs were featured.
+    Returns list of NPC names that appeared in the last RECENT_NPC_COOLDOWN entries.
+    """
+    recent = memory_entries[-RECENT_NPC_COOLDOWN:] if len(memory_entries) >= RECENT_NPC_COOLDOWN else memory_entries
+    featured = set()
+    for entry in recent:
+        names = _extract_npcs_from_text(entry, roster_names)
+        featured.update(names)
+    return list(featured)
+
+
+def _load_variety_state() -> Dict:
+    """Load variety tracking state from database."""
+    try:
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'news_variety'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data
+        return {"recent_types": [], "recent_npcs": [], "recent_districts": []}
+    except Exception:
+        return {"recent_types": [], "recent_npcs": [], "recent_districts": []}
+
+
+def _save_variety_state(state: Dict) -> None:
+    """Save variety tracking state to database."""
+    try:
+        json_str = json.dumps(state, ensure_ascii=False, default=str)
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'news_variety'"
+        )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'news_variety'",
+                (json_str,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "news_variety",
+                "state_value": json_str
+            })
+    except Exception as e:
+        logger.warning(f"📰 Could not save variety state: {e}")
+
+
+def _categorize_bulletin_type(type_str: str) -> str:
+    """
+    Categorize a bulletin type string into a broad category.
+    Used to avoid repeating the same category too often.
+    """
+    type_lower = type_str.lower()
+    
+    # District/location focused
+    if any(w in type_lower for w in ["warrens", "markets infinite", "grand forum", "sanctum", "guild spires", "outer wall"]):
+        return "district"
+    # NPC/person focused
+    if any(w in type_lower for w in ["npc", "roster", "party", "member", "profile", "altercation", "confrontation"]):
+        return "npc_focused"
+    # Human interest
+    if any(w in type_lower for w in ["human interest", "resident", "vendor", "heartwarming", "community notice", "letter"]):
+        return "human_interest"
+    # Crime/incident
+    if any(w in type_lower for w in ["crime", "incident", "wanted", "bounty", "missing"]):
+        return "crime"
+    # Politics/faction
+    if any(w in type_lower for w in ["political", "council", "faction", "guild", "authority", "fta"]):
+        return "politics"
+    # Economy/trade
+    if any(w in type_lower for w in ["trade", "market", "price", "commerce", "black market"]):
+        return "economy"
+    # Divine/religious
+    if any(w in type_lower for w in ["divine", "religious", "serpent choir", "god", "contract"]):
+        return "divine"
+    # Arena/combat
+    if any(w in type_lower for w in ["arena", "argent blades", "duel", "combat"]):
+        return "arena"
+    # Rumour/gossip
+    if any(w in type_lower for w in ["rumour", "gossip", "whisper", "overheard"]):
+        return "rumour"
+    # Weather/environment
+    if any(w in type_lower for w in ["weather", "environmental", "hazard"]):
+        return "environment"
+    # Oddity/curiosity
+    if any(w in type_lower for w in ["oddity", "curiosity", "weird", "strange"]):
+        return "oddity"
+    
+    return "general"
+
+
+def _pick_varied_bulletin_type(all_types: List[str]) -> tuple[str, str]:
+    """
+    Pick a bulletin type while avoiding recently used categories.
+    Returns (chosen_type, category).
+    """
+    state = _load_variety_state()
+    recent_categories = state.get("recent_types", [])[-RECENT_TYPE_COOLDOWN:]
+    
+    # Categorize all available types
+    categorized = [(t, _categorize_bulletin_type(t)) for t in all_types]
+    
+    # Filter out types whose category was recently used
+    available = [(t, c) for t, c in categorized if c not in recent_categories]
+    
+    # If all categories were recently used, reset and use full list
+    if not available:
+        available = categorized
+    
+    # Pick randomly from available
+    chosen_type, chosen_cat = random.choice(available)
+    
+    # Update state
+    recent_categories.append(chosen_cat)
+    if len(recent_categories) > RECENT_TYPE_COOLDOWN * 2:
+        recent_categories = recent_categories[-RECENT_TYPE_COOLDOWN:]
+    state["recent_types"] = recent_categories
+    _save_variety_state(state)
+    
+    return chosen_type, chosen_cat
 
 # ---------------------------------------------------------------------------
 # Rift state machine
@@ -147,17 +298,41 @@ RIFT_LOCATIONS = {
 
 
 def _load_rift_state() -> List[Dict]:
-    if not RIFT_STATE_FILE.exists():
-        return []
+    """Load rift state from database."""
     try:
-        return json.loads(RIFT_STATE_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        state = get_rift_state()
+        if not state:
+            return []
+        # Rifts are stored in effects_json field
+        effects = state.get("effects_json", {})
+        if isinstance(effects, str):
+            effects = json.loads(effects) if effects else {}
+        # effects_json contains {"rifts": [...]} or just the rifts list directly
+        if isinstance(effects, dict):
+            rifts = effects.get("rifts", [])
+        elif isinstance(effects, list):
+            rifts = effects
+        else:
+            rifts = []
+        return rifts if isinstance(rifts, list) else []
+    except Exception as e:
+        logger.error(f"🌀 Rift state load error: {e}")
         return []
 
 
 def _save_rift_state(rifts: List[Dict]) -> None:
+    """Save rift state to database."""
     try:
-        RIFT_STATE_FILE.write_text(json.dumps(rifts, indent=2), encoding="utf-8")
+        # Store rifts in effects_json column (JSON type)
+        # Also update other columns for basic rift status
+        active_rifts = [r for r in rifts if not r.get("resolved")]
+        update_data = {
+            "active": len(active_rifts) > 0,
+            "intensity": len(active_rifts),
+            "location": active_rifts[0].get("location") if active_rifts else None,
+            "effects_json": {"rifts": rifts},  # Store full rifts list in effects_json
+        }
+        update_rift_state(update_data)
     except Exception as e:
         logger.error(f"🌀 Could not save rift state: {e} — Rifts may be lost on bot restart")
 
@@ -465,17 +640,38 @@ _CADENCE_FILE = DOCS_DIR / "economy_cadence.json"
 
 
 def _load_cadence() -> Dict:
-    if not _CADENCE_FILE.exists():
-        return {}
+    """Load bulletin cadence tracking from database."""
     try:
-        return json.loads(_CADENCE_FILE.read_text(encoding="utf-8"))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'economy_cadence'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data
+        return {}
     except Exception:
         return {}
 
 
 def _save_cadence(data: Dict) -> None:
+    """Save bulletin cadence tracking to database."""
     try:
-        _CADENCE_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        json_str = json.dumps(data, ensure_ascii=False, default=str)
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'economy_cadence'"
+        )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'economy_cadence'",
+                (json_str,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "economy_cadence",
+                "state_value": json_str
+            })
     except Exception as e:
         logger.error(f"📰 Could not save bulletin cadence: {e} — timing data may be lost")
 
@@ -660,51 +856,132 @@ async def check_missing_tick() -> list:
 
 
 # ---------------------------------------------------------------------------
-# World lore — concise enough for 3b, rich enough for good output
+# World lore — assembled live from the DB so the world can evolve without
+# touching source code.  Falls back gracefully if any key is missing.
 # ---------------------------------------------------------------------------
 
-_WORLD_LORE = """\
-SETTING: The Undercity — a sealed city under a Dome, built around the Tower of Last Chance.
-Rifts are rare tears in reality that spawn monsters and warp physics. They are feared events, not routine occurrences.
-Adventurers are a recognised economic class: ranked, taxed, tracked, and occasionally harvested by gods.
+def _build_world_lore() -> str:
+    """Build the world-lore context block entirely from the DB.
 
-CURRENCY: Essence Coins (EC) = everyday money. Kharma = crystallised faith, traded and stolen.
-Legend Points (LP) = heroic fame. High LP attracts divine attention — and the Culinary Council's hunger.
+    Sources:
+      global_state → world_setting, world_currency, world_gods, world_key_npcs,
+                     world_active_tensions
+      faction_reputation → live faction list with descriptions, leaders, rep tier
+    Placeholders {LIVE_CITY_DISTRICTS} and {LIVE_ROSTER_NPCS} are left intact
+    so _build_prompt() can inject them as before.
+    """
+    from src.db_api import raw_query as _rq
+    lines: list[str] = []
 
-FACTIONS:
-- Iron Fang Consortium (Markets Infinite) — relic/smuggling cartel. Guildmaster Serrik Dhal. Profit is virtue.
-- Argent Blades (Guild Spires) — glory adventurer guild. Lady Cerys Valemont. Fame is currency. Arena duels, Rift showcases.
-- Wardens of Ash (Outer Wall) — city defenders. Captain Havel Korin. Creed: Hold the Line.
-- Serpent Choir (Sanctum Quarter) — divine contract brokers. High Apostle Yzura. Every miracle has a clause.
-- Obsidian Lotus (The Warrens) — black-market syndicate. The Widow. Memory erasure, bottled souls, god-tongue ink.
-- Glass Sigil — arcane archivists. Senior Archivist Pell. Tracks Rift residue anomalies.
-- Patchwork Saints (Warrens) — failed adventurers protecting Warrens residents. Minimal resources, pure principle.
-- Adventurers' Guild — quest hub, Rift assignments. Front desk: Mari Fen.
-- Guild of Ashen Scrolls (Grand Forum Library) — fate archivists sworn to Thesaurus. Leader: Archivist Eir Velan.
-- Tower Authority / FTA — external oversight. Director Myra Kess. Treats adventurers as data points.
-- Wizards Tower — arcane academy and research institution. Archmage Yaulderna Silverstreak. Knowledge preservation, responsible magic use, arcane licensing.
+    # --- Setting -----------------------------------------------------------
+    try:
+        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_setting'") or []
+        if rows:
+            d = rows[0]["state_value"]
+            if isinstance(d, str):
+                import json as _j; d = _j.loads(d)
+            lines.append(f"SETTING: {d.get('overview', '')}")
+            if d.get("rifts"):    lines.append(d["rifts"])
+            if d.get("adventurers"): lines.append(d["adventurers"])
+    except Exception:
+        lines.append("SETTING: The Undercity — a sealed city under a Dome, built around the Tower of Last Chance.")
 
-GODS:
-- Culinary Council — predator deities harvesting heroic souls. Members: Gourmand Prime the Bone King, Mother Mire, The Hollow Waiter.
-- Thesaurus — archives all legends. Wants the perfect heroic story.
-- Ashara the Phoenix Marshal — war/fire god. Wardens' secret patron. Opposes the Culinary Council.
-- Veha the Silent Bloom — god of forgetting. Obsidian Lotus patron.
+    lines.append("")
 
-KEY NPCs: Mara the Scrapper (Scrapworks boss), Brother Thane (cult leader, building something in the Warrens),
-Sable (Night Pits boss), Aric Veyne (SS-Rank adventurer, Silver Spire), Magister Liora (FTA Tower liaison),
-Kessan & Mira (Grand Forum info brokers, twins), Elune (apothecary owner), Kiva (Hermes shrine scout),
-Wex (courier, currently in trouble), Dova (Glass Sigil junior archivist), Lieutenant Varen (Wardens).
+    # --- Currency ----------------------------------------------------------
+    try:
+        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_currency'") or []
+        if rows:
+            d = rows[0]["state_value"]
+            if isinstance(d, str):
+                import json as _j; d = _j.loads(d)
+            parts = [f"{k} = {v}" for k, v in d.items()]
+            lines.append("CURRENCY: " + "  ".join(parts))
+    except Exception:
+        lines.append("CURRENCY: Essence Coins (EC) = everyday money. Kharma = crystallised faith.")
 
-{LIVE_CITY_DISTRICTS}
+    lines.append("")
 
-ACTIVE TENSIONS:
-- Brother Thane is recruiting aggressively near the Collapsed Plaza. The Saints and Wardens are both watching.
-- Serpent Choir internal corruption: financial officer Sevas went missing with a tithe ledger implicating Brother Enn.
-- Obsidian Lotus memory-erasure contracts are under FTA scrutiny.
-- An independent researcher named Elara Mound has been secretly harvesting a stable Rift seam outside the city.
+    # --- Factions (live from DB with rep tier) -----------------------------
+    try:
+        factions = _rq(
+            "SELECT faction_name, leader, location_name, description, motto, tier "
+            "FROM faction_reputation ORDER BY faction_name"
+        ) or []
+        if factions:
+            lines.append("FACTIONS:")
+            for f in factions:
+                name  = f["faction_name"]
+                loc   = f.get("location_name") or ""
+                lead  = f.get("leader") or ""
+                desc  = f.get("description") or ""
+                motto = f.get("motto") or ""
+                tier  = f.get("tier") or ""
+                parts = []
+                if loc:   name = f"{name} ({loc})"
+                if desc:  parts.append(desc.rstrip("."))
+                if lead:  parts.append(lead)
+                if motto: parts.append(motto)
+                if tier and tier not in ("Neutral", "Friendly"):
+                    parts.append(f"Rep: {tier}")
+                lines.append(f"- {name} — " + ". ".join(parts) if parts else f"- {name}")
+    except Exception as e:
+        logger.warning(f"news_feed: factions DB read failed: {e}")
 
-{LIVE_ROSTER_NPCS}\
-"""
+    lines.append("")
+
+    # --- Gods --------------------------------------------------------------
+    try:
+        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_gods'") or []
+        if rows:
+            import json as _j
+            gods = rows[0]["state_value"]
+            if isinstance(gods, str): gods = _j.loads(gods)
+            lines.append("GODS:")
+            for g in gods:
+                lines.append(f"- {g.get('name','?')} — {g.get('description','')}")
+    except Exception:
+        pass
+
+    lines.append("")
+
+    # --- City geography placeholder (filled later by _build_city_districts_block) ---
+    lines.append("{LIVE_CITY_DISTRICTS}")
+    lines.append("")
+
+    # --- Key named NPCs ----------------------------------------------------
+    try:
+        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_key_npcs'") or []
+        if rows:
+            import json as _j
+            npcs = rows[0]["state_value"]
+            if isinstance(npcs, str): npcs = _j.loads(npcs)
+            lines.append("KEY NPCs: " + ", ".join(npcs))
+    except Exception:
+        pass
+
+    lines.append("")
+
+    # --- Active tensions (from global_state — updated by lifecycle/events) ---
+    try:
+        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_active_tensions'") or []
+        if rows:
+            import json as _j
+            tensions = rows[0]["state_value"]
+            if isinstance(tensions, str): tensions = _j.loads(tensions)
+            if tensions:
+                lines.append("ACTIVE TENSIONS:")
+                for t in tensions:
+                    lines.append(f"- {t}")
+    except Exception:
+        pass
+
+    lines.append("")
+
+    # --- Live roster placeholder (filled later by _build_live_roster_block) ---
+    lines.append("{LIVE_ROSTER_NPCS}")
+
+    return "\n".join(lines)
 
 # ---------------------------------------------------------------------------
 # Mission board parser
@@ -751,13 +1028,21 @@ def _parse_mission_board() -> str:
 # ---------------------------------------------------------------------------
 
 def _read_memory() -> List[str]:
-    if not MEMORY_FILE.exists():
-        return []
+    """Read news memory entries from database."""
     try:
-        text = MEMORY_FILE.read_text(encoding="utf-8", errors="ignore")
-        entries = [e.strip() for e in text.split("\n---ENTRY---\n") if e.strip()]
-        return entries[-MAX_MEMORY_ENTRIES:]
-    except Exception:
+        from src.db_api import get_news_memory
+        entries = get_news_memory(limit=MAX_MEMORY_ENTRIES)
+        # Format entries as [timestamp]\nfacts
+        result = []
+        for entry in entries:
+            ts = entry.get("created_at", "")
+            if hasattr(ts, "isoformat"):
+                ts = ts.isoformat()
+            facts = entry.get("facts", "")
+            result.append(f"[{ts}]\n{facts}")
+        return result
+    except Exception as e:
+        logger.error(f"News memory read error: {e}")
         return []
 
 
@@ -781,6 +1066,79 @@ def _dual_timestamp() -> str:
 # Fact extractor — imported from src.memory_strip
 # ---------------------------------------------------------------------------
 from src.memory_strip import strip_to_facts as _strip_to_facts
+
+# ---------------------------------------------------------------------------
+# EC abuse sanitizer — post-processing to catch Qwen violations
+# ---------------------------------------------------------------------------
+
+_EC_ABUSE_PATTERNS = [
+    # "X EC per person/life/soul/head" pattern
+    re.compile(r'\d+\s*EC\s+per\s+(?:person|life|soul|head|body|victim)', re.IGNORECASE),
+    # "X EC in [abstract]" like "47 EC in shattered glass"
+    re.compile(r'\d+\s*EC\s+in\s+(?:shattered|broken|spilled|lost|scattered|wasted|burning|fading|dying)', re.IGNORECASE),
+    # "X EC from [body part/abstract source]"
+    re.compile(r'\d+\s*EC\s+from\s+(?:their|her|his|fingertips?|hands?|eyes?|tears?|blood)', re.IGNORECASE),
+    # "bleeding EC" / "EC bleeds"
+    re.compile(r'(?:bleeding|bleeds?)\s+(?:\d+\s*)?EC', re.IGNORECASE),
+    re.compile(r'EC\s+(?:bleeds?|bleeding)', re.IGNORECASE),
+    # "the weight of X EC" (metaphorical)
+    re.compile(r'(?:the\s+)?weight\s+of\s+\d+\s*EC', re.IGNORECASE),
+    # "X EC worth of [emotion/abstract]"
+    re.compile(r'\d+\s*EC\s+worth\s+of\s+(?:despair|hope|fear|chaos|desperation|suffering|pain|sorrow)', re.IGNORECASE),
+    # "holds the weight of X EC"
+    re.compile(r'holds?\s+the\s+weight\s+of\s+\d+\s*EC', re.IGNORECASE),
+    # EC counting people: "X EC per smuggled/trafficked"
+    re.compile(r'\d+\s*EC\s+per\s+(?:smuggled|trafficked|stolen|lost)', re.IGNORECASE),
+    # "X EC of [emotion]" like "47 EC of despair"
+    re.compile(r'\d+\s*EC\s+of\s+(?:despair|hope|fear|chaos|desperation|suffering|pain|sorrow|silence|darkness)', re.IGNORECASE),
+    
+    # QWEN-SPECIFIC FILTERS (Qwen tends to treat EC like standard RPG currency):
+    # "X EC reward/bounty for [info/evidence/shard]" — rewards should be Kharma or specific goods, NOT EC amounts
+    re.compile(r'\d+\s*EC\s+(?:reward|bounty|incentive|fee|price)\s+for\s+(?:info|information|evidence|shard|ledger|details|answers?)', re.IGNORECASE),
+    # "X EC increments" — treating EC as abstract counting units
+    re.compile(r'\d+\s*EC\s+increments?', re.IGNORECASE),
+    # "smuggled EC" or "smuggling EC" — EC as a commodity being moved
+    re.compile(r'smuggle[ds]?\s+EC|smuggled?\s+(?:the\s+)?EC', re.IGNORECASE),
+    # "drop point for smuggled EC" or "ledger with EC"
+    re.compile(r'(?:drop\s+point|ledger)\s+(?:for|implicating|involving|holding)\s+(?:smuggled\s+)?EC', re.IGNORECASE),
+    # "trading in EC" or "trading...EC" (sounds like currency exchange)
+    re.compile(r'trading\s+(?:in\s+)?EC|trading\s+.*?\s+EC', re.IGNORECASE),
+    # "recovery costs in EC" — abstract cost counting
+    re.compile(r'recovery\s+costs?\s+in\s+\d+\s*EC', re.IGNORECASE),
+    # Multiple EC amounts in close phrases (Qwen scattering prices) — catch standalone "X EC" that don't follow specific prices
+    # This one is tricky; better handled by context — catch if EC appears with vague transaction words
+    re.compile(r'\d+\s*EC\s+(?:to|for)\s+(?:the|a|their|his|her)\s+(?:shard|ledger|reward|bounty|mechanism)', re.IGNORECASE),
+]
+
+
+def _sanitize_ec_abuse(text: str) -> str:
+    """
+    Post-process bulletin text to remove EC abuse patterns that Qwen generates
+    despite prompt instructions. These patterns use EC as metaphor/symbol
+    rather than as actual currency.
+    
+    Returns cleaned text with offending phrases removed or rewritten.
+    """
+    original = text
+    
+    for pattern in _EC_ABUSE_PATTERNS:
+        # Remove the offending phrase entirely
+        text = pattern.sub('', text)
+    
+    # Clean up any double spaces or orphaned punctuation left behind
+    # IMPORTANT: only collapse within-line whitespace — do NOT touch newlines
+    text = re.sub(r'[^\S\n]+', ' ', text)
+    text = re.sub(r'[^\S\n]+([,.])', r'\1', text)
+    text = re.sub(r'([,.]){2,}', r'\1', text)
+    text = re.sub(r'^\s*[,.]\s*', '', text, flags=re.MULTILINE)
+    
+    # Log if we sanitized anything
+    if text != original:
+        import logging
+        logging.getLogger(__name__).info("📰 EC abuse pattern sanitized from bulletin")
+    
+    return text.strip()
+
 
 # ---------------------------------------------------------------------------
 # LEGACY — Fact extractor — strips emojis, decorative markdown, and narrative fluff
@@ -876,16 +1234,19 @@ def _strip_to_facts_legacy(text: str) -> str:
 
 
 def _write_memory(bulletin: str) -> None:
-    entries = _read_memory()
-    cleaned = _strip_to_facts(bulletin)
-    if not cleaned or cleaned == ".":
-        return  # nothing factual to store
-    entries.append(f"[{_dual_timestamp()}]\n{cleaned}")
-    entries = entries[-MAX_MEMORY_ENTRIES:]
+    """Write a news bulletin to database memory."""
     try:
-        MEMORY_FILE.write_text("\n---ENTRY---\n".join(entries), encoding="utf-8")
-    except Exception:
-        pass
+        from src.db_api import add_news_entry
+        cleaned = _strip_to_facts(bulletin)
+        if not cleaned or cleaned == ".":
+            return  # nothing factual to store
+        add_news_entry(
+            bulletin_text=bulletin,
+            facts=cleaned,
+            news_type="bulletin"
+        )
+    except Exception as e:
+        logger.error(f"News memory write error: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -897,16 +1258,16 @@ def _write_memory(bulletin: str) -> None:
 # ---------------------------------------------------------------------------
 
 _TNN_SIGN_OFFS = [
-    "-# *— Tower News Network (TNN)*",
-    "-# *— Filed by TNN, your Undercity source*",
-    "-# *— A TNN Undercity Report*",
-    "-# *— TNN Field Correspondent*",
-    "-# *— In association with the Grand Forum Public Record*",
-    "-# *— Certified accurate by the Guild of Ashen Scrolls*",
-    "-# *— A joint report: TNN & the Adventurers' Guild Dispatch*",
-    "-# *— Undercity Dispatch, powered by TNN*",
-    "-# *— Paid notice — Grand Forum Public Affairs Office*",
-    "-# *— TNN investigative desk*",
+    "-# *— Talis Vore, TNN Evening Report*",
+    "-# *— Talis Vore reporting. This is TNN.*",
+    "-# *— TNN Evening Report. We'll have more on this story as it develops.*",
+    "-# *— Talis Vore. Good evening, and stay informed.*",
+    "-# *— Reporting for TNN. I'm Talis Vore.*",
+    "-# *— This has been a TNN Evening Report. Talis Vore at the anchor desk.*",
+    "-# *— TNN. The only broadcast cleared by the Grand Forum Public Record.*",
+    "-# *— Filed by the TNN investigative desk. Talis Vore presenting.*",
+    "-# *— A TNN Evening Report. Stay with us.*",
+    "-# *— Talis Vore, TNN. Back after this.*",
 ]
 
 
@@ -968,32 +1329,53 @@ _BULLETIN_TYPES = [
 # ---------------------------------------------------------------------------
 
 def _load_generated_news_types() -> List[str]:
-    """Load AI-generated bulletin types from disk."""
-    if not NEWS_TYPES_FILE.exists():
-        return []
+    """Load AI-generated bulletin types from database."""
     try:
-        data = json.loads(NEWS_TYPES_FILE.read_text(encoding="utf-8"))
-        return data.get("types", [])
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'generated_news_types'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data.get("types", [])
+        return []
     except Exception:
         return []
 
 
 def _save_generated_news_types(types: List[str], generated_date: str) -> None:
+    """Save AI-generated bulletin types to database."""
     try:
-        NEWS_TYPES_FILE.write_text(
-            json.dumps({"generated_date": generated_date, "types": types}, indent=2),
-            encoding="utf-8"
+        data = json.dumps({"generated_date": generated_date, "types": types})
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'generated_news_types'"
         )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'generated_news_types'",
+                (data,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "generated_news_types",
+                "state_value": data
+            })
     except Exception:
         pass
 
 
 def _needs_new_news_types() -> bool:
-    """Returns True if news types file is missing or was generated on a previous UTC day."""
-    if not NEWS_TYPES_FILE.exists():
-        return True
+    """Returns True if news types are missing or were generated on a previous day."""
     try:
-        data = json.loads(NEWS_TYPES_FILE.read_text(encoding="utf-8"))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'generated_news_types'"
+        )
+        if not rows or not rows[0].get("state_value"):
+            return True
+        data = rows[0]["state_value"]
+        if isinstance(data, str):
+            data = json.loads(data)
         last = data.get("generated_date", "")
         return last != datetime.now().strftime("%Y-%m-%d")
     except Exception:
@@ -1009,12 +1391,12 @@ async def refresh_news_types_if_needed() -> None:
         return
 
     # Inject live roster and city geography into world lore for news type generation
-    world_lore = _WORLD_LORE.replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block())
+    world_lore = _build_world_lore().replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block())
     world_lore = world_lore.replace("{LIVE_CITY_DISTRICTS}", _build_city_districts_block())
     prompt = f"""{world_lore}
 
 ---
-You are expanding the Undercity Dispatch's bulletin variety.
+You are expanding the TNN Evening Report's story roster for today's broadcast.
 Generate exactly 10 new bulletin topic seeds for today's news cycle.
 
 These are SEEDS that tell an AI what kind of story to write — not full bulletins.
@@ -1026,29 +1408,49 @@ RULES:
 - Do NOT generate Rift bulletins — Rifts are RARE events handled by a separate state machine. The news should NOT constantly mention Rifts.
 - Do NOT generate TowerBay or TIA market bulletins (those have their own cadence)
 - CRITICAL — RIFT BAN: Do NOT mention Rifts, Rift residue, Rift seams, Rift activity, Rift exploration, tears in reality, dimensional anomalies, or anything Rift-related in ANY of the 10 entries. Rifts are rare catastrophes, NOT daily news fodder. If even ONE of your entries mentions Rifts, you have FAILED.
+- CRITICAL — EC RULES: EC (Essence Coins) is currency. Do NOT create seeds involving "X EC per person", "EC for lives", or EC used as a metaphor. EC appears only as prices for goods/services.
 - Focus on: faction politics, street crime, human interest, religious drama, guild disputes, economic news, weird occurrences that are NOT Rift-related, missing persons, merchant disputes, adventurer drama, divine contract news, Warrens survival stories, arena results, guild promotions/demotions
 - Vary the tone: some street-level, some political, some supernatural (but not Rift), some economic, some human interest
 - Make them feel current — what would be on people's lips in the Undercity TODAY
 - No numbering, no bullets, no preamble, no sign-off. Output exactly 10 plain-text lines, one per seed.
 - If your output contains anything other than 10 lines, you have failed."""
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+                "options": {"num_predict": 1024, "num_ctx": 4096},
+            },
+            timeout=120.0,
+            caller="news_types",
+        )
         text = ""
         if isinstance(data, dict):
             msg = data.get("message", {})
             if isinstance(msg, dict):
                 text = msg.get("content", "").strip()
-        new_types = [l.strip() for l in text.splitlines() if l.strip()][:10]
+
+        # Strip qwen3 <think>...</think> reasoning blocks before extracting lines
+        import re as _re_nt
+        text = _re_nt.sub(r"<think>.*?</think>", "", text, flags=_re_nt.DOTALL).strip()
+
+        # Clean up any lines that are XML/HTML tags or pure reasoning artifacts
+        raw_lines = [l.strip() for l in text.splitlines() if l.strip()]
+        clean_lines = []
+        for ln in raw_lines:
+            # Skip lines that are just tags or look like internal reasoning
+            if ln.startswith("<") and ln.endswith(">"):
+                continue
+            # Strip leading numbering and bullets (model sometimes prefixes 1. 2. -)
+            ln_clean = _re_nt.sub(r"^[\d]+[.)]\s*|^[-•*]\s*", "", ln).strip()
+            if ln_clean:
+                clean_lines.append(ln_clean)
+
+        new_types = clean_lines[:10]
         if not new_types:
             logger.warning("news_feed: daily news type generation returned empty")
             return
@@ -1063,8 +1465,25 @@ NPC_ROSTER_FILE = DOCS_DIR / "npc_roster.json"
 
 
 def _load_live_roster() -> List[Dict]:
-    """Load all alive/injured NPCs from npc_roster.json.
-    Dead NPCs are excluded (they live in npc_graveyard.json)."""
+    """Load all alive/injured NPCs from MySQL npcs table (falls back to file)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, faction, role, status, location, data_json FROM npcs WHERE status IN ('alive','injured') ORDER BY name") or []
+        if rows:
+            result = []
+            for row in rows:
+                dj = row.get("data_json") or {}
+                if isinstance(dj, str):
+                    try:
+                        dj = json.loads(dj)
+                    except Exception:
+                        dj = {}
+                npc = {**dj, "name": row["name"], "faction": row["faction"],
+                       "role": row["role"], "status": row["status"], "location": row["location"]}
+                result.append(npc)
+            return result
+    except Exception as e:
+        logger.warning(f"news_feed: _load_live_roster DB failed: {e}")
     if not NPC_ROSTER_FILE.exists():
         return []
     try:
@@ -1074,29 +1493,54 @@ def _load_live_roster() -> List[Dict]:
         return []
 
 
-def _build_live_roster_block(max_npcs: int = 12) -> str:
+def _build_live_roster_block(max_npcs: int = 6, recently_featured: List[str] = None) -> str:
     """Build a dynamic ROSTER NPCs block from the live roster for prompt injection.
     Samples a mix: prioritise NPCs with secrets, alliances, or recent history,
-    then fill remaining slots randomly. Returns formatted string."""
+    but DEPRIORITIZE NPCs that appeared in recent bulletins (recently_featured).
+    Returns formatted string."""
     alive = _load_live_roster()
     if not alive:
         return "ROSTER NPCs: No active roster NPCs available."
 
-    # Prioritise interesting NPCs (have secrets, revealed secrets, or recent events)
-    interesting = []
-    mundane = []
+    recently_featured = recently_featured or []
+    recently_featured_lower = [n.lower() for n in recently_featured]
+
+    # Categorize NPCs: interesting vs mundane, and fresh vs recently-featured
+    interesting_fresh = []
+    interesting_recent = []
+    mundane_fresh = []
+    mundane_recent = []
+    
     for n in alive:
+        name = n.get("name", "")
+        is_recent = name.lower() in recently_featured_lower
+        
         has_secret   = bool(n.get("secret"))
         has_revealed = bool(n.get("revealed_secrets"))
         has_history  = len(n.get("history", [])) > 2
-        if has_secret or has_revealed or has_history:
-            interesting.append(n)
+        is_interesting = has_secret or has_revealed or has_history
+        
+        if is_interesting:
+            if is_recent:
+                interesting_recent.append(n)
+            else:
+                interesting_fresh.append(n)
         else:
-            mundane.append(n)
+            if is_recent:
+                mundane_recent.append(n)
+            else:
+                mundane_fresh.append(n)
 
-    random.shuffle(interesting)
-    random.shuffle(mundane)
-    chosen = (interesting + mundane)[:max_npcs]
+    # Shuffle each category
+    random.shuffle(interesting_fresh)
+    random.shuffle(interesting_recent)
+    random.shuffle(mundane_fresh)
+    random.shuffle(mundane_recent)
+    
+    # Priority order: interesting_fresh > mundane_fresh > interesting_recent > mundane_recent
+    # This ensures fresh NPCs are selected first
+    prioritized = interesting_fresh + mundane_fresh + interesting_recent + mundane_recent
+    chosen = prioritized[:max_npcs]
 
     lines = ["ROSTER NPCs (LIVE from city records — use for conflict/drama pieces — do NOT kill them in bulletins):"]
     for n in chosen:
@@ -1136,13 +1580,19 @@ def _load_npc_status_blocks() -> tuple[str, str, list, list]:
     Pulls from npc_roster.json so the AI never writes about dead NPCs as if alive,
     and can reference currently injured NPCs by name in dynamic bulletin types.
     """
-    npc_file = DOCS_DIR / "npc_roster.json"
-    if not npc_file.exists():
-        return "", "", [], []
     try:
-        npcs = json.loads(npc_file.read_text(encoding="utf-8"))
-    except Exception:
-        return "", "", [], []
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, status FROM npcs ORDER BY name") or []
+        npcs = [{"name": r["name"], "status": r["status"]} for r in rows if r.get("name")]
+    except Exception as e:
+        logger.warning(f"news_feed: _load_npc_status_blocks DB failed: {e}")
+        npc_file = DOCS_DIR / "npc_roster.json"
+        if not npc_file.exists():
+            return "", "", [], []
+        try:
+            npcs = json.loads(npc_file.read_text(encoding="utf-8"))
+        except Exception:
+            return "", "", [], []
     dead    = [n["name"] for n in npcs if n.get("status") == "dead"    and n.get("name")]
     injured = [n["name"] for n in npcs if n.get("status") == "injured" and n.get("name")]
     deceased_block = (
@@ -1165,16 +1615,30 @@ def _load_party_bulletin_context() -> tuple:
     Only uses profiles where generated=True so the AI always has real names/members.
     """
     try:
-        from src.party_profiles import PARTY_PROFILE_DIR
         import json as _json
         profiles = []
-        for f in PARTY_PROFILE_DIR.glob("*.json"):
-            try:
-                data = _json.loads(f.read_text(encoding="utf-8"))
-                if data.get("generated") and data.get("name") and data.get("members"):
-                    profiles.append(data)
-            except Exception:
-                pass
+        try:
+            from src.db_api import raw_query as _rq
+            rows = _rq("SELECT profile_json FROM party_profiles WHERE profile_json IS NOT NULL") or []
+            for row in rows:
+                pj = row.get("profile_json") or {}
+                if isinstance(pj, str):
+                    try:
+                        pj = _json.loads(pj)
+                    except Exception:
+                        continue
+                if pj.get("generated") and pj.get("name") and pj.get("members"):
+                    profiles.append(pj)
+        except Exception as e:
+            logger.warning(f"news_feed: _load_party_bulletin_context DB failed: {e}")
+            from src.party_profiles import PARTY_PROFILE_DIR
+            for f in PARTY_PROFILE_DIR.glob("*.json"):
+                try:
+                    data = _json.loads(f.read_text(encoding="utf-8"))
+                    if data.get("generated") and data.get("name") and data.get("members"):
+                        profiles.append(data)
+                except Exception:
+                    pass
         if not profiles:
             return "", []
         chosen = random.sample(profiles, min(3, len(profiles)))
@@ -1208,16 +1672,30 @@ def _build_prompt(memory_entries: List[str]) -> str:
     # Combine hardcoded types with today's AI-generated types
     all_types = _BULLETIN_TYPES + _load_generated_news_types()
     mission_block = _parse_mission_board()
+    
+    # Get roster names and find recently featured NPCs
+    roster_names = _get_alive_roster_names()
+    recently_featured = _get_recently_featured_npcs(memory_entries, roster_names)
+    if recently_featured:
+        logger.info(f"📰 Recently featured NPCs (cooldown active): {', '.join(recently_featured[:5])}{'...' if len(recently_featured) > 5 else ''}")
+    
+    # Use variety-aware type picker instead of random.choice
+    bulletin_type, type_category = _pick_varied_bulletin_type(all_types)
+    logger.info(f"📰 Variety picker selected category '{type_category}' — type: {bulletin_type[:60]}...")
 
     try:
         live_rate = get_rate()
         economy_note = (
-            f"\nCURRENT ECONOMY: 1 Kharma = {live_rate:.2f} EC (Kharma is the premium currency — very valuable). "
-            f"CRITICAL RULE: Do NOT include any exchange rate listing in this bulletin. "
-            f"DO NOT write lines like '1 EC: X Kharma', '1 Kharma = X EC', 'New Essence Coin prices', or any rate table. "
-            f"Exchange rates are posted as a SEPARATE bulletin. Your bulletin must not contain them AT ALL. "
-            f"If you mention prices, use specific EC amounts for goods only (e.g. '50 EC for a potion'). "
-            f"NEVER write a rate table or rate block. If your output contains a rate table, you have failed."
+            f"\nCURRENT ECONOMY: 1 Kharma = {live_rate:.2f} EC (Kharma is a CHARACTER RESOURCE earned through deeds, NOT traded in bulletins). "
+            f"EC is minted when players want to trade. Your job is to report what happened in the city, not the mechanics of minting.\n"
+            f"CRITICAL RULES FOR THIS BULLETIN:\n"
+            f"1. DO NOT include exchange rate tables, price comparisons, or rate conversations. Exchange rates are SEPARATE bulletins posted by the Exchange system.\n"
+            f"2. DO NOT use EC as a reward, bounty, or abstract cost (e.g. 'recovery costs in EC increments' is FORBIDDEN).\n"
+            f"3. DO NOT mention EC except for SPECIFIC TANGIBLE PRICES (e.g. 'a sword costs 150 EC' is OK, 'reward for info in 47 EC' is FORBIDDEN).\n"
+            f"4. DO NOT treat EC as a commodity to be smuggled, traded, or moved between NPCs.\n"
+            f"5. DO NOT mention Kharma in this bulletin unless specifically describing a character earning it through a deed.\n"
+            f"6. If you mention ANY EC amount, it must be for a named good/service with a named NPC/vendor. No vague rewards or bounties.\n"
+            f"Maximum one EC price per bulletin. If your bulletin contains multiple EC amounts or reward language, you have violated these rules."
         )
     except Exception:
         economy_note = ""
@@ -1226,6 +1704,11 @@ def _build_prompt(memory_entries: List[str]) -> str:
     if memory_entries:
         recent = memory_entries[-MEMORY_CONTEXT_ENTRIES:]
         recent_block = "\nRECENT BULLETINS (you may follow up, escalate, or contradict these):\n" + "\n\n".join(recent)
+    
+    # Build anti-repetition guidance block
+    anti_repetition_block = ""
+    if recently_featured:
+        anti_repetition_block = f"\nANTI-REPETITION: These NPCs appeared in recent bulletins and should be deprioritized (use sparingly unless following up): {', '.join(recently_featured[:6])}."
 
     deceased_block, injured_block, injured_names, dead_names = _load_npc_status_blocks()
     npc_status_block = ""
@@ -1313,45 +1796,120 @@ def _build_prompt(memory_entries: List[str]) -> str:
     else:
         party_context_block = ""
 
-    bulletin_type = random.choice(all_types)
+    # NOTE: bulletin_type was already set via _pick_varied_bulletin_type() at the top of this function.
+    # DO NOT override it with random.choice(all_types) — that defeats the variety tracking!
 
-    # Inject live roster NPCs and city geography into world lore
-    world_lore = _WORLD_LORE.replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block())
+    # Inject live roster NPCs (with anti-repetition) and city geography into world lore
+    world_lore = _build_world_lore().replace("{LIVE_ROSTER_NPCS}", _build_live_roster_block(recently_featured=recently_featured))
     world_lore = world_lore.replace("{LIVE_CITY_DISTRICTS}", _build_city_districts_block())
+
+    # Pull archived headlines for story de-duplication
+    old_news_block = ""
+    try:
+        from src.expandable_bulletin import get_archived_headlines
+        archived = get_archived_headlines(limit=30)
+        if archived:
+            headlines = []
+            for item in archived:
+                hl = item.get("headline", "").strip()
+                pv = item.get("preview", "").strip()
+                if hl or pv:
+                    headlines.append(f"- {hl or pv[:80]}")
+            if headlines:
+                old_news_block = (
+                    "\nOLD NEWS (already published — do NOT repeat or directly rehash these stories, "
+                    "but you MAY follow up, escalate, or reference them as background):\n"
+                    + "\n".join(headlines[:25])
+                )
+    except Exception:
+        pass
 
     return f"""{world_lore}
 {economy_note}
-{npc_status_block}
+{npc_status_block}{anti_repetition_block}
+{old_news_block}
 {party_context_block}
 {mission_block}{recent_block}
 
 ---
-TASK: Write ONE Undercity Dispatch bulletin of type: {bulletin_type}
+TASK: Write ONE TNN Evening Report segment of type: {bulletin_type}
+
+You are TALIS VORE — anchor for the TNN Evening Report, the Undercity's nightly broadcast.
+Deliver in the voice of a professional 6PM television news anchor: authoritative, measured, precise.
+You have been on air for fifteen years. Your sentences land clean. You do not editorialize. You report.
 
 RULES — READ ALL OF THESE:
-- Output the bulletin and NOTHING ELSE. No preamble, no sign-off, no commentary.
-- Do NOT start with \"Sure!\", \"Here's a bulletin:\", \"I hope this helps\", \"As requested\", or any other opener. Start with the headline or first line of the bulletin itself.
-- Do NOT end with a sign-off. Do NOT write \"May the spirits of the Undercity guide...\" or any similar closing. Just stop after the last line of content.
-- Do NOT repeat the words \"You are the Undercity Dispatch\" in your output. Do NOT repeat any part of these instructions.
-- Do NOT include a timestamp line. The timestamp is added separately.
-- Do NOT use the phrase \"where the echoes of whispered X and the whispers of hidden Y mingle\" — it is overused. Write fresh opening sentences.
-- You are a city news feed — write in-character, gritty, specific prose. Not an AI assistant.
-- Use Discord markdown: **bold** for names/headers, *italics* for atmosphere, emoji for flavour.
-- MINIMUM 3 lines, MAXIMUM 6 lines. If your bulletin is shorter than 3 lines, you have failed.
+- Output the broadcast segment and NOTHING ELSE. No preamble, no meta-commentary, no sign-off.
+- Do NOT start with \"Sure!\", \"Here's a bulletin:\", \"I hope this helps\", or any opener. Start directly with the headline line.
+- Do NOT end with anchor sign-off language — the sign-off is appended automatically. Stop at the last content line.
+- Do NOT repeat the words \"You are Talis Vore\" in your output. Do NOT repeat any part of these instructions.
+- Do NOT include a timestamp line. Added separately.
+- Do NOT use the phrase \"where the echoes of whispered X and the whispers of hidden Y mingle\" — banned, overused.
+- Use Discord markdown: **bold** for headlines and names, *italics* for emphasis, emoji for visual anchoring.
+- MINIMUM 3 lines, MAXIMUM 6 lines. Each sentence on its own line. If your segment is shorter than 3 lines, you have failed.
 - Invent fresh named details — exact EC prices, precise locations, specific minor NPCs.
-- You MAY follow up on a recent bulletin (a story escalates, a rumour is contradicted, an NPC reacts).
+- You MAY follow up on a recent bulletin (a story escalates, a source is quoted, an NPC reacts).
 - Ground everything in this specific city. No generic fantasy filler.
-- For HUMAN INTEREST pieces: small and specific. A real person's real problem. Warm, wry, or quietly sad. Not epic.
-- For NPC CONFLICT pieces: use only the named roster NPCs listed. Do NOT kill them — injuries and ambiguous danger are fine.
-- For PARTY pieces: use only the named party members listed. Treat them as living characters with real stakes.
+- For HUMAN INTEREST pieces: small and specific. One real person's real problem. Warm or wry. Not epic.
+- For NPC CONFLICT pieces: use only the named roster NPCs listed. Do NOT kill them — injuries and ambiguous outcomes are fine.
+- For PARTY pieces: use only the named party members listed. Treat them as living characters with stakes.
 
-PROSE QUALITY — Your writing must:
-- BE SPECIFIC: Name exact locations, NPCs, numbers. "47 EC" not "some coins". "Cobbleway Market" not "a district".
-- BE GROUNDED: Physical details first, then emotional impact. Let readers feel, don't tell them to feel.
-- BE PUNCHY: Mix short sentences with longer ones. One image per sentence. Cut adjective avalanches.
-- AVOID PURPLE PROSE: No "ethereal glows", no "otherworldly pallors", no "ancient secrets mingling". Write like a reporter, not a novelist.
-- AVOID FLUFF PHRASES: Never use "It is worth noting", "Interestingly enough", "As the saying goes", "The city watches", "Whispers of X ripple through".
-- Something must HAPPEN. A headline alone is not a bulletin. A bulletin must have content — who, what, where, consequence.
+BROADCAST FORMAT:
+📺 **[BUREAU/DISTRICT] — [HEADLINE IN TITLE CASE]**
+[Lead sentence: the most important fact. Who. What. Where. No warm-up.]
+[Second sentence: detail, named source, or immediate consequence.]
+[Third sentence (optional): follow-up, reaction, or what happens next.]
+
+ANCHOR DELIVERY — Your prose must:
+- LEAD WITH THE FACT: First sentence is the news. No atmosphere before the story.
+- NAME YOUR SOURCES: "A Wardens spokesperson confirmed..." not "sources allege..."
+- CITE SPECIFICS: Real locations, named characters, real numbers. Vague language is cut before broadcast.
+- ONE STORY, ONE SEGMENT: One event. One consequence. End decisively.
+- EVERY LINE EARNS ITS PLACE: Cut anything that adds atmosphere without adding information.
+- ANCHOR DOES NOT EDITORIALIZE: Report facts. Let the facts carry the weight.
+- SOMETHING HAPPENED: A story requires an event. Report who did what, where, and what it means.
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL QWEN FILTERS — THESE ARE HARD RULES. VIOLATIONS WILL BE REJECTED.
+═══════════════════════════════════════════════════════════════════════════════
+
+EC (ESSENCE COINS) USAGE — MANDATORY:
+EC is ONLY used for actual TANGIBLE purchases of specific goods or services.
+EC is NEVER used as a metaphor, symbol, poetic device, reward, bounty, or emotional weight.
+EC is NEVER minted/traded as a commodity. Players mint EC when they want to trade; you don't describe that process.
+Kharma is earned through deeds and stored on characters — it is NOT a traded currency and never mentioned in bulletins.
+
+FORBIDDEN EC PATTERNS (your output will be REJECTED if it contains ANY of these):
+✗ "X EC per person/life/soul/head" — FORBIDDEN (e.g. "120 EC per person smuggled" is WRONG)
+✗ "X EC per [victim count/abstract]" — FORBIDDEN
+✗ "X EC in [abstract]" — FORBIDDEN (e.g. "47 EC in shattered glass" is WRONG)
+✗ "X EC worth of [emotion/chaos/despair]" — FORBIDDEN
+✗ "bleeding EC" / "EC from fingertips" — FORBIDDEN
+✗ "the weight of X EC" (when not literal) — FORBIDDEN
+✗ EC as counting victims, smuggled people, or lives — ABSOLUTELY FORBIDDEN
+✗ "X EC reward/bounty for [info/evidence]" — FORBIDDEN. Rewards are Kharma-based or specific goods, NOT abstract EC amounts.
+✗ "X EC increments" — FORBIDDEN. Don't count things in EC units.
+✗ "smuggled EC" / "trading EC" — FORBIDDEN. EC is not a commodity to be smuggled or traded between NPCs.
+✗ "recovery costs in X EC" — FORBIDDEN. Don't use EC for abstract cost counting.
+✗ "X EC for the shard/ledger/reward" — FORBIDDEN when the shard/ledger is not an actual good being purchased.
+
+ALLOWED EC PATTERNS (ONLY these are acceptable):
+✓ "a sword costs 150 EC" — selling a specific tangible good
+✓ "she paid 75 EC for information" — paying a specific informant for a specific thing
+✓ "the smithy wants 200 EC for repairs" — specific service with a named provider
+✓ "stole 300 EC from the warehouse" — actual theft of currency itself
+✓ "vials cost 30 EC each" — specific goods with a price
+
+MINIMUM: Only mention EC if describing an ACTUAL TRANSACTION with a specific good/service and a named NPC/vendor.
+MAXIMUM: One EC price mention per bulletin (two ONLY if the bulletin is specifically about commerce/prices).
+If you are not describing a real PURCHASE of a NAMED GOOD/SERVICE, DO NOT MENTION EC AT ALL.
+
+RIFT BAN:
+Do NOT mention Rifts, Rift residue, tears in reality, or dimensional anomalies UNLESS the bulletin type EXPLICITLY asks for Rift news. Rifts are RARE. Regular bulletins should NOT mention Rifts at all.
+
+FORMAT:
+Each sentence should be on its own line. Do NOT run sentences together without line breaks.
+═══════════════════════════════════════════════════════════════════════════════
 
 - If your response contains anything other than the bulletin itself, you have failed."""
 
@@ -1365,10 +1923,11 @@ PROSE QUALITY — Your writing must:
 # ---------------------------------------------------------------------------
 
 _FACTCHECK_NEWS_SYS = """\
-You are a fact-checker for the Undercity Dispatch news feed.
+You are the fact-checker for the TNN Evening Report.
 
-Your job is to CHECK a bulletin draft against the NPC ROSTER and CITY LOCATIONS provided,
+Your job is to CHECK a broadcast segment against the NPC ROSTER and CITY LOCATIONS provided,
 fix any FACTION ASSIGNMENT ERRORS or LOCATION ERRORS, and return the corrected text.
+CRITICAL: Your output must have the same number of lines as the input. Do NOT summarize or shorten.
 
 CRITICAL CHECKS:
 1. FACTION ASSIGNMENT: Every NPC mentioned MUST be assigned to their CORRECT faction
@@ -1391,10 +1950,11 @@ CRITICAL CHECKS:
    The Trench). Invented transport names should be replaced with valid ones.
 
 OUTPUT RULES:
-- Output the CORRECTED bulletin only. No preamble, no commentary.
-- If nothing needs fixing, output the bulletin unchanged.
+- Output the CORRECTED broadcast segment only. No preamble, no commentary.
+- If nothing needs fixing, output the segment UNCHANGED, line for line.
 - Do NOT add new content. Only fix faction/NPC/location errors.
-- Keep all formatting intact.
+- Keep all formatting intact. Keep ALL lines — do not collapse multi-line segments into one line.
+- Your output MUST have the same number of non-empty lines as the input.
 """
 
 
@@ -1403,37 +1963,47 @@ GAZETTEER_FILE = DOCS_DIR / "city_gazetteer.json"
 
 def _load_gazetteer_locations() -> tuple[list, list, list]:
     """
-    Load valid locations from city_gazetteer.json.
+    Load valid locations from gazetteer DB table (falls back to city_gazetteer.json).
     Returns (districts, establishments, transit) lists.
     """
-    if not GAZETTEER_FILE.exists():
-        return [], [], []
+    data = None
     try:
-        data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
-        
-        # Extract district names
-        districts = list(data.get("districts", {}).keys())
-        
-        # Extract establishment names from all districts
-        establishments = []
-        for district_data in data.get("districts", {}).values():
-            for est in district_data.get("notable_establishments", []):
-                if est.get("name"):
-                    establishments.append(est["name"])
-            for sub in district_data.get("sub_areas", []):
-                for loc in sub.get("locations", []):
-                    establishments.append(loc)
-        
-        # Extract transit hubs
-        transit = []
-        tubes = data.get("transportation", {}).get("train_tubes", {}).get("major_lines", [])
-        for line in tubes:
-            transit.append(line.get("name", ""))
-            transit.extend(line.get("stations", []))
-        
-        return districts, establishments, transit
-    except Exception:
-        return [], [], []
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT content_json FROM gazetteer LIMIT 1") or []
+        if rows and rows[0].get("content_json"):
+            cj = rows[0]["content_json"]
+            data = json.loads(cj) if isinstance(cj, str) else cj
+    except Exception as e:
+        logger.warning(f"news_feed: _load_gazetteer_locations DB failed: {e}")
+    if data is None:
+        if not GAZETTEER_FILE.exists():
+            return [], [], []
+        try:
+            data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return [], [], []
+
+    # Extract district names
+    districts = list(data.get("districts", {}).keys())
+
+    # Extract establishment names from all districts
+    establishments = []
+    for district_data in data.get("districts", {}).values():
+        for est in district_data.get("notable_establishments", []):
+            if est.get("name"):
+                establishments.append(est["name"])
+        for sub in district_data.get("sub_areas", []):
+            for loc in sub.get("locations", []):
+                establishments.append(loc)
+
+    # Extract transit hubs
+    transit = []
+    tubes = data.get("transportation", {}).get("train_tubes", {}).get("major_lines", [])
+    for line in tubes:
+        transit.append(line.get("name", ""))
+        transit.extend(line.get("stations", []))
+
+    return districts, establishments, transit
 
 
 def _build_city_districts_block() -> str:
@@ -1441,13 +2011,22 @@ def _build_city_districts_block() -> str:
     Build a concise city geography summary from the gazetteer for prompt injection.
     Replaces {LIVE_CITY_DISTRICTS} placeholder in _WORLD_LORE.
     """
-    if not GAZETTEER_FILE.exists():
-        return "CITY DISTRICTS: No gazetteer data available."
-    
+    data = None
     try:
-        data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return "CITY DISTRICTS: Could not load gazetteer."
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT content_json FROM gazetteer LIMIT 1") or []
+        if rows and rows[0].get("content_json"):
+            cj = rows[0]["content_json"]
+            data = json.loads(cj) if isinstance(cj, str) else cj
+    except Exception as e:
+        logger.warning(f"news_feed: _build_city_districts_block DB failed: {e}")
+    if data is None:
+        if not GAZETTEER_FILE.exists():
+            return "CITY DISTRICTS: No gazetteer data available."
+        try:
+            data = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return "CITY DISTRICTS: Could not load gazetteer."
     
     lines = ["CITY GEOGRAPHY (concentric rings around the Tower):"]
     
@@ -1505,44 +2084,42 @@ async def _fact_check_bulletin(draft: str) -> str:
     if not draft or len(draft.split()) < 10:
         return draft
 
-    # Build NPC roster reference for fact-checking
-    npc_roster_path = DOCS_DIR / "npc_roster.json"
-    graveyard_path = DOCS_DIR / "npc_graveyard.json"
-    
+    # Build NPC roster reference from MySQL (authoritative source)
     roster_lines = []
     dead_lines = []
-    
-    try:
-        if npc_roster_path.exists():
-            roster = json.loads(npc_roster_path.read_text(encoding="utf-8"))
-            for npc in roster:
-                name = npc.get("name", "")
-                faction = npc.get("faction", "Independent")
-                role = npc.get("role", "")
-                rank = npc.get("rank", "")
-                status = npc.get("status", "alive")
-                if name:
-                    line = f"- {name}: {faction}"
-                    if rank:
-                        line += f", {rank}"
-                    if role:
-                        line += f" ({role})"
-                    if status == "injured":
-                        line += " [INJURED]"
-                    roster_lines.append(line)
-    except Exception as e:
-        logger.warning(f"✏️ Fact-check: Could not load NPC roster: {e}")
 
     try:
-        if graveyard_path.exists():
-            graveyard = json.loads(graveyard_path.read_text(encoding="utf-8"))
-            for npc in graveyard:
-                name = npc.get("name", "")
-                faction = npc.get("faction", "")
-                if name:
-                    dead_lines.append(f"- {name} ({faction}) — DECEASED")
-    except Exception:
-        pass
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, faction, role, status, data_json FROM npcs ORDER BY name")
+        for row in rows:
+            name    = row.get("name", "")
+            faction = row.get("faction", "Independent") or "Independent"
+            status  = row.get("status", "alive") or "alive"
+            if not name:
+                continue
+            # Pull rank/role from data_json if available
+            dj = row.get("data_json") or {}
+            if isinstance(dj, str):
+                try:
+                    import json as _j; dj = _j.loads(dj)
+                except Exception:
+                    dj = {}
+            rank = dj.get("rank", "") or row.get("role", "")
+            role = dj.get("role", "") or row.get("role", "")
+
+            if status == "dead":
+                dead_lines.append(f"- {name} ({faction}) — DECEASED")
+            else:
+                line = f"- {name}: {faction}"
+                if rank:
+                    line += f", {rank}"
+                if role and role != rank:
+                    line += f" ({role})"
+                if status == "injured":
+                    line += " [INJURED]"
+                roster_lines.append(line)
+    except Exception as e:
+        logger.warning(f"✏️ Fact-check: Could not load NPC roster from MySQL: {e}")
 
     # Load valid locations from gazetteer
     districts, establishments, transit = _load_gazetteer_locations()
@@ -1587,21 +2164,23 @@ VALID LOCATIONS (use these or similar):
 
 Output the corrected bulletin only. No preamble."""
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [
                     {"role": "system", "content": _FACTCHECK_NEWS_SYS},
                     {"role": "user", "content": prompt},
                 ],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+                "options": {"num_predict": 1024, "num_ctx": 4096, "think": False},
+            },
+            timeout=120.0,
+            caller="edit_bulletin",
+        )
 
         result = ""
         if isinstance(data, dict):
@@ -1617,15 +2196,22 @@ Output the corrected bulletin only. No preamble."""
             lines.pop(0)
         result = "\n".join(lines).strip()
 
-        if result and len(result.split()) >= len(draft.split()) * 0.7:
+        orig_lines = len([l for l in draft.splitlines() if l.strip()])
+        result_lines = len([l for l in result.splitlines() if l.strip()])
+        words_ok = result and len(result.split()) >= len(draft.split()) * 0.7
+        lines_ok = result_lines >= max(2, orig_lines - 1)
+
+        if words_ok and lines_ok:
             logger.info("✅ Fact-check: bulletin validated/corrected")
             return result
         else:
-            logger.warning("✏️ Fact-check: result too short, using original")
+            logger.warning(
+                f"✏️ Fact-check: result truncated ({result_lines} lines from {orig_lines}), using original"
+            )
             return draft
 
     except Exception as e:
-        logger.warning(f"✏️ Fact-check failed: {e} — using original bulletin")
+        logger.warning(f"✏️ Fact-check failed: {type(e).__name__}: {e} — using original bulletin")
         return draft
 
 
@@ -1633,61 +2219,50 @@ async def _edit_bulletin(draft: str, memory_entries: List[str]) -> str:
     """
     Run a second Ollama pass acting as a copy-editor.
     Returns the corrected bulletin text only.
-    If the edit call fails, returns the original draft unchanged.
+    If the edit call fails or returns garbage, returns the original draft unchanged.
+
+    REFACTORED: Now uses bulletin_cleaner module for aggressive output cleaning.
     """
     import httpx
     import logging
     logger = logging.getLogger(__name__)
 
+    # Save true original before fact-check may shorten or corrupt it.
+    # If the editor pass also fails, we fall back to this — not the post-fact-check result.
+    original_draft = draft
+
     # First, run fact-check for faction accuracy
     draft = await _fact_check_bulletin(draft)
 
     context_entries = memory_entries[-6:] if memory_entries else []
-    context_block   = ""
+    context_block = ""
     if context_entries:
         context_block = "RECENT BULLETIN HISTORY (for continuity checking):\n" + "\n\n".join(context_entries)
 
-    editor_prompt = f"""You are the copy-editor for the Undercity Dispatch, a dark fantasy city news feed.
-
-Your job is to review and correct a bulletin draft before it is published.
-
-CHECK FOR:
-1. Grammar and spelling errors — fix them silently.
-2. Voice / tone — the Dispatch is gritty, specific, in-world. Remove any AI assistant phrasing
-   (e.g. "It is worth noting", "In conclusion", "I hope this helps", sign-offs, preambles).
-3. Continuity errors — check against the RECENT BULLETIN HISTORY below.
-   If the draft contradicts a recent established fact (e.g. an NPC is dead, a location is sealed,
-   an event already resolved), rewrite that sentence to avoid the contradiction.
-   If a named NPC from history is mentioned differently (wrong faction, wrong role), correct it.
-4. Formatting — the bulletin should use Discord markdown: **bold** for names/headers,
-   *italics* for atmosphere, emoji on the headline. Do not add or remove emojis unnecessarily.
-5. Length — the bulletin should be 3-6 lines. If it is shorter or longer, lightly trim or expand
-   to fit, but do not change the core story.
+    # Simplified editor prompt — less likely to trigger explanatory output
+    editor_prompt = f"""Fix any errors in this Undercity Dispatch bulletin. Output ONLY the corrected text.
 
 {context_block}
 
-DRAFT TO REVIEW:
+BULLETIN:
 {draft}
 
-INSTRUCTIONS:
-- Output ONLY the corrected bulletin. No preamble, no explanation, no sign-off, no commentary.
-- If the draft is already correct, output it unchanged.
-- Do NOT change the story or invent new facts. Only fix errors and voice issues.
-- Do NOT add a timestamp line.
-- If your output contains anything other than the corrected bulletin, you have failed."""
+OUTPUT THE CORRECTED BULLETIN ONLY. NO EXPLANATIONS. NO COMMENTARY. NO BULLET POINTS ABOUT CHANGES."""
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": editor_prompt}],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+                "options": {"num_predict": 1024, "num_ctx": 4096, "think": False},
+            },
+            timeout=120.0,
+            caller="editor",
+        )
 
         edited = ""
         if isinstance(data, dict):
@@ -1695,21 +2270,27 @@ INSTRUCTIONS:
             if isinstance(msg, dict):
                 edited = msg.get("content", "").strip()
 
-        lines = edited.splitlines()
-        skip  = ("sure", "here's", "here is", "certainly", "of course",
-                 "below is", "as requested", "i hope", "absolutely")
-        while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip):
-            lines.pop(0)
-        while lines and lines[-1].lower().strip().startswith(("note:", "changes", "edits", "i ")):
-            lines.pop()
-        edited = "\n".join(lines).strip()
+        # Strip any LLM reasoning / preamble
+        edited = clean_bulletin(edited)
+        
+        # Validate the edited content; attempt repair before falling back
+        is_valid, reason = validate_bulletin(edited)
+        if not is_valid:
+            if reason in ("incomplete sentence", "truncated"):
+                repaired = repair_incomplete_bulletin(edited)
+                re_valid, _ = validate_bulletin(repaired)
+                if re_valid:
+                    logger.info(f"✂️ Editor output repaired ({reason} → trimmed)")
+                    return repaired
+            logger.warning(f"✏️ Editor output invalid ({reason}) — using original draft")
+            return original_draft
 
         if edited:
             logger.info("✏️ Editor agent: bulletin reviewed and corrected")
             return edited
 
     except Exception as e:
-        logger.warning(f"✏️ Editor agent failed: {e} — using original draft")
+        logger.warning(f"✏️ Editor agent failed: {type(e).__name__}: {e} — using original draft")
 
     return draft  # fallback: original unchanged
 
@@ -1751,24 +2332,24 @@ async def generate_bulletin() -> Optional[str]:
     Generate a fresh bulletin via local Ollama.
     Saves result to news_memory.txt. Returns the bulletin string or None.
     """
+    import re as _re
     memory = _read_memory()
     prompt = _build_prompt(memory)
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
     try:
-        import httpx, re as _re
-        payload = {
-            "model": ollama_model,
-            "messages": [{"role": "user", "content": prompt}],
-            "stream": False,
-        }
-
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            resp = await client.post(ollama_url, json=payload)
-            resp.raise_for_status()
-            data = resp.json()
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
+                "model": ollama_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "options": {"num_predict": 1024, "num_ctx": 4096, "think": False},
+            },
+            timeout=300.0,
+            caller="generate_bulletin",
+        )
 
         bulletin = ""
         if isinstance(data, dict):
@@ -1782,6 +2363,26 @@ async def generate_bulletin() -> Optional[str]:
             while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip_phrases):
                 lines.pop(0)
 
+
+            # Single-line normalisation
+            # Small models (Qwen3 etc.) often output headline + body as ONE
+            # continuous line with no newlines.  Inject them so validate_bulletin
+            # sees >=2 lines and does not discard the whole bulletin.
+            if len(lines) == 1 and len(lines[0]) > 60:
+                single = lines[0]
+                import re as _re2
+                # Case A: proper bold header  **Headline** Body text
+                expanded = _re2.sub(r"(\*\*[^*]{3,}\*\*)\s+", lambda m: m.group(1) + chr(10), single, count=1)
+                if chr(10) not in expanded:
+                    # Case B: dangling bold opener **text Body (no closing **)
+                    expanded = _re2.sub(
+                        r"(\*\*.{20,80}?)\s+((?:The |A |An |In |On |At |By |Two|Three|Four|Several|No |After|Before|While|During|This|That|His|Her|Their|One |[A-Z][a-z]))",
+                        lambda m: m.group(1) + chr(10) + m.group(2), single, count=1
+                    )
+                if chr(10) not in expanded:
+                    # Case C: no bold at all — split at sentence boundaries
+                    expanded = _re2.sub(r"(?<=[.!?])\s+(?=[A-Z*])", chr(10), single, count=3)
+                lines = expanded.splitlines()
             _rate_patterns = [
                 r'^\**new essence coin prices',
                 r'^\d+\s*(kharma|ec)\s*[=:]',
@@ -1812,7 +2413,7 @@ async def generate_bulletin() -> Optional[str]:
 
         if bulletin:
             echo_cut = _re.search(
-                r'\n\s*---\s*\n+(?:you are the undercity dispatch|task:|write one undercity)',
+                r'\n\s*---\s*\n+(?:you are the undercity dispatch|you are talis vore|task:|write one undercity|write one tnn)',
                 bulletin, _re.IGNORECASE
             )
             if echo_cut:
@@ -1838,11 +2439,37 @@ async def generate_bulletin() -> Optional[str]:
             if dead_names:
                 bulletin = _apply_death_honorifics(bulletin, dead_names)
 
+        # Sanitize EC abuse patterns (Qwen tends to ignore prompt rules)
+        if bulletin:
+            bulletin = _sanitize_ec_abuse(bulletin)
+            # Also apply the new aggressive filter
+            bulletin = filter_ec_references(bulletin)
+
         if bulletin:
             bulletin = _apply_tnn_signoff(bulletin)
 
         if bulletin:
             bulletin = await _edit_bulletin(bulletin, memory)
+
+            # Validate after editing; attempt repair before discarding
+            is_valid, reason = validate_bulletin(bulletin)
+            if not is_valid:
+                if reason in ("incomplete sentence", "truncated"):
+                    repaired = repair_incomplete_bulletin(bulletin)
+                    re_valid, re_reason = validate_bulletin(repaired)
+                    if re_valid:
+                        logger.info(f"✂️ Bulletin repaired ({reason} → trimmed to last complete sentence)")
+                        bulletin = repaired
+                    else:
+                        logger.warning(
+                            f"📰 Bulletin failed validation ({reason}) — repair also failed ({re_reason}), discarding: {bulletin[:100]}..."
+                        )
+                        return None
+                else:
+                    logger.warning(
+                        f"📰 Bulletin failed validation ({reason}) — discarding: {bulletin[:100]}..."
+                    )
+                    return None
 
         if bulletin:
             _cta_pats = [
@@ -2369,7 +2996,14 @@ def _prose_to_tags(prose: str) -> str:
 
 
 def _load_sd_prompts() -> dict:
-    """Load the flat NPC name → SD prompt lookup."""
+    """Load NPC name → SD prompt lookup from MySQL npc_appearances (falls back to file)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT npc_name, sd_prompt FROM npc_appearances WHERE sd_prompt IS NOT NULL AND sd_prompt != ''") or []
+        if rows:
+            return {r["npc_name"]: r["sd_prompt"] for r in rows if r.get("npc_name")}
+    except Exception as e:
+        logger.warning(f"news_feed: _load_sd_prompts DB failed: {e}")
     if not _SD_PROMPTS_FILE.exists():
         return {}
     try:
@@ -2442,7 +3076,7 @@ async def _prompt_agent(
             loc_tags = tags
             break
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
     agent_system = (
@@ -2471,17 +3105,20 @@ async def _prompt_agent(
 
     mistral_tags = ""
     try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [
                     {"role": "system", "content": agent_system},
                     {"role": "user",   "content": agent_user},
                 ],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+                "options": {"num_predict": 256, "num_ctx": 4096, "think": False},
+            },
+            timeout=45.0,
+            caller="image_tags",
+        )
         raw = ""
         if isinstance(data, dict):
             msg = data.get("message", {})
@@ -2496,12 +3133,12 @@ async def _prompt_agent(
 
         if raw.count(",") >= 5 and not any(p in raw.lower() for p in _PROSE_INDICATORS):
             mistral_tags = raw
-            logger.info(f"🤖 Prompt agent: Mistral returned {raw.count(',') + 1} tags")
+            logger.info(f"🤖 Prompt agent: {ollama_model} returned {raw.count(',') + 1} tags")
         else:
-            logger.warning(f"🤖 Prompt agent: Mistral returned prose or too few tags — using self-lookup fallback")
+            logger.warning(f"🤖 Prompt agent: {ollama_model} returned prose or too few tags — using self-lookup fallback")
 
     except Exception as e:
-        logger.warning(f"🤖 Prompt agent: Mistral unavailable ({e}) — using self-lookup fallback")
+        logger.warning(f"🤖 Prompt agent: {ollama_model} unavailable ({e}) — using self-lookup fallback")
 
     if not mistral_tags:
         parts: list[str] = []
@@ -2675,10 +3312,21 @@ def _extract_scene_action(text: str) -> str:
 async def _build_image_prompt(memory_entries: List[str]) -> tuple:
     """
     Build an SDXL image prompt directly.
+    Now uses comprehensive story context from database for richer scene building.
     Returns (sd_prompt_str, npc_names_list, chosen_bulletin_str).
     """
     image_style = os.getenv("IMAGE_STYLE", "photorealistic").lower().strip()
     is_anime    = image_style == "anime"
+
+    # Get comprehensive story context from database
+    story_context = get_story_context(limit_news=5, limit_npcs=10, limit_missions=5)
+    context_str = format_story_context_for_prompt(story_context, max_chars=1500)
+    
+    # Log what context sources are available
+    logger.info(f"🖼️ Story context: {len(story_context.get('recent_news', []))} news, "
+                f"{len(story_context.get('active_npcs', []))} npcs, "
+                f"{len(story_context.get('active_missions', []))} missions, "
+                f"{story_context.get('rift_state', {}).get('active_count', 0)} rifts")
 
     if not memory_entries:
         sd_prompt = (
@@ -2730,9 +3378,25 @@ async def _build_image_prompt(memory_entries: List[str]) -> tuple:
         chosen        = random.choice(eval_pool) if eval_pool else random.choice(real_entries)
         found_npcs    = find_npc_in_text(chosen)
         found_parties = _find_parties_in_text(chosen)
-        # If still no NPCs found, try to extract context-based characters
+        # If still no NPCs found, try to extract from database context or use contextual extraction
         if not found_npcs and not found_parties:
-            logger.info(f"🖼️ No named NPCs found in chosen bulletin — using contextual extraction")
+            logger.info(f"🖼️ No named NPCs found in chosen bulletin — checking database context")
+            # Try to get NPCs from database context for richer scenes
+            db_npcs = story_context.get("active_npcs", [])
+            if db_npcs:
+                # Pick 1-2 random NPCs from DB to potentially feature
+                sample_npcs = random.sample(db_npcs, min(2, len(db_npcs)))
+                for npc in sample_npcs:
+                    npc_name = npc.get("name", "")
+                    if npc_name:
+                        try:
+                            from src.npc_appearance import get_npc_appearance
+                            appearance = get_npc_appearance(npc_name)
+                            if appearance:
+                                found_npcs.append((npc_name, appearance.get("sd_prompt", ""), ""))
+                                logger.info(f"🖼️ Added DB NPC to scene: {npc_name}")
+                        except Exception:
+                            found_npcs.append((npc_name, "", ""))
 
     district_aesthetic = _get_district_aesthetic(chosen)
     if district_aesthetic is _AESTHETIC_FALLBACK:
@@ -2853,7 +3517,7 @@ async def generate_story_image() -> tuple:
         A1111_MODEL = os.getenv("A1111_MODEL", "sd_epicrealismXL_pureFix")
 
     memory = _read_memory()
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
     image_prompt, npc_names, chosen_bulletin = await _build_image_prompt(memory)
     logger.info(f"🖼️ SD prompt built: {image_prompt[:120]}")
@@ -2911,14 +3575,16 @@ async def generate_story_image() -> tuple:
             f"Output ONLY the sentence. No preamble. No quotation marks."
         )
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(ollama_url, json={
+            from src.ollama_queue import call_ollama, OllamaBusyError
+            cdata = await call_ollama(
+                payload={
                     "model": ollama_model,
                     "messages": [{"role": "user", "content": caption_prompt}],
                     "stream": False,
-                })
-                resp.raise_for_status()
-                cdata = resp.json()
+                },
+                timeout=30.0,
+                caller="image_caption",
+            )
             raw = ""
             if isinstance(cdata, dict):
                 cmsg = cdata.get("message", {})
@@ -2946,14 +3612,17 @@ async def generate_story_image() -> tuple:
     except Exception as e:
         logger.warning(f"🖼️ Could not switch A1111 model: {e}")
 
+    # Optimized for SDXL: DPM++ 2M SDE Karras converges better than Euler a,
+    # 28 steps is the sweet spot (research shows 21-30 optimal for SDXL),
+    # 1024x576 is closer to SDXL's native 1024x1024 training resolution
     payload = {
         "prompt": image_prompt,
         "negative_prompt": negative_prompt,
-        "steps": 40,
+        "steps": 28,
         "cfg_scale": 5.0,
-        "width": 896,
-        "height": 512,
-        "sampler_name": "Euler a",
+        "width": 1024,
+        "height": 576,
+        "sampler_name": "DPM++ 2M SDE Karras",
         "batch_size": 1,
         "n_iter": 1,
         "seed": random.randint(1, 999999),
@@ -3047,19 +3716,21 @@ async def generate_bulletin_draft() -> tuple:
     memory = _read_memory()
     prompt = _build_prompt(memory)
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
     try:
-        import httpx, re as _re
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(ollama_url, json={
+        import re as _re
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+                "options": {"num_predict": 1024, "num_ctx": 4096, "think": False},
+            },
+            timeout=180.0,
+            caller="bulletin_draft",
+        )
 
         bulletin = ""
         if isinstance(data, dict):
@@ -3103,7 +3774,7 @@ async def generate_bulletin_draft() -> tuple:
 
         if bulletin:
             echo_cut = _re.search(
-                r'\n\s*---\s*\n+(?:you are the undercity dispatch|task:|write one undercity)',
+                r'\n\s*---\s*\n+(?:you are the undercity dispatch|you are talis vore|task:|write one undercity|write one tnn)',
                 bulletin, _re.IGNORECASE
             )
             if echo_cut:
@@ -3132,6 +3803,16 @@ async def generate_bulletin_draft() -> tuple:
 
         if bulletin:
             bulletin = await _edit_bulletin(bulletin, memory)
+
+        # Validate the final bulletin before returning
+        if bulletin:
+            is_valid, reason = validate_bulletin(bulletin)
+            if not is_valid:
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"\U0001f4f0 Draft bulletin failed validation ({reason}) \u2014 discarding"
+                )
+                return None, None
 
         if bulletin:
             # Use double-newline for better Discord embed rendering

@@ -218,38 +218,57 @@ def _looks_like_rulesy(text: str) -> bool:
 
 def _load_docs(include_rules: bool) -> List[Tuple[str, str]]:
     """
-    Load all .txt campaign docs from DOCS_DIR.
+    Load campaign docs from MySQL training_docs table.
+    Falls back to DOCS_DIR .txt files if DB unavailable.
 
-    If include_rules is False, we *skip* any file that looks like the
-    Dungeons & Dragons Player's Handbook, so the model cannot use it.
-
-    If include_rules is True, that file becomes available for retrieval
-    alongside the rest of the campaign docs.
+    If include_rules is False, PHB/DnD rules files are excluded.
     """
     texts: List[Tuple[str, str]] = []
+
+    # Primary: MySQL
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT filename, doc_type, content FROM training_docs ORDER BY filename") or []
+        if rows:
+            for row in rows:
+                name = row.get("filename", "")
+                dtype = row.get("doc_type", "")
+                content = row.get("content") or ""
+                if not content:
+                    continue
+                name_lower = name.lower()
+                is_phb = (
+                    dtype == "phb"
+                    or "player's handbook" in name_lower
+                    or "players handbook" in name_lower
+                    or "phb" in name_lower
+                    or "dungeons & dragons 2024" in name_lower
+                )
+                if is_phb and not include_rules:
+                    continue
+                texts.append((name, content))
+            return texts
+    except Exception:
+        pass
+
+    # Fallback: files
     if not DOCS_DIR.exists():
         return texts
 
     for path in DOCS_DIR.glob("**/*.txt"):
         name_lower = path.name.lower()
-
-        # Heuristics to recognize the PHB file.
         is_phb = (
             "player's handbook" in name_lower
             or "players handbook" in name_lower
             or "phb" in name_lower
             or "dungeons & dragons 2024" in name_lower
         )
-
         if is_phb and not include_rules:
-            # Skip the PHB unless we are explicitly in "rules question" mode.
             continue
-
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
             texts.append((path.name, text))
         except Exception:
-            # Best-effort reading; silently skip unreadable files.
             continue
 
     return texts

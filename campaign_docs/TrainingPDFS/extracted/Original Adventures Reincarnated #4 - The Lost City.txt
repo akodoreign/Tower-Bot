@@ -1,0 +1,1117 @@
+
+
+--- PAGE 1 ---
+
+[No text extracted]
+
+--- PAGE 2 ---
+
+[No text extracted]
+
+--- PAGE 3 ---
+
+[No text extracted]
+
+--- PAGE 4 ---
+
+·IS>@ 
+A FIFTH EDITION CONVERSION & CLASSIC HOMAGE 
+84: THE LOST CITY 
+Conversion by Chris Doyle and Tim Wadzinski 
+
+--- PAGE 5 ---
+
+TIE· LOST CITY 
+Full credits for the original edition of The Lost City can be found in its 
+respective section of this book, where it is scanned verbatim from a prior printing. 
+The credits that follow are for the 5E portion of this work. 
+Original Writer 
+SE Conversion Design and Writing 
+SE Editing and Additional Support 
+Additional Writing 
+Special Thanks 
+SE Edition Playtesters 
+Additional Research 
+Cover Design 
+Cover Art 
+Interior Layout 
+Interior Art Direction 
+Interior Art 
+Cartography 
+Scans and Restoration 
+Publisher 
+Tom Moldvay 
+Chris Doyle 
+Ti m Wadzinski 
+Joseph Goodman, James Maliszewski, 
+Mike Mearls 
+Harold Johnson 
+Alec Doyle, Lisa Doyle, Devin McCullen 
+Scott Fitzgerald Gray 
+Lester B. Portly 
+Jim Holloway 
+Matt Hildebrand 
+Joseph Goodman 
+Brad McDevitt, Chad Sergesketter, Chris 
+Arneson, Cliff Kurowski, Fred Dai ley, Jesse 
+Mohn, Peter Mullen, Stefan Poag, Tom 
+Galambos, Wi lliam McAusland 
+Wi lliam McAusland 
+Steve Crompton 
+Joseph Goodman 
+This volume is produced under permission from Wizards of the Coast. Dungeons & Dragons is a trademark of Wizards of the Coast. Good­
+man Games and the Goodman Games logos are trademarks of Goodman Games. Contents ©2020 Wi zards of the Coast LLC, PO Box 707, 
+Renton, WA 98057-0707, USA. Wi zards of the Coast, D&D, their respective logos, and all adventure rides are trademarks of Wizards of the 
+Coast LLC in the USA and other countries, and are used with permission. First Printing. Printed in China. 
+vi si'f vs onLinE AT: www.Go onmAn -GAm Es .com 
+0RJ GiIIAL ADVE IITVRJ:S RE iIIC AR.._IIA TED • THE LOST ci'fv 
+
+--- PAGE 6 ---
+
+TABLE OF CONTENTS 
+C HAPTER l: INTRODUCTION ...... . ............................. .......... ..................................... 4 
+CHAPTER 2: B 4: THE LosT CITY - ORIGIN AL PUBLICATION ..................................... l 6 
+CHAPTER 3: BACKGROUND ...................................................................................... 57 
+C HAPTER 4: THE UPPER PYRAMID .......................... . ................................................ 71 
+CHAPTER 5: THE LOWER PYRAMID .......................................................................... 104 
+CHAPTER 6: THE LosT CITY OF CYNIDI CE A .............. .. . .................... .... . .................. 128 
+CHAPTER 7: THE GOBLIN CAVES .................................................................... . ... . .... l 6 l 
+CHAPTER 8: THE LOWER CA TACOMBS ..................................................................... l 94 
+AP PENDIX A: NEW MAGIC ITEMS & SPELLS ....................................... ... . .................. 223 
+APPENDIX B: NEW MONSTERS ................ ....... .................................... ... .................. 227 
+APPENDIX C: CHARACTERS ....... . ................ .... ......................................................... 262 
+APPENDIX D: HANDOUTS ....................................................................................... 28 5 
+APPENDIX E: MAPS .............................. ....... .. .. . ....................................................... 292 
+0R. iGiITAL A.DV Eil 'fV�S RE iITC AR._IlA 'fED • 'fHE LOS'f Ci TY 
+
+--- PAGE 7 ---
+
+CHAPTER ONE 
+Autho r's Introd uction 
+by Chris Doy le 
+I consider February 2, 1981 as the date I started playing role­
+playing games. That is the day when I came home from school 
+and sitting on the dining room table was the Dungeons & 
+Dragons Basic Rules boxed set, obtained from Sears via mail order. 
+This was the set graced with purplish-hued Ero! Otus cover art of 
+an underground scene depicting a fighter and a magic-user (before 
+we called them wizards) in a desperate struggle against a draconic 
+creature emerging from a pool. As I type this, I glance upon a vinyl 
+print of the artwork hanging on my basement wall, which I picked 
+up at a Gary Con auction a few years back. I'm lucky enough to have 
+tracked down Mr. Otus to have him sign it. How do I remember 
+that particular date so clearly? It just so happens to be the day my 
+niece was born. 
+Back then, I was only a player. And did we play. At recess during 
+school, after school, on the weekends, on summer vacation. We had 
+raided the Caves of Chaos, found the ruined halls of Qu asqueton, 
+battled the Slave Lords, and explored the Palace of the Silver Prin­
+cess. It was late 1982, or maybe early 1983, when a good friend of 
+mine (also named Chris) offered to DM B4: The Lost City. I was a 
+huge fan of Egyptian mythology, pyramids, dusty trap-filled tombs, 
+giant scorpions, sandy wastes, you name it. So even though we could 
+not find any other players, we played anyway, and I ran all four PCs! 
+After getting stuck in a sandstorm, we sought shelter in the ruins of 
+a city revealed by the storm. Soon, we were trudging down a dusty 
+corridor searching for traps. We battled some fire beetles, a flock of 
+stirges in a concealed room, and a gang of sprites (in the desert?) with 
+a proclivity for pyrotechnics. That encounter should have been a clue 
+to things to come, but the fey were soon defeated and we had a few 
+crates of fireworks now. 
+Then we came to a door. As per standard operating procedures, we 
+listened at the door and heard strange idle chatter, but not in any 
+recognizable humanoid tongue. (They must be gnolls! None of us 
+speak that tongue!) We then searched for traps. Finding none, we 
+kicked in the door and encountered five mask-clad humans, armed 
+and armored. I grabbed my lucky six-sided die and chucked it for 
+initiative. (Yes kids, back in the '80s we used a six-sider for initia­
+tive and rolled once for the whole parry. And rolled each round of 
+combat!) I rolled terribly, and the opposition didn't, so they acted 
+first. The DM rolled 2d6 (why?) and then instead of attacking, the 
+humans greeted us with open arms! What? They didn't attack? D&D 
+was all about exploring dungeons, kicking monster butt, and taking 
+their loot. It never crossed my mind that we could talk to inhabitants 
+of the dungeon. (Keep in mind, I'm 12 years old.) 
+So, we talked (and glossed over the fact that they spoke in their own 
+language which we could not understand). It was awkward at first, 
+like talking to a girl for the first time alone. We traded some fireworks 
+for food and water (we were lost in the desert without many supplies, 
+after all) and eventually learned they were part of a Brotherhood. They 
+asked us to join, so we did, not really knowing what else to do. Besides 
+we really needed to rest at this point and there is safety in numbers. 
+We met their leader and soon were outfitted with masks of our own. 
+We spent most of the rest of the session (a few hours) just talking, 
+mostly about an underground city and where to get more food and 
+water. I'm not even sure what we discussed to be honest. But it was 
+soon time for dinner (and homework!), so we had to end the session. 
+Despite my pleas the next few days, we never did finish our adven­
+tures exploring The Lost City. As it turns out, the DM was not overly 
+fond of the talking and much preferred chucking dice during com­
+bat. Within a few months, he wasn't even playing D&D anymore, 
+and I'm fairly certain he didn't serve as DM again. A big part of the 
+reason was his discovery of sports, and he was truly a gifted athlete, 
+regardless of the sport. We were still good friends, but when we hung 
+out it was just to play football or stickball. I had to find others to 
+share my enjoyment of role-playing games. And I did just that. 
+After tracking down a copy of B4 at a local Toys R Us, I read it cover 
+to cover and was fascinated by the factions, the backstory of the lost 
+city, and the Cynidicean people clearly in decline. It was the revela­
+tion I needed to understand that D&D was a blank canvas and there 
+was the potential to "role" play and not just "roll " play. Soon after 
+I was buying modules whenever I could scrounge up the money or 
+convince the folks I really needed this book. (It's a book! I want to 
+read! That's a good thing!) And then I became a Dungeon Master so 
+I could be in charge of the stories I wanted to tell. Sure, in the begin­
+ning, much of it was still about poking things with a 10-foot pole, 
+kicking in doors, and rollicking combats with evil foes. But it was all 
+part of the process. As a DM, eventually I grew as an arbiter of the 
+rules, and as a "role" player, although I still relied on off-the-shelf 
+published adventures. 
+By the mid-'80s the fad of D&D was dying down in my area. But I 
+kept playing, bouncing from group to group. The local 4H even had 
+a D&D club for a while, including a sleepover D&D camp where 
+I became introduced to organized and tournament play. By the late 
+'80s I was designing my own adventures and attending game con­
+ventions. This was when I was introduced to the Role Playing Game 
+Association (RPGA) and began to play in regional and national tour­
+naments. At some of these events (especially the Master and Grand­
+master sanctioned events) it was not uncommon to spend an entire 
+session role-playing, and never removing your dice from your pouch. 
+0RjGiil AL ADVE ilTVRJ;S REiil CAR_IlA TED • THE LOST ci1Y 
+
+--- PAGE 8 ---
+
+Goodman Games announced this book at Gen Con 2019. Here you see author Chris Doyle, right, and editor Tim Wadzinski, 
+left, holding the original announcement poster at the Goodman Games seminar. 
+So, it is with great fondness that I look back on my brief adventures in 
+B4: The Lost City. Even though I thought I was exploring the pyramid 
+in The Lost City, I was really exploring the many layers of the role­
+playing game genre. And although I never finished the journey to 
+Zargon's lair, or the cavern below the pyramid, B4 was clearly the start 
+of my journey as a Dungeon Master, eventually an adventure designer, 
+and then a published author. It's ironic that Tom Moldvay was the 
+primary author of the Basic set that started my journey, as he was the 
+author of B4: The Lost City. It's also ironic that the O&D brand has 
+outlasted both Toys R Us and (soon to be) Sears! 
+And although the world and I lost my dear friend, OM Chris, way too 
+early at the age of23 due to a battle with leukemia, I'll never forget that 
+after-school D&D session of B4: The Lost City. Or rhat perfect over­
+the-shoulder touchdown pass during flag football that sealed a win. 
+Chris began playing role-playing games in the early '80s (decades before 
+it became mainstream and popular) and began .freelance writing for the 
+game industry in the early '90s. His first publication was for WPGs Star 
+Wtt rs: The Roleplaying Game, which might be a contributing/actor to his 
+unhealthy fascination with jawas. He is most fond of writing adventures, 
+and has been published by TSR, Wizards of the Coast, and Atlas Games. 
+He has been writing for Goodman Games since 2004, starting with the 
+original third edition Dungeon Crawl Classics line of adventures. Re­
+cently, he has penned several of the Fifth Edition Fantasy adventures for 
+Goodman Games, and is the developer/co-author of OAR #1: Into the 
+Borderlands, OAR #2: The Isle of Dread, and OAR #4: The Lost City. 
+In his spare time, he is an avid tabletop role-player and board gamer. 
+0RjG iII AL AD VE IIT V�S RE iIIC AR__IIA TED • THE LOST ci1Y 
+
+--- PAGE 9 ---
+
+The Lost City: 
+An Overlool<ed Classi c 
+by Mike Mearls 
+W hile 1he Lost City, having never been included in a Basic Set, 
+lacks the iconic stature of Keep on the Borderlands or In Search 
+of the Unknown, it is a worthy successor to those classics. It is 
+perhaps the most playable adventure out of the box compared to others 
+of its era, with its emphasis on history , roleplay, and a clear, campaign­
+long goal. Why does it stand the test of time? Probably because it was 
+ahead of its time. 
+A Campaign Villain 
+The dreaded, god-like Zargon looms as a villain worthy of building a 
+campaign around. Prior to this point in TSR's publishing history , we 
+had powerful NPCs and monsters in adventures, but now for the first 
+time we have a grand, powerful villain who looms as the final enemy. 
+True, you could argue that Lolth serves as D&D's first boss monster in 
+the GDQ series, but Lolth remains a passive, distant threat in that series 
+until Queen of the Demonweb Pits. In contrast, Zargon is the catalyst 
+behind the adventure, the source of its greatest threats, and the final 
+enemy who must be defeated. 
+Like any good villain, Zargon is more than a powerful monster at the 
+bottom of a dungeon. Yes, the tentacled beast hides there, but its cult­
+ists are the most powerful enemies the characters face in the adventure. 
+Dismantling the cult and then solving the riddle of how to destroy the 
+beast for good is the stuff of a dozen gaming sessions. 
+A Sense of History 
+To overcome the threats of 1he Lost City, the players must come to grips 
+with the history oflost Cynidicea. With 1he Lost City, the concept of the 
+elaborate backstory hit the perfect balance between too little to give the 
+adventure a distinct flavor and dense lore that remains hidden from play. 
+The ziggurat the characters must explore to enter the city is filled with 
+clues that smart players can unravel to learn the story of the city's rise 
+and fall. That information is critical to completing the adventure. With­
+out it, the players can never truly unravel the mystery of Cynidicea and 
+understand how to defeat Zargon for good. 
+Tom Moldvay is perhaps the first designer to build an adventure where 
+the backstory is so important. That he pulled this off while also making 
+that story relevant and important to the action at the table is a testa­
+ment to his genius. 
+Factions 
+A good adventure gives the players meaningful choices. 1he Lost City's 
+factions provide plenty of those, along with the opportunity for the 
+DM to set up politics, alliances, and treachery. The three factions of the 
+city have clear agendas, obvious incompatibilities, and enough com­
+mon ground that smart players can bring them together. 
+Factions are a big part of RPGs, whether tabletop or digital, but can 
+you think of an earlier D&D adventure that presents them with such 
+clarity and places them in a prominent part of the adventure? Success 
+in this adventure is impossible without the backing of at least one fac­
+tion, placing a focus on roleplay and planning that is rare in D&D 
+adventures in any era. 
+If you've played an Elder Scrolls game or an MMO, you can thank 
+Tom Moldvay for making factions such a prominent part of a fantasy 
+gaming world. 
+Strangers in a Strange Land 
+Final ly, we come to the most compelling part of this adventure, the bi­
+zarre citizens of Cynidicea. Pulled straight from the grandest traditions 
+of pulp fantasy, Cynidicea and its strange, drug-addled people are the 
+perfect sort of culture for characters to interact with. The Cynidiceans 
+are strange but understandable, trapped in a prison of their own crea­
+tion that reflects their cultural slide into decadence. 
+As a DM, the Cynidiceans are a fertile field for exciting roleplay. Their 
+strange dreams make everyday interaction a puzzle, but there is a logic 
+and stable structure beneath the Cynidiceans' hallucinations. Once 
+more, Moldvay's ability to weave history and legend into the immediate 
+action of the adventure looms large. Yes, the Cynicideans seem random 
+and strange, but beneath that seeming is a solid, understandable frame­
+work for their strangeness. 
+An Overlooked Classic 
+Running 1he Lost City takes a little work Moldvay had only 28 pages to 
+work with, leaving many of the lowest dungeon levels with little detail 
+beyond the most basic information. The full depth of the factions and 
+the city is left to the DM to develop. 
+However, if you are looking to run a classic adventure for the latest gen­
+eration of D&D players, you can't go wrong with this gem. The initial 
+levels of the buried step pyramid allow you to launch your campaign 
+with minimal prep. As the players explore, work between sessions to 
+flesh out the factions and add details you need to the city below. When 
+Darius finally falls to the PCs, they are ready to enter the city and take 
+the fight to the cult of Zargon. Luckily, that process should buy you 
+weeks of time to prepare for the next phase of your campaign. What are 
+you waiting for? The treasures of Lost Cynidicea await! 
+Mike Mearls manages the D&D creative team at Wizards of the Coast. He 
+was the co-lead designer on D&D 5th edition. His work includes Xana­
+thar's Guide to Everything and Volo's Guide to Monsters far D&D, 
+and the board games Castle Raven/oft and Betrayal at Baldur's Gate. 
+ezjG iII AL A.D VE IITV�S REiIIC ARJIA TED • THE LOST ci'fY 
+
+--- PAGE 10 ---
+
+An Apprec iation of Torn Moldvay 
+and his Wo"rk on Th e Lost City 
+by James Maliszewski 
+Tom Moldvay's death on March 9, 2007 was indeed untimely­
+not only because he was 58 years old at the time, but also be­
+cause it occurred just as the re-appraisal and re-appreciation of 
+early role-playing games and their designers were getting under way. 
+As the editor of the second edition of the Dungeons & Dragons Ba­
+sic Set, Moldvay would have undoubtedly received much-deserved 
+accolades on the biogs and forums that incubated the Old School 
+Renaissance. The 1981 Basic Set, with its glorious Ero! Otus cover 
+and clear, straightforward rules presentation, was indeed a "Gateway 
+to Adventure" for many . I have no doubt that, had he lived a little 
+longer, Tom Moldvay would have come to realize just how much of 
+an impact his earlier work had had on a generation of role-players. 
+That impact wasn't limited to the Basic Set. During his time at TSR 
+Hobbies, Moldvay wrote or co-wrote several adventure modules for 
+both D&D and AD&D, perhaps the most famous of which is mod­
+ule XI: The Isle of Dread, produced in collaboration with David Cook 
+(and recently reincarnated through Goodman Games). Because Xl 
+was included with the boxed 1981 Dungeons & Dragons Expert Set, 
+it's probably the most widely known-and played!-advenrure that 
+Moldvay ever wrote. 
+I like to say that The Isle of Dread is the first part of Tom Moldvay's 
+"pulp fantasy trilogy." I don't mean this literally, of course. There is 
+no direct connection between the three adventures I include in the 
+trilogy-The Isle of Dread, Castle Amber, and The Lost City- but all 
+of them draw heavily on themes and subject matter deriving from 
+the fantasy tales found in the pages of the pulp magazines from the 
+first half of the 20th century . They are all terrific modules and I have 
+a fondness for each of them for different reasons, but I have a par­
+ticular fondness for The Lost City, because it's so often overlooked 
+compared to its "big brothers." 
+Part of that might be because The Lost City was written to support the 
+Basic Rules. I remember well that some gamers of the time turned 
+their nose up at the Basic Rules as "kiddie D&D" (compared to 
+Advanced Dungeons & Dragons, which was "the real thing"). Even 
+those who didn't feel that way often neglected to look at low-level 
+adventures. After all, how many level 1-3 modules does a Dungeon 
+Master need, especially if he has a long-running campaign? Further­
+more, Mike Carr's In Search of the Unknown or Gary Gygax's The 
+Keep on the Borderlands were both well known, thanks to their inclu­
+sion in various editions of the Basic Set, making them part of many 
+gamers' earliest memories of learning to role-play. By comparison, 
+The Lost City might seem unexceptional. 
+That judgment would, in my opinion, be in error, for reasons I will 
+briefly elaborate. 
+The Lost City's connection to pulp fantasy is readily apparent, as it pre­
+sents a decadent subterranean civilization of great antiquity known 
+as Cynidicea. This civilization has fallen in thrall to a foul alien be­
+ing known as Zargon, whom many Cynidiceans worship as a god. 
+Lost in the desert, the player characters stumble upon the uppermost 
+portion of a Cynidicean step pyramid, the bulk of which is now 
+buried beneath the sands. As they explore the tiers of the pyramid, 
+the characters come into contact with the fringes of the remnant 
+Cynidicean society, which is riven with factions and secret societies, 
+each of which has its own plots and goals. Success in the module is 
+judged at least in part by how adeptly the characters can navigate the 
+treacherous waters of Cynidicean society in order to achieve their 
+own goals, whatever they may be. 
+I found Moldvay's set-up very compelling. The adventure consists pri­
+marily of a dungeon crawl inside the aforementioned buried step pyr­
+amid. The pyramid itself is a well-presented low-level dungeon (with 
+the obligatory wight encounter-nearly every introductory module 
+of the era included an encounter with these level-draining undead, 
+it seems), but what attracted me to the module was the eponymous 
+Lost City and its factions. These are only briefly sketched out in the 
+actual text of the module, taking up two pages of its 32. Nevertheless, 
+these brief sketches are pregnant with ideas, many of which sustained 
+my campaign for weeks and months after the player characters had 
+finished exploring the dusty rooms of the pyramid itself 
+What Moldvay did in The Lost City is a master class of imagination 
+and concision. Not only did he provide us with a fun, varied low-level 
+dungeon crawl filled with a good mix of monsters (several of which 
+are unique to this module), treasures, traps, mysteries, and, of course, 
+empty rooms, but also the outline of how an enterprising Dungeon 
+Master might expand on the material he provided. Re-reading the 
+module in preparation for writing this introduction, I was frankly 
+amazed by how many ideas Moldvay strews through its pages. 
+The subterranean Lost City of the Cynidiceans is a good example of 
+what I mean. There are less than 20 keyed encounter areas to go with 
+the map of the city provided and none of them is more than five or 
+six sentences long (with most being two or three). Yet, many of them 
+could easily inspire adventures of their own. For example, the Island 
+of Death in the middle of the Underground Lake boasts a Stone­
+henge-like structure that predates the Cynidiceans, as well as caves 
+filled with undead. Likewise, goblins and hobgoblins inhabit a series 
+of cliff dwellings nearby and, in the middle of the Wasteland, is a lava 
+pit called the Eye ofZargon, guarded by creatures of elemental flame. 
+Then there are the Cynidiceans themselves, who, we are told, "spend 
+most of their time living in strange dream worlds." They wear styl­
+ized masks of animals and unusual costumes, which only serve to 
+0NG iIT AL AD VEil'fV�S RE iITC AR..IlA 'fED • 'fHE LOS'f ci "tY 
+
+--- PAGE 11 ---
+
+strengthen the dreams they experience. With each generation, fewer 
+and fewer tend to the needs of their society and those that do serve 
+Zargon, a powerful monster masquerading as a god. There are even 
+game stats for Zargon, so that enterprising-or foolish-characters 
+can attempt to overthrow it and restore sanity to the Lost City. This 
+latter endeavor is only one of eight "further adventures" Moldvay of­
+fers up as examples of how to continue to use The Lost City after the 
+dungeon has been thoroughly explored. 
+I can't stress enough how inspirational I found this module when I 
+first read it. Having just re-read it, I find myself tempted to call it the 
+best adventure Moldvay ever wrote and one of the great adventures 
+of the first decade of the hobby of role-playing. The Lost City presents 
+no story; it's almost pure location and so much of that location is left 
+to the Dungeon Master to develop for himself, aided by Moldvay's 
+evocative suggestions and his own imagination. That's what a good 
+adventure module should do in my view, particularly those geared 
+toward beginning role-players, as this one is. 
+The Lost City is, I think, an under-appreciated masterpiece-but 
+don't just take my word for it! I can think of no better way to honor 
+the memory of Tom Moldvay than to read what follows and im-
+merse yourself in its details. Then, go ahead and use it in your own 
+campaigns, in whatever way you choose. Like the best modules of 
+the past, it can serve as a springboard to all manner of memorable 
+fantastic scenarios. 
+Enjoy! 
+James Maliszewski started role-pbiying in the bite Fall of 1979, when he 
+opened up a copy of the Dungeons & Dragons Basic Set edited by Dr. J 
+Eric Holmes originally purchased for his father. More than 40 years biter, 
+he's still pbiying. James is known for his blog Grognardia, which was the 
+focal point of the OSR movement in its early days. 
+His memories and musings about role-pbiying games and rebited nonsense, 
+as well as articles about the history of the hobby from its earliest beginnings 
+to the present day, remain of interest to readers to this day. 
+0NG iII AL ADVE IITVRJ;S REiIIC AR..IIA TED • THE LOST ci'tY 
+
+--- PAGE 12 ---
+
+Goodma n Games Intervi ews 
+Harold Johnson 
+by Tim Wadzinski 
+H arold "Wisconsin" Johnson spent 21 years at TSR and Wizards 
+of the Coast, from April of 1979 through December of 1999, 
+in a variety of roles, and worked on multiple editions of Dun­
+geons & Dragons. Among his many accomplishments are the classic 
+AD&D module CJ: The Hidden Shrine o/Tamoachan; contributions 
+to the Dungeon Master's Guide and the Slave Lords I "A" series; work 
+on the Dragonlance, Forgotten Realms, and Ravenloft product lines; 
+and writing for the Gamma World, Gangbusters, and Indiana Jones 
+role-playing games. He and Jon Pickens are credited with editing B4: 
+The Lost City. Mr. Johnson remains very active in the gaming conven­
+tion scene. He also runs the Breadloaf Book Shop in Lake Geneva, 
+Wisconsin, and is a member of the Geneva Theatre Actors Guild. 
+We were excited to speak with him about his tenure at TSR, his 
+many contributions to the role-playing hobby, and his work with 
+Tom Moldvay on The Lost City. 
+Goodman Games: I did some research on you and your affiliation 
+with TSR and I'd like to know what prompted you, coming out of 
+school, to apply there for a game editor position. 
+Harold Johnson: Well, I had a degree in biology and nowhere to go 
+but to become a biotechnician for places like Abbott Labs, or work 
+for a drug company, because a Bachelor of Science in biology doesn't 
+do much for you-and I hated that concept. I was trying to figure 
+out what to do with my life. 
+I had a job, at the time, working for a union parking cars, and I went 
+to Gen Con in 1978 and found out that TSR had an opening for 
+a game editor. I got back from Gen Con, I picked up the phone, I 
+called Mike Carr-who was the one who answered the phone-and 
+said they probably had already hired somebo dy, but they wouldn't 
+know my skills if they didn't give me an interview . So, they invited 
+me up for an interview. 
+I had no car, so I actually had to take the train up to Milwaukee, a 
+bus down from Milwaukee, and then walk to the interv iew. It was 
+a good interview. I made myself a portfolio of my work from my 
+campaign, with my charts and so on that I had been developing. Our 
+group had noticed there was no Dungeon Master's Guide at the time, 
+and so we were creating our own. 
+I met with Gary Gygax after talking with Mike. It was identified that 
+the position had already been filled, that there was no position avail­
+able. But Gary and I talked, and at the time, I pretty much thought 
+nobody knew who I was. About 10 years ago, I realized that was not 
+so, but at that time, I thought nobody knew who I was. 
+I was talking to Gary. He asked what got me up there. I said, "Well, 
+I have a minor in history, but it's not a typical minor in history, it's a 
+minor in ancient Near Eastern religions, so Hittites, Acadians, Sumer­
+ian, Babylonian, Canaanite, Egyptian, Greek, Roman. That sort of 
+stuff. Mythology." When I said the word ancients, Gary-who was in 
+love with ancients-perked up his ears, and the two of us spent the 
+rest of the time doing a role-playing game for ancient societies, which 
+later Dangerous Journeys was, but that was many, many years later. 
+I went home with no job, and about three months later, there was 
+a position posted to become the lead designer for Dungeons & 
+Dragons because Gary was the only one writing for it. I applied. 
+My whole goal was not to take the job. My whole goal was to get the 
+company to be convinced that I would be a good hire, to offer me 
+the job, and then I would say, 'Tm a scientist. No, thank you." The 
+point being that I was trying to give myself an ego boost so I could 
+go back and enter the actual business world versus working for TSR. 
+GG: [Laughs] That's quite a story. 
+HJ: True story. When I was eventually offered the job, I then said 
+to my friends, "Well, now is the next step where I call them and 
+say, 'Thanks, but no thanks,"' and my friends said, "Are you insane?! 
+There are lots of people who would kill for this opportunity. You've 
+been offered the number one job and lead designer for the company," 
+and I said, "Yeah, yeah, but I'm a scientist. My dad will kill me." 
+Turns out, my dad actually thought it was a great idea. They con­
+vinced me to take the job. 
+I called back and said I'd take the job. Two months later, Gary called 
+and said the editor they had hired quit, and they were in the midst of 
+doing Dungeon Master's Guide. They needed me up there as an editor 
+since I had applied as an editor. I said, "But. .. but. .. I want to be a 
+writer now." I had been a writer for some time. I was a playwright; I 
+had published my own magazines with amateur writings from vari­
+ous people. [Laughs] It was interesting. I came up as an editor with 
+the understanding that one day, I would transfer back to the design 
+department, which did not happen. 
+GG: Really? Never in all your years at TSR? 
+HJ: No. I became an editor; I worked as an editor for about a year, 
+and then I was made a manager. That really came about because they 
+would say to me, "Well, this is your next project," and I would say, 
+"No, it's not," and they'd get this puzzled look on their faces and 
+say, "Yes. It's what we need you to do next." "No, actually, you don't 
+need me to do that. Wh at you need me to do is answer the phones 
+for Gen Con because you have nobody here answering the phones, 
+and you have all these customers calling concerned about Gen Con, 
+and the only person running Gen Con is offsite and not available to 
+take any of the phone calls." So I did that a lot to them, in the first 
+year, about different tasks and different assignments. In the end, they 
+said, "Hmm. He likes to boss people around. Why don't you make 
+him a boss?" 
+GG: Would you say you were you a tough boss or a fair boss? 
+HJ: I think I was a coach. I was manager of design for about a month, 
+0RJ GiIIAL ADVEII'f V�S RE iIIC AR_ IIA 'fED • 'fHE LOS'f ci 'tY 
+
+--- PAGE 13 ---
+
+and then Allen Hammack, who had seniority on me, asked to be in 
+charge of design, so I stepped over to become manager of editing. 
+My goal was ... Bosses have a different way to handle things. A lot 
+of bosses, if it's a victory , it's the boss's victory, and if it's a failure, he 
+points at the team and says it's their fault. 
+GG: Sure. We've all seen that. 
+HJ: I did it the other way. I said if it was a victory, it wasn't me, it was 
+the team who did it, and if it was a failure, it was my fault because 
+I didn't communicate well. And I kept a low profile. I gave credit to 
+the staff, even though, at times, I actually was the editor as well as the 
+editor-in-chief as well as the developer on a product-but the goal 
+was to promote the credits of my staff, so I gave them credits for do­
+ing some of the tasks. The editor of the Dungeons & Dragons Basic 
+set, Anne Gray-later Anne McCready-was actually our copyedi­
+tor. I was the editor; she was the copyeditor. I took the developmen­
+tal credit, is what I put myself down as. 
+GG: You were there for quite a while, and you wore many hats work­
+ing in many areas of the company. I don't know if you can even 
+answer this, but what was your favorite part of working at TSR? 
+HJ: My favorite part of working there was the people and the crea­
+tivity. But if you're asking as far as tasks and assignments, I think it 
+was working with Gen Con. Gen Con and meeting planning was 
+when people came to know that Harold Johnson existed because 
+even though I was the editor-in-chief on everything and the director 
+of publishing, I took a backseat, so they didn't know who I was. Even 
+my design, I would give credit to a coauthor, and in some cases, it 
+was just someone who gave me ideas, and I did all the writing, but I 
+gave them credit for it. 
+When I became the director of consumer services, which included 
+Gen Con, I found that Gen Con was a little bit of everything. It was 
+negotiation; it was marketing; it was planning; it was innovating; 
+service; lots of things, and always different every day. I took a little 
+pride in working with Gen Con, and during that time, we changed 
+our attitude from "We're doing you a favor letting you exhibit at Gen 
+Con" to "Oh, no, no, no, we're here to help you guys succeed. We're 
+a service organization. We're not taking pride that this is our conven­
+tion and we're just doing you guys a favor letting you be here." 
+I became very helpful to the community, to the industry, as well as to 
+the attendees, and that's when people started to know. "Oh, who do 
+you want to talk to? You want to talk to Harold. He can fix things." 
+[Laughs] I thrive on that. I like doing that a lot. 
+I got to talk to media. I was one of the first ones, actual ly, allowed to 
+officially speak for the company in public, on public radio, later on 
+public television, that sort of thing, so that's good. I was an actor be­
+fore I ever came to the compa ny. I had made my career, since age 14 
+on, as a paid actor, playwriter, director, and that's where my money 
+came from to go to school. I like applause. I like celebrity . That's a 
+good thing. [Laughs] Gen Con let me be a celebr ity. 
+GG: That's awesome. Along those lines, everyone knows you wrote 
+the classic module The Hidden Shrine ofTamoachan. You contributed 
+heavily to the Dragonlance line, which was also huge. What do you 
+consider your greatest accomplishment in gaming? 
+HJ: In gaming? Wow. [Laughs] I think my greatest accomplishment 
+in gaming, people don't notice. It was to be a leader and teacher of 
+"In the 'A' series, it starts out with you 
+fighting half-ores at mid-level, and by the 
+time you are at high level, you are fighting 
+kobolds, and it progressed downwards. It 
+went from half-ores to ores to hobgoblins 
+to goblins to kobolds, and as the player 
+characters got more powerful, the monsters 
+got weaker, and yet we challenged the 
+heroes because of the strategy and the 
+story and the planning." 
+those who use our products. Wh en I did Cl: The Hidden Shrine of 
+Tamoachan-which, by the way, was a typo; it was supposed to be 
+Tamoanchan, but the N got dropped out and had been from that 
+point on-I was trying to do an adventure in a different way from 
+all those that had come before. I was inspired by some of the things 
+that Gary showed in Village of Hommlet, where he had text set out 
+that was something that can be revealed to the player characters right 
+away, and then more text that you'd have to search for-you'd have 
+to interact with the environment and the creatures and so on-to 
+learn that information. 
+I said, "Well, I want drama." A playwright, right? [Laughs] "I want 
+drama. I want theater. I can't be certain that the Dungeon Master's 
+going to understand how to create that drama and that atmosphere, 
+so I'm going to write descriptive text. I'm going to give you a story 
+piece that you can read to the players ahead of time," and that be­
+came a standard in the industry; still is today. 
+A lot of the other things I did ... I said, "The previous adventures were 
+all 'Here's a monster. Fight the monster. Kill him. Get his treasure. 
+Here's the treasure."' Tended to be lists of monsters with treasures. 
+Mine said, "Let's talk about tactics. Let's talk about consequences to 
+action. Let's talk about lessons that the players need to learn to work 
+effectively as a team and to thrive in a dungeon." 
+In Tamoachan, there's a place where there's a pile of gold sitting on 
+the floor right in the middle of the corridor, and the lesson that 
+you're going to learn, if you mess with that gold, is there's no such 
+thing as a free lunch because, of course, it's trapped, and you should 
+have been wary of it anyway. It's just lying there unprotected! Come 
+on! [Laughs] You really think we would design an adventure that 
+way? Tamoachan set the standard that is even now used today, 40 
+years later. 
+When I helped contribute to the ''A" series ... in fact the ''A" se­
+ries was based on the only adventure I ever ran for any people who 
+worked for TSR. One day, I brought them in, and they said, "You 
+want to do an adventure?" I said, "Give me some time." I wrote char­
+acter backgrounds, I mixed them up randomly and handed them 
+out to the players, and I put them in a country that was occupied 
+by an invading force. Wi thin 15 minutes of play, each one at a sepa­
+rate time, they all got arrested and thrown in jail for one offense or 
+another. I threw them in prison, and they sat in prison for a while, 
+and then they were, the next day, put on a ship to sail across the bay. 
+0zjGiilAL ADVE ilTV�S REiilC A.RJIA TED • THE LOST ci1Y 
+
+--- PAGE 14 ---
+
+Harold Johnson's Boal< Store 
+Since 2011, Harold Johnson has operated the Breadloaf Book Shop in Lake Geneva, Wi sconsin. The store of­
+fers new and used books. It is part of the Geneva Village Shops inside a former church, at 727 Geneva Street. 
+The location is mere blocks from the Gygax family home, the Horticultural Hall that hosted the first Gen Con, 
+and the building that once housed The Dungeon Hobby Shop. For more information, call (262) 248-9446 
+or visit the store on Facebook at https://www .facebook.com/Breadloaf-Book-Shop-1440863886141160. Here 
+are some photos taken by OAR series editor Tim Wadzinski on a recent visit. 
+The front door to the Breadloaf Book Shop in Lake Geneva. Harold Johnson holding a vintage copy of B4: The Lost City. 
+The Breadloaf Book Shop is located at 727 Geneva Street in Lake Geneva, 
+Wisconsin, as part of the Geneva Village Shops inside a former church 
+Tim Wadzinski and Harold Johnson outside 
+the Breadloaf Book Shop. 
+0RJGi ITAL ADVE ITTVR,!OS RE iITC A1'_IlA TED • THE LOST ci TY 
+
+--- PAGE 15 ---
+
+They still did nothing. I actually had maps that were miniature scale, 
+so you could put your miniatures on them. I was doing it back then. 
+They do it nowadays, but back then, nobody was doing it. Stage. 
+Theater. [Laughs] 
+We got across the bay, and we came to this big wall, and there was 
+a door in this cliff face, huge door, and they creaked the door open, 
+and as they creaked the door open, this goblin bolts out through the 
+door, runs down through the surf, and takes an arrow in the back 
+of the head and falls dead in the surf. All the players felt "Uh-oh." 
+[Laughs] I threw them into a dungeon with no weapons, no posses­
+sions, minimal spells, and said, "Survive." This was based, of course, 
+on the "Star Trek" episode ''Arena." Afterwards, they said, "Oh, this 
+is cool. We need to do this. Giving players at even a high level the 
+chance, the sense of risk and drama, it happens if you take away 
+everything you have, so we know what we're going to do for a round 
+of this tournament." 
+When we did the "A" series, the other lesson I taught was monsters 
+are not stupid. Monsters are as smart as the players. Up to this point, 
+monsters would just attack. You could stand in a doorway, narrow 
+the attack, and wait for them to come at you one at a time and pick 
+them all off. Wh en we did the "A" series, I said, "Let's not do that. 
+Let's teach them several lessons." One of the lessons we taught was 
+strategy: ambushes, tricks. There's a scene where these ores are stand­
+ing on a set of stairs, so they get different levels. There's a heavy force 
+up front defending the ones further up on the stairs, and the ones 
+on the stairs have missile weapons, and at the very back, magic-users. 
+"Gee, oh, these monsters are ready for us, and we've got to run down 
+the corridor at them. Boy, that really sucks." 
+We were showing them strategy. I wanted to show them that that 
+could happen. The other thing that the "A" series did was because 
+I do not like monster inflation. I think that a game, as you advance 
+in level, should challenge you mentally, should challenge the play­
+ers and the heroes mentally, more than "We have to create bigger 
+monsters because you're tougher." In the "A" series, it starts out with 
+you fighting half-ores at mid-level, and by the time you are at high 
+level, you are fighting kobolds, and it progressed downwards. It went 
+from half-ores to ores to hobgoblins to goblins to kobolds, and as the 
+player characters got more powerful, the monsters got weaker, and 
+yet we challenged the heroes because of the strategy and the story 
+and the planning. Those who would follow used this as a basis to 
+write their own adventures, and they started going, "Oh. Monsters 
+aren't stupid." [Laughs] 
+I think that's the thing that I feel I contributed mostly to role-playing 
+games, and all of my work at the game company was always to say, 
+"Just because it hasn't been done this way before does not mean that 
+we should be satisfied with the past. Let's see if there's an evolution, 
+if there's another thing that we can do." 
+When we did Raven/oft, originally vampires were vampires were vam­
+pires. I suggested that wasn't so, that if you had a vampire who drains 
+you by music, that would be a different vampire. You would go, "Oh 
+no, now I have to learn how to defeat this vampire. It's not like I know 
+the standards for killing vampires." Or one that does it through laugh­
+ter or one that does it through, I don't know, leaching plants. We then 
+wrote a series of adventures, the Vtin Richten's Guides, and you would 
+get mini adventures featuring 13 different takes on golems or 13 dif­
+ferent takes on a vampire to show you that things differ. 
+One of my biggest pet peeves in gaming and role-playing is that not 
+every kender is Tasslehoff Burrfoot. I know; I'm Tasslehoff Burrfoot. 
+He was my character; I created him; I know who he is. Every kender is 
+as different as every human being is from the next human being, and if 
+you believe the drawings of some people who illustrated kender, they 
+all look exactly like Tasslehoff Burrfoot. Bah. He's a unique character. 
+I did write a two-part story for Dragon magazine, which introduc­
+es you to 10 different takes on kenders-10 different characters of 
+kenders-just to show you that there are evil kenders, and there's 
+good kenders, you know? [Laughs] People are people are people; 
+they're unique. Kenders are people. Dwarves are people. They may 
+have some common traits, they may be corrupt, they may like to 
+drink, they may be immune to magic, but one dwarf is not the same 
+as the next dwarf to him, and I'd like people to learn that, too. There's 
+a lot of fun in looking at your non-player characters-at your mon­
+sters and your supporting humanoids-and making each one unique 
+and different because it adds so much more depth to your story and 
+your adventure. 
+"There's a lot of fun in looking at your non­
+player characters-at your monsters and 
+your supporting humanoids-and making 
+each one unique and dif ferent because it 
+adds so much more depth to your story 
+and your adventure." 
+GG: Wh en you worked with Tom Moldvay on The Lost City, were you 
+able to apply any of these principles you 've been talking about here? 
+HJ: I was, and we did, but we also did it in the design of The Lost City. 
+I just noted that the original Lost City, we drilled the first edition so 
+that it could be added to a three-ring binder. It had three holes in it 
+so that you can put it in a three-ring binder, and we were proposing 
+to do this with adventures. That one happened, and then when they 
+reprinted it, management thought it was stupid and stopped doing 
+that. We came back to it with the Monstrous Compendiums, and we 
+did loose-leaf so you could pick and choose-instead of carrying 20 
+tons of support product to a game, you could just pick the monsters 
+you want and the portions of the adventure you want. Throw it into 
+a three-ring binder, and just carry that to the game. We did that. 
+Another thing that we did, we actually learned from the past as well. 
+When Mike Carr did In Search of the Unknown, the very first "B" 
+module- Lost City is B4; In Search of the Unknown is B 1-he made 
+it so that it was not just a pre-generated adventure or dungeon or 
+ruin. He made it so that you can personalize it as a DM, that it was a 
+teaching guide. We did that with Lost City so that the upper levels are 
+in detail, and the lower levels are mapped out with some suggestions 
+as to what is there, but we really left it vague so that the nouveau 
+referee, the Dungeon Master, could personalize it, could pick which 
+monsters he wanted to use. 
+The one thing about role-playing that we don't talk a lot about is eve­
+ry role-playing adventure is unique to you. Your story is not the same 
+as somebody else who plays the same adventure because different 
+things happen, and different takes on challenges and how the mon-
+0RjG iIT AL AD VEITT VRJ;S RE iITC AR_IlATED • THE LOST ci1Y 
+
+--- PAGE 16 ---
+
+sters react with you are based on the creativity of the Dungeon Mas­
+ter. The players, with their Dungeon Master, are creating a unique 
+story, which is one of the reasons you would find role-players who 
+would sit down and want to tell you the story of their �dventure be­
+cause it was unique to them. If you didn't play with them, you didn't 
+experience what they experienced, and it was enjoyable just to retell 
+it. We did that in B4. We designed it so that as you went further into 
+it, it would become vaguer as you went. 
+What we did in B4 would later be used when I did the Dragonlance 
+products two years later. We did some of the things I did in C 1. I did 
+a monster chart so I didn't have to list monster stats in the encounter. 
+That always took up a lot of space, so I did it on a master chart, and 
+I could leave the monster statistics-the armor class, hit points, and 
+so on-off, out of the module. It made the module interesting to 
+read without stopping and just glossing over the stats, plus you could 
+always find the stats; they're always in one place. 
+Another thing that we then would do-in Tamoachan, we gave the 
+monsters tactics. In Lost City, we gave ideas for what we later came to 
+call adventure kernels or seeds. They were ideas for adventures, and 
+they might have something at its core. In the case of the last layer 
+of B4, you encounter Zargon, the one-eyed beast. But even with 
+Zargon, while we've given you his stats, we made him immortal. He 
+has the ability to regenerate, although you don't know it because it's 
+a slow regeneration. [Laughs] You can kill him and think, ''Ah, I've 
+managed," and down the road, a couple weeks from now, a couple 
+years from now, Zargon could reappear because he regenerated and 
+he's back alive. 
+This led to another thing we did. We have a cursed item. There's a 
+scroll you read, and it changes the body of the person who reads it. It 
+changes you to look like a mini copy of Zargon. 
+GG: [Laughs] Yes. That is quite nasty and fun. 
+HJ: You think that Zargon's just trying to be a spirit possessing a hu­
+man, and that gets you to ignore the fact that Zargon's over here on 
+the right regenerating because you now think, "Oh, he is a spirit that 
+jumps from body to body." 
+GG: He is a great villain. Was he inspired by anything in particular? 
+Or was he purely constructed by the team? 
+"Tom and I both had a love of Robert E. 
+Howard's Conan stories and H.P . Lovecraft's 
+'The Call of Cthulhu' and the Eldritch 
+monsters. A lot of the monsters that we 
+have created and added to Dungeons &... 
+Dragons are based on this otherworldly 
+nature that's almost Cthulhuian, and I think 
+that was Zargon. Zargon is a creature right 
+out of a Conan story ." 
+HJ: Well, mostly it was Tom's idea, but Tom and I both had a love of 
+Robert E. Howard's Conan stories and H.P. Lovecraft's "The Call of 
+Cthulhu" and the Eldritch monsters. A lot of the monsters that we 
+have created and added to Dungeons & Dragons are based on this 
+otherworldly nature that's almost Cthulhuian, and I think that was 
+Zargon. Zargon is a creature right out of a Conan story. It would 
+have been something that would have been very much at home with 
+Conan-and Robert E. Howard was a big fan of H.P. Lovecraft. If 
+you look in some of his short stories, he actually chants one of the 
+chants from "The Call of Cthulhu." All I remember right now is that 
+jhtagn is one of the words. 
+I think that you'll see that was where Zargon comes from, and right 
+now, a lot of the creatures that I created-the cloaker, the gibbering 
+mouther-they're very Cthulhuian. They're very odd, alien, unnatu­
+ral things. They're not a fairy; they're not an ore; they're not a witch. 
+They're something that is unpredictable. You don't know what it is. 
+In the early days, the standard was that-and Caty started this stand­
+ard-when you wrote an adventure, you would introduce at least one 
+new monster, so that was a perk that the people who bought it would 
+get. The remorhaz appears in the Against the Giants series, in The Gla,­
+cial Rift of the Frost Giant jarl. We would always do that. When I did 
+Tamoachan, there are several new monsters, as well as classic monsters 
+are then referenced, like the amphisbaena. The werejaguar-we didn't 
+have a werejaguar in our thing, but a jaguar is equivalent of a tiger in 
+South America and Central America. We would introduce something 
+new. I think that's where Zargon comes from. 
+GG: The adventure as a whole, and the idea of a lost underground 
+city-were those inspired by any books or movies? 
+HJ: Conan the Barbarian. We were very much into Conan. A lot of 
+the birth of Dungeons & Dragons came about by the reintroduction 
+and the public's rediscovery of the Conan stories, done mostly by 
+Curtis Magazines with Marvel-Marvel owned the black-and-white 
+Curtis Magazines-and The Lord of the Rings, which had reached the 
+stage in the late 1950s, early 1960s, and that brought fantasy into 
+what we were doing. We were originally just doing historical armies, 
+and then we said, "Ooh, we could do dwarves; we could do giants." 
+[Laughs] Dave Arneson, the one who introduced dragons, said, 
+"Ooh, we could do these things, too," and that's where fantasy came 
+from. I know that Gary, myself, a lot of the design team were fans of 
+those grandfathers-or uncles-of horror and modern fantasy. 
+GG: What about the concept of the different factions in The Lost 
+City? That's certainly interesting. Where did that come from? 
+HJ: There is a Conan adventure called "Red Nails," and in it Conan, 
+who comes out of a jungle having fought an earth dragon-which, 
+in fact, is just a giant dinosaur-and killed this dinosaur, finds this 
+encapsulated city , and he goes into the city. 
+The Conan material was written as a series of entries in magazines, 
+so it was a serial, and serials tended to be cliffhangers at the end of a 
+chapter. In that story, "Red Nails," he encounters two factions. One 
+has him captured and is torturing and killing parts and members of 
+the other faction. He decides to throw his fate in with the underdog 
+and rescues the underdog, only to find out that he's a prince of the 
+second faction, and that city has the two factions going on, plus the 
+one faction has a wizard with a flute that can summon ancient ter­
+rors-again, Cthulhuian-like terrors-from the bowels of the earth 
+and bring them up to kill the other. Ir's the Hatfields and McCoys 
+with X factors thrown in, such as the outsider Conan. A lot of the 
+Conan stories had that kind of aspect. 
+0NG iII AL ADVE II'f viu;s RE iIIC A1'_ IIA'fED • 'fHE LOS'f ci 'tY 
+
+--- PAGE 17 ---
+
+We were inspired by those stories. We always did our own, but I 
+think there's a desire in what I write to give you a sense of "Oh! Boy, 
+this feels familiar." That's what I wane. [Laughs] I wane you to sit 
+there and go, "Oh my. I think I know what this is," because if you 
+think you know what it is, I'm going to mislead you and take you in 
+a different direction and surprise you. [Laughs] 
+GG: What was it like working with Tom Moldvay? 
+HJ: Wow. I worked on many projects with Tom. We did D&D Basic 
+and D&D Expert together as editing and development teams. He 
+helped cowrite or type up the updated version of A2: Secret of the 
+Slavers Stockade because as the manager, I was always behind sched­
+ule. I would give him my notes and explain to him what my ineen­
+tion was, and then he'd go off and write. He very much got my ideas. 
+I would give him a half-baked idea; he'd come back, "Well, I did 
+this." "Well, that's right! That's what I mean t! " or "No, no, no, do it 
+this way, Tom." [Laughs] He was very responsive. 
+I don't know that Tom and I were friends, but we were friendly co­
+workers, and I certainly respected his skills as an author. I was sad 
+when he departed the compan y. I was happy when he brought out 
+his own role-playing game, Lords of Creation, that was published by 
+Avalon Hill. 
+I saw a lot of the things that he had learned while he was working 
+with TSR helped develop role-playing further. What we would see 
+from other companies was an adding on of layers of complexity to 
+existing role-playing. Our friends at Iron Crown started with Arms 
+Law and Claw Law, and those were critical hit tables. It was just 
+books and books of tables, and it was levels and levels of complexity, 
+which it did drive us to do and include some of this stuff standard, 
+but we didn't need books and books of tables. [Laughs] 
+Tom actually got that it was story, that what we were doing was a 
+game that was creating a story, not a facsimile of reality. We didn't 
+care. We were there to eneertain and tell a story and get you to help 
+direct the story and determine the stages of drama and wherever it 
+was going to go with the legend you were forging for your heroes. 
+GG: I can see how the design of The Lost City fits in with those ideas. 
+Did you have a favorite or a least favorite part of that module? Does 
+anything stick out? 
+HJ: I waneed to do more with the actual Lost City. We just devoted 
+a page to ideas and, as I said, we have what we call adventure kernels 
+or adventure seeds, so we would describe "Here's this underground 
+chasm that is beneath the lake. It has undertows," and things like 
+that. We would describe it, but I could envision something dark, 
+like from the Mariana Trench, living down in that chasm beneath 
+the underground lake and that it was a danger. As a matter of fact, 
+later on, you see something that would have lived in that chasm: 
+the aboleth, another Cthulhuian-like creature, rises up out of a deep 
+underground chasm in Zeb Cook's Dwellers of the Forbidden City. 
+I wish we had had more space than one page, but I was delighted that 
+we could get one page and not ignore the fact that the city was there be­
+cause what we were trying to do was give you-a term I've recently be­
+come familiar with, and by this I mean two months ago-we gave you 
+a "sandbox," an early sandbox. That is to say, "Here's the tools you need 
+to run your own campaign. Here's random encouneer charts. Here's 
+backstories. Here's maps of the area. Okay, now you start overlaying 
+your own adventures, challenges, traps, and stories to this setting and 
+the underground city. " The lost city of Cynidicea actually is one of the 
+first sandboxes that was ever published. It gives you that sense of"Ooh, 
+I could run many adventures here around each of them." 
+Later on, I did my own adventures that I wrote for the RPGA Net­
+work and their tournamenes. Bear of Tristor is based on a campaign 
+adventure that I wrote for my local players, and you were chasing 
+what you thought was a killer bear who had taken a child, and you 
+wander across this entire terrain, which has landmarks and various 
+challenges. I actually had wandering things-I had a goblin band, 
+I had wolves, and I had two bears because, of course, there's a red 
+herring in there-and those things would move when the players 
+moved, so they're moving around the map, too. [Laughs] 
+What people said to me, after we'd played the adventure-you had 
+destroyed the one bear, saved the other bear, saved the child, brought 
+him home-was, "I need another adventure," and I would go and I'd 
+look at this map that I did for Bear ofTristor, and I said, "Ah. I could 
+use these landmarks to start another adveneure." One landmark is a 
+knoll with a worn-out dolmen at the top surrounded by heather­
+purple heather-and when you step on the heather, as you approach 
+this dolmen, there's the sensation of somebody just walked across 
+your grave-you know, a chill up and down your back. Why? I don't 
+know! I thought it was neat. [Laughs] 
+When I first did it, it was just drama, so when we did a further adven­
+ture of that setting, as in Cynidicea again, a sandbox is what it became 
+for me. I could look at the landmarks I established and say, "Oh, let 
+me further divine what's here at this landmark, this ruined chapel, 
+this cave in the hills-whatever," and I think that that's what we see 
+in Lost City: the poteneial for finding side passages to levels that we 
+didn't even know existed or a set of caverns or, in this case, the city. 
+"The lost city of Cyni dic ea 
+actually is one of the first sandboxes 
+that was ever publi shed." 
+GG: Do you remember anything particularly entertaining or ineer­
+esting that characters did while adventuring in the Lost City in the 
+module? 
+HJ: Oh, wow. [Laughs] Oh my goodness. You know how long ago 
+that was? We're talking 1982. 
+GG: I was hoping there was that one story, that classic story that 
+endures forever because the players did something so crazy. 
+HJ: I'm sure there are many stories. The adventures I write myself, 
+they're invented in my head. I can't get rid of them. People say, "How 
+do you come up with the ideas? " and I'd say, "I don't. I'm recording 
+the ideas." "Where do they come from? " "I don't know. I'm more 
+the historian than the creator." I know them as a piece of history, 
+but something like Lost City, I was oversight. [Laughs] I was Tom 
+Moldvay's muse at that point. I gave him ideas, and he would run 
+some playtests on his own, and then there'd be some games where I'd 
+witness it, but you might see only two or three encouneers, and that's 
+not really indicative of the whole adventure. 
+0NG iirn.L ADVE IITV�S RE iIIC ARJIATED • THE LOST ci 'tY 
+
+--- PAGE 18 ---
+
+Tim Wadzinski, Andy Frielink, Harold Johnson, and Todd Kath at Gary Con XI (March 2019 in Lake Geneva, WI), immediately 
+after Johnson TPK'd their party in an AD&.D tournament game 
+GG: You mentioned playtesting. In the formative years of the hobby, 
+how did playtesting work at TSR? Did people volunteer or were they 
+assigned to it? When they had feedback, how did that process work? 
+HJ: That's a great question. I would say unlike Wizards of the 
+Coast, who hired people to do the playtesting of Magic: the Gather­
+ing-and they would do it 24 hours a day and that was all they did 
+was they'd come in and they'd do iteration after iteration of cards 
+and see how the balance and imbalance was-at TSR, it really came 
+down to the designer. 
+Tracy Hickman loved to flesh out his maps. He'd finish his maps first. 
+I'm a "maps last" kind of guy; Tracy is a "maps first" type of person. 
+He would flesh out that. He'd create some of the encounters based 
+on the neat sections he'd put to the map, and then he would gather 
+players, have them generate characters, so they were random char­
+acters-the original Tasslehoff Burrfoot, the precursor, was a hobbit 
+thief named Almar Tann-and he'd run us through the adventure 
+not knowing what to expect. He knew what encounters he had, but 
+he didn't know the drama, the theater. That was really provided by 
+the playtesters. 
+He chose to do that at his apartment offsite. There were ones that 
+would do it at lunch hours in the games library; there ones that 
+would do it on weekends at their house or in the evenings at their 
+house. I would do it at conventions. I would go to conventions, and 
+people would seek me out and say, "What are you running?" and I'd 
+say, "Nothing. I came to play!" [Laughs] They'd say, "Oh, no, no, 
+you've got to run something!" "I didn't bring anything!" Eventually 
+I'd bring out my notes on the adventures that I was working on then, 
+and we would play that, and then I would go back and say, "This 
+worked; this didn't work. I need more definition," or "I need to add 
+an element that will get it across." 
+I have an adventure I just wrote. One encounter has these mysterious 
+black lobes come down through a chimney and fall, and they turn 
+into spiders. When you smash a spider, it goes up in a puff of smoke, 
+and the surviving spiders all grow a little bigger till there's one spider 
+who's abour the size of a horse. Now, I knew what I intended, which 
+was you should have figured our killing the spiders is a bad thing. 
+[Laughs] You should trap them somewhere while they're weaker be­
+cause, eventually, you're going to make this gargantuan spider that's 
+going to kill you. I don't think the players got it during the playtest, 
+so I've gone back and thought, "Hmm. Maybe I should add some 
+sort of element to give them a clue to that effect." 
+It doesn't even have to be abour the spiders. It could be about some­
+thing else. It could be about drugs and how a drug has a certain effect 
+as a poison when it's at full titration, but when it is weakened and 
+divided and subdivided and sub-subdivided, it becomes an enhance­
+ment for astral projection or something like that, and that would 
+give them a clue to look at the idea about "divide and conquer." 
+It changes. We do adjust things when it plays. We do not have the 
+hubris of saying, "Ha! I killed all the characters!" A lot of people talk 
+about Hidden Shrine ofTamoachan being one of the deadliest adven­
+tures ever out there. I'll tell you that there are other ones, like Tomb 
+of Horrors. It was never my intention to make it a deadly adventure. 
+It was my intention to make you move fast. That's why there's poison 
+gas. It's really not poison gas. It was later defined by, I think, on a 
+rewrite as poison gas, but it was stale air. It was a lack of oxygen. 
+That's what you were suffering from, and the reason I did damage to 
+you was to say, "If you keep dawdling, you're just going to die of as­
+phyxiation, so you need to move. You need to make quick decisions. 
+You need to move swiftly and get to fresh air, or you're going to die." 
+That's why it's there. It's not there to kill them all off, but it does a 
+good job of doing that. [Laughs] 
+GG: Yes, indeed! Harold, thank you very much. Those are some 
+great stories. 
+HJ: No problem. 
+0NGiilAL ADVE ilTV�S RE iITC AR .IlATED • THE LOST ci 1Y 
+
+--- PAGE 19 ---
+
+CHAPTER TWO 
+B4 : The Lost City 
+Origin al Pu bli catio n 
+T he Lost City was originally published by TSR in 1982. Unfor­
+tunate ly, as with many early TSR products, there are no de­
+finitive records of the printing history. Dedicated collectors 
+have pieced together some of the printing history, and based on their 
+notes we believe there were at least four printings of The Lost City, 
+possibly five. 
+The first printing had a yellow diagonal stripe at the upper left corner. 
+After several printings, the format of the cover changed to include a 
+red horizontal banner across the top. There were at least rwo print­
+ings of the "yellow banner edition," based on the shift in placement 
+of the ISBN and product number/piece code. There may have been 
+a third printing, based on the hole-punching and slight change in 
+cover dimensions (by approximately 118") evident in some editions. 
+There may even have been a fourth printing, based on some editions 
+that have a card stock header attached, although this may have sim­
+ply been a repackaged edition of a first printing. There is believed to 
+be only one printing of the "red banner edition." 
+What follows here is a complete scan of what we believe to be the 
+first printing of The Lost City. Following that complete scan is a scan 
+of the cover for the first "red banner edition." The interior contents 
+of that later printing are essentially identical to prior printings. 
+Through the course of creating our 5E conversion of The Lost City, 
+we identified a number of typographical errors in the original­
+more than was typical for a TSR publication. In the off chance that 
+a reader of this volume intends to run a game from the original TSR 
+edition, here are some things to be aware of, mostly related to map 
+discrepancies. You can reference the 5E conversion maps for correc­
+tions to many of these issues. 
+Map Issues 
+• Areas 1 & 6 are connected by a trapdoor that isn't shown in either 
+room. (In addition, falling through it causes ld6 damage despite 
+the ceiling height of area 6 being 15 feet.) 
+•Area l 7a is not labeled on the map. The text for this area doesn't 
+match the map (20xl0 vs. lOxl O). It is implied that there are rwo 
+normal doors, whereas one is secret on the map, and then area 18 
+is called "Secret Room." 
+• Areas 24 and 24a are transposed on the map. 
+• Area 27a is not labeled on the map. 
+• In area 44, the room description should say 27a, not 27. 
+• Area 50 has several issues. The double doors are not clearly marked 
+on the map. The boxed text and room text conflict on northeast vs. 
+northwest directions. 
+• Area 50a is not labeled on the map. 
+Text Issues 
+• Area 56. The boxed text should not be boxed (or at least that's our 
+interpretation ). 
+• Area 57 refers to 54 and 55 but should say 55 and 56a. 
+• Areas 71 and 72. Both say Usamigaras but we believe one of these 
+should be for Madarua. 
+As always, some of the printing information in this entry owes a debt 
+of gratitude to The Acaeum, an online site for D&D collectors. For 
+more information, visit www.acaeum.com. 
+0NG iilAL AD VE ilTV RJ:S RE iIIC AR._IIATED • THE LOST ci'fY 
+
+--- PAGE 20 ---
+
+[No text extracted]

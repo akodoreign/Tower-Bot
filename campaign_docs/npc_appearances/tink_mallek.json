@@ -1,0 +1,28 @@
+{
+  "name": "Tink Mallek",
+  "species": "Gnome",
+  "faction": "Wardens of Ash",
+  "rank": "Recruit",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "gnome-sized frame, wiry and compact, standing just over two feet tall, ash-gray skin etched with soot-streaked scars, coal-black hair tangled into a grease-smeared topknot, tawny eyes sharp and restless, pupils dilated as if tracking unseen movement, patchwork leather armor reinforced with brass plates, scavenged scale mail peeking through frayed seams, warhammer with a cracked obsidian head rests at their hip, crossbow slung across their back with a coiled serpent grip, a jagged ash-mark tattoo crawls across their left cheek, fading into the brass plating.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

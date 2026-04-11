@@ -1,0 +1,1442 @@
+
+
+--- PAGE 1 ---
+
+ 
+1
+Bill william (Order #37485889)
+
+--- PAGE 2 ---
+
+Neverland: The Impossible Island
+A 5th Edition setting Based on JM Barrie's Neverland
+by Diana Gaeta
+Contents
+3
+4
+4
+4
+5
+5
+5
+5
+5
+6
+6
+7
+7
+7
+7
+8
+8
+8
+8
+8
+8
+9
+10
+10
+10
+10
+10
+11
+12
+12
+13
+14
+15
+16
+17
+18
+19
+19
+19
+20
+20
+20
+21
+21
+22
+23
+24
+26
+Introduction
+Chapter 1: Neverland
+Neverland Lore .............................................................
+Running a Campaign in Neverland .........
+Age ................................................................................................
+Origins in Neverland .............................................
+Factions of Neverland ..........................................
+The L ost O nes ............................................................................
+The M ollusks ..............................................................................
+The Scorp ions ............................................................................
+The M others ...............................................................................
+Chapter 2: Navigating Neverland
+The Lost Camp ...................................................................
+Resources ....................................................................................
+Flight ............................................................................................
+Mermaid Lagoon .............................................................
+Cannibal Cove ..................................................................
+Crocodile Mountains ................................................
+Evergreen Forest ............................................................
+Nevergreen Forest ........................................................
+Skull Rock ............................................................................
+Neverland Map .................................................................
+Chapter 3: Creating a Character
+Origins, Classes, and Decisions ...................
+Memory ...................................................................................
+Neverland Backgrounds ......................................
+Neverland Feats ............................................................
+Chapter 4: Paladin Subclass
+Chapter 5: Friends and Enemies
+Figments ................................................................................
+Creating your O wn Figm ents ...............................................
+Croc ............................................................................................
+Merfolk .................................................................................
+Fae ...............................................................................................
+Tinkerbell ..................................................................................
+Queen M ab ...............................................................................
+Pirates .....................................................................................
+Cap tain Hook ...........................................................................
+Sm ee ..........................................................................................
+Lost Ones .............................................................................
+Nibs ............................................................................................
+Slightly ......................................................................................
+Tootles .......................................................................................
+The Twins .................................................................................
+Wendy and Lilly ............................................................
+Pan ..............................................................................................
+Chapter 6: Red Handed Jill
+Chapter 7: Memories in the Dark
+Powered by The Homebrewery
+Featuring cover art by KelseyMichele, and additional art byAnumation, Andrea Scott, andGlimeron Art
+So much love and thanks to myPatrons for the support throughthis passion project.
+Product Identity: The following item s are hereby identified as
+Product Identity, as defined in the O p en Gam e L icense
+version 1.0a, Section 1(e), and are not O p en Content: Plots,
+story elem ents, creature nam es, locations, artwork, and
+sidebars. (Elem ents that have p reviously been designated as
+O p en Gam e Content are not included in this declaration.)
+O p en Gam e Content: The O p en Gam e Content in this book
+includes all m onster nam es, descrip tions, m onster statistics,
+and m onster abilities which are not considered Product
+Identity. No other p ortion of this work m ay be rep roduced in
+any form  without p erm ission.
+2
+Bill william (Order #37485889)
+
+--- PAGE 3 ---
+
+Introduction
+Authors
+Diana Gaeta | She/He/They | @ superdillin
+Noir Enigma | He/Him | @ NoirEnigma - The Oath of the Lost One
+Avalon Mason | She/They | @ a_catattack - Memories in the Dark
+Artists
+Kelsey Michele | She/Her | @ toughtinkart
+Anumation | She/Her | @ AnumationArt
+Glimm | @ GlimeronArt | glimeronart @  gmail.com
+Andrea Scott | @ andreascottart | andreascottart . net
+Playtesters
+Matty | He/Him | @ SoMattyGameZ | link-tube .com/somattygamez
+Bebarce El-Tayib | He/Him | gonerdy.com Christina Sid | She/Her | @ greeksid | greeksidrpg @  gmail.com
+Kate | She/They | @ masulevin
+RK Wildest | They/Them | @ RussWildest | @ PrismPals,
+R. Morgan Slade | He/Him | @ rmorganslade
+Avalon | She/They | @ a_catattack
+Kate Henry | She/Her | @ KatesD8s
+Sarah | She/Her | @ arclghtphnx
+Wren | They/He | @ AtomicFirebird
+Consultants
+Micchi von Cross | He/Him | @ Micchisaurus
+And Special thanks to Leona Maple of Maple Consulting | She/Her | @ TheLeonaMaple
+J
+.M . Barrie’s original novel, Peter Pan (alt. Peter
+and W endy) has been a fascination of m ine since
+childhood. The world of concentrated im agination
+and childhood fantasy com e to life, Neverland, is a
+vibrant background to a story that seem s to tackle
+the very real p ain associated with identity, change,
+and growing up . I can’t sim p lify the way
+Neverland and the story of Peter Pan has been a backdrop  to
+m y life, and a p ersonal m etap hor during m y own p eriods of
+identity and self-discovery.
+I’ve written of this story before, of m y fascination with how
+m uch darker the story is than the way it’s been p ortrayed on
+screen, of how m uch credit Barrie gives his reader, and of m y
+susp icions that this story has m ore to do with gender identity
+and gender roles than it has to do with age and sim p ly leaving
+childhood. But none of that has truly scratched the itch for
+m e. I needed, m ore for m y own self than for any other reason,
+to dive deep  into Neverland and bring the subtext of Barrie’s
+lore to fruition.
+O f course, I can’t sp eak for him , and p erhap s m y
+interp retation of Neverland and Pan’s existence is p urely m y
+own active im agination at p lay. But it has been too loud for
+too long in m y head and writing this setting gave m e the
+chance to finally scratch that itch.
+This setting was designed for 5th Edition, but I welcom e
+you to use it with any tabletop  system  or even with no system .
+Sit with your friends and im agine together, exp lore and
+create together, and discover yourselves together.
+Please be assured that you will not find the p roblem atic
+and unnecessary elem ents of Barrie’s world, or of a certain
+m ouse’s interp retation, within these p ages. Sp ecifically, you
+will not see offensive stereotyp ed dep ictions of Indigenous
+cultures. W hile I deep ly adm ire Barrie’s work, and am
+grateful for the story he wrote, his ideas about these cultures
+are as inaccurate and inap p rop riate now as they were when
+he first p ut them  to p ap er.
+If you read this book, and if you p lay in this setting, I thank
+you from  the bottom  of m y heart. This story has a life-long
+p lace in m y heart and sharing it with you is both terrifying
+and liberating. And so, if you’ve given it a chance you have
+truly seen a p art of m y heart and soul.
+I want to thank all of those who were instrum ental in
+m aking this hap p en, with a sp ecial thank you to m y best
+friend who finally p ushed m e to create this.
+Avalon, you are the world’s best cat.
+And to everyone who was instrum ental in the p laytest
+stages, consulting p rocess, and workshop p ing for this setting.
+W ithout you I would still just be daydream ing about this.
+3
+Bill william (Order #37485889)
+
+--- PAGE 4 ---
+
+Chapter One: Neverland
+Neverland Lore
+N
+everland is a world that exists im p ossibly
+am ongst the stars. W hen ap p roaching this
+floating world, it will ap p ear as a chunk of
+earth as if som eone had sliced into it like a
+p ie. There is no visible sun, or m oon within
+its orbit, but once there, day and night still
+com e.
+O nce up on a tim e, as they say, Neverland was created by
+the fae as a gift to all sentient life across the m ultiverse. O n
+the journey to death, which we all will m ake, one m ust travel
+far and long through the stars. And one of the unfortunate
+truths about the universe is that death can sum m on anyone
+at any age. W hen children need to m ake this journey to the
+afterlife, it can be frightening. And so the fae gifted a m agical
+p lace, fueled by the children's own im aginations to rest and
+p lay, halfway through the journey. W hile there, they forget
+about the life before, and so their fear for the rest of the
+journey is eased. O ver tim e, m any of those who p assed on at
+any stage of life began to stop  by the Neverland, to visit a
+p lace of joy, resp ite, and closure before finally p assing on.
+Along with this gifted world, the fae ap p ointed a very
+sp ecial being, who willingly agreed to ferry these children
+along the way so they would not need to feel fear. For a
+thousand years the job belonged to a young hum an wom an
+nam ed M aim e M annering, who dutifully ferried her charges
+to Neverland, and then to the beyond, with a joyful, loving, and
+entertaining sp irit. After a thousand years, her deal was up ,
+and she was given m any fae gifts as a reward for her service.
+To rep lace M aim e, the fae searched for years on m any
+worlds, looking for one with the desire and the skill. And
+finally, in the m iddle of a m agicless world, in a p lain garden,
+they found an Im p ossible Boy. They lived am ong hum ans, in a
+world with no notable rem arkable beings that they could see,
+and yet they held certain features of the fae, including the gift
+of flight. M ost im p ortantly, they had a burning desire to
+escap e to som ep lace better.
+The fae m ade a deal with the Im p ossible Boy, Bran. Soon
+after, although m uch too late, it was revealed to be a trick,
+p ulled with the aid of a faerie com p anion, Tinkerbell, who
+was also in need of escap e. She used her m agic to give Pan
+flight, and together they took ownership  of the Neverland.
+The fae were foiled, but as always, if a deal is m ade it is kep t
+without excep tion. And so Bran, along with their faerie
+com p anion, becam e the new Pan of Neverland, ferrym an for
+young souls.
+O f course, Pan was not p articularly interested in the job as
+described, just the gifts it cam e with. And so, soon after
+arriving in Neverland, they stop p ed bringing along the souls
+they were m eant to help . Instead, they realized they could
+instead bring any living p erson from  the worlds below to help
+turn Neverland into their own m agical everlasting kingdom .
+W ith Neverland no longer fulfilling its p urp ose, it devolved
+into som ething it was not m eant to be, and over tim e twisted
+its nature. The creatures becam e the p artially recalled
+m em ories of beings from  the living world, often behaving
+antithetical to their nature as well. The weather becam e
+erratic, tied intrinsically to Pan's unreliable m em ory and
+affected by his em otions.
+This does not m ean that Neverland, Pan, or Tinkerbell, are
+all bad. In fact, som etim es, they are all good. The only truth of
+all three is that they are not what they were intended to be.
+Running a Campaign inNeverland
+W e've all exp erienced som e hardship  or trial that m akes us
+wish, p erhap s briefly, to the stars that we could run away to a
+p lace where those p roblem s cannot follow. W hat if, one day, a
+strange being flew down out of the stars and told you that
+they could bring you to such a p lace? Not just to a p lace free
+from  your current trouble, but with m agic, and m erm aids,
+p irates, and endless adventure?
+W ould you have the courage to leave all you know behind
+and race across the stars?
+A cam p aign in Neverland can be indep endent, beginning at
+the m om ent when all of the p layer characters have decided to
+run away to Neverland, away from  whatever it is within their
+backstory that has p ut them  on the run.
+However, Neverland can also be used as an interm itent
+adventure within a longer cam p aign. Should the characters
+in an ongoing cam p aign encounter an enem y too vast, m ade a
+decision they cannot face, or exp erienced a loss too great, a
+GM  could choose to give them  an escap e from  that encounter
+via a visit from  a m ysterious fae being, p rom ising to whisk
+them  away. Should they accep t, the characters are flown off
+to the Neverland for as long as the GM  and p arty like before
+returning hom e, hop efully better equip p ed to handle that
+which they left behind.
+4
+Bill william (Order #37485889)
+
+--- PAGE 5 ---
+
+A g e
+I t  i s  m y  p e r s o n a l  i n t e r p r e t a t i o n  t h a t  J M  B a r r i e 's  o r i g i n a l  s t o r y
+i s  n o t  r e a l l y  a b o u t  " g r o w i n g  u p "  a s  i n  b e c o m i n g  o l d e r  - r a t h e r  I
+b e l i e v e  " g r o w i n g  u p "  t o  B a r r i e  m e a n t  b e i n g  f o r c e d  t o  f i t  i n t o  a
+d e s i g n a t e d  r o l e  b y  s o c i e t y . A s  s u c h ,  I  w o u l d  r e c o m m e n d
+r e s i s t i n g  t h e  u r g e  t o  f i l l  y o u r  p a r t y  w i t h  o n l y  c h i l d r e n  P C s .
+F e e l  f r e e  t o  p l a y  a d u l t  c h a r a c t e r s ,  a s  P a n  a n d  t h e  L o s t  O n e s
+a n d  a l l  o f  t h e  o t h e r  N P C s  i n c l u d e d  o n  t h e s e  p a g e s  w i l l  b e
+a d u l t  c h a r a c t e r s .
+H o w e v e r ,  s h o u l d  y o u  a n d  y o u r  p a r t y  d e c i d e  t o  p l a y  c h i l d
+c h a r a c t e r s ,  p l e a s e  e n s u r e  y o u  d i s c u s s  a n y  c h a n g e s  t o  g a m e
+p l a y  t h a t  w i l l  n e c e s s i t a t e  b e f o r e  y o u  b e g i n . Y o u  m a y  w a n t  t o
+m a k e  a n y  d a m a g e  t o  c h i l d  P C s  n o n - l e t h a l,  o r  b a n  i t  f r o m  t h e
+g a m e  a l l  t o g e t h e r ,  b u t  p l e a s e  b e  m i n d f u l  o f  t h e  c o m f o r t  o f
+e v e r y o n e  a t  t h e  t a b l e .
+O r i g i n s  a n d  C l a s s e s  o f
+N e v e r l a n d
+N e v e r l a n d  e x i s t s  a s  a  p o i n t  i n  s p a c e  a n d  t i m e ,  s e p a r a t e  f r o m
+a l l  t h e  r e s t  o f  t h e  m u l t i v e r s e . A s  t h i s  i s  t h e  n a t u r e  o f  i t ,  t h o s e
+w h o  t r a v e l  t o  N e v e r l a n d ,  k n o w n  f r o m  t h a t  m o m e n t  o n  a s  t h e
+L o s t  O n e s ,  c a n  b e  f r o m  a n y  p l a c e  s e n t i e n t  l i f e  i s  f o u n d .
+T h e  c l a s s e s  ( r o g u e ,  b a r b a r i a n ,  e t c )  a n d  o r i g i n s  ( e l v e s ,
+d w a r v e s ,  e t c )  a v a i l a b l e  f o r  t h e  L o s t  O n e s  a r e  a n y  t h a t  e x i s t  i n
+5 t h  E d i t i o n ,  a n d  a n y  s u p p l e m e n t a l  o r  h o m e b r e w e d  c l a s s e s
+y o u r  G M  w i l l  a l l o w . F o r  t h o s e  w i t h  t h e  c r e a t i v e  h o m e b r e w
+s p i r i t ,  I  w o u l d  e n c o u r a g e  y o u  t o  i n c l u d e  o r i g i n s  f r o m  o t h e r
+l o r e ,  s h o u l d  t h e  G M  a p p r o v e .
+T h e  L o s t  O n e 's  c a m e  f r o m  a n y w h e r e ,  w i t h  a  w i d e  r a n g e  o f
+p o s s i b l e  b a c k g r o u n d s . T h e  o n e  a n d  o n l y  t h i n g  t h e y  n e e d  t o
+h a v e  i n  c o m m o n  p r i o r  t o  t h e  s t a r t  o f  t h e  g a m e ,  i s  t h a t
+s o m e t h i n g  i n  t h e i r  l i f e  m a d e  t h e m  w i s h  f o r  a  w a y  o u t .
+P l a y e r  c h a r a c t e r s  c a n  b e  b r a n d  n e w  t o  N e v e r l a n d ,  o r  c o u l d
+h a v e  b e e n  t h e r e  f o r  m a n y  y e a r s . I f  y o u  n e e d  h e l p  d e c i d i n g
+w h e r e  y o u r  c h a r a c t e r  i s  a t  t h e  s t a r t  o f  t h e  g a m e ,  o r  w i s h  t o
+r a n d o m i z e ,  t h e r e  i s  a  c h a r t  i n  t h e  c h a r a c t e r  o p t i o n s  c h a p t e r
+o n  p a g e .
+F a e .  T h e  o n l y  p o t e n t i a l  c o n f l i c t  f o r  p l a y e r  c h a r a c t e r s  i n  t h i s
+s e t t i n g  i s  t h a t  o f  p l a y a b l e  f a i r i e s  a n d  p i x i e s . W h i l e  I  w o u l d  n o t
+d i s c o u r a g e  y o u  f r o m  p l a y i n g  t h e s e  r a c e s  i n  t h i s  s e t t i n g ,  I
+t h i n k  t h a t  G M s  s h o u l d  e n c o u r a g e  t h o s e  e x p r e s s i n g  i n t e r e s t  i n
+p l a y i n g  a  f a e r i e  c h a r a c t e r  t o  c o m e  u p  w i t h  a  c r e a t i v e  r e a s o n
+a s  t o  w h y  t h e y  h a v e  d e c i d e d  t o  r u n  a w a y  t o  a  p l a c e  t h e  f a e
+h a d  b u i l t . A r e  t h e y  u n a w a r e  o f  t h i s  h i s t o r y ,  o r  a r e  t h e y  a w a r e
+a n d  m o t i v a t e d  b e c a u s e  o f  t h a t  h i s t o r y ?  W i l l  t h e y  k e e p  i t  a
+s e c r e t  f r o m  t h o s e  t h e y  a r e  t r a v e l i n g  w i t h ,  o r  w i l l  t h e y  b e  a n
+i n f o r m e d  g u i d e  t o  t h i s  s t r a n g e  n e w  p l a c e ?
+F a c ti o n s  o f  N e v e r l a n d
+A l l  o f  t h o s e  w h o  a r e  b r o u g h t  t o  N e v e r l a n d  b y  P a n  a r e  f i r s t
+b r o u g h t  t o  t h e  L o s t  C a m p  a t o p  t h e  f l o a t i n g  i s l a n d s .
+F r o m  t h e r e ,  m a n y  s t a y ,  a l t h o u g h  n o t  a l l. M a n y  o v e r  t h e
+d e c a d e s  h a v e  f o u n d  r e a s o n  a n d  o p p o r t u n i t y  t o  r u n  a w a y  f r o m
+P a n  a n d  t h e  r e s t  o f  t h e  L o s t  O n e s ,  a n d  t h e y ’v e  m a n a g e d  t o
+m a k e  N e v e r l a n d  t h e i r  h o m e . S o m e  r e m a i n  o n  t h e i r  o w n ,
+s t a y i n g  o u t  o f  P a n ’s  w a y  a n d  b r a v i n g  t h e  i s l a n d  a l o n e . O t h e r s
+h a v e  f o r m e d  f a c t i o n s  t h a t  s e r v e  a s  N e v e r l a n d ’s  r e s i s t a n c e
+p r e s e n c e .
+T h e  L o s t O n e s
+W h e n  s o m e o n e  i s  f i r s t  b r o u g h t  t o  N e v e r l a n d ,  P a n  g u i d e s
+t h e m  t h r o u g h  t h e  p l a n e t s  a n d  s t a r s  a n d  t h e  b l a c k n e s s  o f
+s p a c e  u n t i l  f i n a l l y ,  t h e y  t u m b l e  i n t o  t h e  b r i g h t  a n d  c o l o r f u l
+i m a g e  o f  N e v e r l a n d . T h e  c a m p  t h e y  b r i n g  y o u  t o  i s  l o c a t e d
+a t o p  a  c l u s t e r  o f  s m a l l e r ,  f l o a t i n g  i s l a n d s . T r e e  h o u s e s ,  t e n t s ,
+a n d  b u r r o u g h s  f u l l  o f  i n h a b i t a n t s  c o v e r  t h e  s u r f a c e  o f  t h e
+f l o a t i n g  c a m p s .
+W h e n  t h e  P C s  a r r i v e ,  P a n  i n t r o d u c e s  t h e m  t o  T h e  L o s t
+O n e s  -  a n d  b e g i n s  t o  r e f e r  t o  t h e  n e w c o m e r s  a s  o n e  o f  t h e m .
+T h e y  a r e  e q u a l l y  a s  e c l e c t i c  i n  b o t h  o r i g i n  a n d  c l a s s  a s  t h o s e
+w h o  h a v e  j u s t  a r r i v e d  a t  t h e  c a m p ,  a n d  i n  t h e i r  r e c e p t i v e n e s s
+t o  n e w c o m e r s .
+D u r i n g  t h e  d a y ,  t h e  L o s t  C a m p  i s  f u l l  o f  l a u g h t e r  a n d  g a m e s
+f o r  t h o s e  t h a t  r e m a i n  a t  c a m p ,  w h i l e  o t h e r s  g o  o f f  t o
+a d v e n t u r e  t h r o u g h o u t  N e v e r l a n d . O c c a s i o n a l l y ,  P a n  w i l l
+p e r s o n a l l y  r e q u e s t  a  f e w  o f  t h e  L o s t  O n e s  t o  a c c o m p a n y  t h e m
+o n  o n e  o f  t h e i r  a d v e n t u r e s ,  u s u a l l y  m e a n i n g  a n  e n c o u n t e r
+w i t h  t h e  P i r a t e s ,  t h e  M o l l u s k s ,  t h e  S c o r p i o n s ,  o r  p e r h a p s  a
+m e e t i n g  w i t h  t h e  m e r m a i d s .
+T h e  L o s t  O n e s  a r e  a l l  v e r y  l o y a l  t o  P a n ,  b u t  n o t  a l l  o f  f o r
+t h e  s a m e  r e a s o n s . S o m e  m a y  e x p r e s s  t r u e  a d m i r a t i o n  o r
+e v e n  l o v e  f o r  P a n ,  o t h e r s  m a y  a c t  l o y a l  o u t  o f  f e a r ,  a n d  s o m e
+m a y  s e e m  t o  s i m p l y  p r e f e r  t h e  L o s t  C a m p  t o  t h e  r e s t  o f
+N e v e r l a n d .
+T h i s  g r o u p  t y p i c a l l y  h a s  v e r y  l i t t l e  t o  n o  m e m o r y  o f  t h e i r
+l i f e  p r i o r  t o  a r r i v i n g  i n  N e v e r l a n d ,  a l t h o u g h  s o m e  m a y  h a v e
+t r i n k e t s  o n  t h e m  f r o m  t h e i r  f o r m e r  l i f e . A n y  t a l k  o f  r e c o v e r i n g
+m e m o r i e s  w i t h  t h e  L o s t  O n e s  m a y  c o n f u s e ,  f r i g h t e n ,  o r
+p o s s i b l y  a n g e r  t h e m .
+T h e  M o l l u s k s
+T h e  M o l l u s k s  a r e  o n e  f a c t i o n  i n  t h e  N e v e r l a n d  R e s i s t a n c e .
+T h o s e  w h o  l e a v e  P a n ’s  L o s t  C a m p  a n d  j o i n  t h i s  f a c t i o n
+b e l i e v e  t h a t  t h e  b e s t  w a y  t o  l e a r n  a b o u t  N e v e r l a n d ,  a n d  t o
+d e f e n d  a g a i n s t  t h e  h o s t i l e  c r e a t u r e s  t h a t  i n h a b i t  i t ,  i s  t o
+r e m a i n  u n s e e n  a s  m u c h  a s  p o s s i b l e . T h e y  l i v e  i n  a  n e t w o r k  o f
+c a v e r n s  f o u n d  u n d e r  t h e  s u r f a c e  o f  t h e  w a t e r  i n  c a v e s  a l o n g
+N e v e r l a n d ’s  c o a s t ,  i n c l u d i n g  t h e  c a v e  a t  t h e  m o u t h  o f
+m e r m a i d  l a g o o n .
+T h e s e  e n t r a n c e s  a r e  n o t  e a s i l y  f o u n d  b y  t h o s e  w h o  d o  n o t
+k n o w  h o w  t o  l o o k  f o r  t h e m . S h o u l d  t h e  M o l l u s k s  t r u s t  o n e
+e n o u g h  t o  l e a d  t h e m  t h e r e ,  i t  a p p e a r s  t o  b e  a  n o r m a l  w a t e r
+s u r f a c e . W h i l e  s w i m m i n g  d o w n ,  i t  m a y  s e e m  l i k e  a  t r i c k .
+H o w e v e r ,  o n c e  y o u  a r e  f u l l y  s u b m e r g e d ,  y o u  i m m e d i a t e l y
+e n t e r  a  f r e s h  -  y e t  m u s k y  -  a i r  a n d  s e e  t h e  v a s t  u n d e r g r o u n d
+t u n n e l s  a r o u n d  y o u ,  w i t h  t h e  w a t e r  s u r f a c e  r e m a i n i n g  s a f e l y
+a b o v e  y o u r  h e a d .
+5
+Bill william (Order #37485889)
+
+--- PAGE 6 ---
+
+B e c a u s e  o f  t h e i r  a f f i n i t y  f o r  s n e a k i n g ,  s e c r e t s ,  a n d  m y s t e r y ,
+T h e  M o l l u s k s  a r e  h a r d e r  t o  f i n d  t h a n  a n y  f a c t i o n  o n
+N e v e r l a n d . W h i l e  y o u  w i l l  f i n d  a  m i x  o f  a l l  c l a s s e s  a n d  o r i g i n s
+a m o n g  t h e i r  r a n k s ,  y o u  m a y  s e e  m o r e  r o g u e s ,  a r t i f i c e r s ,
+r a n g e r s ,  a n d  w i z a r d s  t h a n  o t h e r  c l a s s e s .
+T h e  S c o r p i o n s
+T h e  S c o r p i o n s  a r e  a n o t h e r  f a c t i o n  w i t h i n  t h e  N e v e r l a n d
+R e s i s t a n c e . T h o s e  w h o  l e a v e  P a n ’s  L o s t  C a m p  a n d  j o i n  t h i s
+f a c t i o n  b e l i e v e  t h a t  t h e  b e s t  a p p r o a c h  i s  a n  o f f e n s i v e  o n e ,  a n d
+o f t e n  p l a n  d i r e c t  a t t a c k s  a g a i n s t  t h e  h o s t i l e  c r e a t u r e s  i n
+N e v e r l a n d ,  a n d  o c c a s i o n a l l y  a g a i n s t  P a n  d i r e c t l y . T h e y  a r e
+s t r o n g  a n d  a  p o w e r f u l  f o r c e  t o  b e  r e c k o n e d  w i t h ,  h o w e v e r ,
+t h e i r  t a c t i c s  m a k e  t h e m  a  t a r g e t  i n  r e t u r n .
+T o  c o u n t e r  t h i s ,  t h e  S c o r p i o n s  m o v e  f r e q u e n t l y ,  c h a n g i n g
+c a m p s  t o  d i f f e r e n t  l o c a t i o n s  i n  t h e  C r o c o d i l e  M o u n t a i n s .
+A d v e n t u r e r s  w a n d e r i n g  t h r o u g h  t h e  m o u n t a i n s  m a y  f i n d
+a b a n d o n e d  c a m p s i t e s ,  e v e n  a t  s e e m i n g l y  i m p o s s i b l e  h e i g h t s .
+W h i l e  t h e  S c o r p i o n s  c o v e r  t h e i r  t r a c k s  f a i r l y  w e l l,  t h e y  a r e
+a l s o  k n o w n  t o  l e a v e  t r a p s . T h e y  m i g h t  r e t u r n  t o  a n  o l d  c a m p
+e v e n t u a l l y ,  w a i t i n g  l o n g  e n o u g h  t o  e n s u r e  t h o s e  w h o
+s t u m b l e d  u p o n  i t  w o u l d  n o  l o n g e r  r e m e m b e r  i t ’s  l o c a t i o n .
+B e c a u s e  o f  t h e i r  t e n d e n c y  t o  f i g h t  o f f e n s i v e l y ,  t h e
+S c o r p i o n s  a r e  o n e  f a c t i o n  a d v e n t u r e r s  m a y  e n c o u n t e r  o n
+t h e i r  j o u r n e y s ,  a n d  t h e y  b e s t  b e  p r e p a r e d . W h i l e  y o u  w i l l  f i n d
+a  m i x  o f  a l l  c l a s s e s  a n d  o r i g i n s  a m o n g  t h e i r  f o r c e s ,  y o u  m a y
+s e e  m o r e  f i g h t e r s ,  b a r b a r i a n s ,  s o r c e r e r s ,  a n d  m o n k s  t h a n
+o t h e r  c l a s s e s .
+R e l a t i on sh i p  b e t w e e n  t h e  S c orp i on s
+a n d  t h e  M ol l u sk s
+T h e  M o l l u s k s  a n d  S c o r p i o n s  d i s a g r e e  w i t h  o n e
+a n o t h e r ’ s  t a c t i c s ,  a n d  t h e  t w o  f a c t i o n s  m a y  b u t t
+h e a d s  a s  a  r e s u l t . H o w e v e r ,  t h e  M o l l u s k s  w i l l  s t i l l
+o c c a s i o n a l l y  p r o v i d e  t h e  S c o r p i o n s  w i t h
+i n f o r m a t i o n  t h e y ’ v e  c o l l e c t e d ,  a n d  t h e  S c o r p i o n s
+m a y  d e f e n d  t h e  M o l l u s k s  i f  t h e y  a r e  i n  i m m e d i a t e
+d a n g e r . T h e  t w o  a r e  k n o w n  t o  e x p l i c i t l y  j o i n  e f f o r t s  i f
+a  t h r e a t  t o  t h e  M o t h e r s  i s  s u s p e c t e d .
+T h e  M o th e r s
+T h e  m o s t  e l u s i v e  f a c t i o n  o f  t h e  N e v e r l a n d  R e s i s t a n c e  a r e  t h e
+M o t h e r s . T h e y  a r e  a  s m a l l  b u t  s k i l l e d  g r o u p ,  w h o  h a v e
+d e d i c a t e d  t h e i r  l i v e s  t o  p r o t e c t i n g  a n y  c h i l d r e n  t h a t  a r e
+i n a d v e r t e n t l y  b r o u g h t  t o  N e v e r l a n d . P a n  s e e m s  e i t h e r
+i g n o r a n t  t o ,  o r  u n a f f e c t e d  b y  t h e  e t h i c a l  i m p l i c a t i o n s  o f
+m o r t a l  c h i l d r e n  e n g a g i n g  i n  c o m b a t ,  a n d  s o  t h i s  g r o u p  o f
+h i g h l y  c o m p a s s i o n a t e  a n d  e q u a l l y  c a p a b l e  p e o p l e  h a v e  b u i l t  a
+s y s t e m  o f  h i d e o u t s  w i t h i n  t h e  t r e e s  o f  t h e  E v e r g r e e n  F o r e s t .
+T h e y  d o  n o t  m a k e  a  h a b i t  o f  m a k i n g  t h e m s e l v e s  k n o w n ,
+e x c e p t  t o  o t h e r  k n o w n  m e m b e r s  o f  t h e  R e s i s t a n c e . T h e y  a l s o
+k e e p  t h e  o r i g i n a l  c o p y  o f  t h e  m e m o r y  r e s t o r a t i o n  p o t i o n
+r e c i p e ,  a s  t h e i r  l o c a t i o n  i s  t h e  m o s t  w e l l - h i d d e n .
+I n  t h i s  m a g i c a l  s a f e  h o u s e ,  s h o u l d  y o u r  p a r t y  e n c o u n t e r  i t ,
+y o u  w i l l  f i n d  a d u l t  c a r e t a k e r s  f r o m  e v e r y  c l a s s ,  o r i g i n ,  a n d
+g e n d e r . A l t h o u g h  t h o s e  t h e r e  a r e  c a r i n g  a n d  c o m p a s s i o n a t e ,
+d o  n o t  d i s c o u n t  t h e m  a s  i n c a p a b l e . M a n y  o f  t h e m  h a v e  b e e n
+o n  N e v e r l a n d  f o r  c e n t u r i e s ,  a n d  h a v e  h e l d  t h e i r  o w n  i n  m a n y
+a  b a t t l e . W h e n  t h e  M o l l u s k s  h e r e  o f  a n o t h e r  c h i l d  b r o u g h t  t o
+N e v e r l a n d ,  t h e y  r e p o r t  t h i s  i n f o r m a t i o n  t o  t h e  M o t h e r s  s o  t h a t
+t h e y  c a n  e x e c u t e  a  r e s c u e . S i m i l a r l y ,  i f  a  t h r e a t e n i n g  b e i n g  i s
+n e a r  t o  t h e  M o t h e r ’s  c a m p ,  t h e  S c o r p i o n s  w i l l  o f t e n  s t a g e  a
+m a j o r  a s s a u l t  t o  d i s t r a c t  t h e  e n e m y .
+T h e  t w o  l e a d e r s  o f  t h e  M o t h e r s  a r e  L i l l y  a n d  W e n d y ,  t w o  o f
+t h e  f i r s t  r u n a w a y s  o f  P a n ’s  L o s t  C a m p . L i l l y  w a s  t h e  v e r y  f i r s t
+t o  r u n  a w a y  f r o m  t h e  L o s t  C a m p ,  o n l y  a  f e w  d a y s  a f t e r  s h e
+w a s  b r o u g h t  t o  N e v e r l a n d . T h e  t h i n g  t h a t  b o t h e r e d  h e r  m o s t ,
+w a s n 't  h e r  o w n  s i t u a t i o n  -  s h e  w a s  a  g r o w n  w o m a n  t a k i n g  a
+r i s k  o f  h e r  o w n  a c c o r d  -  b u t  s o m e  o f  t h o s e  P a n  b r o u g h t  t o
+N e v e r l a n d  w e r e  q u i t e  y o u n g ,  a n d  s h e  f e l t  t h a t  t h e y  m a y  n o t
+r e a l l y  u n d e r s t a n d  t h e  d a n g e r s  t h e y  m i g h t  f a c e  w h i l e
+a d v e n t u r i n g  w i t h  P a n . S o ,  s h e  m a n a g e d  t o  s n e a k  a w a y  w i t h  a
+f e w  o f  t h e  y o u n g e r  o n e s ,  t h o s e  w h o  w e r e  f r i g h t e n e d ,  a n d
+f o u n d  a  p l a c e  t o  h i d e .
+N o t  t o o  m a n y  m o n t h s  l a t e r ,  w h e n  P a n  b r o u g h t  t h e  n e x t
+r o u n d  o f  L o s t  O n e s  t o  t h e  N e v e r l a n d ,  W e n d y  a r r i v e d . S h e  f e l t
+d u p e d  b y  P a n 's  p r o m i s e  f o r  a d v e n t u r e  a f t e r  h e r  f i r s t  t r i p
+a b o a r d  t h e  J o l l y  R o g e r . T w o  P i r a t e s  a n d  t w o  L o s t  O n e s
+p e r i s h e d  f o r  r e a l  t h a t  n i g h t ,  a n d  s h e  r e a l i z e d  t h a t  s h e  w a s n 't
+t r a d i n g  h e r  t r o u b l e s  b a c k  h o m e  f o r  a  l i f e  o f  a d v e n t u r e  -  s h e
+t r a d e d  h e r  o l d  t r o u b l e s  f o r  n e w  o n e s . S o  s h e  l e f t ,  a n d  w h i l e
+w a n d e r i n g  l o s t  i n  t h e  t r e e s  o f  t h e  E v e r g r e e n  F o r e s t ,  s h e  w a s
+f o u n d  b y  L i l l y .
+T o g e t h e r  t h e y  s h a r e d  t h e i r  w o r r i e s  a n d  c o n c e r n s ,  f e l l  i n
+l o v e ,  a n d  d r e a m t  o f  f i n d i n g  a  w a y  o f f  o f  N e v e r l a n d . B u t  a s
+t i m e  w e n t  o n ,  m o r e  c h i l d r e n  a r r i v e d  t h e r e ,  a n d  t h e i r  g o a l s
+b e c a m e  l e s s  a b o u t  t h e m s e l v e s ,  a n d  m o r e  a b o u t  k e e p i n g  t h e m
+s a f e  f r o m  t h e  d a n g e r s  o f  t h i s  i m p o s s i b l e  i s l a n d . S o ,  t h e y  b u i l t
+a  s a f e  p l a c e  f o r  t h e m s e l v e s ,  t h e  c h i l d r e n ,  a n d  a l o n g  t h e  w a y
+o t h e r  a d u l t s  w h o  r a n  a w a y  w h o  s h a r e d  t h e i r  c o n c e r n s  o v e r
+t h e  m a n y  y e a r s  t h e y  h a v e  r e m a i n e d .
+" M ot h e r "
+T h e  w o r d  " M o t h e r "  i s  a  g e n d e r l e s s  d e s i g n a t i o n  i n
+N e v e r l a n d ,  a s  i t  ju s t  m e a n s  o n e  w h o  n u r t u r e s  a n d
+p r o t e c t s  c h i l d r e n  o r  a n y o n e  u n a b l e  t o  d e f e n d
+t h e m s e l v e s . I n  t h e  M o t h e r 's  c a m p ,  y o u  w i l l  f i n d
+c a r e g i v e r s  o f  a l l  g e n d e r s  r e p r e s e n t e d .
+W e n d y  a n d  L i l l y  b y  @ A n u m a t i o n A r t
+6
+Bill william (Order #37485889)
+
+--- PAGE 7 ---
+
+Chapter 2: Navigating Neverland
+T
+he geograp hy of Neverland is inherently
+nonsense.
+W hen flying above Neverland, traveling is
+relatively sim p le. O ne can clearly see the
+different regions and can safely drop  into them
+as they wish. However, the weather and
+top ograp hy of Neverland can change within a
+few footstep s of distance, with snowfall hap p ening inches
+away from  one’s face while they stand at the edge of a trop ical
+forest. W hile traveling by foot, finding landm arks to m ark
+your p ath is difficult, as often trees, p lants, and even rocks
+m ay m ove or shift on their own. Because of this, those with
+typ ical survival skills m ay still struggle to find their way when
+traveling by ground. All Player Characters suffer disadvantage
+when rolling to navigate, unless they have a skill or item  that
+negates that p enalty, like Second Star to the Right.
+Star m ap s are a p recious item  found in Neverland that can
+guide you to your location. A star m ap  is a dry starfish that
+has had a p articular location whisp ered to it by the
+m erm aids. O nce this hap p ens, a unique p attern of tiny, star
+shap ed holes will ap p ear on the underside of the starfish.
+W hen held up  under the m oonlight, the star m ap  will m atch
+the stars above, drawing a clear m ap  guiding you to one
+sp ecific location. W hile these m ap s are incredibly useful, they
+are difficult to obtain, for you need a m erm aid to give it to you
+willingly.
+GM Tip
+Don’t be afraid to enact consequences of the erratic weather
+changes onto your players. Sudden heavy rains may obstruct
+vision, sudden snowfall may slow them down, or they may
+even find that lightning can strike just about anywhere - at any
+time.
+W hile traveling by foot on Neverland, the L ost O nes m ay
+learn that nothing is what they exp ect. Plants and rocks m ay
+act bizarrely sentient, and creatures they anticip ate to be
+hostile m ay in fact be quite the op p osite.
+The Lost Camp
+The L ost Cam p  is the first thing m ost p eop le who arrive in
+Neverland will visit, as it is hom e to Pan and the L ost O nes.
+This cam p  is actually a series of cam p sites on a cluster of
+floating islands that hover above the south east coast of
+Neverland. The cam p sites are all full of treehouses, log
+cabins, ham m ocks, and other m akeshift living sp aces, as well
+as several enchanted p ots that create a m agical stew that
+never runs out.
+Resources
+There are not m any natural resources in the L ost Cam p , but
+there are things that can frequently be acquired here.
+M issions to the m ainland often result in casualties, due to
+which weap ons and arm or in varying conditions are often
+brought back and discarded into a p ile for the taking. They
+m ay not be in the greatest of conditions, but they are free.
+Common Never Weapons
+Name Damage Range
+Wooden Sword 1d4 slashing 5ft
+Club 1d4 bludgeoning 5 ft
+Blow Dart 1d6 piercing 10ft/60 ft
+Wood Bow 1d4 piercing 80 ft/320 ft
+Slingshot 1d6 bludgeoning 30 ft/120 ft
+Arm or in Neverland is often m ade from  natural m aterials
+as they are, for exam p le oversized Tortle shells strap p ed to
+the L ost O ne’s back, or leaves boiled and sewn into a thick
+chest p iece. The L ost Cam p  has no concep t of advanced
+crafting beyond a bit of sewing or whittling, so to find higher
+quality arm or, one would need to venture to the m ainland and
+acquire it from  a m em ber of the Resistance, by trade or by
+force.
+Common Never Armor
+Name AC Description
+Leaf 11 + Dex Thick leaves sewn with twine
+Bark 12 + Dex Splintered Wood Chest Plate
+Shell 14 An unaltered Tortle Shell, Worn as a shirt
+Flight
+Should you wish to leave the L ost Cam p , there's only one way
+to do so without certain death: flight. Pan and the faeries who
+inhabit the isle of Neverland are the only creatures who
+p ossess the ability to fly naturally. All other Neverland
+inhabitants who wish to do so m ust obtain faerie dust. If a
+L ost O ne does develop  the ability to fly without the aid of
+faerie dust, they would do their best to hide this ability from
+Pan. Flight that they did not freely give causes Pan a great
+deal of anxiety, and they m ay lash out unp redictably. Fighting
+while flying takes a great am ount of concentration, and so a
+constitution 13 saving throw m ust be m ade. Pan will dust all
+the residents of the L ost Cam p  each m orning with enough
+faerie dust to get them  through the day.
+Acquiring Faerie Dust
+Pan is the only person on Neverland known to haveplentiful Faerie Dust, thanks to Tinkerbell. Fairiepresence besides Tinkerbell on Neverland is rare.One sprinkling of faerie dust will give a Lost Oneapproximately eight hours of flight. For those newto Neverland, this flight may take some gettingused to.
+7
+Bill william (Order #37485889)
+
+--- PAGE 8 ---
+
+Mermaid Lagoon
+Just north of the L ost Cam p , on the far east side of Neverland,
+you will find a m ysterious and m agical lagoon inhabited by
+M erfolk. The L agoon is surrounded by rocks and caves som e
+of which have entries below the water line. There is a long,
+thin line of beach between the L agoon and the nearby
+grasslands and the Nevergreen Forest. There, one can often
+find m any beautiful shells, rocks, and occasionally bits of the
+m erfolk treasure that has washed up  on shore. W hile it’s safe
+to take things found up on the beach, be very wary of taking
+things from  the water itself. The m erfolk are defensive of
+both their hom e in the water, and of the things in it - both
+living and inanim ate. They will even defend the water itself, if
+they believe it to be threatened.
+O n the north m ost side of the lagoon is M erm aid Cave, a
+very large and deep  stone cavern that is im p ossibly dark the
+m om ent one step s inside. The floor of the cavern is
+underneath roughly one foot of lagoon water, m aking it
+difficult to m ove around inside quietly. At night, it is typ ically
+em p ty, however, during the day, Croc is known to sleep  there
+to escap e the light.
+Cannibal Cove
+If any newcom ers were to stum ble up on Neverland without
+the aid of Pan, just as the Pirates of the Jolly Roger once did,
+they would likely find them selves in the p ort of Cannibal
+Cove. This is a very wide C-shap ed body of water that sp ills
+out into a giant waterfall off the southm ost coast of
+Neverland. If one wanted a swim , it’s safest to say as far north
+as p ossible, for once you venture too far toward the m outh of
+the cove, the waterfall will start to p ull.
+As Neverland does not have a center, there is technically no
+“bottom ” to this waterfall. The L ost O nes have running bets
+about what hap p ens to som eone who has gotten sucked over
+the edge - whether they be stuck there forever, or will
+eventually p op  back on the other side of Neverland som eday.
+Crocodile Mountains
+The Crocodile M ountain range runs entirely down the
+centerline of Neverland. The northernm ost m ountains are
+snow-covered, with no snow at all ap p earing on the
+southernm ost m ountains. Through the center of the range, a
+river, form ed by the m elting snow of the northern m ountains,
+form s to run straight down to Cannibal Cove.
+There are m any p athways that sp iral up  the side of these
+m ountains, left p rim arily by the Scorp ions, who call these
+m ountains hom e. O ne m ay often find deserted cam p sites,
+freshly covered tracks, or even the em bers of a recently
+extinguished fire - but the Scorp ions know these m ountains
+well, and are unlikely to be found unless they want to be
+found.
+The m ajority of figm ents that L ost O nes m ight encounter
+while clim bing the m ountains are those that can fly, however,
+som e bugs and p lants m ay show up  as well. Rem em ber, from
+the high p oints of these m ountains, one will have a great view
+of their surroundings, however, it will be difficult to hide as
+well.
+Evergreen Forest
+O n the west side of Neverland is a thick green forest that, in
+som e p laces, is so thick with towering, full-leafed trees it can
+block out the sunlight. This wood is heavily p op ulated with
+figm ents of all typ es, but very few sentient creatures are
+found there. At least - not ones who are easily found.
+The Evergreen Forest can be quite help ful in gaining cover
+from  flying enem ies or unp redictable weather, however, it can
+be harder to see the stars above in order to navigate by way of
+a star m ap , as the stars above will be obscured by the thick
+tree top s.
+Pan least often travels to this p articular forest, as none of
+his favorite enem ies reside there. However, he is known to
+send group s of L ost O nes there to obtain sup p lies and food,
+and m any L ost O nes will adventure there when not otherwise
+engaged, to hunt figm ents for fun.
+Nevergreen Forest
+O n the far east side of Neverland is a thin forest of
+p erp etually dead or dying trees that form  a half-circle around
+m erm aid lagoon. W hile the trees always ap p ear to be dead or
+dying, they never fall to the ground or rot, staying in stasis
+through any am ount of tim e or change in the weather.
+The figm ents that p op ulate this wood are m ostly the
+crawling typ e, bug and crustacean-like creatures who have
+wandered too far from  the beach of the lagoon, as well as the
+flying figm ents who will fly in through the very op en and
+sp arse tree top s to rest on branches.
+This area p rovides som e sm all am ount of cover, but still
+p rovides a clear view of the sky, and im p ortantly, m erm aid
+lagoon and the coves. The Jolly Roger, additionally, sails by
+this forest during its p eriodic lap s of Neverland.
+Skull Rock
+Just off the north east coast of Neverland, just before the sea
+water begins to p our over the edge of the Island, is a giant
+rock form ation nam ed "Skull Rock" by the Pirates. It does
+not look at all like a skull, but it is the last thing the Pirates of
+the Jolly Roger rem em ber searching for when the Jolly Roger
+sank.
+W hen they arrived on Neverland, they assum ed they had
+m iraculously found their sought destination. A bit of denial
+and the m em ory-clouding effects of Neverland p revent them
+from  confronting this reality.
+Should the p irates ever take p risoners, be them  L ost O nes,
+M erfolk, or others, they would hide them  at Skull Rock. Hook
+has also been known to try to lure Pan to this location to
+finally get his revenge.
+8
+Bill william (Order #37485889)
+
+--- PAGE 9 ---
+
+Neverland
+9
+Bill william (Order #37485889)
+
+--- PAGE 10 ---
+
+Chapter 3: Creating a Character
+Classes, Origins, andDecisions
+The classes and origins available for the L ost O nes are any
+that exist in 5th Edition, and any sup p lem ental or
+hom ebrewed classes your GM  will allow. The L ost O ne's
+cam e from  anywhere, with a wide range of p ossible
+backgrounds. The one and only thing they need to have in
+com m on p rior to the start of the gam e, is that som ething in
+their life m ade them  wish for a way out. Player characters
+can be brand new to Neverland, or could have been here for
+m any years. If you need help  deciding where your character
+is at the start of the gam e, you can roll on this chart.
+Character Backgroundd4 Result
+1 Newcomer
+2 Pan's Crew
+3 Mollusks
+4 Scorpions
+Newcom ers Begin the gam e as they arrive in Neverland
+with Pan for the first tim e. Skill p roficiency in Constitution
+saving throws, and Percep tion or Survival. Tool Proficiency in
+a M usical Instrum ent.
+Pan's Crew Begin the gam e as existing L ost O nes, and
+residents of Pan's floating island cam p s. Skill p roficiency in
+Perform ance or Persuasion, and History or Nature. Tool
+p roficiency in a Gam ing Set.
+M ollusks Begin the gam e as a m em ber of the Resistance,
+sp ecifically am ong the stealth-focussed group  who reside
+near M erm aid L agoon. Skill p roficiency in Sleight of Hand or
+Stealth, and Investigation or Percep tion. Tool p roficiency in
+Thieves Tools.
+Scorp ions Begin the gam e as a m em ber of the Resistance,
+sp ecifically am ong the offensive group  who reside in cam p s
+along the snow-top  m ountains. Skill p roficiency in anim al
+handling or survival, and decep tion or intim idation. Tool
+p roficiency in Navigator’s Tools.
+Memory
+O ne of Neverland's natural abilities is that it can weaken ones
+ability to retain their m em ory p rior to arriving. U p on the start
+of the gam e, or whenever the L ost O ne arrives in Neverland,
+they should roll on the M em ory table below, and they should
+do so again at each new level they gain while in Neverland.
+Memoryd20+WisResult
+1-7 only remembers Neverland
+8-12 remember only the events that led to themcoming to Neverland
+13-17 only early childhood memories are lost
+18 + retain all memories prior to Neverland
+Neverland Feats
+In addition to the feats already in 5th Edition, and other
+sup p lem ents your GM  allows, consider taking these
+additional feats for your L ost O ne.
+Second Star to the Right
+Prerequisite: Intelligence 13
+This L ost O ne has m anaged to hold on to the odd p atterns
+of the Neverland stars enough to use them  as a m ap . W hen
+traveling by foot on Neverland, gain advantage on all
+navigation rolls as long as the night sky is visible, without the
+use of a star m ap .
+Happy Thought
+Prerequisite: W isdom  13 This L ost O ne has held on tightly
+to one m em ory strong enough that they are able to com bat
+the effects of Neverland’s ability to erase one’s p ast from  their
+m ind. Gain advantage on all M em ory table rolls, and extend
+the use of one dose of fairy dust for double the tim e.
+Sky Flight
+This L ost O ne has had m uch p ractice flying and feels m ore
+com fortable m id-air now. They gain the ability to fight with
+their p roficient weap ons while in flight without m aking any
+saving throws to stay in the air, so long as they have faerie
+dust still in use.
+The Hidden Kiss
+Prerequisite: Sp ell Casting
+This L ost O ne has discovered their hidden kiss, a sp ecial
+and m ysterious p ower hidden neatly in the corner of their
+sm ile. They can hide one additional sp ell p er day that they
+know and have p rep ared. W hen all their sp ell slots have been
+sp ent, they m ay blow a kiss and cast this final sp ell as a
+bonus action.
+I Do Believe
+Prerequisites: The L ost O ne has m et their faerie, Charism a
+13
+This L ost O ne has m et their faerie and m anaged to form  a
+bond strong enough to linger when they are not nearby. This
+L ost O ne can use the rem ainder of their faerie dust in use to
+wish a fallen ally back to one Hit Point, once p er day. If the
+L ost O ne has no faerie dust in use, but has som e on their
+p erson, the vial it is kep t in will be dep leted to activate this
+feat.
+10
+Bill william (Order #37485889)
+
+--- PAGE 11 ---
+
+Chapter 4: The Oath of the Lost One
+Paladin Subclass
+Credit: @ AndreaScottArt
+In leaving his lost boys Peter left his successor with a sim p le
+yet p otent com m and - to "p rotect everyone sm aller than you".
+Taking these words to heart Thudd would, with the aid of the
+fae of Neverland, develop  a style of com bat centered on this
+p rincip al. Fueled by the burning desire to live up  to the Pan,
+those that walk this p ath are always there to p rotect the silver
+lining and m aintain the hap p y thoughts of those under their
+p rotection.
+Oath of the Lost One Spell List
+Paladin Level Spells
+3rd Animate Shadow, Faerie Fire
+5th See Invisibility, Misty Step
+9th Counterspell, Fly
+13th Dimension Door, Freedom of Movement
+17th Legend Lore, Creation
+Channel Divinity
+W hen you take this oath at 3rd level, you gain the following
+two Channel Divinity op tions. See the Sacred O ath class
+feature for how Channel Divinity works.
+Faith, Trust and Pixie Dust. You can use your ChannelDivinity to conjure fairy dust for yourself and your allies. Youhave a flying sp eed of 30 feet for 1 m in. Each willinghum anoid in a 20-foot-radius sp here originating from  youwhen you take this action has advantage on any new savingthrow against being Charm ed , Frightened , or Possessionor m ay im m ediately reroll to rem ove one Charm ed ,Frightened , or Possession effect.
+Detach Shadow
+You can use a bonus action to detach your shadow and
+sum m on it in an unoccup ied sp ace you can see within 15 feet
+of you for 1 m in. This shadow is a m agical, and a p itch black
+im age of you that lasts until it is destroyed, until you dism iss
+it as a bonus action, or until you’re incap acitated.
+Your shadow has AC 13 + your p roficiency bonus, Hit
+Points 20 + 5 p er p roficiency bonus. If it has to m ake a saving
+throw, it uses your saving throw bonus for the roll. It is the
+sam e size as you, and it occup ies its sp ace. O n your turn, you
+can m entally com m and the shadow to m ove up  to 30 feet in
+any direction (no action required). If your shadow is ever
+m ore than 60ft from  you at the end of your turn, it reattaches
+to you.
+W hen you take the Attack action on your turn, any attack
+you m ake with that action can originate from  your sp ace or
+the Shadows sp ace. You m ake this choice for each attack.
+W hen a creature that you can see within 5 feet of your
+shadows m oves at least 5 feet away from  it, you can use your
+reaction to m ake an op p ortunity attack against that creature
+as if you were in the shadows’s sp ace.
+Bangarang
+Starting at 7th level, as a reaction you or your shadow can
+telep ort up  to 30 feet to an unoccup ied sp ace that you can see
+ap p earing in front of an ally that has been the target of a
+m elee or ranged attack. You or your shadow becom e the new
+target of that attack. This can be done a num ber of tim es
+equal to your charism a m odifier p er long rest.
+At 18th level, the range of this ability increases to 60 feet.
+Never Say Goodbye
+Starting at 15th level, your allies' faith in you is rewarded with
+vitality. Allies p rotected by the ability "Bangarang" regain hit
+p oints equal to 1d6 + half your p aladin level. Additionally, you
+no longer age, and you can’t be aged m agically.
+Thank you for believing
+You have em braced the legend of the Pan. At 20th level your
+typ e becom es Fey, and you gain a flying sp eed of 60ft:
+Faith, Trust and Pixie dust Now grants a flying sp eed of
+30 feet to each willing hum anoid in a 20-foot radius sp here
+originating from  you, in addition to the original effects.
+W hen the tim e com es for the gam e to end, you are charged
+with finding a new guardian for Neverland. O nce done you
+can age norm ally and rest.
+11
+Bill william (Order #37485889)
+
+--- PAGE 12 ---
+
+Chapter 5: Friends and Enemies
+Figments
+L
+ife native to Neverland is unlike those found
+anywhere, in any realm . They defy nature
+sim p ly because they are not a p art of nature.
+The creatures who were not brought to
+Neverland from  another world or p lane of
+existence, are the cobbled bits of the
+im aginations of all living beings - called
+Figm ents. They are very often hybrids of two or m ore real
+creatures, or a real creature with som ething just slightly
+wrong about it.
+For exam p le, you m ay encounter a turtle that is wickedly
+quick-footed, with razor-sharp  teeth, or a tarrasque that's
+covered in fluffy fur and is only dangerous due to how badly it
+wants to cuddle.
+It is encouraged to invent your own unique Figm ents, as
+that is the basis for their existence - whatever your
+im agination can com e up  with. Som e exam p les are included
+over the next few p ages, as well as a chart to help  get your
+started.
+Figm ents in Com bat
+Figm ents are resistant to standard dam age. W eap ons
+enchanted with Fae M agic work best when fighting a
+Figm ent.
+Fae enchanted weap ons deal an additional die of dam age
+that cannot be resisted, dep ending on the success of the
+enchantm ent. These enchantm ents can som etim es be
+p urchased from  the m erm aids, the fae, or traded by the
+sp ellcasters in the Neverland Factions. M ore rare Enchanted
+weap ons m ay be found in som e of the dangerous
+underground or underwater locations hidden throughout
+Neverland, often guarded by Figm ents. They m ay also be
+found in Faerie villages, like in Kensington Gardens.
+Fae EnchantmentRarity Additional Damage
+Common 1d4
+Uncommon 1d6
+Rare 1d8
+Very Rare 1d10
+12
+Never Turtles
+Turtles with the legs of a spiderlarge Figment, chaotic evil
+Armor Class 17Hit Points 20(1d4 + 5)Speed 40ft.Figment
+STR DEX CON INT WIS CHA
+3 (-3) 17 (+4) 20 (+5) 12 (+1) 12 (+1) 16 (+3)
+Senses passive Perception 15Languages None
+Figment. Figment Rules apply to the Never Turtle.
+Multi Attack. Never Turtles make two bite attackson their turn.
+Actions
+Bite. Melee Weapon Attack: +4 to hit, reach 5ft.,one target. Hit 5 (1d6 + 2)
+Charge. Ranged Attack: The Never Turtle runs at topspeed straight into targets within a 15 ft. cube. +4to hit, range 40 ft. Hit 6 (1d8 + 2)
+Web (Recharge 5-6). Ranged Weapon Attack: +5 tohit, range 30/60 ft., one creature. Hit: The target isrestrained by webbing. As an action, the restrainedtarget can make a DC 12 Strength check, burstingthe webbing on a success. The webbing can also beattacked and destroyed (AC 10; hp 5; vulnerabilityto fire damage; immunity to bludgeoning, poison,and psychic damage).
+Venus Grick
+A beautiful large, colorful lilly plant, with petals that arelike the tenticles of a GrickSmall Figment, neutral
+Armor Class 10Hit Points 25Speed 0ft.Figment
+STR DEX CON INT WIS CHA
+1 (-4) 14 (+2) 10 (+0) 3 (-3) 16 (+3) 13 (+2)
+Senses passive Perception 13Languages None
+Flower Camouflage. The venus grick has advantage onDexterity (Stealth) checks made to hide amongflowers.
+Actions
+Multiattack. The venus grick makes one attack with itstentacles. If that attack hits, the grick can make onebeak attack against the same target.
+Tentacles. Melee Weapon Attack: +4 to hit, reach 5 ft.,one target. Hit: 9 (2d6 + 2) slashing damage.
+Bill william (Order #37485889)
+
+--- PAGE 13 ---
+
+Creating your own Figments
+W hen inventing your own Figm ents, rem em ber that they are willed into existence by the collective im agination of those who live
+on Neverland, including Pan. Due the Neverland's ability to cloud any m em ories of real creatures, p lants, and m onsters, they often
+becom e quite distorted. Below is how I sp ark ideas for new Figm ents of Neverland's collective im agination.
+If, for exam p le, you rolled a Constrictor Snake with the ap p endages of an Adult Blue Dragon...you now have a flying snake. Roll
+m ultip le tim es on p art 2 to further distort your Figm ent.
+Figment Companions
+Holdlings and other Figm ents m ay not always be
+antagonistic. In fact, Holdlings are alm ost entirely
+defenseless. W hen your p arty encounters a figm ent like this,
+they m ay want to befriend it and add it to their group  of L ost
+O nes.
+If no one in the p arty has anim al handling or another
+relevant skill, they m ay exp end eight hours worth of faerie
+dust to m ake a p ersuasion roll with advantage, to convince
+the figm ent they are safe and trustworthy.
+d20Base Creature (Part 1)
+1 Adult Blue Dragon
+2 Baboon
+3 Bronze DragonWyrmling
+4 Crab
+5 Constrictor Snake
+6 Eagle
+7 Elephant
+8 Frog
+9 Gnoll
+10 Grick
+11 Hell Hound
+12 Owl
+13 Pegasus
+14 Phase Spider
+15 Purple Worm
+16 Scorpion
+17 Spider
+18 Stirge
+19 Tarasque
+20 Treant  
+d10 But...(Part 2, repeat asman times as you like)
+1 With the oppositealignment
+2 The size of a...(Rollagain on Part 1)
+3 With the ability/spellsof a...(Roll again onPart 1)
+4 With the appendagesof a...(Roll again onPart 1)
+Holdlings
+A hovering round eye about the size of a basketball,with two small eyes on appendages, with nomouths or other visible featuresSmall Figment, chaotic good
+Armor Class 18Hit Points 30Speed Fly 20ft.Figment
+STR DEX CON INT WIS CHA
+11 (+0) 12 (+1) 8 (-1) 5 (-2) 10 (+0) 20 (+5)
+Condition Immunities NoneSenses passive Perception 3Languages Can Understand common, does notspeak out loud
+Spellcasting. Holdlings cast the cantrip friends atwill. DC 15 CHA and the spell slow as an action. DC12 WIS.
+Bill william (Order #37485889)
+
+--- PAGE 14 ---
+
+Croc
+H
+e's never satisfied. The Croc is a Neverland
+Native creature who is the only one to ever
+successfully eat p art of one of the undead
+p eop le inhabiting the island - Cap tain JAS
+Hook.
+W hen Hook and the Jolly Roger first arrived
+accidentally in Neverland, Pan was offended
+greatly that the Pirates seem ed to have no interest in staying
+in Neverland - and certainly had no intention of staying with
+Pan. M ore than that, the Pirates did not even have the
+decency to hide from  Pan, as the other Neverland factions
+did. And so Pan and Hook had their first violent encounter.
+During this fight, Pan was nearly defeated by the Pirate's
+desp eration to be done with this odd p lace. But in the final
+m om ents before Hook could p lunge his sword into Pan's
+chest, he realized that his enem y had drop p ed their only
+weap on. Hook had never killed an unarm ed enem y before,
+and did not intend to lose his honor now. And so he p icked up
+the fallen dagger to hand it back to his foe.
+Pan has no such sense of Good Form , and used the
+m om ent of weakness cleverly, grabbing the dagger and
+im m ediately slicing the outstretched hand that held it - clean
+off of Hook's arm .
+Pan flew up  into the air victorious, and tossed the hand
+overboard the ship  into the sea, heading back to the L ost
+Cam p  with a crow as Croc em erged from  the water for an
+unexp ected treat.
+Turns out that the flesh of the dead is tastier than eating
+bland L ost O nes, and so Croc stalks the island looking for
+m ore ghosty snacks, or ideally, to finish off Cap tain Hook
+him self.
+Croc is a nocturnal creature, who sp ends its days hiding
+from  the sunlight in the deep est p art of M erm aid Cave at the
+northm ost side of M erm aid L agoon.
+Figm ent
+Croc is a true Neverland creature, and as such is inherently
+full of Neverland's own m agic. Harm ing this beast with
+m undane dam age will be a difficult endeavor. The creature is
+m ost vulnerable to fae dam age, and will take an additional
+dam age die from  weap ons im bued with fae m agic.
+Croc and Hook
+Long ago, Croc swallowed the hand of the PirateCaptain JAS Hook. Since this hand, and Hook, areundead, Croc can sense Hook at all times, andhungers for him most of all. Should an opportunityoccur during a combat for Croc to abandon hisprey for Hook, he will most certainly do so.Note: This same honing device allows Hook tosense the approach of Croc as well
+14
+Croc
+Huge Figment, Lawful Evil
+Armor Class 19Hit Points 185Speed 35 ft.
+STR DEX CON INT WIS CHA
+20 (+5) 14 (+2) 17 (+3) 6 (-3) 16 (+3) 12 (+1)
+Condition Immunities FrightenedSenses detect undeadLanguages None
+Figment
+Multi Attack. Croc makes two bite attacks on his turn.
+A Taste for Hook. Croc has advantage when trackingundead Neverland inhabitants.
+Actions
+Bite. Melee Weapon Attack: +5 to hit, reach 5ft., onetarget. Hit 10 (1d8 + 5)
+Tail Slam Melee Weapon Attack: +5 to hit, reach 10ft.,one target. Hit 17 (2d8 + 5) DC 15 CON save to avoidbeing knocked back 5 ft.
+Bill william (Order #37485889)
+
+--- PAGE 15 ---
+
+Merfolk
+T
+he M erfolk are m onochrom atic, shim m ering,
+elegant creatures with hum anoid torsos and
+fish-like tails. Those that live on Neverland live
+in M erm aid L agoon, and are nocturnal
+creatures. During the day, they take cover on
+the L agoon floor in the nests they’ve m ade
+next to their treasure hoards.
+M erfolk are extrem ely charm ing, and as such, have very
+little trouble getting those that sp eak to them  to tell them  all
+m anner of secrets. If you want som ething kep t to yourself,
+you should not so m uch as whisp er it near M erm aid L agoon.
+Sim ilarly, be careful to hang on to your things, esp ecially if
+you're wearing som ething that shim m ers in the sunlight, like
+gem stones or other jewelry. M erfolk will not steal it from  you,
+but they m ost certainly will attem p t to talk you out of it - and
+they can be quite convincing.
+Should you be lucky enough to see a M erfolk’s treasure,
+you could find things like valuable gem s for trading or
+enchanting, m agical arm or or weap ons, am ong other less
+valuable knick knacks.
+M erfolk will never let you take their things for free,
+including the water they live in. However, they will hap p ily
+trade with you. L ike the fae, m erm aids will often trade
+p hysical item s, including the star m ap s they m ake, for
+m em ories. Dep ending on the value of the item  being traded,
+they m ay only request a sm all m em ory, like your first
+birthday, or the last thing you ate. For som ething quite
+sp ecial, however, they m ay ask for your first love, or your
+father’s nam e.
+M erfolk are the sole residents of Neverland able to m ake a
+star m ap , which they will sell for a p rice, or for a great favor.
+In order for one of the M erfolk to m ake one of these m ap s,
+the L ost O ne will need to p rovide them  with as m uch
+inform ation as p ossible about the p lace or item  they wish to
+navigate to. The m ore details given, the m ore accurate the
+star m ap  will be. O nce m ade, it cannot be changed. The
+holder of the Star M ap  has advantage on all rolls to navigate,
+only while traveling to the location sp ecified by this m ap .
+Pan and the Merfolk
+The Merfolk are quite friendly to Pan, and the LostOnes as long as Pan is around to witness theinteraction. Pan will often visit with the Merfolk atnight, just before the end of the night, to find out ifthey've heard any secrets about the Pirates or themissing Lost Ones.
+Spell Casting
+To make Merfolk stronger, you can give them Spell Casting in
+addition to their stats above. The spells most appropriate for
+these Merfolk would be focused on charming and water
+shaping.
+Consider Calm Emotions, Charm Person, Control Water,
+Drown, Seeming
+15
+Merfolk
+Medium Monster, Lawful Neutral
+Armor Class 15Hit Points 50Speed 30 ft./Swim 40 ft.
+STR DEX CON INT WIS CHA
+13 (+1) 10 (+0) 12 (+1) 14 (+2) 14 (+2) 16 (+3)
+Condition Immunities CharmedSenses passive Perception 17Languages Aquan, Common
+Amphibious. Merfolk breathe both air and water.
+Shimmer. The scales of merfolk catch and reflectthe light of the moon, drawing people in. Anyonewho can see this takes disadvantage on charismasaving throws against the Merfolk.
+Actions
+Trident (Two-Handed). Melee Weapon Attack: +2 tohit, reach 5 ft., one target. Hit: (1d8) piercingdamage.
+Trident. Ranged Weapon Attack: +2 to hit, reach20/60 ft., one target. Hit: (1d6) piercing damage.
+Bill william (Order #37485889)
+
+--- PAGE 16 ---
+
+Fae
+F
+-aeries do exist.
+They are, however, uncom m on in Neverland.
+The only exp licitly known faerie that lives in
+Neverland is Tinkerbell, the faerie com p anion of
+the current Pan.
+You m ay rem em ber p art of the origin of the
+faeries:
+"W hen the first baby laughed, for the first tim e, the laugh
+broke into a thousand pieces, and that was the beginning of
+faeries."
+But since then one single faerie has been willed into
+existence for each and every sentient creature that has been
+born since. Your faerie is tied to you even now, even if you
+have never seen them  or been in their p resence. Your faerie
+knows your heart, and recognizes your m agic. Should you
+ever be so lucky as to m eet your faerie face to face - they
+could help  you in ways no one else could, just by believing in
+you.
+The faeries live in Hedges. Secret, hidden worlds that are
+extrem ely difficult to discover if you have not been p erm itted
+to find it. There are rum ors am ong the Neverland Factions
+that there is a Hedge som ewhere in Neverland - they all cite
+different signs they have p icked up  on over the years - but
+none have ever actually found one.
+W ithout a faerie's invite, it is still p ossible to stum ble up on
+the entrance to a Hedge, if one believes strongly enough and
+if the faeries can sense that no harm  is m eant to them .
+Should a L ost O ne believe they have found a Hedge, they can
+attem p t to reveal it's entrance by p leading with the faeries
+with a DC 18 p ersuasian check, but this can only be
+attem p ted once at a p articular location. If the L ost O ne fails,
+and the Hedge was in fact there, it will instantly m ove to a
+new location.
+The faeries inside lead quite norm al lives, all things
+considered. They work, sell their wares, care for their
+fam ilies, and fight for them  if necessary. They are also known
+to throw fabulous and extravagant celebrations with drinking,
+dancing, and gam es.
+A faerie ball is quite a form al event, and every faerie will be
+dressed in the finest, glittering ensem ble that they can afford,
+including those who serve the drinks and p lay the enchanting
+m usic.
+Not all faeries have the sam e abilities, in fact they are as
+varied as any other p erson. Som e are not very m agical at all,
+only p ossessing the basic ability to m ake faerie dust and fly,
+while som e can enchant weap ons and arm or, som e can
+create legendary jewelry from  p lain stones, and a few can
+even im agine item s or creatures right into existence.
+Meeting Your Faerie
+If a L ost O ne is lucky enough to m eet any faeries at all, they
+m ay ask help  in finding their own faerie. W hether or not their
+faerie is nearby enough for this to occur can be the GM s
+discretion, a discussion between the GM  and p layer, or if
+you'd rather it be left up  to chance - a DC 15 Persuasion
+check to p rove that the L ost O ne believes in them .
+O nce found, the L ost O ne's faerie will always know how to
+find them .
+Faerie Emotions
+You may recall that Faeries are so small, they onlyhave room for one emotion at a time. This is morepronounced in Faeries who are younger, less wise,or those who have been on their own for too long.It is important to note that although thesestrong shifts in emotion might temp a faerie tobehave eradically, logic will always return and theymay attempt to undo any mistakes they feel theyhave made.
+Kensington Gardens
+The p rop er hom e of the Faerie Royal Court, which is the
+origin hom e of the fae, is Kensington Gardens, a m agical
+p ark in the m idst of an otherwise unm agical world called
+"Earth". It is p ossible for the L ost O nes to travel there, should
+they find a faerie guide that trusts them  enough to m ake this
+journey.
+O nce there, they should be wise not to travel far from  the
+Garden itself, esp ecially if there are m agical beings or non-
+hum ans am ong them  - as the hum ans on Earth have no
+knowledge of these things and will m ost certainly react
+p oorly.
+Queen M ab rules over the m ain Faerie kingdom  in the
+Hedge of Kensington Gardens, and is as old as the existence
+of Faeries herself. She is tim eless, extrem ely m agical, and
+can com e off as a bit cold. However, she is extrem ely loved by
+those she rules over, and it's clear by her actions that it is a
+m utual love.
+Purchasing wares from a Faerie
+The Fae will trade for any item you can spare, butthey most prefer to trade valuable items formemories, as the Merfolk do. Unlike the Merfolk,however, the fae are not known to make unfairtrades, even if one is offered.
+16
+Bill william (Order #37485889)
+
+--- PAGE 17 ---
+
+Tinkerbell
+T
+inkerbell is the faerie com p anion of the current
+Pan.
+She is sm all enough to sit com fortably in
+your hand, but strong enough to carry you into
+the air, which she loves to do to those who ruin
+her m ood. Tinkerbell, before finding Pan and
+com ing to Neverland, was a fairly ordinary
+faerie. She was a Tinker faerie, handling p ots and p ans, and -
+as faeries go - was not p articularly m agical. Besides the
+ability to fly and create faerie dust, her only other gifts were
+her sharp  tongue and extrem ely restless sp irit.
+She often disagreed with fae rules - of which there are
+m any - and would leave the Hedge alone often, sp rinkling
+faerie dust on unsusp ecting hum ans which would cause
+them  quite a fright when they suddenly hovered into the air.
+Tinkerbell gave no thought to the afterm ath that followed
+when these hum ans ran hom e to show their friends and
+fam ily the m agic they discovered - only to be m et with
+worried and concerned faced when this tim e they did not fly
+at all.
+She eventually earned herself a distasteful rep utation that
+sp read further than Kensington Gardens, as faeries
+everywhere becam e fam iliar with cleaning up  after her hijinx.
+She eventually ran away from  hom e, after an altercation
+with the queen herself, and decided she didn't need faerie
+rules or the com forts of the Hedge at all. She had her fun for
+a tim e, but that excitem ent soon faded and she was hit with a
+strong lonliness once it did.
+However lonely she becam e, however, her stubbornness
+p revented her from  returning, she only lingered in the
+Gardens, just outside the Hedge entrance feeling anger at
+those who she felt forced her to run away.
+It was there that she found Bran. Bran was different than
+the other hum ans. Bran looked different than the rest, with
+features that could alm ost be fae - ears that cam e to just the
+slightest p oint, sharp  angled bone structure, and eyes that
+seem ed to reflect the m oonlight by them selves.
+M ost im p ortantly, it seem ed that Bran was young and on
+their own, having run away from  their own life as well. It did
+not take long for the two of them  to form  quite a dram atic
+bond over their sim ilarities, and that's when Tinkerbell
+thought of the p lan to get them  away together, som ewhere
+they would never be alone and would never have to hide.
+She told Bran about the Neverland, and about the contract
+one needed to take it over. M aim e had long wanted to com e
+hom e, and Queen M ab was frought to find a rep lacem ent to
+fill this role.
+So Tinkerbell told Bran everything they needed to say and
+do to convince the faeries that they were the one, and with
+their com bined cunning and a dash of desp eration - the two
+of them  p ulled it off together.
+Tinkerbell often laughs about Queen M ab's exp ression
+once Bran signed the contract and she flew into view as the
+signature turned to thread on the p archm ent.
+Tinkerbell has been Bran's faerie ever since.
+Creating more Faeries
+When creating more faeries for this universe, Iprefer to start with the Pixie 5e rules and adjustfrom there.Faeries do not exist as a monolith, they havedifferent skills, dreams, personalities, and fears justas anyone does.
+17
+Tinkerbell
+She/HerTiny Fae, Alignment changes by the moment
+Armor Class 15Hit Points 15Speed 10ft./ Fly 60ft.
+STR DEX CON INT WIS CHA
+18 (+4) 12 (+1) 1 (-4) 10 (+0) 6 (-2) 15 (+3)
+Condition Immunities CharmedSenses passive Perception 12Languages Common, Elvish, Sylvan, Undercommon
+Evasion. When Tinkerbell is subjected to an effectthat allows her to make a Dexterity saving throw totake only half damage, she instead takes no damageif she succeeds on the saving throw, and only halfdamage if she fails.
+Carry Weight. Tinkerbell can carry up to twomedium humanoids with her in flight.
+Protect Pan. As far as Tinkerbell is concerned, Pan ishers. She can sense when Pan is harmed or inserious danger, and will go to them regardless ofany other task or situation.
+Actions
+Flurry. Melee Weapon Attack: Tinkerbell flies inquick circles around her foe's head, causingdistortion. +2 to hit, reach 5ft., one target. Hit 5(1d6 + 2) psychic damage. Saving throw DC CON15 or fall prone.
+Tiny Punches. Melee Weapon Attack: +4 to hit,reach 5ft., one target. Hit 7 (1d6 + 4)
+Bill william (Order #37485889)
+
+--- PAGE 18 ---
+
+Queen Mab
+S
+he is the Queen of all faerie kind, whether they
+know it or not.
+Queen M ab was the universe's first faerie, and
+her m agic is what help s to create the faerie
+counterp arts born to m atch each and every
+m ortal being in creation. Her age gives her m any
+strengths and abilities that other faeries do not
+have, but even still, every faerie in Kensington Gardens and
+beyond would likely give their life to keep  her alive - or else
+they risk the end of Faerie kind all together.
+In p erson, she is always dressed like royalty. Queen M ab is
+never seen without a full length gown covered in faerie dust
+crystals that shim m er like stars, her silver tiara that looks
+like the weaving of branches together, and her p olished
+wooden sep tor. Her hair sits p erm anently in a bun that
+nestles neatly in the center of her tiara.
+Desp ite how she m ay com e across, the Queen has an
+infinite am ount of love for both faeries and m ortals, but with
+her age her em otions have becom e m ore difficult to interp ret.
+She m ay ap p ear to sp eak flatly, but her intentions are always
+aim ed at keep ing her p eop le and the m ortals they are bound
+to safe.
+O ne of her favorite and m ost p recious m om ents are those
+where she can facilitate the reuniting of a faerie with a m oral
+being. As m ortals often do not believe in that which they
+cannot p rove, they often stop  believing in faeries and lose that
+connection. Should Queen M ab get the chance to reunite
+them  in the belief of one another, she will do so with the m ost
+p om p  and circum stance she can.
+18
+Queen Mab
+She/HerTiny fey, chaotic good
+Armor Class 15Hit Points 98Speed 10ft./ Fly 60ft.
+STR DEX CON INT WIS CHA
+10 (+0) 15 (+2) 12 (+1) 18 (+4) 20 (+5) 18 (+4)
+Condition Immunities CharmedSenses passive Perception 20Languages Common, Elven, Sylvan
+Spellcasting. Queen Mab is a level 10 spellcasterwho can cast spells from the Druid spell list withthe use of her septor. Dancing Lights, Druidcraft,Sacred Flame, Cure Wounds, Faeerie Fire,Protection from Good and Evil, Enlarge/Reduce,Counterspell, Revivify, Wall of Fire, Tree Stride
+Speak with Plants Queen Mab can always speak withplants and trees.
+Actions
+MultiAttack. Queen Mab makes two attacks with herelemental dagger on her turn.
+Elemental Dagger. Melee Weapon Attack: +5 to hit,reach 5ft., one target. Hit (1d8+4) On a Critical Hit(19 or 20) the Elemental Dagger will do anadditional d4 of each type of damage: Cold, Fire,Force, and Thunder.
+Bill william (Order #37485889)
+
+--- PAGE 19 ---
+
+Pirates
+A
+ny p irates whose ship  has p erished m ay find
+them selves sailing, lost am ong the stars in
+search of the beyond. Not all p irates know how
+to navigate the stars as well as they m ay boast,
+however, and ship s have known to get lost on
+the journey.
+The Pirates on Neverland are U ndead
+hum anoids of any race and class, but you m ay find m ore
+fighters, rogues, artifacers, gunslingers, and barbarians over
+other classes.
+Captain JAS Hook
+The Jolly Roger is one such ship , and it's unlucky journey
+found the ship  and it's crew lost up on the shores of
+Neverland. Cap tain JAS Hook went ashore on this m ysterious
+Island in an attem p t to find locals to help  turn send them  off
+in the right direction.
+However, he was m et with an antagonistic p rankster, an
+im p ossible, flying being that not only refused to help  - but
+seem ed to be insulted by Hook's very existence. Hook
+attem p ted to defend his honor with a p rop er duel, and quickly
+learned that this creature - who he would later com e to know
+as Pan - does not value the sam e typ e of Good Form .
+First Mate Smee
+First M ate Sm ee is the second in com m and to Cap tain Hook,
+and has been aboard the Jolly Roger the longest next to him .
+However, they don’t share m any of the sam e goals. Sm ee
+greatly p refers loot to vengeance or violence, and would
+rather be hunting for treasure again. Sm ee feels him self to be
+a fearsom e p irate, but he ap p ears to be so cute and sweet
+that m any don’t feel right attacking him . If the Jolly Roger
+should find itself in real danger, Sm ee would seek to p reserve
+him self and as m uch treasure as p ossible.
+19
+First Mate Smee
+He/HimSmall Undead Gnome, True Neutral
+Armor Class 12Hit Points 11Speed 30ft.
+STR DEX CON INT WIS CHA
+11 (+0) 12 (+1) 12 (+1) 10 (+0) 10 (+0) 10 (+0)
+Senses passive Perception 10Languages Gnomish, Common
+Undead. If Smee is brought to zero Hit Points, Hewill awaken back in his Quarters the followingmorning with full HP.
+Actions
+Johnny Corkscrew. Melee Weapon Attack: +3 to hit,range 5 ft., one target. Hit (1d6 + 1) piercingdamage.
+Light Crossbow: Ranged Weapon Attack: +3 to hit,range 80 ft./320 ft., one target. Hit: 5 (1d8 + 1)piercing damage.
+Captain JAS Hook
+He/HimMedium Undead Human, lawful evil
+Armor Class 14Hit Points 45Speed 30ft.
+STR DEX CON INT WIS CHA
+16 (+3) 14 (+2) 14 (+2) 11 (+1) 10 (+0) 14 (+2)
+Skills Athletics +5, Intimidation +4Senses passive Perception 10Languages Common
+Good Form. Captain Hook believes in a fair fight,and will not strike an enemy that is unarmed or whodoes not face him.
+Undead. If Captain Hook is brought to zero HitPoints, He will awaken back in his Captain'sQuarters the following morning with full HP.
+Actions
+Multiattack. Captain Hook makes two attacks withhis Scimitar.
+Scimitar. Melee Weapon Attack: +5 to hit, reach 5ft., one target. Hit: 9 (1d8 + 5) slashing damage
+Fetch Long Tom. Captain Hook can use his fullaction to fire the ship’s cannon. Ranged WeaponAttack: +6 to hit, range 500/2000 ft., one target.Hit: 22 (4d10) bludgeoning damage. Long Tom hasAC 18, HP 30
+Bill william (Order #37485889)
+
+--- PAGE 20 ---
+
+The Lost Ones
+T
+here are m any L ost O nes, and m ore that com e
+and go, but som e have been by Pan's side for
+m any years and have earned their p lace as
+Pan's trusted inner circle. They will often be
+p rivy to secrets, have first dibs on new
+m issions and loot, and can even carry extra
+faerie dust.
+Nibs
+Nibs is Pan’s second in com m and and the battlem aster for
+The L ost O nes. He rem em bers very little of his life before
+Neverland and does not care to, as he only cares for fighting
+the Pirates and the Resistance, with little regard of
+understanding for the lives lost am ong the L ost O nes in the
+p rocess. It’s rare to find Nibs without Pan, or vice versa, with
+the excep tion of tim es when Pan has left Neverland to recruit
+m ore L ost O nes.
+Slightly
+Slightly is a lanky, tall, hum an wom an who holds her ability to
+rem em ber (although often with wild inaccuracies) m ore
+about her life before Neverland as her greatest skill, and will
+often attem p t to educate her fellow L ost O nes about worldly
+factoids. None of the L ost O nes question her insights about
+the world, likely because they also do not rem em ber.
+20
+Nibs
+He/HimHalf-Elf Fighter, Lawful Evil
+Armor Class 16Hit Points 49Speed 30ft.
+STR DEX CON INT WIS CHA
+17 (+3) 11 (+1) 17 (+3) 10 (+0) 9 (-1) 15 (+2)
+Condition Immunities FightenedLanguages Common, Elven
+Command Ally. Nibs can have an ally make an attackwith 1d8 extra damage in place of one of his ownattacks.
+Fly. Nibs always carries a pouch of Tinkerbell’s duston him, which Pan replenishes.
+Actions
+Longsword Melee Weapon Attack: +6 to hit, reach5ft., one target. Hit 10 (1d8 + 5) slashing.
+Crossbow, light. Ranged Weapon Attack: +3 to hit,reach 80/320ft., one target. Hit 4 (1d8)
+Slightly
+She/HerHuman Rogue, True Neutral
+Armor Class 16Hit Points 28Speed 30ft.
+STR DEX CON INT WIS CHA
+12 (+1) 20 (+5) 11 (+0) 15 (+2) 11 (+0) 17 (+3)
+Senses passive Perception 12Languages Common
+Sneak Attack. Slightly adds an additional 3d6damage to attacks made on unsuspecting targets.
+Disengage. Bonus Action
+Actions
+Rapier. Melee Weapon Attack: +8 to hit, reach 5ft.,one target. Hit 10 (1d8 + 5)
+Shortbow. Melee Weapon Attack: +8 to hit, reach10ft., one target. Hit 8 (1d6 + 5)
+Bill william (Order #37485889)

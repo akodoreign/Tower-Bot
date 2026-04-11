@@ -1,51 +1,39 @@
 """
 missing_persons.py — Undercity Missing Persons Ticker
+*** REFACTORED TO USE MySQL via db_api ***
 
 Small human-interest bulletins. Missing persons notices posted by residents,
 factions, or the city itself. Some are plot-relevant. Most are texture.
-
-- 2-4 new notices per week, posted as news bulletins
-- Notices persist for 14-30 days, then quietly expire (resolved, ran away, or just gone)
-- Occasionally a missing person is "found" — good or bad
-- Some tie back to roster NPCs or faction events
-
-Persists to campaign_docs/missing_persons.json
 """
 
 from __future__ import annotations
-import json, os, random
+import random
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
-DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-MISSING_FILE = DOCS_DIR / "missing_persons.json"
 TOWER_YEAR_OFFSET = 10
-
-MISSING_COOLDOWN_MIN = 2 * 24 * 3600   # at least 2 days between notices
-MISSING_COOLDOWN_MAX = 4 * 24 * 3600   # at most 4 days
+MISSING_COOLDOWN_MIN = 2 * 24 * 3600
+MISSING_COOLDOWN_MAX = 4 * 24 * 3600
 MISSING_EXPIRY_MIN   = 14
 MISSING_EXPIRY_MAX   = 30
-
-# 20% of missing persons will get a "found" resolution
 FOUND_CHANCE = 0.20
 
 _SUBJECT_POOLS = [
-    # (description_hint, district, filed_by, urgency)
     ("a young courier who has not reported back in three days",              "Grand Forum",      "their employer at the Adventurers Guild",    "moderate"),
-    ("an elderly herbalist who lives alone in the Warrens",                 "The Warrens",      "a neighbour",                                "low — they go missing occasionally"),
+    ("an elderly herbalist who lives alone in the Warrens",                 "The Warrens",      "a neighbour",                                "low"),
     ("a Glass Sigil junior archivist who missed two shifts",                "Guild Spires",      "Senior Archivist Pell",                      "high"),
     ("a child last seen near Brother Thane's Cult House",                   "The Warrens",      "their parent",                               "urgent"),
-    ("a Warden patrol member who did not return from a routine check",      "Outer Wall",       "Lieutenant Varen",                           "high — not publicly disclosed"),
-    ("a merchant whose stall in Markets Infinite has been empty for a week","Markets Infinite",  "Iron Fang Consortium debt officer",          "financial — not welfare"),
+    ("a Warden patrol member who did not return from a routine check",      "Outer Wall",       "Lieutenant Varen",                           "high"),
+    ("a merchant whose stall in Markets Infinite has been empty for a week","Markets Infinite",  "Iron Fang Consortium debt officer",          "financial"),
     ("a Serpent Choir novice who was last seen signing a contract",         "Sanctum Quarter",  "the Choir — officially, quietly",            "uncertain"),
     ("a Scrapworks day-labourer, one of three who went down a sealed shaft","The Warrens",      "Mara the Scrapper",                          "grim"),
-    ("an FTA field officer who did not submit their weekly report",         "Grand Forum",      "Director Myra Kess — via internal memo only","very high, not public"),
-    ("a street performer who has been a fixture of Cobbleway for years",    "Markets Infinite", "regular patrons of the stall",               "low — but people noticed"),
-    ("a Patchwork Saints volunteer, last seen heading toward Echo Alley",   "The Warrens",      "Pol Greaves",                                "personal — Greaves is not sleeping"),
-    ("an Obsidian Lotus client who attended a memory-erasure session",      "Night Pits",       "an anonymous third party",                   "the Lotus has not commented"),
+    ("an FTA field officer who did not submit their weekly report",         "Grand Forum",      "Director Myra Kess",                         "very high"),
+    ("a street performer who has been a fixture of Cobbleway for years",    "Markets Infinite", "regular patrons",                            "low"),
+    ("a Patchwork Saints volunteer, last seen heading toward Echo Alley",   "The Warrens",      "Pol Greaves",                                "personal"),
+    ("an Obsidian Lotus client who attended a memory-erasure session",      "Night Pits",       "an anonymous third party",                   "unknown"),
 ]
 
 _FOUND_OUTCOMES = [
@@ -54,37 +42,45 @@ _FOUND_OUTCOMES = [
     "Located at a Serpent Choir hospice. Under voluntary contract terms.",
     "Returned on their own. Filed no report. Spoke to no one.",
     "Their belongings were found. The person has not been.",
-    "A body matching the description was recovered near the Outer Wall. Wardens are investigating.",
+    "A body matching the description was recovered near the Outer Wall.",
     "They were found working under a different name in Markets Infinite.",
     "Confirmed alive in FTA custody. Reason for detention not disclosed.",
-    "Located by the Glass Sigil during a routine anomaly sweep. Circumstances classified.",
-    "Found in good health. Claim they were never missing. Records suggest otherwise.",
+    "Located by the Glass Sigil during a routine anomaly sweep.",
+    "Found in good health. Claim they were never missing.",
 ]
 
 
 def _load_missing() -> List[Dict]:
-    if not MISSING_FILE.exists():
-        return []
+    """Load missing persons from database."""
     try:
-        return json.loads(MISSING_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        records = raw_query("SELECT * FROM missing_persons ORDER BY reported_at DESC")
+        return records or []
+    except Exception as e:
+        logger.error(f"Missing persons load error: {e}")
         return []
 
 
-def _save_missing(records: List[Dict]) -> None:
+def _save_missing_record(record: Dict) -> int:
+    """Save a new missing person record."""
     try:
-        MISSING_FILE.write_text(json.dumps(records, indent=2), encoding="utf-8")
+        return db.insert("missing_persons", {
+            "person_name": record.get("name", "Unknown"),
+            "last_seen_location": record.get("district", "Unknown"),
+            "status": "missing" if not record.get("resolved") else "found",
+            "reported_at": datetime.now(),
+        })
     except Exception as e:
         logger.error(f"Missing persons save error: {e}")
+        return 0
 
 
 def _last_posted_at() -> Optional[datetime]:
-    records = _load_missing()
-    posted  = [r for r in records if r.get("posted_at") and not r.get("is_resolution")]
-    if not posted:
-        return None
+    """Get timestamp of most recent missing person posting."""
     try:
-        return max(datetime.fromisoformat(r["posted_at"]) for r in posted)
+        result = raw_query("SELECT MAX(reported_at) as last_post FROM missing_persons WHERE status = 'missing'")
+        if result and result[0].get("last_post"):
+            return result[0]["last_post"]
+        return None
     except Exception:
         return None
 
@@ -97,23 +93,17 @@ def should_post_missing() -> bool:
         elapsed = (datetime.now() - last).total_seconds()
         if elapsed < min_gap:
             return False
-    return random.random() < 0.25   # 25% chance per bulletin tick when eligible
+    return random.random() < 0.25
 
 
 async def generate_missing_bulletin() -> Optional[str]:
-    """
-    Generate a missing persons notice using KimiAgent.
-    
-    REFACTORED: Now uses src.agents.generate_with_kimi helper.
-    """
+    """Generate a missing persons notice using KimiAgent."""
     from src.agents import generate_with_kimi
 
     desc, district, filed_by, urgency = random.choice(_SUBJECT_POOLS)
-    days     = random.randint(MISSING_EXPIRY_MIN, MISSING_EXPIRY_MAX)
-    expires  = datetime.now() + timedelta(days=days)
-    now      = datetime.now()
-    tower    = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts       = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    now   = datetime.now()
+    tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
+    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
     prompt = f"""You are writing a missing persons notice for the Undercity Dispatch.
 The Undercity is a sealed dark fantasy city under a Dome.
@@ -132,34 +122,33 @@ REQUIRED OUTPUT FORMAT — output exactly this, nothing else:
 
 **Last seen:** [specific location in {district}], approximately [X] days ago
 **Description:** [2 sentences — age, appearance, what they were wearing or carrying]
-**Circumstances:** [1-2 sentences — what was normal before they disappeared, any last contact]
+**Circumstances:** [1-2 sentences — what was normal before they disappeared]
 
 *Anyone with information contact [appropriate faction contact or location].*
 
 RULES:
-- Invent a real-feeling specific person. Give them texture.
-- The notice should feel like someone actually filed it — worried, terse, or bureaucratic depending on who filed it.
-- Tone: human, grounded, specific. Not dramatic. Not epic. A real person is missing.
-- No preamble, no sign-off. Output the notice only.
-- If your response contains anything other than the notice, you have failed."""
+- Invent a real-feeling specific person.
+- Tone: human, grounded, specific. Not dramatic.
+- No preamble, no sign-off. Output the notice only."""
 
     try:
         text = await generate_with_kimi(prompt, temperature=0.8)
-        
         if not text:
             return None
 
-        # Save to persistence
-        records = _load_missing()
-        records.append({
-            "id":         f"mp_{int(datetime.now().timestamp())}",
-            "body":       text,
-            "posted_at":  datetime.now().isoformat(),
-            "expires_at": expires.isoformat(),
-            "resolved":   False,
-            "found":      False,
+        # Extract name from notice
+        import re
+        name_match = re.search(r"\*\*MISSING PERSON — (.+?)\*\*", text)
+        name = name_match.group(1) if name_match else "Unknown"
+
+        # Save to database
+        _save_missing_record({
+            "name": name,
+            "district": district,
+            "filed_by": filed_by,
+            "body": text,
+            "resolved": False,
         })
-        _save_missing(records)
 
         return f"-# 🕰️ {ts}\n{text}"
 
@@ -169,44 +158,40 @@ RULES:
 
 
 def tick_missing_resolutions() -> List[str]:
-    """
-    Check for expired missing persons. 20% get a 'found' bulletin.
-    Returns list of resolution bulletin strings.
-    """
-    records  = _load_missing()
-    now      = datetime.now()
-    tower    = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts       = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
-    outputs  = []
-    updated  = False
+    """Check for expired missing persons. 20% get a 'found' bulletin."""
+    now     = datetime.now()
+    tower   = now.replace(year=now.year + TOWER_YEAR_OFFSET)
+    ts      = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    outputs = []
 
-    for r in records:
-        if r.get("resolved"):
-            continue
-        try:
-            exp = datetime.fromisoformat(r["expires_at"])
-        except Exception:
-            continue
-        if now < exp:
-            continue
+    try:
+        # Get missing persons older than 14 days
+        cutoff = now - timedelta(days=MISSING_EXPIRY_MIN)
+        records = raw_query(
+            "SELECT * FROM missing_persons WHERE status = 'missing' AND reported_at < %s",
+            (cutoff,)
+        )
 
-        r["resolved"] = True
-        updated       = True
+        if not records:
+            return []
 
-        if random.random() < FOUND_CHANCE:
-            outcome = random.choice(_FOUND_OUTCOMES)
-            # Extract name from first bold text if possible
-            import re
-            name_match = re.search(r"\*\*MISSING PERSON — (.+?)\*\*", r.get("body", ""))
-            name = name_match.group(1) if name_match else "The individual"
-            outputs.append(
-                f"-# 🕰️ {ts}\n"
-                f"🔍 **UPDATE — MISSING PERSONS CASE**\n"
-                f"*{name}: {outcome}*"
+        for r in records:
+            # Mark as resolved
+            raw_execute(
+                "UPDATE missing_persons SET status = 'found' WHERE id = %s",
+                (r["id"],)
             )
-        # Else: quietly expires — no resolution notice, they're just gone
 
-    if updated:
-        _save_missing(records)
+            if random.random() < FOUND_CHANCE:
+                outcome = random.choice(_FOUND_OUTCOMES)
+                name = r.get("person_name", "The individual")
+                outputs.append(
+                    f"-# 🕰️ {ts}\n"
+                    f"🔍 **UPDATE — MISSING PERSONS CASE**\n"
+                    f"*{name}: {outcome}*"
+                )
+
+    except Exception as e:
+        logger.error(f"Missing resolutions error: {e}")
 
     return outputs

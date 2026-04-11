@@ -1,0 +1,28 @@
+{
+  "name": "Lysandra Vane",
+  "species": "Aasimar",
+  "faction": "Adventurers Guild",
+  "rank": "Unranked",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Aasimar build, tall and slender, with radiant skin glowing faint gold beneath a layer of cracked ash that smudges her silver-streaked hair and soot-streaked face, pale eyes flickering like dying embers as she adjusts her weathered leather duster over chainmail, the Adventurers Guild crest peeling at the edges, her warhammer slung across one shoulder and crossbow at her hip, one finger absently tracing a jagged scar along her forearm where celestial light once burned too bright.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

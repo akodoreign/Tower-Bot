@@ -1,14 +1,14 @@
 """
 npc_appearance.py — Generate and store rich appearance/style/stat profiles for all NPCs.
 
-For each NPC in npc_roster.json, generates:
+For each NPC in the database, generates:
   - Physical appearance (from existing roster field, enhanced)
   - Class + estimated stats appropriate to their role
   - Equipment appropriate to class/faction/role
   - Style description for Stable Diffusion (based on race, class, faction aesthetic)
 
-Stored in: campaign_docs/npc_appearances/{name_slug}.json
-Also maintains a quick-lookup flat file for image prompt injection.
+Stored in: MySQL npc_appearances table
+Also rebuilds npc_roster.txt for RAG system.
 
 Usage:
   python -m src.npc_appearance   (run once to generate all)
@@ -25,9 +25,10 @@ from pathlib import Path
 from typing import Optional
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
+# Keep NPC_APP_DIR for backward compatibility with npc_lifecycle.py references
 DOCS_DIR         = Path(__file__).resolve().parent.parent / "campaign_docs"
-NPC_ROSTER_FILE  = DOCS_DIR / "npc_roster.json"
 NPC_APP_DIR      = DOCS_DIR / "npc_appearances"
 NPC_APP_DIR.mkdir(exist_ok=True)
 
@@ -437,7 +438,7 @@ async def _generate_npc_profile(npc: dict) -> dict:
     faction_vis  = FACTION_SD_NOTES.get(faction_key, FACTION_SD_NOTES["independent"])
 
     # Ask Ollama to write the enriched style description
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
     prompt = f"""You are writing a visual character profile for an Undercity NPC. 
@@ -461,17 +462,18 @@ Write a SINGLE PARAGRAPH (3-4 sentences) describing this NPC as they would appea
 Include: build/height from species, skin/hair/eye details, outfit (faction-appropriate), equipment visible on their person, one distinctive visual detail.
 Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD prompt phrases."""
 
-    import httpx
     sd_description = ""
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+            },
+            timeout=90.0,
+            caller="npc_appearance",
+        )
 
         if isinstance(data, dict):
             msg = data.get("message", {})
@@ -517,17 +519,47 @@ Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD pro
 
 
 def _profile_path(name: str) -> Path:
+    """Legacy path function - kept for compatibility with npc_lifecycle.py."""
     return NPC_APP_DIR / f"{_slug(name)}.json"
 
 
-def get_npc_appearance(name: str) -> Optional[dict]:
-    """Load a stored NPC appearance profile. Returns None if not yet generated."""
-    p = _profile_path(name)
-    if not p.exists():
-        return None
+def _save_npc_appearance(name: str, profile: dict) -> None:
+    """Save an NPC appearance profile to database."""
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
+        appearance_json = json.dumps(profile, ensure_ascii=False, default=str)
+        existing = raw_query(
+            "SELECT id FROM npc_appearances WHERE npc_name = %s",
+            (name,)
+        )
+        if existing:
+            raw_execute(
+                "UPDATE npc_appearances SET appearance_json = %s WHERE npc_name = %s",
+                (appearance_json, name)
+            )
+        else:
+            db.insert("npc_appearances", {
+                "npc_name": name,
+                "appearance_json": appearance_json
+            })
+    except Exception as e:
+        logger.error(f"Failed to save NPC appearance for {name}: {e}")
+
+
+def get_npc_appearance(name: str) -> Optional[dict]:
+    """Load a stored NPC appearance profile from database. Returns None if not yet generated."""
+    try:
+        rows = raw_query(
+            "SELECT appearance_json FROM npc_appearances WHERE npc_name = %s",
+            (name,)
+        )
+        if rows and rows[0].get("appearance_json"):
+            data = rows[0]["appearance_json"]
+            if isinstance(data, str):
+                return json.loads(data)
+            return data
+        return None
+    except Exception as e:
+        logger.error(f"Failed to load NPC appearance for {name}: {e}")
         return None
 
 
@@ -540,49 +572,65 @@ def get_npc_sd_prompt(name: str) -> Optional[str]:
 
 
 def get_all_npc_names() -> list[str]:
-    """Return all NPC names from the roster."""
-    if not NPC_ROSTER_FILE.exists():
-        return []
+    """Return all NPC names from the database."""
     try:
-        roster = json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
-        return [npc.get("name", "") for npc in roster if npc.get("name")]
-    except Exception:
+        rows = raw_query("SELECT name FROM npcs WHERE status != 'dead' OR status IS NULL")
+        return [row.get("name", "") for row in rows if row.get("name")]
+    except Exception as e:
+        logger.error(f"Failed to get NPC names: {e}")
         return []
 
 
 async def generate_all_npc_appearances(force: bool = False) -> dict[str, str]:
     """
-    Generate and store appearance profiles for all NPCs in the roster.
+    Generate and store appearance profiles for all NPCs in the database.
     Skips NPCs that already have a stored profile unless force=True.
     Returns {name: sd_appearance} for all processed NPCs.
     """
-    if not NPC_ROSTER_FILE.exists():
-        logger.warning("npc_roster.json not found")
+    # Load all NPCs from database
+    try:
+        rows = raw_query("SELECT * FROM npcs WHERE status != 'dead' OR status IS NULL")
+    except Exception as e:
+        logger.warning(f"Failed to load NPCs from database: {e}")
         return {}
-
-    roster = json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
+    
+    if not rows:
+        logger.warning("No NPCs found in database")
+        return {}
+    
     results = {}
 
-    for npc in roster:
+    for row in rows:
+        # Parse NPC data from data_json column
+        npc_data = row.get("data_json", {})
+        if isinstance(npc_data, str):
+            npc_data = json.loads(npc_data) if npc_data else {}
+        
+        npc = {
+            **npc_data,
+            "name": row.get("name") or npc_data.get("name", "Unknown"),
+            "faction": row.get("faction") or npc_data.get("faction", "Independent"),
+            "role": row.get("role") or npc_data.get("role", ""),
+            "location": row.get("location") or npc_data.get("location", ""),
+            "status": row.get("status") or npc_data.get("status", "alive"),
+        }
+        
         name = npc.get("name", "")
         if not name:
             continue
 
-        p = _profile_path(name)
-        if p.exists() and not force:
-            # Load existing
-            try:
-                existing = json.loads(p.read_text(encoding="utf-8"))
-                results[name] = existing.get("sd_appearance", "")
-                logger.info(f"✓ Loaded existing profile: {name}")
-                continue
-            except Exception:
-                pass
+        # Check if profile exists in DB
+        existing_profile = None if force else get_npc_appearance(name)
+        
+        if existing_profile and not force:
+            results[name] = existing_profile.get("sd_appearance", "")
+            logger.info(f"✓ Loaded existing profile: {name}")
+            continue
 
         logger.info(f"⚙ Generating appearance for: {name}")
         try:
             profile = await _generate_npc_profile(npc)
-            p.write_text(json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8")
+            _save_npc_appearance(name, profile)
             results[name] = profile.get("sd_appearance", "")
             logger.info(f"✓ Saved profile: {name}")
         except Exception as e:
@@ -592,7 +640,7 @@ async def generate_all_npc_appearances(force: bool = False) -> dict[str, str]:
         # Small delay to not hammer Ollama
         await asyncio.sleep(2)
 
-    # Also write a flat lookup JSON for quick image prompt access
+    # Also write a flat lookup JSON for quick image prompt access (legacy compatibility)
     flat_path = NPC_APP_DIR / "_all_sd_prompts.json"
     flat_path.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"💾 Saved flat SD prompt lookup: {flat_path}")
@@ -601,13 +649,27 @@ async def generate_all_npc_appearances(force: bool = False) -> dict[str, str]:
 
 
 def get_all_sd_prompts() -> dict[str, str]:
-    """Load the flat {name: sd_prompt} lookup. Returns {} if not yet generated."""
-    flat_path = NPC_APP_DIR / "_all_sd_prompts.json"
-    if not flat_path.exists():
-        return {}
+    """Load all NPC SD prompts from database. Returns {name: sd_prompt}."""
     try:
-        return json.loads(flat_path.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT npc_name, appearance_json FROM npc_appearances")
+        result = {}
+        for row in rows:
+            name = row.get("npc_name", "")
+            data = row.get("appearance_json", {})
+            if isinstance(data, str):
+                data = json.loads(data) if data else {}
+            if name and data:
+                result[name] = data.get("sd_appearance", "")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to load SD prompts: {e}")
+        # Fallback to flat file if DB fails
+        flat_path = NPC_APP_DIR / "_all_sd_prompts.json"
+        if flat_path.exists():
+            try:
+                return json.loads(flat_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
         return {}
 
 
@@ -679,7 +741,7 @@ def _location_to_district_key(location_text: str) -> str:
 def get_npc_home_district(name: str) -> str:
     """
     Return the district key for where this NPC lives/works.
-    Checks stored appearance profile first, then falls back to the roster.
+    Checks stored appearance profile first, then falls back to the database.
     Returns empty string if nothing can be determined.
     """
     # 1. Try stored profile (fast path, already computed)
@@ -687,17 +749,26 @@ def get_npc_home_district(name: str) -> str:
     if profile and profile.get("home_district"):
         return profile["home_district"]
 
-    # 2. Fall back to roster location field
-    if not NPC_ROSTER_FILE.exists():
-        return ""
+    # 2. Fall back to npcs table location field
     try:
-        roster = json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
-        for npc in roster:
-            if npc.get("name", "").lower() == name.lower():
-                loc = npc.get("location", "")
+        rows = raw_query(
+            "SELECT data_json, location FROM npcs WHERE name = %s",
+            (name,)
+        )
+        if rows:
+            row = rows[0]
+            # Check location column first
+            loc = row.get("location", "")
+            if loc:
                 return _location_to_district_key(loc)
-    except Exception:
-        pass
+            # Then check data_json
+            data = row.get("data_json", {})
+            if isinstance(data, str):
+                data = json.loads(data) if data else {}
+            loc = data.get("location", "")
+            return _location_to_district_key(loc)
+    except Exception as e:
+        logger.error(f"Failed to get home district for {name}: {e}")
     return ""
 
 
@@ -722,6 +793,7 @@ def find_npc_in_text(text: str) -> list[tuple[str, str, str]]:
 
 if __name__ == "__main__":
     import sys
+    import logging
     force = "--force" in sys.argv
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     loop = asyncio.new_event_loop()

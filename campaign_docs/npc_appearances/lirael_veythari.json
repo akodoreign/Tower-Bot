@@ -1,0 +1,28 @@
+{
+  "name": "Lirael Veythari",
+  "species": "Elf",
+  "faction": "Serpent Choir",
+  "rank": "Acolyte",
+  "role": "acolyte",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "WIS 14",
+      "CHA 13",
+      "INT 12"
+    ],
+    "secondary": [
+      "CON 11",
+      "DEX 10",
+      "STR 9"
+    ],
+    "hp_range": "25–35"
+  },
+  "equipment": {
+    "weapons": "mace, holy symbol",
+    "armour": "vestments, light padding"
+  },
+  "sd_appearance": "tall, lithe elf frame draped in jade-green silk robes patterned with coiled serpents, their scales shimmering like wet obsidian under the Dome’s flickering neon, her gold eyes glinting beneath a hooded cowl, fingers gripping a rusted mace while a faintly glowing holy symbol of intertwined serpents rests against her collarbone, one hand clutching a satchel of illicit trinkets as her iridescent skin pulses with the faint hum of hidden contract seals etched into her wrist.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "faction's divine colours, symbol prominently displayed"
+}

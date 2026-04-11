@@ -1,0 +1,28 @@
+{
+  "name": "Elyndor Mournshade",
+  "species": "Elf",
+  "faction": "Patchwork Saints",
+  "rank": "Saint",
+  "role": "mercenary",
+  "home_district": "patchwork saints",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "tall, lithe elf with silver-streaked hair cascading over a scalp of dusky skin, violet eyes flickering like dying embers, their patchwork cloak stitched from frayed velvet, leather, and moth-eaten silk draped over worn-but-loved boots, a red armband peeking from beneath a medicinal pouch slung across their chest, hands stained deep with ink from transcribing prayers while a jagged scar traces the curve of their jaw—a relic of a forbidden spell once whispered to save their sister.",
+  "faction_visual": "patchwork cloth of many fabrics, red armband, worn-but-loved boots, medicinal pouch",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

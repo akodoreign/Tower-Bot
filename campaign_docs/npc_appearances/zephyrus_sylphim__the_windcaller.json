@@ -1,0 +1,28 @@
+{
+  "name": "Zephyrus Sylphim, the Windcaller",
+  "species": "Aasimar",
+  "faction": "Wardens of Ash",
+  "rank": "Sergeant",
+  "role": "warden",
+  "home_district": "outer wall",
+  "stats": {
+    "primary": [
+      "CON 15",
+      "STR 14",
+      "WIS 12"
+    ],
+    "secondary": [
+      "DEX 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "spear, crossbow, handaxe",
+    "armour": "chain mail, Warden badge"
+  },
+  "sd_appearance": "A tall, willowy Aasimar woman with silver-white hair cascading in loose, wind-tousled strands that defy stillness, her pale blue eyes glowing like distant starlight against radiant skin streaked with faint, shifting silver patterns that pulse faintly when she moves, her ash-grey chainmail armor etched with Warden sigils and a jagged ash-mark scar across her left cheek, her windswept cloak clinging to her frame like storm-tossed fabric, a spear strapped to her back, crossbow slung across her chest, and a handaxe tucked into a utility belt, her fingers adorned with tiny, glowing runes that hum with divine energy.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "utilitarian-military — built to survive, nothing wasted"
+}

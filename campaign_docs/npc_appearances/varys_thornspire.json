@@ -1,0 +1,28 @@
+{
+  "name": "Varys Thornspire",
+  "species": "Dragonborn",
+  "faction": "Wizards Tower",
+  "rank": "Researcher",
+  "role": "mercenary",
+  "home_district": "warrens",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A towering dragonborn figure, their silver-scaled frame glinting with faint iridescent hues along the spine, their jagged scar etching a crimson line from cheek to jaw, eyes sharp and pale gold beneath a hood of tattered, soot-streaked leather, fingers curled around a weathered crossbow with glowing runes pulsing at the stock, chainmail links tarnished by centuries of contracts, tail twitching restlessly like a nervous predator, a jagged shard of obsidian embedded in their boot heel where a rift once erupted.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

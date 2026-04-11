@@ -1,6 +1,6 @@
 {
   "season": 1,
-  "match_count": 11,
+  "match_count": 14,
   "fighters": [
     {
       "name": "Aric Veyne",
@@ -30,27 +30,27 @@
       "notes": "Cult-trained. Movements that should not be physically possible."
     },
     {
-      "name": "Drell the Unfinished",
+      "name": "Sela Vance",
       "rank": 4,
       "wins": 14,
-      "losses": 11,
-      "title": "Crowd Favourite",
-      "faction": "Independent",
-      "notes": "Lost his right hand three seasons ago. Still ranked."
-    },
-    {
-      "name": "Sela Vance",
-      "rank": 5,
-      "wins": 13,
-      "losses": 9,
+      "losses": 10,
       "title": null,
       "faction": "Wardens of Ash",
       "notes": "Active Warden. Fights for extra income. Korin disapproves."
     },
     {
+      "name": "Drell the Unfinished",
+      "rank": 5,
+      "wins": 14,
+      "losses": 13,
+      "title": "Crowd Favourite",
+      "faction": "Independent",
+      "notes": "Lost his right hand three seasons ago. Still ranked."
+    },
+    {
       "name": "The Composite",
       "rank": 6,
-      "wins": 11,
+      "wins": 12,
       "losses": 10,
       "title": "Most Complaints Filed",
       "faction": "Iron Fang",
@@ -95,7 +95,7 @@
     {
       "name": "The Patchwork Kid",
       "rank": 11,
-      "wins": 7,
+      "wins": 8,
       "losses": 14,
       "title": "Most Injuries Per Bout",
       "faction": "Patchwork Saints",
@@ -111,8 +111,8 @@
       "notes": "Loses dramatically. Enormous fan base. Suspects the fix is in."
     }
   ],
-  "last_match_at": "2026-04-01T05:21:00.673439",
-  "next_match_at": "2026-04-04T03:59:41.673439",
+  "last_match_at": "2026-04-08T15:03:19.685377",
+  "next_match_at": "2026-04-11T01:56:44.685377",
   "last_posted_at": null,
   "match_log": [
     {
@@ -202,6 +202,30 @@
       "loser": "Priest of Ash",
       "location": "the Arena's underground Cage circuit",
       "at": "2026-04-01T05:21:00.673439"
+    },
+    {
+      "match": 12,
+      "type": "grudge",
+      "winner": "Sela Vance",
+      "loser": "Drell the Unfinished",
+      "location": "the Grand Forum exhibition stage",
+      "at": "2026-04-04T04:08:17.312886"
+    },
+    {
+      "match": 13,
+      "type": "upset",
+      "winner": "The Composite",
+      "loser": "Drell the Unfinished",
+      "location": "the Grand Forum exhibition stage",
+      "at": "2026-04-06T05:42:59.670189"
+    },
+    {
+      "match": 14,
+      "type": "upset",
+      "winner": "The Patchwork Kid",
+      "loser": "Sela Vance",
+      "location": "the Arena's underground Cage circuit",
+      "at": "2026-04-08T15:03:19.685377"
     }
   ]
 }

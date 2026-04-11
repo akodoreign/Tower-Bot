@@ -46,7 +46,7 @@ LOC_REFS = REFS_DIR / "locations"
 for _d in (REFS_DIR, NPC_REFS, LOC_REFS):
     _d.mkdir(parents=True, exist_ok=True)
 
-MAX_REFS = 3  # keep last 3 images per entity (plus optional pinned)
+MAX_REFS = 2  # keep last 2 images per entity (plus optional pinned) — trimmed from 3 to save disk space
 
 # Default denoising strength for img2img — 0.0 = exact copy, 1.0 = ignore reference
 # 0.45 preserves core composition/colors while allowing prompt to steer details

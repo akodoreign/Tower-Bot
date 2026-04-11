@@ -1,5 +1,6 @@
 """
 ec_exchange.py — EC/Kharma exchange rate tracker for Tower of Last Chance.
+*** REFACTORED TO USE MySQL via db_api ***
 
 CANON:
   Essence Coins (EC) are common currency, formed from Kharma for everyday trade.
@@ -10,10 +11,6 @@ INFLATION:
   Slow natural drift of ~1–2% per real month.
   Per bulletin tick (~1 hour): ~0.002% drift (adds up to ~1.5%/month).
   Major news events can shock the rate by up to ±10%.
-
-PERSISTENCE:
-  Stored in campaign_docs/ec_exchange.json.
-  Rate history kept for last 30 entries.
 """
 
 from __future__ import annotations
@@ -22,31 +19,19 @@ import json
 import random
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
+
+from src.db_api import get_economy_state, update_economy_state
 
 logger = logging.getLogger(__name__)
 
-DOCS_DIR       = Path(__file__).resolve().parent.parent / "campaign_docs"
-EC_FILE        = DOCS_DIR / "ec_exchange.json"
-
 # Base rate: how many EC per 1 Kharma
 EC_BASE_RATE   = 10.0
-
-# Inflation per bulletin tick (~hourly). Targets ~1.5%/month.
-# 1.5% / (30 days * 24 ticks) = ~0.002% per tick
-EC_TICK_DRIFT  = 0.00002   # fractional drift per tick (tiny, compounding)
-
-# Max random noise per tick (so rate isn't perfectly smooth)
-EC_TICK_NOISE  = 0.0001    # ± this per tick
-
-# Hard floor/ceiling on the rate (prevents runaway)
-EC_RATE_FLOOR  = 5.0       # EC per Kharma min
-EC_RATE_CEIL   = 50.0      # EC per Kharma max
-
-# History entries to keep
+EC_TICK_DRIFT  = 0.00002
+EC_TICK_NOISE  = 0.0001
+EC_RATE_FLOOR  = 5.0
+EC_RATE_CEIL   = 50.0
 EC_HISTORY_MAX = 30
-
 TOWER_YEAR_OFFSET = 10
 
 
@@ -57,17 +42,34 @@ def _dual_ts() -> str:
 
 
 def _load() -> dict:
-    if not EC_FILE.exists():
-        return {}
+    """Load economy state from database."""
     try:
-        return json.loads(EC_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        state = get_economy_state()
+        if not state:
+            return {}
+        # Rate is stored in ec_to_kharma_rate, full data might be in a JSON field
+        return {
+            "rate": float(state.get("ec_to_kharma_rate", EC_BASE_RATE)),
+            "trend": state.get("trend", "stable"),
+            "last_updated": str(state.get("updated_at", "")),
+            "history": [],  # History tracking simplified for DB
+            "last_event": state.get("trend", "normal drift"),
+        }
+    except Exception as e:
+        logger.error(f"ec_exchange load error: {e}")
         return {}
 
 
 def _save(data: dict) -> None:
+    """Save economy state to database."""
     try:
-        EC_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        trend = data.get("last_event", "stable")
+        if len(trend) > 50:
+            trend = trend[:47] + "..."
+        update_economy_state({
+            "ec_to_kharma_rate": data.get("rate", EC_BASE_RATE),
+            "trend": trend,
+        })
     except Exception as e:
         logger.error(f"ec_exchange save error: {e}")
 
@@ -88,61 +90,40 @@ def get_rate() -> float:
 
 
 def tick_exchange() -> float:
-    """
-    Apply one bulletin-tick of inflation drift.
-    Call this each bulletin cycle (alongside TIA tick, etc.).
-    Returns the new rate.
-    """
+    """Apply one bulletin-tick of inflation drift. Returns the new rate."""
     data = _load()
     if not data:
         data = _init()
 
     old_rate = float(data.get("rate", EC_BASE_RATE))
-
-    # Inflation drift: very slight upward nudge each tick
     noise    = random.uniform(-EC_TICK_NOISE, EC_TICK_NOISE)
     new_rate = old_rate * (1 + EC_TICK_DRIFT + noise)
     new_rate = round(max(EC_RATE_FLOOR, min(EC_RATE_CEIL, new_rate)), 4)
 
-    _record(data, old_rate, new_rate, "tick")
+    data["rate"] = new_rate
+    data["last_event"] = "tick"
+    data["last_updated"] = datetime.now().isoformat()
     _save(data)
     return new_rate
 
 
 def apply_event_shock(delta_pct: float, reason: str = "") -> tuple[float, float]:
-    """
-    Apply an event-driven shock to the exchange rate.
-    delta_pct: fractional change, e.g. +0.05 = +5%, -0.10 = -10%.
-    Returns (old_rate, new_rate).
-    """
+    """Apply an event-driven shock to the exchange rate."""
     data = _load()
     if not data:
         data = _init()
 
     old_rate = float(data.get("rate", EC_BASE_RATE))
-    # Clamp shock to ±10%
     delta_pct = max(-0.10, min(0.10, delta_pct))
     new_rate  = round(max(EC_RATE_FLOOR, min(EC_RATE_CEIL, old_rate * (1 + delta_pct))), 4)
 
+    data["rate"] = new_rate
     data["last_event"] = reason or f"Market shock {delta_pct:+.1%}"
-    _record(data, old_rate, new_rate, data["last_event"])
+    data["last_updated"] = datetime.now().isoformat()
     _save(data)
 
     logger.info(f"💱 EC exchange shock: {old_rate:.4f} → {new_rate:.4f} EC/Kharma ({delta_pct:+.1%}) — {reason}")
     return old_rate, new_rate
-
-
-def _record(data: dict, old: float, new: float, event: str) -> None:
-    history = data.get("history", [])
-    history.append({
-        "ts":    datetime.now().isoformat(),
-        "old":   old,
-        "new":   new,
-        "event": event,
-    })
-    data["history"]      = history[-EC_HISTORY_MAX:]
-    data["rate"]         = new
-    data["last_updated"] = datetime.now().isoformat()
 
 
 # ---------------------------------------------------------------------------
@@ -159,8 +140,6 @@ def format_exchange_line() -> str:
     )
 
 
-# Example goods whose EC prices scale with inflation for the daily bulletin
-# Format: (name, base_ec_price, description)
 _EXAMPLE_GOODS = [
     ("Healing Potion (basic)",  50,    "2d4+2 HP"),
     ("Hot meal (Grand Forum)",   3,    "standard inn fare"),
@@ -180,21 +159,10 @@ def format_exchange_bulletin() -> str:
         data = _init()
 
     rate    = float(data.get("rate", EC_BASE_RATE))
-    history = data.get("history", [])
     last_ev = data.get("last_event", "normal market drift")
 
-    # Calculate recent change if we have history
-    change_str = ""
-    if len(history) >= 2:
-        day_ago_entries = [h for h in history if h.get("old")]
-        if day_ago_entries:
-            oldest = day_ago_entries[0]["old"]
-            pct    = ((rate - oldest) / oldest) * 100 if oldest else 0
-            sign   = "+" if pct >= 0 else ""
-            arrow  = "🟢 ▲" if pct > 0.05 else ("🔴 ▼" if pct < -0.05 else "⬜ ─")
-            change_str = f" {arrow} _{sign}{pct:.2f}%_"
+    change_str = ""  # Simplified without history tracking
 
-    # Pick 3 varied example goods to show live-inflated prices
     import random as _random
     sampled = _random.sample(_EXAMPLE_GOODS, min(3, len(_EXAMPLE_GOODS)))
 
@@ -210,14 +178,13 @@ def format_exchange_bulletin() -> str:
         "**Sample Prices (EC) at today\'s rate:**",
     ]
     for name, base, desc in sampled:
-        # Apply inflation ratio relative to base rate of 10.0
         inflated = round(base * (rate / EC_BASE_RATE), 2)
         lines.append(f"└ **{name}** — _{desc}_ · `{inflated:.2f} EC`")
 
     lines += [
         "",
         f"-# Rate note: {last_ev}",
-        "-# Exchange kiosks at Cobbleway Market, Grand Forum, and Guild Spires. Rates subject to change without notice.",
+        "-# Exchange kiosks at Cobbleway Market, Grand Forum, and Guild Spires.",
     ]
     return "\n".join(lines)
 
@@ -225,9 +192,6 @@ def format_exchange_bulletin() -> str:
 # ---------------------------------------------------------------------------
 # Price reference tables (static — from campaign docs)
 # ---------------------------------------------------------------------------
-
-# These are the canonical Undercity EC prices from the sourcebook.
-# Used by /finances prices command.
 
 PRICE_TABLES = {
     "quest_rewards": {
@@ -312,7 +276,6 @@ def format_all_prices() -> str:
     sections = []
     for key in PRICE_TABLES:
         sections.append(format_price_table(key))
-    # Insert live rate into kharma_uses section naturally
     header = (
         "📋 **UNDERCITY PRICE REFERENCE**\n"
         f"-# {_dual_ts()}\n"

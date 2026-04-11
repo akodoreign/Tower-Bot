@@ -1,43 +1,48 @@
 {
   "districts": {
     "The Warrens": {
-      "condition": "Rust Rain",
-      "description": "Oxidised particulate is falling with the condensation. Everything it touches stains brown.",
-      "emoji": "\ud83d\udfe4"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     },
     "Markets Infinite": {
-      "condition": "Veil Thin",
-      "description": "The boundary between planes feels permeable. Faint sounds from elsewhere. Shadows move wrong.",
-      "emoji": "\ud83d\udc41\ufe0f"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     },
     "Sanctum Quarter": {
-      "condition": "Ghost Light",
-      "description": "Pale orbs drifting through the Divine Garden. The Choir says they're benign. Nobody asked them.",
-      "emoji": "\ud83d\udc7b"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     },
     "Grand Forum": {
-      "condition": "Deep Freeze",
-      "description": "Dome thermal regulators offline in this sector. Breath is visible. Pipes are at risk.",
-      "emoji": "\ud83e\udd76"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     },
     "Guild Spires": {
-      "condition": "Whistling Vents",
-      "description": "Pressure equalisation through narrow vents is producing an eerie whistle across the district.",
-      "emoji": "\ud83c\udf90"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     },
     "Outer Wall": {
-      "condition": "Cold Sink",
-      "description": "Gate District is freezing. Wall Quadrant C reports frost on the inner seal. FTA is aware.",
-      "emoji": "\u2744\ufe0f"
+      "condition": "PRESSURE INVERSION",
+      "description": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+      "emoji": "\ud83d\udd04"
     }
   },
-  "pressure": 49,
-  "special_event": null,
+  "pressure": 43,
+  "special_event": {
+    "label": "PRESSURE INVERSION",
+    "pressure_delta": -3,
+    "desc": "A full pressure inversion is underway. Weather is running backwards across all districts. This is not normal.",
+    "emoji": "\ud83d\udd04"
+  },
   "forecast": [
-    "Furnace Draft",
-    "Total Dark",
-    "Total Dark"
+    "UV Bleed",
+    "Whistling Vents",
+    "Deep Freeze"
   ],
-  "updated_at": "2026-04-02T06:12:04.312807",
-  "last_posted_at": "2026-04-02T05:18:35.025945"
+  "updated_at": "2026-04-09T05:16:56.055997",
+  "last_posted_at": "2026-04-09T03:22:25.945374"
 }

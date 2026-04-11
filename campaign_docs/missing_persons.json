@@ -20,7 +20,7 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 LYRIAN RHONE**\n*Filed by: Director Myra Kess \u2014 via internal memo only*\n\n**Last seen:** The Grand Forum's Arcane Exchange, approximately 4 days ago\n**Description:** Male, 38 years old, average height, lean build, dressed in his standard FTA field uniform with a distinctive silver-plated badge. Carrying a leather satchel containing his field equipment and weekly report.\n\n**Circumstances:** Lyrian has been a dedicated and reliable FTA officer for the past decade. His last known communication was a brief message confirming his arrival at the Grand Forum's Arcane Exchange to submit his weekly report. Since then, he has failed to respond to any attempts at contact.",
     "posted_at": "2026-03-11T16:35:38.129582",
     "expires_at": "2026-04-06T16:35:18.828501",
-    "resolved": false,
+    "resolved": true,
     "found": false
   },
   {
@@ -28,7 +28,7 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 ELIAS GILLAN**\n*Filed by: Senior Archivist Pell*\n\n**Last seen:** The Scribe's Pinnacle, Guild Spires, approximately 3 days ago\n**Description:** Young man, 25 years of age, with short, sandy hair and eyes that sparkle like shards of moonlight. Last seen wearing a worn leather coat over his official archivist robes, carrying a leather-bound journal and a silver quill.\n\n**Circumstances:** Elias has been a reliable junior archivist for the past year, never missing a shift. Last contact was a brief message confirming he'd be late for his morning shift due to a \"personal matter\". Since then, he has not returned to the Glass Sigil.\n\n*Anyone with information contact the Silver Watch at the Guild Spires Watchtower.*",
     "posted_at": "2026-03-14T04:52:27.802608",
     "expires_at": "2026-04-08T04:52:06.235730",
-    "resolved": false,
+    "resolved": true,
     "found": false
   },
   {
@@ -44,7 +44,7 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 ELIASHA ZHARA**\n*Filed by: the Choir \u2014 officially, quietly*\n\n**Last seen:** The Scroll Keepers' Archive, Sanctum Quarter, approximately 5 days ago\n**Description:** Young novice of the Serpent Choir, 19 years old, with a striking scar on her left cheek, wearing the hooded robe of her order. Carrying a bound, leather-bound tome and a silver-handled dagger.\n**Circumstances:** Last seen signing a contract with the Shadow Merchants, her usual routine involved daily prayers and study at the archives. Last contact was a brief, cryptic message: \"Something is not as it seems.\"\n\n*Anyone with information contact the Serpent Choir's Sanctum Quarter offices.*",
     "posted_at": "2026-03-19T17:29:41.595092",
     "expires_at": "2026-04-04T17:29:38.705483",
-    "resolved": false,
+    "resolved": true,
     "found": false
   },
   {
@@ -84,6 +84,22 @@
     "body": "\ud83d\udd0d **MISSING PERSON \u2014 ELANORA THORNBERRY**\n*Filed by: her employer at the Adventurers Guild*\n\n**Last seen:** The Grand Forum Waypoint, approximately 3 days ago\n**Description:** 22-year-old, slender build, long auburn hair tied in a high ponytail, wears a leather courier pouch with a silver falcon insignia.\n**Circumstances:** Elanora was last seen delivering a package to the Temple of the Hollow One. Her usual check-in at the Guild has not been received.",
     "posted_at": "2026-04-01T13:08:03.901980",
     "expires_at": "2026-04-20T13:08:01.349499",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1775331921",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 Kaelen Voss**  \n*Filed by: Lieutenant Varen*  \n\n**Last seen:** **Blackspire Outpost**, approximately **7** days ago  \n**Description:** 24, 6'1\", lean, with a jagged scar running from cheekbone to collarbone. Wore a patched Warden duster over a reinforced trench coat, and carried a modified plasma torch and a data slate marked \"Project Ashen Veil.\"  \n**Circumstances:** Routine patrol to investigate a smuggler\u2019s cache near the Iron Fang\u2019s docks. Last contact was a garbled radio transmission: \u201cThey\u2019re not what they seemed\u2026 the rift\u2019s *alive*.\u201d  \n\n*Anyone with information contact **Wardens of Ash command post**, sector 9-K.*",
+    "posted_at": "2026-04-04T14:45:21.146188",
+    "expires_at": "2026-04-19T14:45:10.732482",
+    "resolved": false,
+    "found": false
+  },
+  {
+    "id": "mp_1775533440",
+    "body": "\ud83d\udd0d **MISSING PERSON \u2014 Kaelen Veyra**  \n*Filed by: an anonymous third party*  \n\n**Last seen:** The Hollow Vein, Night Pits, approximately 7 days ago  \n**Description:** Late 20s, lean, with a jagged scar across the left eyebrow. Wore a threadbare black cloak stitched with faded lotus sigils and carried a data crystal tucked into their belt.  \n**Circumstances:** Last contacted a Lotus operative to discuss erasing a client\u2019s memories of a smuggling ring. The operative left abruptly, citing \u201cinternal protocol.\u201d No further contact since.  \n\n*Anyone with information contact the Warden of Ash\u2019s office in the Night Pits.*",
+    "posted_at": "2026-04-06T22:44:00.004375",
+    "expires_at": "2026-05-04T22:43:50.211875",
     "resolved": false,
     "found": false
   }

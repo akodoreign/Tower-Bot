@@ -203,7 +203,7 @@ Investigation modules MUST include a reason the players can't take forever:
 
 ---
 
-## WHAT NOT TO DO (common Mistral failures)
+## WHAT NOT TO DO (common LLM failures)
 
 1. Do NOT have every NPC speak in the same dramatic, portentous tone. Vary speech patterns. A dwarf blacksmith talks differently than an Aasimar priestess.
 2. Do NOT write "the city watches" or "whispers ripple through the streets" — these are empty filler.

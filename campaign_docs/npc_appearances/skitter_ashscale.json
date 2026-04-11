@@ -1,0 +1,28 @@
+{
+  "name": "Skitter Ashscale",
+  "species": "Kobold",
+  "faction": "Wardens of Ash",
+  "rank": "Recruit",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "Small, wiry Kobold with charred ember-colored scales stands tall amidst the Undercity's Slums. His outfit consists of ash grey chainmail adorned with the Wardens of Ash badge, and a worn leather belt holding a warhammer and a crossbow. A machete strapped to his back gleams ominously in the dim light. A distinctive ash-mark on his left cheek, marking him as an officer, stands out against his scaly skin.",
+  "faction_visual": "ash grey chainmail or plate, Warden badge, ash-mark on left cheek if officer",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

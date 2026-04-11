@@ -1,24 +1,23 @@
-# Skill: Mission Quality Report
-**Keywords:** mission, quality, analysis, improvement, balance
-**Category:** learned
-**Version:** 4
-**Source:** self-learned
+# Skill: Mission Quality Report  
+**Keywords:** mission, quality, analysis, improvement, balance  
+**Category:** learned  
+**Version:** 11  
+**Source:** self-learned  
 
-## Quality Score: 6/10
-## Issues Detected
-1. Faction imbalance: Wardens of Ash missions (6 out of 20) are overrepresented.
-2. Repetitive patterns: Escort missions (6 out of 20) appear too often.
-3. Completion rate: No completed or failed missions in the last 20.
-4. Player vs NPC claim ratio: NPCs claim more missions (11 out of 28 total claims).
-5. Quality of mission type seeds: Some seeds are vague, such as "A Dance with Dark Forces" and "The Long Owed Debt."
+## Quality Score: 5/10  
+## Issues Detected  
+1. **Faction Imbalance:** Iron Fang Consortium dominates (35% of missions), while Adventurers Guild is underrepresented (5%).  
+2. **Repetitive Mission Types:** "Standard" missions (40%) overrepresent mundane tasks; "rift" and "major" are underused.  
+3. **Completion Rate:** 0% completed/failed/expired; missions remain "open" indefinitely.  
+4. **Claim Ratio:** 1:1 player/NPC claims; players should claim ~70-80% of missions.  
+5. **Seed Quality:** Seeds lack evocative details (e.g., "sentient gemstones" is vague; "cursed automaton workshop" could specify lore).  
 
-## Recommendations
-1. Balance faction distribution: Reduce the number of missions for Wardens of Ash and distribute them to other factions.
-2. Introduce more mission types to reduce repetition.
-3. Encourage player interaction by increasing the number of player-driven missions.
-4. Improve the specificity and evocativeness of mission type seeds.
+## Recommendations  
+1. **Balance Factions:** Reduce Iron Fang Consortium missions (currently 35%) to ~25% and add more Adventurers Guild tasks.  
+2. **Diversify Mission Types:** Replace 3-4 "standard" missions with "investigation" or "dungeon" to reduce repetition.  
+3. **Enforce Completion:** Introduce time limits or consequences for unclaimed missions to drive player engagement.  
+4. **Shift Claim Ratio:** Prioritize player-claimable missions (e.g., "local" or "standard" with clear stakes) to boost player involvement.  
+5. **Refine Seeds:** Add sensory details and stakes (e.g., "cursed gemstones that whisper secrets" or "automaton workshop guarded by rogue AI").  
 
-## Next Cycle Focus
-1. Encourage mission completion by introducing more player-driven, competitive missions.
-2. Balance faction representation and mission types to foster a more engaging and diverse campaign.
-3. Continuously refine and improve the quality of mission type seeds to create more engaging and immersive experiences.
+## Next Cycle Focus  
+Prioritize faction balance, mission type diversity, and seed specificity to improve player engagement and mission completion rates.

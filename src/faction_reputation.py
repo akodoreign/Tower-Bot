@@ -1,5 +1,6 @@
 """
 faction_reputation.py — Faction favorability tracking for Tower of Last Chance.
+*** REFACTORED TO USE MySQL via db_api ***
 
 Tiers (low to high):
   Detested → Hated → Disliked → Neutral → Friendly → Liked → Associated → Partner
@@ -13,13 +14,14 @@ Detested/Hated factions generate hostile missions AGAINST players instead of con
 
 from __future__ import annotations
 
-import json
-import os
-from pathlib import Path
 from typing import Dict, Optional
 
-DOCS_DIR        = Path(__file__).resolve().parent.parent / "campaign_docs"
-REP_FILE        = DOCS_DIR / "faction_reputation.json"
+# Import database API
+from src.db_api import (
+    get_faction_reputation as db_get_faction_rep,
+    get_all_faction_reputations as db_get_all_factions,
+    set_faction_reputation as db_set_faction_rep,
+)
 
 # ---------------------------------------------------------------------------
 # Reputation tiers — ordered lowest to highest
@@ -95,44 +97,42 @@ KNOWN_FACTIONS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Persistence
+# Persistence — Now uses MySQL via db_api
 # ---------------------------------------------------------------------------
 
-def _load_rep() -> Dict[str, dict]:
-    """Returns {faction_name: {tier, points}}"""
-    if not REP_FILE.exists():
-        return {}
-    try:
-        return json.loads(REP_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-
-
-def _save_rep(data: Dict[str, dict]) -> None:
-    try:
-        REP_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    except Exception:
-        pass
-
-
-def _ensure_faction(data: Dict[str, dict], faction: str) -> None:
-    """Initialise a faction entry if it doesn't exist yet."""
-    if faction not in data:
-        data[faction] = {"tier": DEFAULT_TIER, "points": 0}
+def _ensure_faction(faction: str) -> dict:
+    """Initialise a faction entry if it doesn't exist yet. Returns the entry."""
+    entry = db_get_faction_rep(faction)
+    if not entry:
+        # Create new faction with default values
+        db_set_faction_rep(faction, 0, DEFAULT_TIER)
+        return {"tier": DEFAULT_TIER, "points": 0}
+    return {
+        "tier": entry.get("tier", DEFAULT_TIER),
+        "points": entry.get("reputation_score", 0)
+    }
 
 
 def get_all_reputations() -> Dict[str, dict]:
-    data = _load_rep()
-    # Ensure all known factions are present
+    """Get all faction reputations, ensuring all known factions exist."""
+    # First ensure all known factions exist
     for f in KNOWN_FACTIONS:
-        _ensure_faction(data, f)
-    return data
+        _ensure_faction(f)
+    
+    # Now fetch all from database
+    all_reps = db_get_all_factions()
+    result = {}
+    for row in all_reps:
+        result[row["faction_name"]] = {
+            "tier": row.get("tier", DEFAULT_TIER),
+            "points": row.get("reputation_score", 0)
+        }
+    return result
 
 
 def get_reputation(faction: str) -> dict:
-    data = _load_rep()
-    _ensure_faction(data, faction)
-    return data[faction]
+    """Get reputation for a single faction."""
+    return _ensure_faction(faction)
 
 
 # ---------------------------------------------------------------------------
@@ -144,41 +144,38 @@ def _apply_event(faction: str, delta: int) -> dict:
     Apply +1 (complete) or -1 (fail/expire) to a faction.
     Returns a result dict: {faction, old_tier, new_tier, points, shifted}.
     """
-    data = _load_rep()
-    _ensure_faction(data, faction)
-    entry = data[faction]
+    entry = _ensure_faction(faction)
 
     old_tier   = entry["tier"]
     old_index  = TIER_INDEX.get(old_tier, TIER_INDEX[DEFAULT_TIER])
-    entry["points"] += delta
+    new_points = entry["points"] + delta
 
     shifted   = False
     new_tier  = old_tier
     new_index = old_index
 
     # Check for upward shift
-    if entry["points"] >= POINTS_TO_SHIFT:
+    if new_points >= POINTS_TO_SHIFT:
         new_index = min(old_index + 1, len(TIERS) - 1)
         new_tier  = TIERS[new_index]
-        entry["points"] = 0
+        new_points = 0
         shifted = True
 
     # Check for downward shift
-    elif entry["points"] <= -POINTS_TO_SHIFT:
+    elif new_points <= -POINTS_TO_SHIFT:
         new_index = max(old_index - 1, 0)
         new_tier  = TIERS[new_index]
-        entry["points"] = 0
+        new_points = 0
         shifted = True
 
-    entry["tier"] = new_tier
-    data[faction] = entry
-    _save_rep(data)
+    # Save to database
+    db_set_faction_rep(faction, new_points, new_tier)
 
     return {
         "faction":  faction,
         "old_tier": old_tier,
         "new_tier": new_tier,
-        "points":   entry["points"],
+        "points":   new_points,
         "shifted":  shifted,
     }
 
@@ -193,8 +190,9 @@ def on_mission_failed(faction: str) -> dict:
 
 def on_mission_expired(faction: str) -> dict:
     # Expired = nobody claimed it. No reputation penalty — only failure earns that.
-    return {"faction": faction, "old_tier": get_reputation(faction)["tier"],
-            "new_tier": get_reputation(faction)["tier"], "points": get_reputation(faction)["points"],
+    rep = get_reputation(faction)
+    return {"faction": faction, "old_tier": rep["tier"],
+            "new_tier": rep["tier"], "points": rep["points"],
             "shifted": False}
 
 

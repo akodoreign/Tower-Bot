@@ -11,15 +11,7 @@ Each NPC party that takes a mission gets a full profile generated on first use:
 Rank ladder (slowest in the game — takes sustained performance to shift):
   Unknown → Recognized → Established → Respected → Notable → Renowned → Legendary
 
-Points to shift: PARTY_POINTS_TO_SHIFT = 5 (vs 3 for factions)
-
-Mission tier affects point delta:
-  local / patrol / escort / standard / investigation → ±1  (bread-and-butter)
-  major / inter-guild / dungeon / high-stakes        → ±2  (notable work)
-  rift / epic / divine / tower                       → ±3  (city-shaping events)
-
-This means a Legendary-tier success CAN jump a party a full rank, but only if they
-were already close. Normal missions are a long slow grind — by design.
+Data persists to MySQL party_profiles table.
 """
 
 from __future__ import annotations
@@ -28,15 +20,12 @@ import os
 import json
 import random
 import asyncio
+import re
 from datetime import datetime
-from pathlib import Path
 from typing import Optional, List
 
 from src.log import logger
-
-DOCS_DIR          = Path(__file__).resolve().parent.parent / "campaign_docs"
-PARTY_PROFILE_DIR = DOCS_DIR / "party_profiles"
-PARTY_PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+from src.db_api import raw_query, raw_execute, db
 
 # ---------------------------------------------------------------------------
 # Rank ladder
@@ -120,39 +109,66 @@ SPECIES_LIST = [
 ]
 
 # ---------------------------------------------------------------------------
-# File path helpers
+# Slug helper (for backward compatibility / identification)
 # ---------------------------------------------------------------------------
 
 def _slug(name: str) -> str:
-    """Convert party name to a safe filename slug."""
-    import re
+    """Convert party name to a safe identifier slug."""
     return re.sub(r"[^\w\-]", "_", name.lower().strip())
 
 
-def _profile_path(name: str) -> Path:
-    return PARTY_PROFILE_DIR / f"{_slug(name)}.json"
-
-
 # ---------------------------------------------------------------------------
-# Persistence
+# Persistence — MySQL via db_api
 # ---------------------------------------------------------------------------
 
 def load_profile(name: str) -> Optional[dict]:
-    path = _profile_path(name)
-    if not path.exists():
-        return None
+    """Load party profile from database."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query(
+            "SELECT * FROM party_profiles WHERE party_name = %s LIMIT 1",
+            (name,)
+        )
+        if not rows:
+            return None
+        row = rows[0]
+        # Parse members_json which stores the full profile
+        profile_data = row.get("members_json", {})
+        if isinstance(profile_data, str):
+            profile_data = json.loads(profile_data)
+        # Merge DB columns with JSON data
+        profile_data["name"] = row.get("party_name", name)
+        if row.get("formed_at"):
+            profile_data.setdefault("created_at", row["formed_at"].isoformat() if hasattr(row["formed_at"], 'isoformat') else str(row["formed_at"]))
+        return profile_data
+    except Exception as e:
+        logger.error(f"party_profiles load error for {name}: {e}")
         return None
 
 
 def save_profile(profile: dict) -> None:
+    """Save party profile to database."""
     name = profile.get("name", "unknown")
     try:
-        _profile_path(name).write_text(
-            json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8"
+        # Store full profile in members_json
+        profile_json = json.dumps(profile, ensure_ascii=False, default=str)
+        
+        existing = raw_query(
+            "SELECT id FROM party_profiles WHERE party_name = %s LIMIT 1",
+            (name,)
         )
+        
+        if existing:
+            raw_execute(
+                "UPDATE party_profiles SET members_json = %s WHERE party_name = %s",
+                (profile_json, name)
+            )
+        else:
+            db.insert("party_profiles", {
+                "party_name": name,
+                "members_json": profile_json,
+                "reputation": profile.get("points", 0),
+                "status": "active"
+            })
     except Exception as e:
         logger.error(f"party_profiles save error for {name}: {e}")
 
@@ -180,18 +196,18 @@ def _init_profile(name: str) -> dict:
 # ---------------------------------------------------------------------------
 
 async def _generate(prompt: str) -> Optional[str]:
-    import httpx
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model": ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+            },
+            timeout=120.0,
+            caller="party_profiles",
+        )
         text = ""
         if isinstance(data, dict):
             msg = data.get("message", {})
@@ -301,32 +317,27 @@ async def ensure_profile(name: str) -> dict:
 
 async def generate_all_party_profiles(force: bool = False) -> dict:
     """
-    Iterate over all party names from used_parties.json + any existing profile files.
+    Iterate over all party names from used_parties.json + existing DB profiles.
     Generate profiles for any that don't have one (or all if force=True).
     Returns {total, done, skipped, failed}.
     """
-    from src.mission_board import _load_party_list, USED_PARTIES_FILE
+    from src.mission_board import _load_party_list, _load_used_parties
 
     # Collect all known party names from:
-    # 1. adventurer_parties.txt (master list)
-    # 2. used_parties.json (have been deployed)
-    # 3. existing profile files (already generated)
+    # 1. adventurer_parties table (master list)
+    # 2. used_parties (global_state table)
+    # 3. existing profiles in party_profiles table
     all_names = set(_load_party_list())
+    all_names.update(_load_used_parties())
 
-    if USED_PARTIES_FILE.exists():
-        try:
-            used = json.loads(USED_PARTIES_FILE.read_text(encoding="utf-8"))
-            all_names.update(used)
-        except Exception:
-            pass
-
-    for f in PARTY_PROFILE_DIR.glob("*.json"):
-        try:
-            data = json.loads(f.read_text(encoding="utf-8"))
-            if "name" in data:
-                all_names.add(data["name"])
-        except Exception:
-            pass
+    # Get party names from database
+    try:
+        db_rows = raw_query("SELECT party_name FROM party_profiles")
+        for row in db_rows:
+            if row.get("party_name"):
+                all_names.add(row["party_name"])
+    except Exception:
+        pass
 
     total   = len(all_names)
     done    = 0
@@ -505,14 +516,22 @@ def _rank_bar(pts: int) -> str:
 
 def format_all_party_ranks() -> str:
     """Formatted string for a /partyranks command embed."""
-    profiles = []
-    for f in sorted(PARTY_PROFILE_DIR.glob("*.json")):
-        try:
-            data = json.loads(f.read_text(encoding="utf-8"))
-            if data.get("name"):
-                profiles.append(data)
-        except Exception:
-            pass
+    try:
+        rows = raw_query("SELECT party_name, members_json FROM party_profiles")
+        profiles = []
+        for row in rows:
+            try:
+                data = row.get("members_json", {})
+                if isinstance(data, str):
+                    data = json.loads(data)
+                if data.get("name") or row.get("party_name"):
+                    data["name"] = data.get("name") or row.get("party_name")
+                    profiles.append(data)
+            except Exception:
+                pass
+    except Exception as e:
+        logger.error(f"Error loading party ranks: {e}")
+        profiles = []
 
     if not profiles:
         return "*No party records yet.*"

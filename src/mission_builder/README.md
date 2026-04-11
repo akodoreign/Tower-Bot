@@ -224,13 +224,13 @@ GAP_BETWEEN_TILES = 2
 ### Ollama Model Selection
 
 ```python
-# Use any Ollama model: mistral, llama2, openchat, etc.
+# Use any Ollama model: qwen3-8b-slim:latest, llama2, openchat, etc.
 mission = await generate_mission_async(
     title="Mission",
     faction="Faction",
     tier="mid-level",
     body="Brief",
-    model_name="mistral"  # or "openchat", "neural-chat", etc.
+    model_name="qwen3-8b-slim:latest"  # or "openchat", "neural-chat", etc.
 )
 ```
 
@@ -374,7 +374,7 @@ except Exception as e:
 1. **Cache Ollama responses** - Avoid regenerating same content
 2. **Parallel tile generation** - `asyncio.gather()` handles this
 3. **Pre-generate reference images** - Use `img2img` instead of `txt2img` for consistency
-4. **Use faster models** - Mistral/OpenChat faster than Llama2
+4. **Use faster models** - qwen3-8b-slim:latest/OpenChat faster than Llama2
 
 ### Memory Usage
 
@@ -467,7 +467,7 @@ curl http://127.0.0.1:7860/sdapi/v1/sd-models
 
 **Problem**: Ollama takes >2 minutes per mission
 **Solution**:
-- Use faster model: `model_name="mistral"` instead of llama2
+- Use faster model: `model_name="qwen3-8b-slim:latest"` instead of llama2
 - Reduce steps: `DEFAULT_STEPS = 15`
 - Check Ollama is running: `ollama list`
 

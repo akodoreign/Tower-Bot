@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "title": "The Argent Vault of Echoing Shadows",
+    "faction": "Argent Blades",
+    "tier": "local",
+    "mission_type": "dungeon-delve",
+    "cr": 4,
+    "is_learning_test": true,
+    "generated_at": "2026-04-04T01:15:51.808529"
+  },
+  "sections": {
+    "overview": "[overview generation failed]",
+    "act_1": "[act_1 generation failed]",
+    "act_2": "[act_2 generation failed]",
+    "act_3": "[act_3 generation failed]",
+    "rewards": "### REWARDS & CONCLUSION  \n\n**XP Awards:**  \nEach player gains **300 XP** for successfully navigating the Vault of Echoing Shadows and defeating the guardian. A party of four earns **1,200 XP** total.  \n\n**Gold & Treasure:**  \n- **1,000 gp** in scattered coins and gemstones from the vault\u2019s treasure hoard.  \n- **The Echoing Sigil** (a crystalline pendant humming with arcane energy). When activated, it allows the wearer to *hear faint echoes of past events* within 60 feet, revealing hidden clues or secrets.  \n- **A scroll of Echoing Whisper** (DC 15 Arcana, 1 charge). When cast, it creates a soundwave that echoes through walls, revealing concealed passages or enemy positions.  \n- **A set of reinforced silver armor** (AC +1, 10 gp value) from the vault\u2019s armory.  \n\n**Faction Reputation:**  \nThe Argent Blades grant **+10 reputation** to the party for their success. This unlocks a new quest: *The Whispering Archive*, where the Sigil\u2019s echoes reveal a hidden library of forbidden magical knowledge.  \n\n**Consequences of Success:**  \n- The vault\u2019s guardian is sealed, but its spirit lingers as a *shadowy wraith* near the Argent Blades\u2019 temple. If the party investigates, they may uncover a deeper conspiracy tied to the Blades\u2019 founding.  \n- The Echoing Sigil\u2019s power draws the attention of the *Veilwardens*, a secretive order that seeks to reclaim it.  \n\n**Consequences of Failure:**  \n- If the party fails to defeat the guardian, it escapes with the Sigil, leaving the vault unstable. The Argent Blades demand a \u201creparation\u201d of **5,000 gp** or a favor to resolve the crisis.  \n- The vault\u2019s echoes may become permanent, causing hallucinations or paranoia among the party.  \n\n**Magic Item Spotlight:**  \n**Echoing Sigil (Unique):**  \n- *Rarity:* Rare  \n- *Usage:* Once per long rest, the wearer can attune to a single object (e.g., a weapon, gem, or tool). While attuned, the Sigil grants advantage on Investigation checks to discern hidden details about the object.  \n\n**Future Hooks:**  \n1. **The Veilwardens\u2019 Gambit:** The Sigil\u2019s whispers attract the Veilwardens, who offer a trade: return the Sigil for a map to a lost *Echoing Citadel* or a favor to stop a magical catastrophe.  \n2. **The Guardian\u2019s Shadow:** The wraith from the vault haunts the Argent Blades\u2019 temple, demanding the party confront it. Defeating it grants **+10 reputation** and a *ring of echo resonance* (grants *Resilient* trait against sound-based attacks).  \n3. **Whispers in the Archive:** The Echoing Sigil\u2019s power reveals a hidden chamber in the Argent Blades\u2019 library. Inside lies a *scroll of the Echoing Cataclysm*, detailing a ritual to awaken a primordial force\u2014**but the ritual requires the Sigil as a sacrifice**.  \n\n**Final Note:**  \nThe Vault of Echoing Shadows is more than a treasure trove\u2014it\u2019s a gateway to secrets that could reshape the world. Whether the party claims its rewards or becomes its next target, the echoes of their choices will linger."
+  }
+}

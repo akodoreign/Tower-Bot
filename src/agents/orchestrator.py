@@ -168,15 +168,32 @@ class AgentOrchestrator:
             return None
     
     def _collect_mission_metrics(self) -> Dict[str, Any]:
-        """Calculate key mission metrics from mission_memory.json."""
-        mission_path = self.campaign_docs / "mission_memory.json"
-        
+        """Calculate key mission metrics from MySQL missions table."""
         try:
+            from src.db_api import raw_query as _rq
+            rows = _rq("SELECT title, status, tier, faction, mission_json FROM missions ORDER BY id") or []
+            missions = []
+            for row in rows:
+                mj = row.get("mission_json") or {}
+                if isinstance(mj, str):
+                    try:
+                        mj = json.loads(mj)
+                    except Exception:
+                        mj = {}
+                s = row["status"]
+                m = {**mj, "title": row["title"], "tier": row["tier"], "faction": row["faction"],
+                     "outcome": s if s in ("completed","failed","expired") else None}
+                missions.append(m)
+        except Exception:
+            mission_path = self.campaign_docs / "mission_memory.json"
             if not mission_path.exists():
                 return {"total_missions": 0, "completion_rate": 0}
-            
-            missions = json.loads(mission_path.read_text(encoding="utf-8"))
-            
+            try:
+                missions = json.loads(mission_path.read_text(encoding="utf-8"))
+            except Exception:
+                return {"total_missions": 0, "completion_rate": 0}
+
+        try:
             # Calculate stats
             total = len(missions)
             completed = sum(1 for m in missions if m.get("outcome") == "completed")
@@ -215,18 +232,35 @@ class AgentOrchestrator:
             return {}
     
     def _collect_recent_missions(self, count: int = 10) -> List[Dict]:
-        """Get recent completed/failed missions for narrative analysis."""
-        mission_path = self.campaign_docs / "mission_memory.json"
-        
+        """Get recent missions from MySQL for narrative analysis."""
         try:
+            from src.db_api import raw_query as _rq
+            rows = _rq(
+                "SELECT title, status, tier, faction, mission_json FROM missions "
+                "ORDER BY id DESC LIMIT %s", (count,)
+            ) or []
+            missions = []
+            for row in rows:
+                mj = row.get("mission_json") or {}
+                if isinstance(mj, str):
+                    try:
+                        mj = json.loads(mj)
+                    except Exception:
+                        mj = {}
+                s = row["status"]
+                missions.append({**mj, "title": row["title"], "tier": row["tier"],
+                                  "faction": row["faction"],
+                                  "outcome": s if s in ("completed","failed","expired") else None})
+            return missions
+        except Exception:
+            mission_path = self.campaign_docs / "mission_memory.json"
             if not mission_path.exists():
                 return []
-            
-            missions = json.loads(mission_path.read_text(encoding="utf-8"))
-            # Return last N missions
-            return missions[-count:] if len(missions) > count else missions
-        except Exception:
-            return []
+            try:
+                missions = json.loads(mission_path.read_text(encoding="utf-8"))
+                return missions[-count:] if len(missions) > count else missions
+            except Exception:
+                return []
     
     def _collect_code_files(self) -> Dict[str, str]:
         """Collect source code from mission builder modules."""
@@ -290,33 +324,41 @@ class AgentOrchestrator:
         return metrics
     
     def _collect_npc_data(self) -> Dict[str, Any]:
-        """Collect NPC roster data."""
-        roster_path = self.campaign_docs / "npc_roster.json"
-        
+        """Collect NPC roster data from MySQL."""
         try:
+            from src.db_api import raw_query as _rq
+            rows = _rq(
+                "SELECT name, faction, role, location, status FROM npcs "
+                "WHERE status IN ('alive','injured') ORDER BY name LIMIT 20"
+            ) or []
+            npcs = [dict(r) for r in rows]
+            total = (_rq("SELECT COUNT(*) as cnt FROM npcs WHERE status IN ('alive','injured')") or [{}])[0].get("cnt", 0)
+            return {"npcs": npcs, "total_count": total, "by_faction": {}}
+        except Exception:
+            roster_path = self.campaign_docs / "npc_roster.json"
             if not roster_path.exists():
                 return {"npcs": [], "total_count": 0}
-            
-            npcs = json.loads(roster_path.read_text(encoding="utf-8"))
-            return {
-                "npcs": npcs[:20],  # First 20 NPCs
-                "total_count": len(npcs),
-                "by_faction": {},
-            }
-        except Exception:
-            return {"npcs": [], "total_count": 0}
-    
+            try:
+                npcs = json.loads(roster_path.read_text(encoding="utf-8"))
+                return {"npcs": npcs[:20], "total_count": len(npcs), "by_faction": {}}
+            except Exception:
+                return {"npcs": [], "total_count": 0}
+
     def _collect_faction_info(self) -> Dict[str, Any]:
-        """Collect faction information."""
-        rep_path = self.campaign_docs / "faction_reputation.json"
-        
+        """Collect faction information from MySQL."""
         try:
+            from src.db_api import get_all_faction_reputations
+            rows = get_all_faction_reputations() or []
+            return {r["faction_name"]: {"tier": r["tier"], "points": r["reputation_score"]}
+                    for r in rows}
+        except Exception:
+            rep_path = self.campaign_docs / "faction_reputation.json"
             if not rep_path.exists():
                 return {}
-            
-            return json.loads(rep_path.read_text(encoding="utf-8"))
-        except Exception:
-            return {}
+            try:
+                return json.loads(rep_path.read_text(encoding="utf-8"))
+            except Exception:
+                return {}
     
     def _get_difficulty_scale(self) -> Dict[int, str]:
         """Get the current difficulty scale mapping."""

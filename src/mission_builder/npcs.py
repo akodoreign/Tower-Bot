@@ -57,7 +57,28 @@ LEADER_RANKS = [
 
 
 def load_npc_roster() -> List[dict]:
-    """Load the NPC roster from disk."""
+    """Load the NPC roster from MySQL (falls back to npc_roster.json)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "WHERE status IN ('alive','injured') ORDER BY name"
+        ) or []
+        if rows:
+            npcs = []
+            for row in rows:
+                npc = {"name": row["name"], "faction": row["faction"],
+                       "role": row["role"], "location": row["location"], "status": row["status"]}
+                dj = row.get("data_json") or {}
+                if isinstance(dj, str):
+                    try: dj = json.loads(dj)
+                    except: dj = {}
+                npc.update(dj)
+                npcs.append(npc)
+            return npcs
+    except Exception:
+        pass
+    # Fallback
     roster_file = DOCS_DIR / "npc_roster.json"
     if not roster_file.exists():
         return []

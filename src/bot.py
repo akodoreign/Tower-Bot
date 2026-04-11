@@ -8,6 +8,8 @@ import os
 import asyncio
 import importlib
 
+import discord
+
 from src.aclient import discordClient
 from src.log import logger
 
@@ -23,6 +25,7 @@ COG_MODULES = [
     "src.cogs.admin",
     "src.cogs.module_gen",
     "src.cogs.skills",
+    "src.patch_approval",  # Patch approval for module quality learning
 ]
 
 
@@ -62,6 +65,42 @@ def run_discord_bot():
         loop = asyncio.get_event_loop()
         loop.create_task(discordClient.process_messages())
         logger.info(f"{discordClient.user} is now running!")
+
+    # ---- on_interaction: Handle bulletin expansion and other custom interactions ----
+    @discordClient.event
+    async def on_interaction(interaction):
+        """Handle custom button interactions that aren't managed by views."""
+        if interaction.type != discord.InteractionType.component:
+            return
+        
+        custom_id = interaction.data.get("custom_id", "") if interaction.data else ""
+        
+        # Handle bulletin expansion buttons
+        if custom_id.startswith("bulletin_expand:"):
+            try:
+                from src.expandable_bulletin import handle_bulletin_interaction
+                await handle_bulletin_interaction(interaction)
+            except discord.errors.NotFound:
+                # Interaction expired (>15 minutes old) — silently ignore
+                logger.debug("📰 Bulletin expansion: interaction expired")
+            except discord.errors.HTTPException as e:
+                # 40060 = already acknowledged — silently ignore (button worked, just cleanup failed)
+                if e.code == 40060:
+                    logger.debug("📰 Bulletin expansion: interaction already acknowledged")
+                else:
+                    logger.warning(f"📰 Bulletin expansion HTTP error: {e}")
+            except Exception as e:
+                logger.error(f"📰 Bulletin expansion error: {e}")
+                # Only try to respond if we haven't already
+                try:
+                    if not interaction.response.is_done():
+                        await interaction.response.send_message(
+                            "📰 Could not load bulletin content.",
+                            ephemeral=True,
+                        )
+                except discord.errors.HTTPException:
+                    # Response already sent or expired — nothing to do
+                    pass
 
     # ---- Run ----
     discordClient.run(os.getenv("DISCORD_BOT_TOKEN"))

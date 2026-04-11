@@ -61,6 +61,9 @@ MAP_SAMPLER = "DPM++ 2M Karras"
 # Checkpoint for maps — use the photorealistic model for battlemaps
 MAP_MODEL = os.getenv("A1111_MODEL", "juggernautXL_version6Rundiffusion.safetensors")
 
+# LoRA for top-down RPG table maps — must be present in A1111's lora folder
+MAP_LORA = "<lora:DD_Table_RPG:0.75>"
+
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 
 # ---------------------------------------------------------------------------
@@ -181,69 +184,76 @@ def extract_map_scenes(module_data: dict) -> List[Dict]:
         logger.warning("🗺️ No sections found in module_data; attempting raw_content parse")
         sections = {"acts_1_2": raw_content, "acts_3_4": raw_content}
     
-    # Parse Act 2 leads (investigation locations)
+    # Parse Chapter 2 scenes / investigation leads
     acts_1_2 = sections.get("acts_1_2", "")
     if not acts_1_2:
-        logger.info("🗺️ No acts_1_2 section found for lead extraction")
-    
-    # Flexible regex to match "Lead", "Investigation Lead", "## Lead", "### Lead", etc.
-    lead_pattern = r"(?:###|##)?\s*(?:Investigation\s+)?Lead\s*\d+:?\s*([^\n]+)\n(.*?)(?=(?:###|##)|\Z)"
-    
-    for match in re.finditer(lead_pattern, acts_1_2, re.DOTALL | re.IGNORECASE):
+        logger.info("🗺️ No acts_1_2 section found for scene extraction")
+
+    # Match both new "### Scene N: Location" and old "### Lead N: Location" formats
+    scene_pattern = r"###\s*(?:Scene|Investigation\s+Lead|Lead)\s*\d+:\s*([^\n\[]+?)(?:\s*[-—]\s*[^\n]*)?\n(.*?)(?=###|##|\Z)"
+
+    for match in re.finditer(scene_pattern, acts_1_2, re.DOTALL | re.IGNORECASE):
         location_name = match.group(1).strip()
         scene_text = match.group(2).strip()
-        
-        # Extract scene description if present
-        desc_match = re.search(r"\*\*Scene Description\*\*[:\s]*(.*?)(?=\*\*|$)", scene_text, re.DOTALL)
+
+        # Extract scene setting/description if present
+        desc_match = re.search(r"\*\*(?:Setting|Scene Description)\*\*[:\s]*(.*?)(?=\*\*|\Z)", scene_text, re.DOTALL)
         description = desc_match.group(1).strip() if desc_match else scene_text[:500]
-        
+
         scenes.append({
-            "scene_id": f"act2_lead_{_slugify(location_name)}",
-            "scene_name": f"Lead: {location_name}",
+            "scene_id": f"ch2_scene_{_slugify(location_name)}",
+            "scene_name": f"Scene: {location_name}",
             "location": location_name,
             "description": description,
             "district": _detect_district(scene_text),
             "scene_type": _detect_scene_type(scene_text),
             "act": 2,
         })
-    
-    # Parse Act 4 confrontation (main battle)
+
+    # Parse Chapter 3 confrontation — handles both new "### Location:" and old "### Battlefield:" formats
     acts_3_4 = sections.get("acts_3_4", "")
-    
-    # Look for battlefield section
-    battlefield_match = re.search(
-        r"###\s*Battlefield:\s*([^\n]+)\n(.*?)(?=###|##|$)",
+
+    # New format: "### Location: [Name]" inside Chapter 3 Part B
+    confrontation_match = re.search(
+        r"###\s*(?:Location|Battlefield):\s*([^\n]+)\n(.*?)(?=###|##|\Z)",
         acts_3_4, re.DOTALL | re.IGNORECASE
     )
-    
-    if battlefield_match:
-        location_name = battlefield_match.group(1).strip()
-        scene_text = battlefield_match.group(2).strip()
-        
-        desc_match = re.search(r"\*\*Scene Description\*\*[:\s]*(.*?)(?=\*\*|$)", scene_text, re.DOTALL)
+
+    if confrontation_match:
+        location_name = confrontation_match.group(1).strip()
+        scene_text = confrontation_match.group(2).strip()
+
+        desc_match = re.search(r"\*\*(?:Setting|Scene Description)\*\*[:\s]*(.*?)(?=\*\*|\Z)", scene_text, re.DOTALL)
         description = desc_match.group(1).strip() if desc_match else scene_text[:500]
-        
+
         scenes.append({
-            "scene_id": f"act4_confrontation_{_slugify(location_name)}",
+            "scene_id": f"ch3_confrontation_{_slugify(location_name)}",
             "scene_name": f"Confrontation: {location_name}",
             "location": location_name,
             "description": description,
             "district": _detect_district(scene_text),
-            "scene_type": "boss",  # Act 4 is always the boss fight
+            "scene_type": "boss",
             "act": 4,
         })
     else:
-        # Fallback: look for Act 4 header
-        act4_match = re.search(
-            r"##\s*Act\s*4[:\s]*([^\n]*)\n(.*?)(?=##|$)",
+        # Fallback: Chapter 3 Part B header itself
+        ch3_match = re.search(
+            r"##\s*Chapter\s*3[,\s]*Part\s*B[:\s]*([^\n]*)\n(.*?)(?=##|\Z)",
             acts_3_4, re.DOTALL | re.IGNORECASE
         )
-        if act4_match:
-            scene_text = act4_match.group(2).strip()
+        if not ch3_match:
+            # Very old Act 4 fallback
+            ch3_match = re.search(
+                r"##\s*Act\s*4[:\s]*([^\n]*)\n(.*?)(?=##|\Z)",
+                acts_3_4, re.DOTALL | re.IGNORECASE
+            )
+        if ch3_match:
+            scene_text = ch3_match.group(2).strip()
+            primary_loc = module_data.get("metadata", {}).get("primary_location", "Undercity")
             scenes.append({
-                "scene_id": "act4_confrontation",
+                "scene_id": "ch3_confrontation",
                 "scene_name": "Final Confrontation",
-                "location": module_data.get("metadata", {}).get("primary_location", "Unknown"),
+                "location": primary_loc,
                 "description": scene_text[:500],
                 "district": _detect_district(scene_text),
                 "scene_type": "boss",
@@ -275,14 +285,15 @@ def build_map_prompt(scene: Dict) -> Tuple[str, str]:
     district_style = _DISTRICT_STYLES.get(district, _DISTRICT_STYLES["warrens"])
     scene_features = _SCENE_FEATURES.get(scene_type, _SCENE_FEATURES["combat"])
     
-    # Build prompt
+    # Build prompt — LoRA must come first so A1111 applies it at full weight
     prompt_parts = [
+        MAP_LORA,
         _BASE_STYLE,
         f"location: {location}",
         district_style,
         scene_features,
     ]
-    
+
     # Add description details if meaningful
     if description and len(description) > 20:
         # Extract key visual elements from description
@@ -294,7 +305,7 @@ def build_map_prompt(scene: Dict) -> Tuple[str, str]:
                 visual_words.append(word_clean)
         if visual_words:
             prompt_parts.append(", ".join(visual_words[:5]))
-    
+
     positive = ", ".join(prompt_parts)
     
     return positive, _NEGATIVE
@@ -470,44 +481,46 @@ async def post_maps_to_channel(
     map_paths: List[Path],
     module_data: dict,
     retry_count: int = 2,
+    channel=None,
 ) -> bool:
     """
-    Post generated maps to the maps channel with retry logic.
-    
+    Post generated maps to the module output channel with retry logic.
+
+    Posts to the same channel as the DOCX (MODULE_OUTPUT_CHANNEL_ID).
+    Pass channel directly to skip the lookup.
+
     Args:
         client: Discord client
         map_paths: List of paths to map files
         module_data: Module data for context
         retry_count: Number of retries on transient failures
-    
+        channel: Optional pre-resolved discord.TextChannel (skips env lookup)
+
     Returns:
         True if posted successfully, False otherwise
     """
     import discord
-    
+
     if not map_paths:
         logger.warning("🗺️ No map paths provided to post")
         return False
-    
+
     # Validate all map files exist before attempting post
     for p in map_paths:
         if not p.exists():
             logger.error(f"🗺️ Map file missing: {p}")
             return False
-    
-    channel_id = int(os.getenv("MAPS_CHANNEL_ID", "0"))
-    if not channel_id:
-        # Fall back to module output channel
-        channel_id = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "0"))
-    
-    if not channel_id:
-        logger.warning("🗺️ No maps channel configured (MAPS_CHANNEL_ID or MODULE_OUTPUT_CHANNEL_ID)")
-        return False
-    
-    channel = client.get_channel(channel_id)
-    if not channel:
-        logger.warning(f"🗺️ Maps channel {channel_id} cannot be accessed by bot")
-        return False
+
+    # Use provided channel, or resolve from MODULE_OUTPUT_CHANNEL_ID
+    if channel is None:
+        channel_id = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "0")) or int(os.getenv("MAPS_CHANNEL_ID", "0"))
+        if not channel_id:
+            logger.warning("🗺️ No module output channel configured (MODULE_OUTPUT_CHANNEL_ID)")
+            return False
+        channel = client.get_channel(channel_id)
+        if not channel:
+            logger.warning(f"🗺️ Module output channel {channel_id} cannot be accessed by bot")
+            return False
     
     # Verify bot has send permissions
     try:

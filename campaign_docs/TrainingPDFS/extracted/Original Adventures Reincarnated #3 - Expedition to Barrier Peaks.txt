@@ -1,0 +1,902 @@
+
+
+--- PAGE 1 ---
+
+[No text extracted]
+
+--- PAGE 2 ---
+
+[No text extracted]
+
+--- PAGE 3 ---
+
+EIPEBITIOI TO TIE 
+1111111 PlllS 
+A FIFTH EDITION CONVERSION AND CLASSIC HOMAGE 
+S3: EXPEDITION TO THE BARRIER PEAI<S 
+Conversion by Michael Curtis and Tim Wadzinski 
+0RiG irrn.L ADVEI TTVRJ;S REiITC AR_IlATE D • EXPEDI TI 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 4 ---
+
+EIPEDITIGI TO TIE B!BBllB PE!IS 
+Full credits for the original editions of Expedition to the Barrier Peaks can be found in their respective sections of this 
+book, where thry are scanned verbatim from prior printings. The credits that follow are for the 5E portion of this work. 
+Original Writer 
+SE Conversion Design and Writing 
+SE Edition Editing and Additional Support 
+Additional Writing 
+Special Th anks 
+SE Edition Playtesters 
+Cover Design 
+Cover Art 
+Endsheet Art 
+Interior Layout 
+Interior Art Direction 
+Interior Art 
+Cartography 
+Gary Gygax 
+Michael Curtis 
+Tim Wadzinski 
+Tony DiTerlizzi, James Maliszewski, 
+Erol Otus, Jon Peterson 
+David "Diesel" LaForce 
+Sara Beyers, Bruce Cunnington, Errin Larsen, 
+Kenneth W Oswald, Rob Plummek, Aaron 
+Sarver, Douglas Ward, and Paul Wiltburn; Tim 
+Deschene, Ben Grimes, John Hess, Jeff Laluc, and 
+Jaime Sine; Dave 8cylinder, Dan Bidwa, Michael 
+Bolam, Allen Hitches, John Shortino, Jonathan 
+Snodgrass, and Christopher Woodford 
+Lester B. Portly 
+Erol Otus 
+Erol Otus 
+Jamie Wallis 
+Jeremy Mohler, Joseph Goodman 
+Tom Galambos, Doug Kovacs, Cliff Kurowski, 
+William McAusland, Brad McDevitt, Peter 
+Mullen, Erol Otus, Stefan Poag, Chad 
+Sergesketter, Chris Yarborough 
+Will iam McAusland 
+Scans and Restoration Steve Crompton 
+Publisher Joseph Goodman 
+This volume is produced under permission from Wizards of the Coast. Dungeons & Dragons is a trademark of Wizards of the Coast. Good­
+man Games and the Goodman Games logos are trademarks of Goodman Games. Contents ©2019 Wizards of the Coast LLC, PO Box 707, 
+Renton, WA 98057-0707, USA. Wizards of the Coast, D&D, their respective logos, and all adventure titles are trademarks of Wizards of the 
+Coast LLC in the USA and other countries, and are used with permission. 
+vi si T vs OITLiITE AT: WWW.GO O DffiAIT-GAmE s. co m 
+0R.iGi IIAL ADVEIIT VR,J:S REiIIC AR_IIA TED • E�PEDITl 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 5 ---
+
+TABLE OF CONTENTS 
+CHAPTER 1: INTR ODUCTION ............................... ........ ...................................................... ...... ................................ ... 5 
+CHAPTER 2: S3: EXPEDITION TO THE BARRIER PEAKS - ORIGINAL PUBLI CATION ............. .......... 21 
+CHAPTER 3: THE SPACESHIP .......... ....................... .. ........ ............ .... .... ......................................................................... 17 4 
+CHAPTER 4: ADVENTURE AL TERNA TIVES AND EXPAN SIONS ............. .................. ........................... ........ 229 
+CHAPTER 5: THE CRASH SITE ENVIRONS ............. .............................................................................. .................. 233 
+CHAPTER 6: EXPANDED ENCOUN TERS FOR THE SPACESHIP .......................................................... .......... 249 
+APPENDIX A: AGAINST THE VENOMOUS WARLORD ! .......................................................................... .......... 280 
+APPENDIX B: NEW MON STERS ........ ......................................................................... ................ ..... ... ....................... ... 285 
+APPENDIX C: TECHNOLOGIC AL ITEMS .................... ............................................ ........ ................... .................. ... 315 
+APPENDIX D: CHARACTERS ............. ........................................................ .................................. .................................. 329 
+APPENDIX E: HANDOUTS .............................................................................................. ............................................ ... 337 
+APPENDIX F: MAPS ........................................................................................................................................................... 381 
+APPENDIX G: METAMORPHOSIS ALPHA AND EXPEDITION TO THE BARRIER PEAKS .............. ... 394 
+0NG iII AL ADVEIITVRJ';S REiI IC AR.._IIA TED • E�PED ITI 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 6 ---
+
+0NG iilAL ADVEilTV�S REiilC AR_IlA TED • EXPE DI TI 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 7 ---
+
+CHAPTER ONE 
+Author's Introduction 
+by Michael Curtis 
+I n the annals of Dungeons & Dragons history, there are 
+dungeons that are legendary. Gamers from around the 
+globe speak with a mixture of awe, fondness, and fear 
+of places such as the Tomb of Horrors, Undermoun­
+tain, Castle Greyhawk, the Ghost Tower of Inverness, 
+and others. Each of these dungeons is-or was, after the 
+adventurers got through with them-home to a vast ar­
+ray of monsters, traps, and fabulous treasures. Be ing able 
+to say you braved their depths and survived is a badge of 
+honor worn proudly at the gaming table. 
+Yet, there is one renowned dungeon that outshines them 
+all. Yes, there are mons ters and treasures galore, but 
+they are of an ilk far stranger than anything else found 
+in the count less worlds of Dungeons & Dragons. That 
+dungeon is the mysterious and name less one that waits 
+beneath the Barrier Peaks. The one that is described in 
+the book you now hold in your hands (or your tablet or 
+phone or ... You get the idea). 
+Expeditio n to the Barrier Peaks is a landmark piece of game 
+design and most of us can only wonder what the reac­
+tions were around the table back in 19 7 6 when Gary 
+Gygax debuted it as a tournament adventure for Origins 
+II. I'm sure it met with a mixture of sheer disbelief, child­
+ish glee, and probably a few upturned noses. As the game 
+ses sion progressed, the players began to realize that they 
+weren't facing yet another dungeon filled with 20' -by-20' 
+rooms occupied by ores guarding treasure chests or even 
+hoary old crypts containing ravenous undead lead by a 
+scheming vampire or lich. No, the dungeon beneath the 
+Barrier Peaks was unlike anything that had come before it 
+and very little resembling it has followed in its footsteps. 
+If you've somehow managed to avoid the secret of this 
+adventure up until now , I beg you to close this book, 
+hand it to someone else, and bid-nay command-them 
+to run it for you. Your world will never be the same. 
+OK, are those folks gone? For those of us in on the se­
+cret, let's talk among ourselves then. 
+The idea of mixing high and low technology in fiction 
+wasn't a new idea when Gary wrote Expedition to the Bar-
+rier Peaks. It's a concept that goes back at least as far a 
+Mark Tw ain's A Connecticut Yankee in King Arthur's Court. 
+Poul Anderson, a favorite author of Gygax's, played with 
+the idea in his novel, The High Crusade. So while the idea 
+wasn't a new one, it hadn't been tackled in the newborn 
+field of fantasy role-playing games. The players at Ori­
+gins II couldn't have seen it coming. Despite its unique 
+concept, however, I'm sure there were some at that first 
+game table who weren't pleased with the dungeon once 
+they tw igged what was going on. 
+Not everyone enj oys a mixture of fantasy and science 
+fiction after all, and Expedition to the Barrier Peaks is the 
+dungeon that joyfully mashes the chocolate of swords 
+and sorcery into the peanut butter of sci-fi. Fantasy pur­
+ists would balk at confronting robots in the metal halls 
+of a downed space ship when they signed on to play wiz­
+ards and warriors defeating the dungeons and dragons 
+they were ostensibly promised. Stodgy grognards, who 
+already demonstrated a distrust in any form of "war­
+gaming" that didn't ground itself in historical accuracy, 
+were already dismissing the new role-playing game with 
+its embracing of fantasy tropes-laser guns and "Star 
+Trek" -esque sliding doors would have sent them into 
+paroxysms. 
+But for every naysayer, there were 10 gamers who em­
+braced such delicious mash-ups with childlike abandon. 
+Who would pos sibly turn down the opportunity to com­
+bine magical swords and blaster rifles against classic D&D 
+monsters and brand-new alien menace s? The combina­
+tion of science fiction and fantasy concepts would only 
+gain popu larity in the years ahead; "Star Wars," with its 
+mixture of spaceships and mystical powers, was only a 
+year away when the first sess ion of Expedition to the Bar­
+rier Peaks was unleashed on the world, demonst rating that 
+the futuri stic and the fantast ic can exist side-by-side. 
+More than 40 years later, I like to believe that the fire­
+walls between science fiction and fantasy have weakened 
+and that the gamer community at large is more accepting 
+when one genre bleeds into the other. In short, I think 
+the gamers of today are ready to accept Expedition to the 
+0NG iI TAL ADVEITT V�S REiITC AR_IlA TED • EX:PE DI TI0n T0 THE BARRIER PEAKS 
+
+--- PAGE 8 ---
+
+Barrier Peaks in the manner it deserves, enthusias tically 
+embracing it rather than shunni ng it as a grotesque hy­
+brid birthed from a malfun ctioning clone tank. 
+Role-playing adventure design has changed in many re­
+gards since the original Expeditio n was written. It comes 
+from an age when story was incidental and a good "dun­
+geon" (a synony m for any adventure) was one that chal­
+lenged the players' brains as much as their characters' 
+abilities. It is a "fu nhouse dungeon" of the oldest school, 
+where anything is pos sible so long as it is unexpected. 
+And while other funh ouse dunge ons, those grounded 
+en tirely in pure fantasy settings, haven't aged well in the 
+eyes of gamers used to more modern design schools, 
+the dungeon of the Expeditio n to the Barrier Peaks has re­
+mained largely critic-proof simply because it's a mixture 
+of so many diverse elements. It's easy to snub a supposed 
+fantasy dungeon that includes anachronisms and illogi­
+cal monsters, but in the already otherworldly setting of a 
+crashed space ship, arguments against such elements lack 
+weight. 
+When I was gifted the honor of con verting this classic 
+adventure into the modern Dungeons & Dragon rules, 
+there was only one concern that caused a bit of lost sleep: 
+the original fu turistic technolo gy. Forty years ago, we 
+couldn't imagine that we' d live in a world where comput­
+ers would shrink to the size of a smart phone or that dig­
+ital information storage would outs trip analog methods. 
+In light of what we 're capable of doing with technolo gy, 
+much of the "futuristic" elements of the spacesh ip seem 
+quaint (the microfilm library, for example). Discussions 
+occurred about whether to "update the fu ture" and use 
+modern techn ological levels as our starting point, imag­
+ining what the fu ture would look like on the space ship if 
+the adventure were written today. In the end, however, it 
+was decided to remain true to Gary's vision of the futu re. 
+This was done to firstly honor what the co-creator of 
+Dungeons & Dragons originally wrote, but also because 
+we realized that the past is just as strange and unfamil­
+iar to some today as the fu ture would be. There will be 
+players experiencing Expedition to the Barrier Peaks for the 
+first time, almost all younger ones who are just discover­
+ing D&D, who will find a microfilm reader ju st as mys-
+terious and unrecognizable as the futu ristic technology 
+the adventure' s original players encountered in 19 76! If 
+anything, I wish I had the chance to make the spaces hip 
+even more "retro futu re" and fill it with magnetic tape 
+data storage devices, 5-inch floppy disks, and other rel­
+ics from the fu ture we envisioned almost a half-cent ury 
+ago. Alas, I only had so much word count to play with, 
+so this desire went unrealized (there's nothing stopping 
+you though !). 
+Regardless of whether you find the future on display in 
+this adventure to be quaint, imaginative, humorous, or 
+even not to your purist taste, it is nevert heless a classic 
+dungeon module that everyone should experience once 
+in their gaming career. To do so is to connect you with 
+your fellow gamers, to share an experience with one an­
+other like some sort of deep dive into a Jungian collective 
+unconscious. Whether you first started gaming in 19 77 
+and never abandoned the rules you cut your eyeteeth on 
+or are just getting started with the most up-to-date itera­
+tion of Dungeons & Dragons, this version of Expeditio n 
+to the Barrier Peaks has you covered. You'll never be the 
+same after you enter that mysterious cave set into a rocky 
+slope, one sheathed in metal and disgorging bizarre mon­
+sters. I hope you have as much fun in there as I did. 
+Michael Curtis was introduced to mashing science .fictio n and fa n­
+tary toget her in a darkened theater in 19 77 when his fa ther brought 
+him to see "Star Wars." He� never been the same. Since that 
+time, Michael made a name for himse(f in the Goodman Games 
+writers' pool l:J .first mixin g time-travelers and cavemen toget her 
+in his well -loved DCC RPG adventure DCC #79: Frozen in 
+Time, then jaunted to the Warden 1vhere he fu rther mashed this 
+up in the Metamorphosis Alpha Deluxe Edition and its 
+companion mo dules The Android Underlords andThe Level 
+of the Lost. Michael also wrote some ef the .fir st 3PP releases 
+fo r 5E Dung eons & Dragons, Goodman Games' Glitterdoom 
+and War-lock, and has contributed to both OAR #1: Into the 
+Borderlands and OAR #2: The Isle of Dread. He current fy 
+li ves on Long Island, NY, with a slowfy-d iminishin g collection ef 
+books and a static number ef cats. 
+0NG iil AL ADVEilTV RJ:S REiilCA R_IlATE D • E�PEDITl 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 9 ---
+
+Wizards and Goblins and ... Spaceships? 
+Yes, Please! 
+by Tony DiTerlizzi 
+T o say that Dungeons & Dragons has had an impact 
+on my life would be an understatement. Not only 
+did I con tribute artwork to many books, adventure 
+modules, and magazines throughout the 19 90s, I was an 
+avid player during the 19 80s when the game rose from an 
+obsc ure hobby to pop cultural pastime. 
+I was hooked from the moment I held my first 20-sided 
+die, an unheard-of piece of plastic that soon encom­
+passed not only luck but adventure and daring deeds in 
+a fantastic world of sword-and-sorcery. I felt as if I had 
+wandered into a land patched together from the pages 
+of ].R.R. Tolkien, Robert E. Howard, and Peter Bea­
+gle, authors I adored. I was fortunate in that my middle 
+school friends were just as obsessed with D&D as I was; 
+many weekend sleepo vers were planned around game 
+nig hts. The dice never stopped rolling and the crunching 
+of Doritos never ended as we explored the mysterious 
+Caverns of Quasqueton, the prehistoric Isle of Dread, 
+and battled our way through the jam-packed Caves of 
+Chaos. I might have been exhausted at the conclusion of 
+each adventure, but I always counted the days until we'd 
+return for more escapades. After all, there were wizard's 
+spells to learn, magic potions to sip, enchanted swords to 
+master ... and hordes of vicious goblins to slay. A kid's 
+life could not have been any better. 
+Then one night our Dungeon Master told of a mysterious 
+cave from which new threats to the kingdom emerged. 
+Expecting to arrive at a new underground dungeon my 
+friends and I discovered a downed spacesh ip loaded with 
+robots, futuristic techno logy, and alien life-forms. 
+My 12 -year-old mind was blown at the mash-up of my 
+favorite genres. I'm a science fiction nerd and, like so 
+many, I was introduced in 19 77 when I first watched a 
+film set " .. .in a galaxy far, far away." The blockbuster suc­
+cess of "Star Wars: A New Hope" ushered an explosion 
+of sci-fi in pop culture which burned brightly through the 
+next decade. Bloo dthirsty aliens parasitized the crew of 
+the space tug Nostromo. Cylons battled a "ragtag fleet" of 
+humans every Sunda y night on television. Arthur Dent 
+escaped the destruction of Earth and learned that the an-
+swer to everything in the univ erse was 42. The rock band, 
+Styx, recorded a synth-infused song about Mr. Roboto. 
+In my mind the starry realm of sci-fi sat right next to the 
+myriad wonders of fantasy, but, like books on the shelves 
+of a vast library, the two hardly commingled.1 
+Then came TSR's module S3, Expedition to the Barrier 
+Peaks, and sudden ly all bets were off. 
+When I reflect on it now, this adventure was so appealing 
+because it mirrored the nat ural evolution of play for this 
+kid-I had once teamed my Micronauts with plastic cow­
+boys to battle rampaging toy dinosaurs on my bedroom 
+floor. And this was just like the wizardry of Gary Gygax's 
+game design: he cherished all the things he'd loved as a 
+kid and created a world where they all could coexist. 
+I'm more a D&D enthusiast than a historian, but I do 
+know that Gygax's love of sci-fi is evident in the ear­
+liest incarnation of the game. Robots and androids are 
+listed in the Monsters & Treas11re booklet from the original 
+19 7 4 edition. So, too, are Thar ks and Martians (no doubt, 
+from Edgar Rice Burroug hs' A Princess of Mars) in the 
+"Wilderness Wandering Monsters" tables found within 
+The Underworld & Wilde rness Adventures booklet of the 
+same edition. Older gamers will recall the Gamma World 
+RPG released by TSR at the same time as the launch for 
+AD&D. It seemed inevitable that Gygax would one day 
+blend the two genres into one epic adventure. 
+But how could he suc cessf ully create the conf usion and 
+awe that a medieval-minded player character, say a hal­
+fling thief, would feel when discovering otherworldly al­
+ien artifacts-especi ally when the savvy gamer playing 
+that halfling knew how to activate a communicator (what 
+gamer of the time wasn't also a devotee of "Star Trek,'' 
+that other sci-fi obse ssion? ) or switch on a lightsaber? 
+The answer was simple: illu stration. 
+Like Tomb of Horror s before it, Expeditio n to the Barrier 
+Peaks util izes illu stration to great effect. I cons ider S3 a 
+milestone in gaming design for its presentation, proof 
+that visuals enrich the gaming experience. Artwork is so 
+key to this adventure that the majority of illu strations 
+0R;iG iil AL ADVEilTVIUS REiITC AR_IlA TED • E�PEDITl 0ll T0 THE BARRIER PEAKS 
+
+--- PAGE 10 ---
+
+were bound in a separate booklet containing over 60 
+black & white drawings (as well as four full-page color 
+pages), all of which is intended to be shown to players. 
+TSR's iconic artists of the day like Jeff Dee, Erol Otus, 
+and David Sutherland deftly drew scenes of task-orient­
+ed androids, otherworldly gardens, and alien creatures 
+in a setting that also housed classic D&D monsters like 
+Shambling Mounds, Umber Hulks, and a Mind Flayer. 
+Among these fantastic drawings are puzzl ing diagrams 
+of odd devices that neither a player character, nor the 
+players themselves, could easily identify. And while many 
+of the futuristic gadgets bore a resemblance to real-world 
+items like calculators, pistols, and grenades, their design 
+was a ruse to throw off the gamers. Handheld computer 
+monitors turned out to be blasters. That flamethrower 
+your halfling discovered? It sprayed weed killer. Don't 
+forget the Flash Gordon-inspired paralysis pistol that 
+your character is probably holding backwards. Time to 
+roll a saving throw. 
+The combination of genre-ho pping, puzzle-s olving, and 
+ever-lurking danger makes Expeditio n to the Barrier Peaks 
+an unf orgettable experience and a ben chmark in D&D. 
+Gygax pushed the limits of what a role-playing game ad­
+venture could be, and our imaginations are richer for it. 
+Now sharpen your weapons, steel your resolve, and ven­
+ture forth into that strange cave of metal hidden high 
+atop the peaks. Whether it is your first time or a return 
+visit, may luck be on your side! (But watch out for those 
+Vegepygmies.) 
+New York Times bestselling author and illus trator To'!J Dz Ter­
+li zzi has been creating children s books for near/y two decades. From 
+fa ncif ul picture books li ke The Spider & The Fly (a Caldecott 
+Honor book), to cha pter books li ke Kenny and The Dragon 
+and the WondLa trilogy, DzTerli zzi im bues his stories with a 
+rich imagin ation. With Hol/y Black, he created the middle-grade 
+serz"es, The Spiderwick Chronicles, which has sold over 20 mil­
+li on copies, been adapted into a feature film, and has been translat­
+ed in over 30 countn.es. He teamed up with Lucas.film to retell the 
+orig inal "Star Wars" trilogy as a picture book and his ear/y work 
+has been collected in Realms: The Roleplaying Game Art of 
+Tony DiTerlizzi � Dark Horse Books. Recent/y the Norman 
+Rockwell museum's 20-year retrospective ef DiTerl izzi's artwork, 
+''Never Abandon Imag ination," broke attendance records. He has 
+been featured in Time maga zine, USA Today, CNN, PBS, 
+NPR, the BBC, and 'The T odqy Show." 
+1 Some would argue that "Star Wars,'' with its mysticism 
+and classic quest story structure, is a fantasy but I would 
+point out that it is skinned in a sci-f i univ erse of space­
+ships, laser blasters, and droids. 
+0NG iITAL ADVEI TTVR]:S REiITC AR._IlATE D • EXPEDI Tl 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 11 ---
+
+Painting the Froghemoth 
+by Erol Otus 
+W e JVere fortunate to have Ero! Otus contribute an original painting to this volume ef Origi nal Adventures Reincarnated. When 
+he 1vas a TSR emplqyee several decades ag o, he ill ustrated the original edition ef the adventure. NoJV he has returned JVith a neJV 
+image inspired ly the original material. 
+We asked Ero! if he could describe his artistic process fo r our readers. Unl ike maf!)I modern artists, Ero! stil! JVorks in pi?Jsical media. His 
+art invol ves actual pencil and paper, and real paints and brushes! We hope you erijqy this behind-the-scenes outline ef his process, JVhich gives 
+insi ghts into hoiv the finished painting came about. 
+You can see the finished painting on the fr ont endsheet ef this book. 
+First, a small sketch planning the content and composition: 
+The sketch is scanned and printed out at the size of the final paint ing, then transferred to the illu stration board by trac­
+ing over it with graphite paper underneath: 
+eajGiI IAL ADVEI I'fVRJ;:S REiII CAR.._IIA'fED • E�PEDITI 0n T0 TH E BARRIER PEAKS 
+
+--- PAGE 12 ---
+
+All that for this? But it does maintain the composition from the thumbnail. I find that using the thumbnail just for refer­
+ence, and recreating the drawing without the tracing, I always end up liking the composition of the little sketch better: 
+Blue penc il helps work out details, getting to the final drawing with less mess: 
+0NG iirn.L ADVEIIT VRJ;S REiII CARJIATED • E�PEDI Tl0II T0 THE BARRIER PEAKS 
+
+--- PAGE 13 ---
+
+Final drawing with graphite over the blue pencil: 
+Painting in progress, in various sta ges: 
+0RjGiII AL ADVE IIT VIQ:S REiII CAR.._IIA TED • E?l'.PEDI Tl0II T0 TH E BARRIER PEAKS 
+
+--- PAGE 14 ---
+
+I 
+Ero! Otus is a legendary artist whose credits trace back to the earliest dqys of TSR and Dung eons & Drag ons. Among other things, he 
+ill ustrated the fr ont cover of Deities & Demigods, and the 1981 edi tion of the Dung eons & Drago ns boxed sets. He also created the 
+Remorhaz. 
+0R,jGiIIAL A.DVEIIT V�S REiII CAR_II ATED • EXPE DI TI 0ll T0 THE BARRIER PEA.KS 
+
+--- PAGE 15 ---
+
+Mixing Peanut Butter and Chocolate: 
+Sci-Fi and Fantasy Themes in Dungeon 
+Module 53 
+by James Maliszewski 
+B ased loosel y on an Advanced Dungeons & Dragons tournament scenario from Origins II in 19 7 6 that 
+combined elements from James M. Ward's Meta­
+morphosis Alpha and a portion of Gary Gygax's Cas­
+tle Greyhawk, the 19 80 module Expedition to the Barrier 
+Peaks was presented as "an exciting insertion into your 
+campaign and as a primer on how to combine 'science' 
+into your fantasy role-playing. " Gamers have been argu­
+ing about it ever since. 
+That's because the decision to include overt science fic­
+tional elements into what is ostensibly a fantasy adven­
+ture scenario is a contentious one in certain quarters. 
+One of the fault lines that rumbles ben eath the surface 
+of the hobby is the lack of distinction between fantasy , 
+horror, and science fiction, three now-sepa rate genres 
+that had, prior to the '70s (if not later), peacef ully coex­
+isted as part of an indisting uishable mass of literature. 
+Dungeons & Dragons arose in such an envi ronment and 
+is pretty comfortable with such genre ben ding, because 
+early gamers (mostly) saw it as part of a long tradition, 
+going back to classics like 19 33's "The Tower of the El­
+ephant" by Robert E. Howard, whose eponymous tower 
+is inhabited by an extraterrestrial being. Some gamers 
+who grew up later or who were never immersed in the 
+world of early fantasy fandom tend to cavil at such easy 
+mixing of elements, seeing them as breaking with fantasy 
+con vent ions. 
+I am certainly sympathetic to those who don't want 
+chocolate in their peanut butter when it comes to fantasy 
+gaming. I occupy a weird middle place in this dispute, be­
+cause, while I had plenty of contact with the remnants of 
+the old days of fantasy fandom, I wasn't part of it myself. 
+Ins tinc tively, I'm part of the camp that sees sci-ii and 
+fantasy as two separate genres of imaginative fiction. I'm 
+also hyper-rationalist and prefer that my set tings "make 
+sense,'' which is to say, that I can explain how and why 
+everything works the way it does, even if my explana­
+tions resort to the fan tastic to do so. Having spaceships 
+and lasers in a setting with gods and magic requires some 
+imaginative explanatio ns: it can be done but it's often 
+more work than I prefer to undertake and so I avoid it. 
+No wadays, though, I have come around, perhaps not to 
+a full-bore appreciation of "gonzo" settings, but a bet­
+ter unders tanding of the hows and whys of what some 
+might see as genre mixing. It's very hard, if you have any 
+knowledge of the history of the RPG hobby and the fan­
+doms from which it sprang, to get worked up about ro­
+bots and aliens in Greyhawk. They've alwqys been there, 
+just as they've always been a part of weird fiction. The 
+boxes we now use to categorize-and market!-our cre­
+ative products are purely artificial, the result primarily of 
+bean counters looking for ways to sell their wares more 
+effectively. "Genre" nowadays is often more an exercise 
+in brand building than literary theory and modules like 
+S3 are throwbacks to the days before such a mindset was 
+commonplace. 
+The module itself is effectively a dungeon crawl, but in 
+a "dungeon" of steel and plastic rather than stone and 
+mud. The crashed spacesh ip is large and filled with a 
+wide variety of environments, making it a terrific set-up 
+for encounters of many sorts. These encounters include 
+many memorable new monst ers, like the froghemoth 
+and vegepygmies, and give us hints into a pos sible expla­
+nation of the illithids that I think works far better than 
+anything we saw subseq uent ly. The "magic items" of the 
+module are technological artifacts who se use is potent ial­
+ly dangerous, thanks to a series of charts Gamma World 
+fans should recognize. I'm also fond of the illustrat ions 
+of these artifacts, very few of which look anything like 
+you might expect, which con tributes to their mystery. In­
+deed, Expeditio n to the Barrier Peaks may be one of the 
+most lavishly illu strated modules ever, since it came with 
+a booklet con taining 63 separate pieces of artwork, many 
+by Erol Otus, who, as an artist, was probably destined to 
+cont ribute to a product like this. 
+0NG iil AL ADVEilT V�S REiil CAR__IlATE D • E�PEDI Tl 0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 16 ---
+
+Like most modules of the period, there's only the thin­
+nest outline of a plot and little in the way of context or 
+explanation about the spacesh ip and its origins. Referees 
+are thus left to their own devices to provide these things. 
+Back in the day, I never did so, but I think S3 could, if the 
+referee is wil ling, be the catalyst for some very fascinating 
+and potentially setting- changing events. Dave Arneson 's 
+Black.moor campaign-al most certainly another inspira­
+tion for this module-prov ides one example of how this 
+might proceed, but there are na turally as many possi bili­
+ties as there are individual referees. Expedition to the Barrier 
+Peaks may not be to everyone 's tastes, espec ially nowa­
+days, but it's nonetheless an excellent romp and a time 
+capsule from an age befo re the demands of marketing 
+narrowed our sense of what was and was not "fanta sy." 
+I re-read S3 every few months to remind myself of this; 
+it's a practice I recommend highly if you're able to do so. 
+James Ma!i szeivski started ro!e-p!q ying in the !ate Fa!! of 19 79, 
+when he opened up a copy of the Dunge ons & Dragons Basic Set 
+edited qy Dr. ]. Eric Holmes origi nal!J purchased for his fa ther. 
+More than 40 years later, he's still plqying. James is known fo r his 
+blog Grogn ardia, 1vhich 1vas the fo cal point of the OSR movement 
+in its ear!J dqys. 
+His memories and musings about role-plqying games and related 
+nonsense, as well as articles about the history of the hobqy fr om its 
+earliest begi nnings to the present dqy, remain of interest to readers 
+to this dqy. 
+0RjGiil AL ADVEilTVR,J::S REiil CAR.._IlATED • E�PEDIT I0Il T0 THE BARRIER PEAKS 
+
+--- PAGE 17 ---
+
+Goodman Games Interviews 
+Diesel Laforce 
+by Tim Wadzinski 
+D avid S. "Diesel" Laforce worked as a prolific staf f artist and cartographer at TSR from 19 79-19 97, 
+working on maps for most of the classic modules 
+and cont ributing illustrations to C1: The Hidden Shrine of 
+Tamoachan, Dei ties & Demi god s, and the B /X (Basic and 
+Expert) rulebooks, among countle ss other seminal gam­
+ing products. He also served as primary cartographer for 
+the first two years of Dunge on magazine's run. 
+We had the opportunity to speak with him regarding his 
+maps and drawings in Expedition to the Barrier Peaks. 
+Goodman Games: I've long admired your illu stration 
+work, and I was inspired to talk to you after hearing you 
+speak at Gary Con XI about your experience as TSR's 
+cartographer. What do you recall about working on SJ: 
+Expedition to the Barrier Peaks? 
+DL: If I remember correctly, those maps were round. I 
+think I had to come up with a little bit of different sym­
+bology because it's a high-tech area, and the doors were 
+different-some were kind of oval-sh aped things, more 
+like a portal. 
+GG: There were drop tub es, and some of the doors were 
+color card-coded. They weren't standard dunge on doors 
+like we were all used to seeing. 
+DL: Yes, and the color codes, they all had a letter desig­
+nating what code they were, what color. For all our maps 
+back then, we used press type. We didn't have things type­
+set that we could cut out and paste down, we would get 
+these press type letter sheets. I think Letraset put them 
+out, and they were just letters in different sizes on a clear 
+sheet, and you put that sheet down, and you would rub 
+over the letter to transfer it off onto your paper. With all 
+the type on those maps, I had to do that little rub-off for 
+all the labels and everything that went on them. I remem­
+ber specifically doing all those little doors, putting the Y 
+for yellow, R for red, so on and so forth. 
+GG: It appears that there are different fonts, and there 
+are many words on the maps that label some of the 
+rooms-Librar y, Game Room-things like that that are 
+full words, that appear to be in a smaller, tighter font than 
+these letters that were used for the doorways. 
+DL: There's lots. Right, well, the Letraset sheets, you 
+could get them in different font sizes, or you get a style, 
+a font style on the sheet, and then the style had all differ­
+ent sizes on it. You could even get strip fonts. We would 
+have drawers full of these Letraset sheets. (laughs) They 
+weren't really filed in any kind of alphabetical way to find 
+them or anything, it was just stacks of sheets in draw­
+ers, and you'd pull them out, and you'd just kind of flip 
+through them to see what you liked. That's the way we 
+kept track of that stuff , which was hardly at all. (laughs) 
+We would just have different fonts, and use those. 
+GG: How tedious was that? It sounds like you're es­
+sentially doing some of this freehand, where the words 
+would then have to be vertically centered, or horizon tally 
+centered, to keep them all align ed properly. I imagine that 
+was kind of a night mare. 
+DL: Yes, occasio nall y, you would Letraset down a letter, 
+and it would be crooked, or offset, and you'd have to get 
+this rough, hard eraser, and you could kind of erase it off, 
+scrape off the letter with this eraser, and you could put 
+a new one down. Or, if your letter had a break in it or 
+something, you would take, maybe the number 1, or a let­
+ter L, or something like that, off the Letraset sheet, and 
+fix your letter by just putting it over the top of that break 
+on your letter that you had. (laughs) Espe cially, if you ran 
+out of a letter. Sometimes you'd have to build a letter. 
+That happened occasio nally, too. (laughs) So you're actu­
+ally making a letter out of other letters. You would flip 
+your sheet over and get a really sharp blade, and you'd cut 
+your letter or your number, and you'd scrape away what 
+you weren't going to use, and then you'd flip your sheet 
+back over, and you've made an L shape, or just a vertical 
+piece, and you could start building your letters or your 
+numb ers with that. So, yeah, it could become tedious at 
+times. And then, later on, we started leaving spaces on 
+the map or grid, so that the letters could go over the grid, 
+and not have the grid go through the letters. You'd have 
+0NG iII AL ADVEIIf VRFS REiIIC AR.IIA fE D • E�PEDI TI 0ll T0 TH E BARRIER PEAKS 
+
+--- PAGE 18 ---
+
+to plan out how your word was going to go in. Yeah, it 
+was tedious. That was kind of stupid. (laughs) 
+But then, we learned that we could go, "Hey, you know 
+what we can do? We can just run off type and the type­
+setter could do it for us." Then we could just cut out our 
+type and put some wax on the back of our paper, and cut 
+out our letters or numbers or whole words, and put them 
+right down. 
+GG: The different techniques, letters over and under the 
+gridlines, appear to both be used in S3. For example, on 
+the Level III map where there are many cargo holds, for 
+the letters in the words Cargo and Hold, you're trying to fit 
+them into the squares nicel y, but then on the Level IV map 
+there are places where you put the words over the lines. 
+DL: Yeah, and then, not specifically for that module, but 
+there were times where we realized we could put the Le­
+traset letters right on a piece of paper, and cut that out, 
+and glue it down, or wax it down, so that piece of paper 
+would obliterate any detail underneath it. So, if it needed 
+to go through some lines, or through a wall, or obsc ure 
+something so you could read the type, you'd just have it 
+on a piece of paper that was cut out and put over the top 
+of that. But you kn ow, it was all a learning curve. You 
+learn as you go along, like, "Well, how can I make this 
+look better?" It was a slow process of making things look 
+a little bit better as we went along, as we thought about it 
+more and more. 
+But the Letraset stuff , the way that that's done there, that 
+was pretty much Dave Sutherland who started doing 
+that. That's all I knew when I got there, is how to do that. 
+I don't know how we then started graduating to differ­
+ent ideas. I suppose different gu ys-either me or Dave, 
+or Steve Sulli van-wo uld come up with some different 
+things. 
+GG: You mentioned the symbology. Did you just make a 
+lot of that up, or did you look at other things for inspira­
+tion? 
+DL: Well, I was pretty good at drafting when I got out of 
+high school. I was using those skills any time I would do 
+a building or a castle or something. But, we weren't using 
+drafting symb ols, because Dave Sut herland had already 
+come up with the basic symbols for a door, or a wind ow, 
+or a well, that kind of st uff. So, there was already a sym­
+bology in place. I just expanded upon it a lot, because we 
+started getting into different kinds of things. You kn ow, 
+locked secret doors, one -way secret doors, an open door, 
+a portcullis, a barred wind ow-j ust all kinds of stuf f like 
+that. And, it became obvious after a while that we were 
+starting to get some confused signals between us, the 
+mappers, and the writers, and the editors, as to what their 
+symbology meant on their maps, because nobody was 
+consistent with it. 
+I don't know if I decided to do it on my own, or I was 
+tasked to do it. I would imagine I was probably tasked 
+to do it by Jim Roslof , now that I think about it a little 
+bit more, to sit down and come up with all our standard 
+symbology. Just standardize everything so that there was 
+no confusion, so everybody would be going off the same 
+page. In doing that, I realized there were symbols that 
+we would need in the futu re, too. So, as I was coming 
+up with the standardization, I was also coming up with 
+some new stuf f to plug in there that would help us in the 
+fu ture with any other thing, that we didn't have to scratch 
+our heads and wonder how to do it-we 'd already have 
+it. And then, with the outdoor stuff , Darlene, she had 
+already come up with pretty much that iconic look, with 
+the Greyhawk map, so any time we did an illust rative type 
+of map, we gravitated towards her look. But then, there 
+were simpler things, like map hexes that had little trian­
+gles in them for mountains, three lines for a swamp or a 
+fen, and so on and so forth. So, I had to standardize all 
+that stuff , too. 
+GG: Did you put together an actual document? Was 
+there a symbology bible? 
+DL: Yes. It was two sheets, if I remember correctly. So, 
+it wasn't a big document, or anything. It was just sheets 
+of little boxes stacked on top of one another, and in each 
+box was an example of whatever it had to be. You kn ow, 
+the door, the portcullis, the window , the barred window, 
+so on and so forth, and they were just labeled. And, eve­
+rybody had access to those, so everybody knew what to 
+put down on a piece of paper to show what you wanted. 
+GG: There's an obvious Easter egg on the Level II map 
+of the spacesh ip, where you can clearly see the letters 
+E-G-G-Gary Gygax's initials-up side down. Was that 
+one of the first, or if not the first, map Easter egg you 
+had come across? 
+DL: Yes, that's the first one I can ever remember seein g. 
+I don't think there are any map Easter eggs earlier than 
+that. I think that might be the first one. I didn't come up 
+with that, it was whoever designed the map came up with 
+that and stuck it in there. 
+0R.iG irrn.L A.DVE IIT V�S REiIIC AR_II ATED • EXPEDIT I0n T0 THE BARRIER PEA.KS 
+
+--- PAGE 19 ---
+
+GG: Would you be given a sketch map done in pencil on 
+graph paper as your starting point? 
+DL: Yes. We would get a pretty well-detailed drawing­
+(laughs) sometimes they were pretty well-detailed-of 
+the whole level. It was just on graph paper, and we got 
+all the text so we could read what was going on in each 
+room. We would go through and we 'd map it, and we'd 
+kind of double check to make sure that what we were 
+putting down on paper for the map coincided with the 
+text. Sometimes we'd get a map and, say, a door would 
+be left off, or they'd put a staircase in that didn't match 
+up with any staircase on the next level. In fact, I think 
+you even pointed out to me that, one of the lifts or drop 
+tub es in S3 doesn' t really match up with one of the levels. 
+And, that's my boo-boo, I gue ss, I didn't catch it. (laughs) 
+It was probably given to me that way, too, you know? 
+So, when we would map out our projects, we would have 
+to be counting squares, you know? I mean, all day long, 
+you're counting, "O kay, well, how big is this room? One, 
+two, three, four, five, by one, two, three, four, five, six. 
+Okay." Then you map that out, and then, you put the 
+next room to it, then the next room to that. But then, 
+when you go to do your next level, you have to make sure 
+it matches up before you start penning it all down. So, 
+yeah, it was a lot of cou nting. (laughs) 
+GG: Yes, I was going over the maps for our fifth edition 
+conversion, doing a lot of cou nting, just as you said. I 
+noticed between a couple of the levels, the drop tub es 
+wander around a little bit. And then, you kn ow, I thought 
+maybe, mqybe that was intentional. Having the lift tubes 
+curve that way maybe threw off the ship's equilibrium, 
+which maybe contributed to the crash of the ship. I'm try­
+ing to help retcon here a little bit. .. 
+DL: Oh, that's interest ing. That could be intentional by 
+the writer, too. I don't know. But, you kn ow, unless it's 
+because I didn't count correctly-th ere could be that, 
+too. (laughs) 
+We us ually drew on graph paper, or like a translucent vel­
+lum you put over graph paper, and then you do all your 
+drawing on the vellum. You'd draw it all out in blue pen­
+cil, first, to get all your major spots, and then, you could 
+go in with pen. Or a lot of times we also used this stuff 
+that came on rolls, that was lines of different widths. 
+You'd just roll it out-it's just like a tape, a black tape­
+and you would just cut it off. That's how you made your 
+walls. 
+GG: I'm looking at the maps now , and I'm just trying to 
+wrap my head around this. So, all the thick lines that were 
+the walls, each of those was a piece of tape that you had 
+to cut? 
+DL: Yes. Because it was actually faster and more consist­
+ent to use a piece of tape like that, than it was to try and 
+draw that line out. 
+GG: Wow. So, that had to take quite a bit of time, espe­
+cially in this module with so many complex maps. This 
+had to be a huge project. 
+DL: Yeah, it could take us weeks to do a project. Sure. 
+Do you know why those maps were printed in blue? The 
+reason they did that was copying machines would not 
+reproduce light blue ink, so you couldn't copy the maps. 
+They wanted to make it hard for someone to pirate the 
+stuff. They'd print them in blue to keep people from cop­
+ying and handing them out. 
+GG: So that's true? I thought maybe it was an old wi ves' 
+tale. 
+DL: It's true. A lot of illustrations and maps would be 
+sketched out in blue pencil, then I'd go over it in ink, and 
+in the final product the pencil wouldn't show up. The 
+graph paper we used came with squares in blue ink. You 
+could draw right on it, shoot it with a camera, and all the 
+lines would disappear. A black-and-white camera does 
+not see blue. It sees red-if you marked something up 
+in red you'd see it as black on the finished product-but 
+not the light blue. We could even get light blue markers 
+and sketch with them, and they would not show up on 
+the camera either. 
+GG: This was one the first modules to come with a sepa­
+rate illustration booklet. You had quite a few pieces in 
+that booklet, as well as pieces of artwork within the mod­
+ule itself , where you were tasked with drawing the tech­
+nological equipment-the pistols, rifles, grenades, etc. 
+Were you given guidelines on how to make these look fu­
+turistic, but also not completely obvious as to what they 
+were? You know, to keep the players guessing a little bit? 
+DL: Well, we had descriptions of what everything kind 
+of looked like, so we would draw things that looked like 
+whatever was being described. Some of it was kind of 
+ambiguous, so it didn't matter if it was ambiguous, you 
+could kind of do what you wanted. But yes, we purp osely 
+were trying to make it look unobvious as to its function. 
+Even to somebody today, to look at it and know whether 
+0R.iGiIT AL ADVEITT VRJ:S REiITC AR__IlA TED • E�PEDITl0Il T0 TH E BARRIER PEAKS 
+
+--- PAGE 20 ---
+
+it was, you kn ow, "Gee, is this a healing spray, or is this 
+a mace, or is this going to shoot out a dart if I squeeze 
+this trigger?" So yeah, it was meant to be unobvious, defi­
+nitel y. Because, you know. .. (laughs) You don't want your 
+players looking at it and going, "Yeah, I kn ow, that's a 
+blaster." Of course that's what it is, but you're supposed 
+to be a medieval adventurer, you don't know what a blast­
+er is. You've never seen anything like that. So, you had to 
+even make the player guess, a little bit, if you could. 
+GG: Was there any kind of back-and-forth between you 
+and the designers? Perhaps Gary himself, saying, "You 
+kn ow, I have this idea, maybe we should tweak this to 
+look a little bit less like this, or little more like this." 
+DL: First of all, I never had any talks with Gary on 
+anything I did. Ever. He didn't come in and ask about 
+what we were doing, or ask to see anything. He was ju st 
+pretty much hands-off. I think there were some sketches 
+for a lot of that stuff , already. Some rough, rudimenta­
+ry sketches to give an idea of what some of it would 
+look like. And then, I think some of the things that I 
+had to draw were already drawn by, like, Erol Otus, or 
+somebody, like in an illustration, and then I had to take 
+that and put it in separately as a floating element to show 
+what the item was. But, I think there were some sketches 
+already done, by either the writer or the editor. Maybe 
+even Dave Sutherland. 
+GG: With respect to sketches, we ju st learned about one 
+of yours that shows a robot at a recharging station. For 
+some reason it wasn't used; it was replaced by another 
+image. Do you remember that? 
+DL: I know the robot. They look kind of similar, right? 
+The two drawings? 
+GG: Yes, one appears to be more vertically oriented, and 
+the final one was horizontal, or landscape. The sketch 
+version looks like the robot is using an ATM, for lack of 
+a better description. (see picture opposite) 
+DL: (laughs) I remember that when I had done it, that 
+Dave Sutherland wanted it more heavily shadowed. And 
+so, he took a Sharpie to it, and drew over my drawing. 
+Which, as I look back on that in retrospect, that was kind 
+of a pretty ballsy thing to do, draw on somebody else' s 
+drawing, but I didn't really care at the time. (laughs) As to 
+there being two different ones, I don't really recall there 
+being two different ones. I thought there was one ro­
+bot that was a vertical, and one was a horizontal, and 
+I thought they were both used at one point. But, on a 
+reprint, maybe only one of them was? 
+GG: The unused sketch is ju st the robot and the charg­
+ing station. It's not the complete scene that ended up in 
+the module as handout #19 , where you can also see the 
+entire room around the robot. 
+DL: Seems to me there was something they didn't like 
+about it. They must have wanted to see the room that the 
+robot was in. It wasn't good enough. They didn't want to 
+see just the robot, they also wanted to see the room. So, 
+when the player walks in, they see this vista, you know , 
+not ju st the robot, but the surroundings as well. Because 
+that was kind of the idea behind those handouts anyway, 
+was to give an idea to the player of what, exactly, they're 
+seeing. So, I guess it was important enough to them that 
+they needed to see the whole room, you know? 
+The final robot is de finitely different; it's squatter and 
+doesn 't have some appendages on the sides. If you look 
+at the taller robot from the sketch, the one arm on the 
+side was added afterwards, for whatever reason. Either 
+they added it in the description or I missed it when I first 
+drew it. I don't know for sure, but it looks like it turned 
+out the 'robot was meant to be squatter. 
+If you look at the second illustration with the squat ro­
+bot, the room has a lot of gray patterns in it. All those 
+patterns are done with a product, which was a dot pat­
+tern on a film, and you could peel that dot pattern off 
+and cut it off, and it had a sticky back and you could put 
+it over your illu stration, to have an instant grayed area. 
+0RiGirrn.L ADVEilT VN:S REiil CAR..IlA TED • E�PEDI TI 0n T0 THE BARRIER PEAKS 

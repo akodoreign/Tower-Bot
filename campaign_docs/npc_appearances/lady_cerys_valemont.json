@@ -1,0 +1,28 @@
+{
+  "name": "Lady Cerys Valemont",
+  "species": "Human",
+  "faction": "Argent Blades",
+  "rank": "Commander — Leader of the Argent Blades",
+  "role": "senior blade",
+  "home_district": "guild spires",
+  "stats": {
+    "primary": [
+      "STR 16",
+      "DEX 14",
+      "CON 14"
+    ],
+    "secondary": [
+      "CHA 12",
+      "WIS 10",
+      "INT 9"
+    ],
+    "hp_range": "55–70"
+  },
+  "equipment": {
+    "weapons": "longsword, shield with faction emblem",
+    "armour": "polished scale mail or plate"
+  },
+  "sd_appearance": "A tall, athletic human figure, weathered skin etched with faint scars, stands in a dimly lit chamber of the Undercity, their silver-and-white scale mail gleaming with blue-tinted accents that catch the pale glow of bioluminescent fungi. Brown hair streaked with silver is tied back, strands fraying at the edges, and steel-gray eyes scan the room, sharp and unyielding, while a jagged scar crosses their left cheekbone. Their left hand grips a longsword with a cracked hilt, the right rests on a shield emblazoned with the Argent Blades' crest, its edges dulled by years of combat, and a single arena medal hangs from their belt—its edge tarnished, its ribbon frayed.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "theatrical glory-hunter — everything designed to be seen from the stands"
+}

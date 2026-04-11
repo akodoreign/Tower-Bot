@@ -12,7 +12,7 @@ Hot Factor (days 4–7):
   and in-world handles. Two bidders can get into a brief war on the same tick.
   Frozen listings skip this entirely.
 
-Listings persist in campaign_docs/player_listings.json.
+Listings persist in MySQL player_listings table.
 """
 
 from __future__ import annotations
@@ -20,16 +20,14 @@ from __future__ import annotations
 import json
 import random
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import List, Dict, Optional
 
 import discord
 from discord import app_commands
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
-DOCS_DIR            = Path(__file__).resolve().parent.parent / "campaign_docs"
-PLAYER_LISTINGS_FILE = DOCS_DIR / "player_listings.json"
 AUCTION_DAYS         = 7
 HOT_PHASE_START_DAY  = 3   # hot bidding kicks in after 3 full days (days 4-7)
 
@@ -62,25 +60,111 @@ _PHANTOM_BIDDERS = [
 
 
 # ---------------------------------------------------------------------------
-# Persistence
+# Persistence — MySQL via db_api
 # ---------------------------------------------------------------------------
 
-def _load_listings() -> List[Dict]:
-    if not PLAYER_LISTINGS_FILE.exists():
-        return []
+def _ensure_listing_json_column():
+    """Ensure listing_json column exists (added for complex data storage)."""
     try:
-        return json.loads(PLAYER_LISTINGS_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        # Check if column exists
+        result = raw_query(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+            "WHERE TABLE_NAME = 'player_listings' AND COLUMN_NAME = 'listing_json'"
+        )
+        if not result:
+            raw_execute("ALTER TABLE player_listings ADD COLUMN listing_json JSON")
+            logger.info("💾 Added listing_json column to player_listings table")
+    except Exception as e:
+        logger.debug(f"listing_json column check: {e}")
+
+# Try to ensure column exists on module load
+try:
+    _ensure_listing_json_column()
+except Exception:
+    pass
+
+
+def _load_listings() -> List[Dict]:
+    """Load all listings from database."""
+    try:
+        rows = raw_query("SELECT * FROM player_listings ORDER BY created_at DESC")
+        listings = []
+        for row in rows:
+            # Try to get full listing from listing_json, fall back to row data
+            listing_data = row.get("listing_json")
+            if listing_data:
+                if isinstance(listing_data, str):
+                    listing = json.loads(listing_data)
+                else:
+                    listing = listing_data
+            else:
+                # Construct from row columns
+                listing = {
+                    "id": f"pl_{row.get('id')}",
+                    "player_id": int(row.get("player_id", 0)) if row.get("player_id") else 0,
+                    "player_name": row.get("player_name", ""),
+                    "item_name": row.get("item_name", ""),
+                    "min_bid": row.get("asking_price", 0),
+                    "current_bid": row.get("asking_price", 0),
+                    "status": row.get("status", "active"),
+                    "listed_at": row.get("created_at").isoformat() if row.get("created_at") else datetime.now().isoformat(),
+                    "expires_at": (row.get("created_at") + timedelta(days=AUCTION_DAYS)).isoformat() if row.get("created_at") else (datetime.now() + timedelta(days=AUCTION_DAYS)).isoformat(),
+                }
+            listings.append(listing)
+        return listings
+    except Exception as e:
+        logger.error(f"PlayerListings load error: {e}")
         return []
+
+
+def _save_listing(listing: Dict) -> None:
+    """Save a single listing to database (insert or update)."""
+    try:
+        listing_json = json.dumps(listing, ensure_ascii=False, default=str)
+        listing_id = listing.get("id", "")
+        
+        # Extract numeric ID if it exists
+        db_id = None
+        if listing_id.startswith("pl_"):
+            try:
+                db_id = int(listing_id[3:])
+            except ValueError:
+                pass
+        
+        # Check if exists
+        if db_id:
+            existing = raw_query("SELECT id FROM player_listings WHERE id = %s", (db_id,))
+        else:
+            existing = raw_query(
+                "SELECT id FROM player_listings WHERE player_id = %s AND item_name = %s AND status = 'active'",
+                (str(listing.get("player_id", "")), listing.get("item_name", ""))
+            )
+        
+        if existing:
+            # Update
+            raw_execute(
+                "UPDATE player_listings SET status = %s, asking_price = %s, listing_json = %s WHERE id = %s",
+                (listing.get("status"), listing.get("current_bid"), listing_json, existing[0]["id"])
+            )
+        else:
+            # Insert
+            new_id = db.insert("player_listings", {
+                "player_id": str(listing.get("player_id", "")),
+                "player_name": listing.get("player_name", ""),
+                "item_name": listing.get("item_name", ""),
+                "asking_price": listing.get("min_bid", 0),
+                "status": listing.get("status", "active"),
+                "listing_json": listing_json,
+            })
+            listing["id"] = f"pl_{new_id}"
+    except Exception as e:
+        logger.error(f"PlayerListings save error: {e}")
 
 
 def _save_listings(listings: List[Dict]) -> None:
-    try:
-        PLAYER_LISTINGS_FILE.write_text(
-            json.dumps(listings, indent=2), encoding="utf-8"
-        )
-    except Exception as e:
-        logger.error(f"PlayerListings save error: {e}")
+    """Save all listings (for batch updates)."""
+    for listing in listings:
+        _save_listing(listing)
 
 
 # ---------------------------------------------------------------------------
@@ -202,7 +286,6 @@ def create_listing(
 ) -> Dict:
     """Create and save a new active listing. Returns the listing dict.
     frozen=True: lists publicly for 7 days but gets no phantom bids and closes as unsold."""
-    listings = _load_listings()
     now = datetime.now()
 
     listing = {
@@ -224,8 +307,7 @@ def create_listing(
         "sold_at":      None,
     }
 
-    listings.append(listing)
-    _save_listings(listings)
+    _save_listing(listing)
     logger.info(
         f"🏪 New player listing {'(frozen) ' if frozen else ''}activated: {item_name} "
         f"by {player_name} (min {min_bid:,} EC)"

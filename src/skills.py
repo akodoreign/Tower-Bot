@@ -32,8 +32,16 @@ from __future__ import annotations
 
 import os
 import json
-import yaml
 import asyncio
+import re
+
+# Make yaml optional — use simple fallback parser if not installed
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    yaml = None
+    YAML_AVAILABLE = False
 import logging
 from pathlib import Path
 from dataclasses import dataclass
@@ -73,6 +81,32 @@ class Skill:
 # Skill Loading & Storage
 # ─────────────────────────────────────────────────────────────────────────
 
+def _parse_simple_frontmatter(text: str) -> Dict[str, Any]:
+    """
+    Simple fallback parser for YAML frontmatter when PyYAML isn't installed.
+    Handles basic key: value pairs and simple lists.
+    """
+    metadata = {}
+    for line in text.strip().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if ":" in line:
+            key, value = line.split(":", 1)
+            key = key.strip()
+            value = value.strip()
+            # Handle simple lists: [item1, item2]
+            if value.startswith("[") and value.endswith("]"):
+                items = value[1:-1].split(",")
+                metadata[key] = [item.strip().strip('"').strip("'") for item in items if item.strip()]
+            # Handle quoted strings
+            elif (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+                metadata[key] = value[1:-1]
+            else:
+                metadata[key] = value
+    return metadata
+
+
 def load_skill_from_file(skill_file: Path) -> Optional[Skill]:
     """
     Parse a single SKILL.md file.
@@ -110,11 +144,15 @@ def load_skill_from_file(skill_file: Path) -> Optional[Skill]:
         parts = raw_content.split("---", 2)
         if len(parts) >= 3:
             frontmatter_text, body = parts[1], parts[2].strip()
-            try:
-                metadata = yaml.safe_load(frontmatter_text) or {}
-            except yaml.YAMLError as e:
-                logger.warning(f"YAML parse error in {skill_file}: {e}")
-                metadata = {}
+            if YAML_AVAILABLE:
+                try:
+                    metadata = yaml.safe_load(frontmatter_text) or {}
+                except yaml.YAMLError as e:
+                    logger.warning(f"YAML parse error in {skill_file}: {e}")
+                    metadata = {}
+            else:
+                # Simple fallback parser for basic key: value frontmatter
+                metadata = _parse_simple_frontmatter(frontmatter_text)
     
     # Extract skill info
     skill_name = metadata.get("name") or skill_file.parent.name
@@ -341,7 +379,7 @@ def build_system_prompt_with_skills(
 async def generate_with_skills(
     prompt: str,
     task: str,
-    model_name: str = "mistral",
+    model_name: str = None,  # Uses OLLAMA_MODEL env var
     skills: Optional[Dict[str, Skill]] = None,
     use_tools: bool = False,
 ) -> Optional[str]:
@@ -351,7 +389,7 @@ async def generate_with_skills(
     Args:
         prompt: User prompt for generation
         task: Task type (used for skill selection)
-        model_name: Ollama model to use (default: mistral)
+        model_name: Ollama model to use (default: qwen3-8b-slim:latest)
         skills: Pre-loaded skills dict
         use_tools: If True, enable OpenClaw function calling (experimental)
     

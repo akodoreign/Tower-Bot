@@ -1,0 +1,28 @@
+{
+  "name": "Kippy Mucklefoot",
+  "species": "Halfling",
+  "faction": "Adventurers Guild",
+  "rank": "Unranked",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A stocky halfling, no taller than three feet, hunched with a mechanical leg of jagged salvaged steel glinting under dim light, his pale green slit-pupiled eyes gleam with feline sharpness as he clutches a rusted dagger at his hip, weathered leather armor reinforced with patchwork chainmail bearing faded Guild insignia, a crossbow slung across his back and a scroll case tucked into his belt, one hand perpetually stained with ink and grease from unloading forbidden relics into the Gutterpunk Quarter’s shadowed alleys.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -80,11 +80,18 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "generated_m
 # ---------------------------------------------------------------------------
 
 def _load_gazetteer() -> Dict:
-    """Load the city gazetteer."""
+    """Load the city gazetteer from MySQL (falls back to file)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT content_json FROM gazetteer LIMIT 1") or []
+        if rows and rows[0].get("content_json"):
+            cj = rows[0]["content_json"]
+            return json.loads(cj) if isinstance(cj, str) else cj
+    except Exception as e:
+        logger.warning(f"🏰 Gazetteer DB load failed: {e}")
     if not GAZETTEER_FILE.exists():
         logger.warning("🏰 Gazetteer not found, using fallback locations")
         return {}
-    
     try:
         return json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
     except Exception as e:

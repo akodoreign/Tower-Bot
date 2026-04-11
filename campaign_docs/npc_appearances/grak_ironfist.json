@@ -1,0 +1,24 @@
+{
+  "name": "Grak Ironfist",
+  "species": "Orc",
+  "faction": "Argent Blades",
+  "rank": "Prospect",
+  "role": "freelance",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "varies by specialty"
+    ],
+    "secondary": [
+      "varies"
+    ],
+    "hp_range": "35–55"
+  },
+  "equipment": {
+    "weapons": "varied — chosen for the job",
+    "armour": "practical adventuring gear"
+  },
+  "sd_appearance": "A towering orcish figure, 8 feet tall, his deep moss-green skin etched with the jagged scar of a thousand battles, tusks cracked and dulled by years of metal-grinding, eyes glowing with a sickly bioluminescent green that pierces the gloom of the Undercity's crumbling alleyways. His silver-plated armor, scavenged from fallen foes, is a patchwork of reinforced plates and frayed leather, adorned with a single blue-tinted arena medal pinned haphazardly to his chest, while a rusted chainmail hauberk hangs loose over his broad shoulders. A jagged dagger rests at his hip, its edge dulled by recent use, and a satchel of brittle maps and ink-stained parchment clings to his belt, its frayed strap revealing a hidden crack in the Dome’s barrier, etched into the metal with obsessive precision.",
+  "faction_visual": "silver and white armour with blue accents, arena medals, theatrical presence",
+  "style_note": "eclectic — no faction marks, which is itself a statement"
+}

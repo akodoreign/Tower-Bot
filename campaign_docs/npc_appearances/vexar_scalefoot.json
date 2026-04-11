@@ -1,0 +1,28 @@
+{
+  "name": "Vexar Scalefoot",
+  "species": "Kobold",
+  "faction": "Wizards Tower",
+  "rank": "Researcher",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A wiry Kobold standing at 2.5 feet, his mottled green-brown scales shimmer like wet bark, with a long snout and twitching tail that betrays his restless anxiety, his sharp, gold-flecked eyes gleaming behind a cracked pair of spectacles balanced on his snout. His leather-wrapped chainmail is scuffed with soot and ink stains, adorned with a tarnished Wizards Tower badge, while a crossbow slung across his back and a warhammer strapped to his thigh hint at his dual role as scholar and enforcer. One clawed hand clutches a brittle, bloodstained tome, its pages fraying at the edges as if the very magic within threatens to consume him.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -7,21 +7,21 @@ auctions, trials, tournaments, holy days, council sessions, black markets.
 - Events are generated 30-90 days into the future on a rolling basis
 - Bot announces each event 48h in advance
 - Bot posts a follow-up result bulletin when the event date passes
-- Events persist to campaign_docs/faction_calendar.json
+- Events persist to MySQL faction_events table
 - Max 8 upcoming events at once; new ones generated when below 4
 
 Posts announcements and results to the news channel.
 """
 
 from __future__ import annotations
-import json, os, random, logging
+import json
+import random, logging
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional
 
-logger   = logging.getLogger(__name__)
-DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-CALENDAR_FILE = DOCS_DIR / "faction_calendar.json"
+from src.db_api import raw_query, raw_execute, db
+
+logger = logging.getLogger(__name__)
 TOWER_YEAR_OFFSET = 10
 
 
@@ -99,23 +99,96 @@ _FACTION_EVENTS = {
 
 
 # ---------------------------------------------------------------------------
-# Persistence
+# Persistence — MySQL via db_api
 # ---------------------------------------------------------------------------
 
 def _load_calendar() -> List[Dict]:
-    if not CALENDAR_FILE.exists():
-        return []
+    """Load all faction events from database."""
     try:
-        return json.loads(CALENDAR_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
-
-
-def _save_calendar(events: List[Dict]) -> None:
-    try:
-        CALENDAR_FILE.write_text(json.dumps(events, indent=2), encoding="utf-8")
+        rows = raw_query("SELECT * FROM faction_events ORDER BY event_date ASC")
+        events = []
+        for row in rows:
+            # Map event_type -> type for compatibility
+            ev = dict(row)
+            if "event_type" in ev:
+                ev["type"] = ev.pop("event_type")
+            if ev.get("event_date") and isinstance(ev["event_date"], datetime):
+                ev["event_date"] = ev["event_date"].isoformat()
+            
+            # Extract metadata from description if present
+            desc = ev.get("description", "")
+            if "<!--META:" in desc and "-->" in desc:
+                try:
+                    meta_start = desc.index("<!--META:") + 9
+                    meta_end = desc.index("-->", meta_start)
+                    meta_json = desc[meta_start:meta_end]
+                    meta = json.loads(meta_json)
+                    ev["emoji"] = meta.get("emoji", "")
+                    ev["announced"] = meta.get("announced", False)
+                    ev["resolved"] = meta.get("resolved", False)
+                    ev["description"] = meta.get("original_desc", desc[:desc.index("<!--META:")].strip())
+                except (ValueError, json.JSONDecodeError):
+                    # If metadata parsing fails, use defaults
+                    ev["emoji"] = ""
+                    ev["announced"] = False
+                    ev["resolved"] = False
+            else:
+                # No metadata, use defaults
+                ev["emoji"] = ""
+                ev["announced"] = False
+                ev["resolved"] = False
+            
+            events.append(ev)
+        return events
     except Exception as e:
-        logger.error(f"Calendar save error: {e}")
+        logger.error(f"Calendar load error: {e}")
+        return []
+
+
+def _save_event(ev: Dict) -> None:
+    """Insert or update a single event in the database.
+    Note: Only using columns that exist in schema: id, faction, event_type, event_date, description
+    Extra data (emoji, announced, resolved) is stored in description as JSON suffix.
+    """
+    try:
+        # Encode extra state in description field since schema is limited
+        extra_data = {
+            "emoji": ev.get("emoji", ""),
+            "announced": ev.get("announced", False),
+            "resolved": ev.get("resolved", False),
+            "original_desc": ev.get("description", ""),
+        }
+        # Store original description + JSON suffix
+        description_with_meta = ev.get("description", "") + "\n<!--META:" + json.dumps(extra_data) + "-->"
+        
+        # Check if event already exists by id (use faction + event_type + event_date as composite key)
+        existing = raw_query(
+            "SELECT id FROM faction_events WHERE faction = %s AND event_type = %s AND event_date = %s",
+            (ev.get("faction"), ev.get("type"), ev.get("event_date"))
+        )
+        if existing:
+            # Update existing event
+            raw_execute(
+                """UPDATE faction_events 
+                   SET description = %s
+                   WHERE faction = %s AND event_type = %s AND event_date = %s""",
+                (
+                    description_with_meta,
+                    ev.get("faction"),
+                    ev.get("type"),
+                    ev.get("event_date"),
+                )
+            )
+        else:
+            # Insert new event
+            db.insert("faction_events", {
+                "faction": ev.get("faction"),
+                "event_type": ev.get("type"),
+                "event_date": ev.get("event_date"),
+                "description": description_with_meta,
+            })
+    except Exception as e:
+        logger.error(f"Calendar save event error: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +220,7 @@ def _top_up_calendar(events: List[Dict]) -> List[Dict]:
     upcoming = [e for e in events if not e.get("resolved")]
     while len(upcoming) < 4 and len(events) < 20:
         new_ev = _generate_event()
+        _save_event(new_ev)  # Persist new event to DB
         events.append(new_ev)
         upcoming.append(new_ev)
     return events
@@ -177,18 +251,24 @@ def tick_calendar() -> List[Dict]:
             continue
         
         hours_until = (event_dt - now).total_seconds() / 3600
+        changed = False
 
         # 48h advance announcement
         if not ev.get("announced") and 0 < hours_until <= 48:
             ev["announced"] = True
             outputs.append({"type": "announce", "event": ev})
+            changed = True
 
         # Event has passed — post result
         if now >= event_dt and ev.get("announced"):
             ev["resolved"] = True
             outputs.append({"type": "result", "event": ev})
+            changed = True
 
-    _save_calendar(events)
+        # Save only if event state changed
+        if changed:
+            _save_event(ev)
+
     return outputs
 
 

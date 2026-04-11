@@ -26,7 +26,7 @@ from typing import Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 DOCS_DIR        = Path(__file__).resolve().parent.parent / "campaign_docs"
-OUTCOMES_FILE   = DOCS_DIR / "mission_outcomes.json"
+OUTCOMES_FILE   = DOCS_DIR / "mission_outcomes.json"  # fallback only
 NPC_JSON_FILE   = DOCS_DIR / "npc_roster.json"
 GRAVEYARD_FILE  = DOCS_DIR / "npc_graveyard.json"
 ARCHIVES_DIR    = DOCS_DIR / "archives"
@@ -36,10 +36,27 @@ MEMORY_FILE     = DOCS_DIR / "news_memory.txt"
 
 
 # ---------------------------------------------------------------------------
-# Persistence — structured JSON (for code queries)
+# Persistence — MySQL (primary) with JSON file fallback
 # ---------------------------------------------------------------------------
 
 def _load_outcomes() -> List[Dict]:
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT * FROM mission_outcomes ORDER BY id") or []
+        results = []
+        for row in rows:
+            o = dict(row)
+            cj = o.pop("consequences_json", None)
+            if cj:
+                o["consequences"] = json.loads(cj) if isinstance(cj, str) else cj
+            else:
+                o["consequences"] = []
+            results.append(o)
+        if results:
+            return results
+    except Exception as e:
+        logger.warning(f"mission_outcomes DB load error: {e}")
+    # Fallback to file
     if not OUTCOMES_FILE.exists():
         return []
     try:
@@ -49,17 +66,51 @@ def _load_outcomes() -> List[Dict]:
 
 
 def _save_outcomes(outcomes: List[Dict]) -> None:
+    """Write new outcome entries to MySQL. Keeps file in sync for fallback."""
+    try:
+        from src.db_api import raw_query as _rq, raw_execute as _rx, db
+        existing_ids = {r["id"] for r in (_rq("SELECT id FROM mission_outcomes") or [])}
+        for o in outcomes:
+            oid = o.get("id")
+            if oid and oid in existing_ids:
+                continue  # already persisted, skip
+            _rx(
+                """INSERT INTO mission_outcomes
+                   (mission_title, faction, opposing_faction, tier, completed_by,
+                    completed_at, result, npcs_killed, key_decisions, location_changes,
+                    loose_threads, notable_moments, consequences_json)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (o.get("mission_title"), o.get("faction"), o.get("opposing_faction",""),
+                 o.get("tier"), o.get("completed_by"), o.get("completed_at"),
+                 o.get("result"), o.get("npcs_killed"), o.get("key_decisions"),
+                 o.get("location_changes"), o.get("loose_threads"), o.get("notable_moments"),
+                 json.dumps(o.get("consequences", []), ensure_ascii=False))
+            )
+    except Exception as e:
+        logger.error(f"mission_outcomes DB save error: {e}")
+    # Keep file in sync
     try:
         OUTCOMES_FILE.write_text(
             json.dumps(outcomes, indent=2, ensure_ascii=False), encoding="utf-8"
         )
     except Exception as e:
-        logger.error(f"Failed to save mission outcomes: {e}")
+        logger.warning(f"mission_outcomes file sync error: {e}")
 
 
 def get_recent_outcomes(n: int = 10) -> List[Dict]:
     """Return the N most recent outcomes for code-level queries."""
-    return _load_outcomes()[-n:]
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT * FROM mission_outcomes ORDER BY id DESC LIMIT %s", (n,)) or []
+        results = []
+        for row in rows:
+            o = dict(row)
+            cj = o.pop("consequences_json", None)
+            o["consequences"] = (json.loads(cj) if isinstance(cj, str) else cj) or []
+            results.append(o)
+        return list(reversed(results))
+    except Exception:
+        return _load_outcomes()[-n:]
 
 
 # ---------------------------------------------------------------------------
@@ -67,11 +118,33 @@ def get_recent_outcomes(n: int = 10) -> List[Dict]:
 # ---------------------------------------------------------------------------
 
 def save_outcome(outcome: Dict) -> None:
-    """Save a mission outcome to both JSON and a readable archive file."""
-    # Append to JSON
-    outcomes = _load_outcomes()
-    outcomes.append(outcome)
-    _save_outcomes(outcomes)
+    """Save a mission outcome to MySQL and a readable archive file."""
+    # Write to DB
+    try:
+        from src.db_api import raw_execute as _rx
+        _rx(
+            """INSERT INTO mission_outcomes
+               (mission_title, faction, opposing_faction, tier, completed_by,
+                completed_at, result, npcs_killed, key_decisions, location_changes,
+                loose_threads, notable_moments, consequences_json)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (outcome.get("mission_title"), outcome.get("faction"), outcome.get("opposing_faction",""),
+             outcome.get("tier"), outcome.get("completed_by"), outcome.get("completed_at"),
+             outcome.get("result"), outcome.get("npcs_killed"), outcome.get("key_decisions"),
+             outcome.get("location_changes"), outcome.get("loose_threads"), outcome.get("notable_moments"),
+             json.dumps(outcome.get("consequences", []), ensure_ascii=False))
+        )
+    except Exception as e:
+        logger.error(f"save_outcome DB error: {e}")
+    # Keep file in sync
+    try:
+        outcomes = _load_outcomes()
+        outcomes.append(outcome)
+        OUTCOMES_FILE.write_text(
+            json.dumps(outcomes, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+    except Exception as e:
+        logger.warning(f"save_outcome file sync error: {e}")
 
     # Write readable .md archive file
     MISSION_ARCHIVE.mkdir(parents=True, exist_ok=True)
@@ -205,6 +278,25 @@ def archive_outcomes_weekly() -> Optional[str]:
 # ---------------------------------------------------------------------------
 
 def _load_npcs() -> List[Dict]:
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, faction, role, location, status, data_json FROM npcs WHERE status IN ('alive','injured') ORDER BY name") or []
+        npcs = []
+        for row in rows:
+            npc = {"name": row["name"], "faction": row["faction"], "role": row["role"],
+                   "location": row["location"], "status": row["status"]}
+            dj = row.get("data_json") or {}
+            if isinstance(dj, str):
+                try: dj = json.loads(dj)
+                except: dj = {}
+            npc.update(dj)
+            if "history" not in npc:
+                npc["history"] = []
+            npcs.append(npc)
+        return npcs
+    except Exception as e:
+        logger.warning(f"_load_npcs DB error: {e}")
+    # Fallback
     if not NPC_JSON_FILE.exists():
         return []
     try:
@@ -214,13 +306,35 @@ def _load_npcs() -> List[Dict]:
 
 
 def _save_npcs(npcs: List[Dict]) -> None:
+    """Delegate NPC saves to npc_lifecycle which owns that table."""
     try:
-        NPC_JSON_FILE.write_text(json.dumps(npcs, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+        from src.npc_lifecycle import _save_npc, _rebuild_txt
+        for npc in npcs:
+            _save_npc(npc)
+        _rebuild_txt(npcs)
+    except Exception as e:
+        logger.error(f"_save_npcs error: {e}")
 
 
 def _load_graveyard() -> List[Dict]:
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT name, faction, role, status, data_json FROM npcs WHERE status='dead' ORDER BY name") or []
+        npcs = []
+        for row in rows:
+            npc = {"name": row["name"], "faction": row["faction"], "role": row["role"], "status": "dead"}
+            dj = row.get("data_json") or {}
+            if isinstance(dj, str):
+                try: dj = json.loads(dj)
+                except: dj = {}
+            npc.update(dj)
+            if "history" not in npc:
+                npc["history"] = []
+            npcs.append(npc)
+        return npcs
+    except Exception as e:
+        logger.warning(f"_load_graveyard DB error: {e}")
+    # Fallback
     if not GRAVEYARD_FILE.exists():
         return []
     try:
@@ -230,10 +344,14 @@ def _load_graveyard() -> List[Dict]:
 
 
 def _save_graveyard(graveyard: List[Dict]) -> None:
+    """Graveyard is now just npcs with status='dead' — delegate to npc_lifecycle."""
     try:
-        GRAVEYARD_FILE.write_text(json.dumps(graveyard, indent=2, ensure_ascii=False), encoding="utf-8")
-    except Exception:
-        pass
+        from src.npc_lifecycle import _save_npc
+        for npc in graveyard:
+            npc["status"] = "dead"
+            _save_npc(npc)
+    except Exception as e:
+        logger.error(f"_save_graveyard error: {e}")
 
 
 def _fuzzy_find_npc(name: str, npcs: List[Dict]) -> Optional[Dict]:

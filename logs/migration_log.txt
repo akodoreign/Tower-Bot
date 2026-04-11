@@ -1,0 +1,146 @@
+
+==================================================
+Migrating: NPC Roster → npcs table
+==================================================
+  ✗ Error migrating NPC Sera Voss: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Mira Kessan: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Brother Aldric: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Pol Greaves: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Calix Drenn: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Vesper: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gorgon Gizzick: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Groz Krax: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Elara Starbinder: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gruum Boneshaper: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eira Filigree: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Elara Ironclaw: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gurthok Ironhide: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grothor Grimclaw: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grozak Ironscrivener: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kyrus Fireeye: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zara Forgemender: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eamon Hawthorne: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zephyrus Sylphim, the Windcaller: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Arin Obsidianwhisper: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zara Leafwhisper: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eira Ashflame: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Arthur Fyreclaw: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zippy Quickclaw: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gavrik Ironshield: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thoren Grudbreaker: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Isabelle Hartling: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zinnia Snakefang: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gideon Steelforge: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Arion Celestia: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Seraphina Luminara: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Elara Celestian: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eira Shadowstalk: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Lysandra Stardust: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grimwit Stone-Eye: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Sebastian Azrael: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Voris Ironhammer: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thoren Azurescale: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Yaulderna Silverstreak: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kyrus Ironscale: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thalia Elenshade: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thyra Scalescar: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thalia Ignis-Veil: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eolande Starfall: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gruggar Grimshackle: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Gurrek Ironheart: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Torinn Wyrmbane: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Seraph Zephyrion: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Rianna Elenshade-Ironhammer: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Zelos Firetongue: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Seraphina Nightshade-Ironheart: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grimm Ironheart: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Captain Havel Korin: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grug Ironfist: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Aldric Ebonwhisper: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Serrik Dhal: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Lady Cerys Valemont: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC High Apostle Yzura: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC The Widow: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Senior Archivist Pell: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Mari Fen: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Brother Thane: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Orion Swiftshadow: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Isaac 'Ironhide' Gallows: 1265 (01000): Data truncated for column 'status' at row 1
+  ✗ Error migrating NPC Zinnia Flamegrip: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thaddeus 'Thunder' Arden: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Yuna Saltis: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Alaric Vespera: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Jorick Sparrowthief: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Korra Ironheart: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kaelen Duskbane: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kargath Stoneclaw: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Vexar Scalefoot: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Tessaly Orin: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Veyra Emberveil: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kippy Mucklefoot: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Varys Thornspire: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Lysandra Vane: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Kip Stonefang: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Eliana Veyra: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thrain Deepforge: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Tink Mallek: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Elaris Moonshadow: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Finnick Tinkersong: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Dain Veythor: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Thrain Ironwound: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Elyndor Mournshade: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Lirael Veythari: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Director Myra Kess: 1406 (22001): Data too long for column 'role' at row 1
+  ✗ Error migrating NPC Grak Ironfist: 1406 (22001): Data too long for column 'role' at row 1
+  ✓ Migrated 25 NPCs
+
+==================================================
+Migrating: Mission Memory → missions table
+==================================================
+  ✓ Migrated 333 missions
+
+==================================================
+Migrating: Faction Reputation → faction_reputation table
+==================================================
+  ✓ Migrated 11 faction reputations
+
+==================================================
+Migrating: News Memory → news_entries table
+==================================================
+  ✓ Migrated 40 news entries
+
+==================================================
+Migrating: Bounty Board → bounties table
+==================================================
+  ✓ Migrated 5 bounties
+
+==================================================
+Migrating: Dome Weather → weather_state table
+==================================================
+  ✓ Migrated weather state
+
+==================================================
+Migrating: EC Exchange → economy_state table
+==================================================
+  ✓ Migrated economy state
+
+==================================================
+Migrating: Rift State → rift_state table
+==================================================
+  ✗ Error migrating rift state: 'list' object has no attribute 'get'
+
+==================================================
+Migrating: TIA Market → tia_market table
+==================================================
+  ✗ Error migrating sector rift_tech: 1264 (22003): Out of range value for column 'value' at row 1
+  ✓ Migrated 7 TIA sectors
+
+==================================================
+Migrating: NPC Appearances → npc_appearances table
+==================================================
+  ✓ Migrated 127 NPC appearances
+
+==================================================
+Migrating: Party Profiles → party_profiles table
+==================================================
+  ✓ Migrated 110 party profiles

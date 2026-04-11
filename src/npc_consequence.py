@@ -20,6 +20,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 
 from src.log import logger
+from src.db_api import raw_query as _rq, raw_execute as _rx
 
 DOCS_DIR       = Path(__file__).resolve().parent.parent / "campaign_docs"
 NPC_JSON_FILE  = DOCS_DIR / "npc_roster.json"
@@ -69,55 +70,131 @@ _CONTEXT_WINDOW = 200
 # ── Roster helpers ─────────────────────────────────────────────────────
 
 def _load_roster() -> List[Dict]:
-    if not NPC_JSON_FILE.exists():
-        return []
+    """Load alive/injured NPCs from MySQL."""
     try:
-        return json.loads(NPC_JSON_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = _rq(
+            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "WHERE status IN ('alive', 'injured') ORDER BY name"
+        ) or []
+        npcs = []
+        for row in rows:
+            dj = row.get("data_json") or {}
+            if isinstance(dj, str):
+                try:
+                    dj = json.loads(dj)
+                except Exception:
+                    dj = {}
+            npc = {**dj, "name": row["name"], "faction": row["faction"],
+                   "role": row["role"], "location": row["location"],
+                   "status": row["status"], "_db_id": row.get("id")}
+            npcs.append(npc)
+        return npcs
+    except Exception as e:
+        logger.error(f"npc_consequence: roster load error: {e}")
+        # Fallback to JSON file
+        if NPC_JSON_FILE.exists():
+            try:
+                return json.loads(NPC_JSON_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
         return []
 
 
 def _save_roster(npcs: List[Dict]) -> None:
+    """Save roster back to MySQL and keep JSON/txt in sync."""
     try:
-        NPC_JSON_FILE.write_text(json.dumps(npcs, indent=2), encoding="utf-8")
-    except Exception as e:
-        logger.error(f"npc_consequence: roster save error: {e}")
-    # Rebuild the txt file so RAG stays in sync
-    try:
-        from src.npc_lifecycle import _rebuild_txt
+        from src.npc_lifecycle import _save_npc, _rebuild_txt
+        for npc in npcs:
+            _save_npc(npc)
         _rebuild_txt(npcs)
     except Exception as e:
-        logger.warning(f"npc_consequence: txt rebuild error: {e}")
+        logger.error(f"npc_consequence: roster save error: {e}")
 
 
 def _load_graveyard() -> List[Dict]:
-    if not GRAVEYARD_FILE.exists():
-        return []
+    """Load dead NPCs from MySQL."""
     try:
-        return json.loads(GRAVEYARD_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = _rq(
+            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "WHERE status = 'dead' ORDER BY name"
+        ) or []
+        graveyard = []
+        for row in rows:
+            dj = row.get("data_json") or {}
+            if isinstance(dj, str):
+                try:
+                    dj = json.loads(dj)
+                except Exception:
+                    dj = {}
+            npc = {**dj, "name": row["name"], "faction": row["faction"],
+                   "role": row["role"], "location": row["location"],
+                   "status": "dead", "_db_id": row.get("id")}
+            graveyard.append(npc)
+        return graveyard
+    except Exception as e:
+        logger.error(f"npc_consequence: graveyard load error: {e}")
+        if GRAVEYARD_FILE.exists():
+            try:
+                return json.loads(GRAVEYARD_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
         return []
 
 
 def _save_graveyard(graveyard: List[Dict]) -> None:
+    """Save dead NPCs back to MySQL (status=dead already set)."""
     try:
-        GRAVEYARD_FILE.write_text(json.dumps(graveyard, indent=2), encoding="utf-8")
+        from src.npc_lifecycle import _save_npc
+        for npc in graveyard:
+            npc["status"] = "dead"
+            _save_npc(npc)
     except Exception as e:
         logger.error(f"npc_consequence: graveyard save error: {e}")
 
 
 def _load_resurrection_queue() -> List[Dict]:
-    if not RESURRECTION_QUEUE_FILE.exists():
-        return []
+    """Load resurrection queue from MySQL."""
     try:
-        return json.loads(RESURRECTION_QUEUE_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = _rq(
+            "SELECT id, npc_name, died_at, resurrect_at, status FROM resurrection_queue "
+            "WHERE status = 'pending' ORDER BY resurrect_at"
+        ) or []
+        return [dict(r) for r in rows]
+    except Exception as e:
+        logger.error(f"npc_consequence: resurrection queue load error: {e}")
+        if RESURRECTION_QUEUE_FILE.exists():
+            try:
+                return json.loads(RESURRECTION_QUEUE_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
         return []
 
 
 def _save_resurrection_queue(queue: List[Dict]) -> None:
+    """Upsert resurrection queue entries into MySQL."""
     try:
-        RESURRECTION_QUEUE_FILE.write_text(json.dumps(queue, indent=2), encoding="utf-8")
+        for entry in queue:
+            npc_name = entry.get("npc_name") or entry.get("name", "")
+            died_at = entry.get("died_at")
+            resurrect_at = entry.get("resurrect_at")
+            status = entry.get("status", "pending")
+            if not npc_name:
+                continue
+            existing = _rq(
+                "SELECT id FROM resurrection_queue WHERE npc_name=%s AND status='pending'",
+                (npc_name,)
+            )
+            if existing:
+                _rx(
+                    "UPDATE resurrection_queue SET resurrect_at=%s, status=%s WHERE id=%s",
+                    (resurrect_at, status, existing[0]["id"])
+                )
+            else:
+                _rx(
+                    "INSERT INTO resurrection_queue (npc_name, died_at, resurrect_at, status) "
+                    "VALUES (%s, %s, %s, %s)",
+                    (npc_name, died_at, resurrect_at, status)
+                )
     except Exception as e:
         logger.error(f"npc_consequence: resurrection queue save error: {e}")
 

@@ -1,0 +1,28 @@
+{
+  "name": "Mari Fen",
+  "species": "Half-Elf",
+  "faction": "Adventurers Guild",
+  "rank": "Guildmaster — Head of the Adventurers Guild",
+  "role": "mercenary",
+  "home_district": "adventurers guild",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "tall half-elf figure, slightly taller than human, with subtly pointed ears and a graceful, athletic build, skin weathered by years of travel, brown hair streaked grey and braided tightly at the nape, amber eyes flecked with gold, face etched with laugh lines and faint scars from old battles; draped in a faded leather duster over chainmail衬衫, the collar worn thin from countless skirmishes, a rusted warhammer slung across one hip and a crossbow with a cracked grip resting at her side, the Guildmaster’s badge—a tarnished silver stag head—glinting faintly on her chest, her left hand clutching a faded parchment marked with the names of fallen adventurers, the memorial wall’s shadow stretching behind her like a silent, ever-growing scar.",
+  "faction_visual": "rank-appropriate gear from leather to enchanted plate, Guild badge displayed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

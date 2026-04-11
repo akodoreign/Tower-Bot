@@ -118,25 +118,43 @@ RULES: Gritty, terse. No preamble, no sign-off."""
     @client.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         """Handle ⚔️ (player claim) reactions on mission board posts."""
+        logger.info(f"⚔️ RAW REACTION RECEIVED: emoji={payload.emoji}, channel={payload.channel_id}, user={payload.user_id}")
+        
         if payload.user_id == client.user.id:
+            logger.debug("⚔️ Ignoring bot's own reaction")
             return
 
         mission_channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        logger.info(f"⚔️ Channel check: payload.channel_id={payload.channel_id}, mission_channel_id={mission_channel_id}")
         if payload.channel_id != mission_channel_id:
+            logger.debug(f"⚔️ Wrong channel, ignoring")
             return
 
-        if str(payload.emoji) != EMOJI_CLAIM:
+        # Strip variation selector U+FE0F — Discord sometimes drops it from returned payloads
+        _emoji_str = str(payload.emoji).replace('\ufe0f', '')
+        _claim_str = EMOJI_CLAIM.replace('\ufe0f', '')
+        logger.info(f"⚔️ Emoji check: '{_emoji_str}' vs EMOJI_CLAIM '{_claim_str}'")
+        if _emoji_str != _claim_str:
+            logger.debug(f"⚔️ Wrong emoji, ignoring")
             return
 
         channel = client.get_channel(payload.channel_id)
         if channel is None:
+            logger.warning(f"⚔️ Channel {payload.channel_id} not found in cache")
             return
         try:
             message = await channel.fetch_message(payload.message_id)
             user    = await client.fetch_user(payload.user_id)
-        except Exception:
+            logger.info(f"⚔️ Fetched message and user, calling handle_reaction_claim")
+        except Exception as e:
+            logger.error(f"⚔️ Failed to fetch message/user: {e}")
             return
 
         reaction = type("R", (), {"message": message, "emoji": payload.emoji})()
         dm_id = int(os.getenv("DM_USER_ID", 0))
+        logger.info(f"⚔️ Calling handle_reaction_claim for user {user.display_name}")
         await handle_reaction_claim(reaction, user, dm_id, client=client)
+        logger.info(f"⚔️ handle_reaction_claim completed")
+
+    # Log that the event handler was registered
+    logger.info(f"⚔️ on_raw_reaction_add event handler registered for mission claims")

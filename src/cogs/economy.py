@@ -103,7 +103,7 @@ def setup(client):
         await interaction.response.defer(ephemeral=False)
 
         import httpx
-        ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+        ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
         ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
         from src.tower_rag import search_docs

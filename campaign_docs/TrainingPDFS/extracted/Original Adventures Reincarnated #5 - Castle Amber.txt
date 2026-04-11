@@ -1,0 +1,976 @@
+
+
+--- PAGE 1 ---
+
+[No text extracted]
+
+--- PAGE 2 ---
+
+[No text extracted]
+
+--- PAGE 3 ---
+
+CASTLE llBEB 
+A FIFTH EDITION CONVERSION AND CLASSIC HOMAGE 
+X2: CASTLE AMBER 
+Conversion by Michael Curtis and Tim Wadzinski 
+0IQGiilAL ADVEilTV�S REiilCAR._IlATED • CASTLE AJh:BER 
+
+--- PAGE 4 ---
+
+CASTLE !lllB 
+Full credits for the original edition of Castle Amber can be found in its respective section 
+of this book, where it is scanned verbatim from a prior printing. 
+The credits that follow are for the 5E portion of this work. 
+Original Writer 
+5E Conversion Design and Writing 
+5E Editing and Additional Support 
+Additional Writing 
+Special Thanks 
+5E Edition Playtesters 
+Cover Design 
+Cover Art 
+Endsheet Art 
+Interior Lay out 
+Interior Art Direction 
+Interior Art 
+Cartography 
+Scans and Restoration 
+Publisher 
+Tom Moldvay 
+Michael Curtis 
+Ti m Wadzinski 
+Bob Brinkman, Doug Kovacs, James Maliszewski 
+Emmanuel Bouteille, Christophe Dorchies 
+Charles D'Arcangelis, Thomas Doran, David Key, 
+Kal-El Key, Dan Love 
+Lester B. Portly 
+Erol Otus 
+Doug Kovacs 
+Matt Hildebrand 
+Michael Curtis and Matt Hildebrand 
+Chris Arneson, Fred Dailey, Tom Galambos, 
+Doug Kovacs, Cliff Kurowski, Wi lliam 
+McAusland, Brad McDevitt, Jesse Mohn, Peter 
+Mullen, Stefan Poag, Chad Sergesketter 
+Stefan Poag 
+Steve Crompton 
+Joseph Goodman 
+This volume is produced under permission from Wizards of the Coast. Dungeons & Dragons is a trademark of Wizards of the Coast. Goodman 
+Games and the Goodman Games logos are trademarks of Goodman Games LLC. Contents ©2020 Wizards of the Coast LLC, PO Box 707, 
+Renton, WA 98057 -0707, USA. Wizards of the Coast, D&D, their respective logos, and all adventure titles are trademarks of Wizards of the 
+Coast LLC in the USA and other countries, and are used with permission. First Printing. Printed in China. 
+visiT vs onLinE AT: WWW.G OODmAil-GAmEs.com 
+0R.iGiIIAL ADVEII'fviu;s REiIICAR._IIA'fED • CASTLE AlhBER 
+
+--- PAGE 5 ---
+
+TABLE OF CONTENTS 
+CHAPTER l: INTRODUCTION ......................................................................... 4 
+CHAPTER 2: X2: CASTLE AMBER - ORIGINAL PUBLICATION ........................... l 6 
+CHAPTER 3: BACKGROUND ............................................................................ 5 4 
+CHAPTER 4: WEST WING ............................................... .. .............................. 62 
+CHAPTER 5: THE INDOOR FOREST ............................................................ .. ... 8 5 
+CHAPTER 6: THE CHAPEL ...................... .............................. .......... ................ 92 
+CHAPTER 7: EAST WING ........................................................................... ..... 98 
+CHAPTER 8: THE DUNGEON ................ ......................................................... l l 5 
+CHAPTER 9: AvEROIGNE ................................................................ ............... 125 
+CHAPTER lO: THE ToMB OF STEPHEN AMBER .............................................. 156 
+APPENDIX A: NEW MONSTERS ...................................................................... l 6 l 
+APPENDIX B: THE AMBER FAMILY .................................. .... ......... ................... 216 
+APPENDIX C: NEW MAGIC ITEMS ......... ........... .............................................. 244 
+APPENDIX D: THE HUNTING LODGE .. ..................................... ....... ....... ....... 249 
+APPENDIX E: HANDOUTS .................................. ..... ....................................... 2 5 5 
+APPENDIX F: MAPS ....................................................................................... 258 
+0RjGiIIAL ADVEIITV�S REiIICAR._IIATED • CASTLE A-Jb:BER 
+
+--- PAGE 6 ---
+
+CHAPTER ONE 
+Author' s Introduction 
+by Michael Curtis 
+Bonjour! Welcome, my friends, to the strangest house you 
+may every visit, the palatial home of the Amber Family-or, 
+as they are known in the distant world from which they hail, the 
+D' Ambervilles. 
+Castle Amber was the second adventure released for the Expert edi­
+tion of Dungeons & Dragons, following up the famed Isle of Dread 
+which was included in the Expert D&D boxed set (and is now 
+available as Original Adventures Reincarnated #2 from Goodman 
+Games). Castle Amber was penned by Isle of Dread's co-author, Tom 
+Moldvay, and is a curiosity among RPG adventures. Not because 
+of the adventure itself (although there are plenty of curiosities to be 
+found inside the castle), but because it represents one of the hobby's 
+earliest examples of using licensed literary works in role-playing. 
+In 1981, the year of Castle Amber's release, the field of licensed prop­
+erties as role-playing material was still a new one. Unlike today, 
+where it seems almost every other new role-playing game-not to 
+mention Hollywood blockbuster-is based on an existing property, 
+few RPGs owed their existence to pre-existing material. The late 
+1970s saw initial forays into licensed games with tides like Fan­
+tasy Games Unlimited's Flash Gordon & the Warriors of Mongo 
+or Heritage Model's John Carter, Warlord of Mars and Star Trek: 
+Adventure Gaming in the Final Frontier, but no company had yet 
+cracked the licensed property puzzle. In fact, as Heritage Models 
+would soon find out, too many licenses could sink a company. TSR 
+also dabbled in the realm of licensed gaming, producing the hex­
+and-chit wargame Lankhmar in 1976 after Gary Gygax and author 
+Fritz Leiber struck up a correspondence. The game, while popular 
+among wargamers and Leiber fans, never escaped its niche, however. 
+Things began to change in the 1980s, starting with a most unusual 
+herald of things to come. Dallas: The Television Role-Playing Game 
+was published in 1980 by Simulations Publications, Inc., an attempt 
+to cash in on both the faddish popularity of role-playing games and 
+one of the more popular shows on television at the time. Suffice to 
+say, given the reader has probably never played the game, it proved 
+to be a commercial failure. Luckily, Dallas' crash didn't deter others 
+from undertaking the task of converting potentially profitable liter­
+ary works into role-playing games. 
+Chaosium, by far, led the charge in 1981 with a pair of licensed 
+games: Stormbringer, based on the works of Michael Moorcock, 
+and, more famously, Call of Cthulhu, which not only brought the 
+writings of H.P. Lovecraft to the game table but was instrumental in 
+introducing Lovecr aft to the mainstream. Both tides proved popu­
+lar among gamers and opened up the floodgates in the industry . 
+It's only fitting then that 1981 would see the arrival of another RPG 
+product utilizing the works of one of Weird Tales' frequent contribu­
+tors, the third of the "Big Three" weird fiction authors that maga­
+zine spawned: Clark Ashton Smith. 
+Smith was a prolific writer for the brief period he worked in the 
+pulps, creating a number of stories that shared common settings. 
+Distant lands from distant times, both past and future, proved to 
+have a special place in Smith's creative heart, and he told tales set in 
+ancient Hyperborea and in the far-flung future Zothique, a tired 
+Earth entering its final days. Yet among these fantastical realms, 
+the one that Smith appeared to enjoy returning to most was one 
+not so far from our own: the fictional medieval French province of 
+Averoigne. 
+Averoigne, despite having one foot firmly planted in Earthly his­
+tory, is nearly as fantastic as Smith's other weird pulp creations. It is 
+a land both familiar and unreal. Evil bishops conspire to send their 
+foes 700 years into the past. The land's corpses rise from their graves 
+and become fodder for a necromantically-created titan. Sculptures 
+of unearthly-perhaps even infernal-beauty are uncovered and 
+spread discord and death. While it's far from Middle-earth or Hy­
+boria, it's a land with no dearth of possibilities for adventure. 
+Moldvay decided to include Averoigne in Castle Amber, making 
+the mysterious and mad family that occupies the doomed chateau 
+ref ugees from that medieval land. They've left their world behind, 
+fleeing religious persecution, and have settled in the player charac­
+ters' home world-which was assumed to be the Known World first 
+introduced in Isle of Dread. However, treachery within the Amber 
+Family caused both the clan and their home to be hurled between 
+dimensions. Unlucky travelers sometimes find themselves trans­
+ported to the castle, which is where the PCs come in. To escape the 
+castle, they must break a dire curse, and doing so requires traveling 
+to Averoigne. Averoigne proves to be, like in Smith's writings, a 
+place of both beauty and terror, a hotbed of religious persecution, 
+necromantic arts, time travel, and even stranger things. Don't be 
+surprised in the party decides to spend more time than you antici­
+pate in Averoigne, though, as it has its charms. 
+Castle Amber is an adventure that couldn't be written today. De­
+sign expectations have changed too much in the now more than 
+40 years role-playing games have been around. The castle is a "fun­
+house dungeon," one more concerned with providing challenging 
+and interesting encounters for the players to overcome than with an 
+overarching plot and maintaining standards of plausibility . Within 
+its walls you'll find boxing matches, the Three Billy Goats Gruff, 
+an Edgar Allan Poe ref erence, dog-headed men, the Wild Hunt, 
+0RjGiIIAL A.DVEIITVRJ:S REiIICA.RJIATED • CASTLE A.Jb:BER 
+
+--- PAGE 7 ---
+
+Michael Curtis (L.) gets ready to play Star Frontiers with family members in 1982, one year after Castle Amber was released 
+brain collectors, a passageway which seems to lead into Lovecraft's 
+Dreamlands, Richard the Lion-Hearted, and ... well let's just say 
+there's yet more surprises waiting. 
+Despite this melange of influences and outlandish encounters, Cas­
+tle Amber makes it all work. It remains one of my favorite old school 
+adventures of all time (room 8 alone is worth the price of admis­
+sion). Tom Moldvay's work also has a special place in my heart and, 
+while I've had the opportunity to meet many game designers dur­
+ing my time working in this profession, I'l l always regret that Tom 
+passed away in 2007 and I never had the opportunity to shake his 
+hand and thank him for the enjoyment he provided for my friends 
+and me. As such, I'm utterly grateful to be given the opportunity to 
+not only convert my favorite old school dungeon adventure for use 
+with the fifth edition of Dungeons & Dragons, but to able to add 
+my own contributions to the work of a designer I respect greatly. 
+I'd also like to express my thanks to Aaron Allston, Jeff Grubb, and 
+John D. Rateliff, whose .Mark of Amber adventure proved inspira­
+tional when expanding upon the original Castle Amber. You three 
+had already ventured were I intended to tread and blazing the trail 
+made it easier for me to follow in your wake. 
+Michael Curtis 
+December 15th, 2019 
+Michael Curtis has always lived in the Castle, but that hasn't prevented 
+him from working in the role-p/,aying game industry since 2009. During 
+that time, Michael has written or contributed to more than 50 game books 
+far Goodman Games, including the best-selling The Dungeon Alphabet, 
+the Fifth Edition Fantasy adventures Glitterdoom and War-lock , and 
+Original Adventures Reincarnated #3: Expedition to the Barrier Peaks. 
+He currently serves as head writer and designer far the Dungeon Crawl 
+C/,assics Lankhmar line. Michael believes C/,ark Ashton Smith is woefolly 
+overlooked by fans of fantasy and is honored to be able to lend his talents to 
+something creatively adjacent to the works of the great "K/,arkash-Ton. "He 
+currently lives on Long Js/,and, NY, with a collection of books worthy of its 
+own castle wing and a cat (whose name is not Jonas). 
+0NGiITAL ADVEITTVRf:S REiITCAR__IlATED • CASTLE AJb:BER 
+
+--- PAGE 8 ---
+
+APPENDIX N ARCHAEOLOGY 
+Clari< Ashton Smith 
+by Michael Curtis 
+G amers often point to Appendix N in the original Dungeon 
+Masters Guide and decry the absence of a particular author (or 
+three, or seven, or. .. ), declaring Gary Gygax's omission of them to be 
+a literary crime of some sort. Putting aside the unbelievable idea that 
+gamers may complain about things for the moment, we must realize 
+that Appendix N is not a list one can argue with. It is a catalogue of all 
+the literary influences Gygax chose to recognize as wellsprings from 
+which Dungeons & Dragons flowed. Since it is representative of one 
+man's work, we can't claim he made the error of excluding a particular 
+author, even if we believe we can see their influence in the final prod­
+uct. Game design, like art, is a subjective process and one tends to see 
+what one is inclined to see. 
+While we cannot fault Gygax for not including certain names, we 
+can, however, dig deeper into the authors he does list and examine 
+where they drew their influences from. In the process, we discover 
+that some of the names that people grumble about over their absence, 
+are in fact representative in the works of those that are present. One 
+of these influencers of the influencers is the third name from "the big 
+three of Weird Tales"-Clark Ashton Smith. 
+Clark Ashton Smith is a name that has only recently begun to creep 
+back into the consciousness of the fans of genre fiction. Despite his 
+amazing productivity in such a short period-he wrote more than a 
+hundred short stories in the "weird fiction" vein in only about five 
+years-circumstance precluded him from enjoying the prolonged 
+popularity and public recognition that his colleagues and constant 
+correspondents H.P. Lovecraft and Robert E. Howard enjoyed. 
+Unlike Lovecraft, Smith lacked the cadre of devoted fans and writers 
+dedicated to keeping his work in prim or expanding on the concepts 
+he created. And whereas Howard's signature character of Conan the 
+Cimmerian would captivate imaginations and be raised back into 
+the public eye by the efforts of a devoted curator of his literary es­
+tate, Smith's massive body of work focused more on creating unique 
+worlds where stories unfolded rather than reoccurring characters 
+who adventured there. By the time Smith's work began to re-emerge 
+thanks to the efforts of Lin Carter's editorship of the Ballantine Adult 
+Fantasy series line of paperbacks (Carter edited four anthologies of 
+Smith's stories for that series between 1970 and 1973), the founda­
+tions of Gygax's literary influences on Dungeons & Dragons were 
+likely already set, their intellectual concrete cured. We can speculate 
+this might be the reason for Smith's absence from Appendix N. 
+Clark Ashton Smith was born in California on January 13, 1893 and 
+would remain a lif elong resident of the Golden State. He spent the 
+majority of his life in Auburn, California, dwelling in a small cabin 
+his parents erected. Smith lacked a complete public education, finish­
+ing only eight years of grammar school before pursuing his education 
+at home, largely self -taught. This lack of formal education wouldn't 
+hamper his literary career in the slightest, however. 
+Smith attempted fiction 
+writing in his youth, in­
+spired by Poe and the 
+Arabian Nights stories he 
+read at home, but it wasn't 
+until he turned his atten­
+tion to poetry that he be­
+gan to flourish as a writer. 
+Smith met and became 
+friends with and a pro­
+tege to George Sterling, 
+the noted California poet 
+who was at the forefront 
+of a Romantic revival at 
+the time. Sterling encour-
+aged Smith and the young Clark Ashton Smith 
+poet enjoyed critical suc-
+cess with his first volume of verse, 1he Star- Treader and Other Poems. 
+In 1920, Smith composed the long blank verse poem "The Hash­
+ish Eater, or the Apocalypse of Evil." The poem was read by H.P. 
+Lovecraft who, in typical Lovecraftian epistolary proclivity , wrote the 
+poet a fan letter. This missive began a correspondence that lasted until 
+Lovecraft's death. 
+Smith might have gone on to worldwide renown as a poet had not 
+economic forces intervened. In 1929, the stock market crashed, 
+plunging the United States into the Great Depression. Smith, facing 
+both widespread economic hardship and the need to support his ag­
+ing and ailing parents, turned to fiction writing, a field only slightly 
+more profitable than poetry . Many of these tales saw publication in 
+the pulp magazine, Weird Tales, which introduced his work to Robert 
+E. Howard. Soon, Smith and Howard were enjoying a correspond­
+ence as well. The "big three of Weird Tales" exchanged letters constant­
+ly between 1933 and 1936, their ideas influencing one another and 
+finding fertile ground in each other's imaginations. The god Tsathog­
+gua, a creation of Smith's, was borrowed by Lovecraft in the story 
+"The Whisperer in Darkness, '' for example, and he in turn included 
+references to the high priest "Kl arkash-Ton" in another story. 
+Smith's work was distinct from his compatriots, however. Whereas 
+Lovecraft's work celebrated certain themes like cosmic horror and in­
+human contamination and Howard was known for his memorable 
+characters, Smith built worlds, weaving baroque word tapestries to 
+describe places such as prehistoric Hyperborea; the far-flung realm 
+of Zothique, a land at the end of Earth's prolonged death rattle; or 
+the fictional French province of medieval Averoigne. He set many of 
+his tales in these realms, places J .R.R. Tolkien would later describe 
+as "secondary worlds"-coherent imaginary lands that would be the 
+predecessors of the campaign worlds gamers later become intimately 
+familiar with. 
+0RiGirrn.L A.DVEil1'VJU;S REiITCARJIA1'ED • CASTLE A.JhBER 
+
+--- PAGE 9 ---
+
+Smith's weird fiction writing ceased almost as quickly as it began. 
+The mid- 1930s took a heavy toll on Smith. His mother died in 
+1935 and Robert E. Howard committed suicide in 1936, ending 
+the exchange of letters between the Weird Tales triumvirate for good. 
+Both Lovecraft and Smith's father died in 1937, and with their pass­
+ing, Smith's literary fire cooled to embers. For th�remainder of his 
+life, Smith's creative efforts were focused on poetry and the visual 
+arts; he became an accomplished sculptor and artist. He died at the 
+age of 68 on August 14, 1961, his ashes buried beneath a boulder 
+not far from the small cabin his parents had built. 
+Smith's roots in poetry are evident in his prose. He is a "writer's 
+writer," one with a deft command of vocabulary and no hesitation 
+to use it. He employs language to describe his imaginary worlds in 
+a method that is more akin to prose poetry than to the lines of the 
+average pulp writer. To appreciate Smith, you have to give your­
+self over entirely to the sorcery of his sentences, willingly submit to 
+his evocations of language. His writings are works of dense beauty, 
+which might also account for his lack of overall popularity among 
+genre fans. Smith's stories are not the blood and thunder of How­
+ard's, and, while Lovecraft demonstrates a love for antiquated word 
+play, his use of old words and British spelling is far and away differ­
+ent from the language mastery that Smith commands. 
+Smith's work inspired a number of authors working contemporane­
+ously and subsequenrly to the "poet of Auburn's" prolific period. In 
+addition to his shared encouragements with Lovecraft and Howard, 
+Smith's writing has been credited as influential by such esteemed gen­
+re writers as Harlan Ellison (who despite being a fan once described 
+Smith's writing as "prose so purple it sloshes over into ultraviolet. A 
+writing style that would make Hemingway break out in hives."), Ray 
+Bradbury, Jack Vance, Michael Moorcock, and Fritz Leiber (who not 
+only paid a visit to Smith at his home but also incorporated the Weird 
+Tales luminary into his novel, Our Lady of Darkness). Of the afore­
+mentioned authors, it's Smith's influence on Vance which leads us 
+direcrly into the origins of Dungeons & Dragons. 
+Among Smith's many literary worlds was that of Zothique. This set­
+ting for 16 of his stories was the last inhabited continent on a far­
+future Earth. Zothique is, as Smith describes it, a world where "The 
+science and machinery of our present civilization have long been 
+forgotten, together with our present religions. But many gods are 
+worshipped; and sorcery and demonism prevail again as in ancient 
+days." The Earth upon which Zothique lies is a weary one, and the 
+Zothique cycle of stories are all in the Dying Earth genre. At least 
+one writer and critic has claimed that Zothique owes its inspiration 
+to William Hope Hodgson, another name from our Appendix N 
+Archeolo gy, specifically Hodgson's novel, The Night Lands. 
+Smith's Zothique stories had a direct influence on Vance's The Dying 
+Earth tales, stories which likewise occur as Earth is fading and "sorcery 
+and demonism'' have returned . Without Smith's creation, we might never 
+have seen The Eyes of the Overwor!tl and Vance's other Dying Earth tales. 
+And without those, we have no "Vancian magic" to serve as the basis from 
+spellcasting in Dungeons & Dragons. Smith's vision of a magical Earth 
+at the end of time is therefore essential to the creation of the original fan­
+tasy role-playing game, regardless of whether Gygax was aware of Smith's 
+work or not. (As an aside, I'll note that given Gary Gygax's love of florid 
+writing and his own occasionally purple prose, I find it surprising that 
+Gygax never spoke more exuberantly about Smith in later years.) 
+Of course, D&D fans from a long ways back are already aware of 
+a more direct intersection between the role-playing game and the 
+work of Clark Ashton Smith. This conflux of ideas owes its being 
+to Tom Moldvay, a designer whose own list of inspirational authors 
+is not only larger than Gygax's (it can be found at the back of the 
+Dungeons & Dragons Basic Rulebook edited by him in 198 1), but 
+specifically mentions Smith. Moldvay also wrote the adventure, X2: 
+Castle Amber (Chdteau d'Amberville), further linking the Weird Tales 
+author and the game. 
+"Smith's stories are not the blood and 
+thunder of Howard's, and, while Lovecraft 
+demonstrates a love for antiquated word 
+play, his use of old words and British 
+spelling is far and away different from the 
+language mastery that Smith commands." 
+Castle Amber, despite what one might think, has no connections 
+to the work of Roger Zelazny, but does owe a debt to Smith's sto­
+ries. The entire second half of the adventure is set in the realm of 
+Averoigne, Smith's fictional French province. The party must contend 
+with antagonists ripped direcrly from the pages of Smith's short stories 
+(with permission of his literary estate), including "The Colossus of 
+Ylourgne," "The Beast of Averoigne," and "The Enchantress of Sy­
+laire." This marks Castle Amber as one of the few early licensed adap­
+tations of genre fiction into role-playing game material, putting it in 
+good company with Fritz Leiber's Nehwon, Robert Asprin's city of 
+Sanctuary, and Michael Moorcock's Melnibone. 
+Castle Amber is a "funhouse" dungeon of the old school, filled with 
+numerous oddities, anachronisms, and random events, and one's 
+opinion of it depends largely on the reader's own attitudes regard­
+ing those things. However, regardless of whether an entire generation 
+of role-players enjoyed the module or not, for many it was the first 
+time they ever heard the name "Clark Ashton Smith." Much as Deities 
+& Demigods served to introduce gamers to the works of Fritz Leiber 
+and Michael Moorcock, Castle Amber brought Smith's name inro the 
+awareness of a new, albeit smaller audience-myself included. Re­
+turning to the adventure and rereading it after becoming familiar 
+with the stories Moldvay incorporates inro the module is a fun expe­
+rience. It might even change opinions about X2 in some cases. 
+While Smith has enjoyed something of a resurgence over the past 
+decade, parrly due to Night Shade Books' wonderful anthology series 
+of all Smith's weird fiction stories, it's unlikely that he'll ever gain the 
+popularity of Lovecraft or Howard. His fellow Weird Tales colleagues 
+are both more accessible to the average reader (Howard more so than 
+Lovecraft) and both have benefited from adaptations of their work 
+into other media forms, notably motion pictures which serve to in­
+troduce the authors' concepts and characters to a non-literary audi­
+ence. Smith's work remains overlooked, which is a crime committed 
+by popular culture on one hand, but which also makes those of us 
+already familiar Clark Ashton Smith's stories feel fortunate we know 
+what others don't. If you've never experienced Smith, consider this my 
+invitation to join our close circle of privileged readers. 
+0R.iGiIIAL A-DVEII'fV�S REiIICAR_IIA'fED • CASTLE A-Jb:BER 
+
+--- PAGE 10 ---
+
+Castlernania 
+by Michael Curtis 
+H er hair ivill be disheveled, her grave clothes tattered, her fingernails 
+broken and her hands bloodied from the effort to dig herself out. 
+Madeline has gone completely insane ... And with those words, my fate 
+was sealed. 
+Like the majority of gamers, my introduction to fantasy came not by 
+the visual arts like movies or video games, but by the written word. 
+Fairy tales and folklore ushered me across the threshold between the 
+mundane and the phantasmagorical, breaking a path that wound far 
+into my future and I still trod today. When inspiration is lacking, it 
+is to novels and short stories I turn for ideas rather than the works of 
+artists. Perhaps then it comes as no surprise that I consider the D&D 
+module X2: Castle Amber (Chdteau D'Amberville) one of the finest 
+adventures ever penned. 
+Let's get this out of the way right now: Castle Amber is a funhouse 
+dungeon, one of those wild and nearly illogical places where form 
+doesn't always follow function and the chaos holds a not-ungentle 
+reign. This type of dungeon was far more the norm in the early days 
+of the hobby but has since fallen out of fashion. If you cannot adjust 
+your sensibilities to embrace the gonzo nature of these types of dun­
+geons, X2 will be a hard sell for you and the module does have a poor 
+reputation among some games. I, however, am not one of those. 
+Castle Amber, written in 1981 by the incredibly talented (and much 
+missed) Tom Molday, is a love lecter to "weird fiction" in all its many 
+forms. It wears its inspirations on its sleeve. A well-read gamer can­
+not miss the homages to the works of Edgar Allan Poe, the Brothers 
+Grimm, Roger Zelazny, Greek and Celtic myth, and Howard Phillips 
+Lovecraft that pepper the adventure's pages. But these references all 
+pale in the shadow of the adventure's true literary forefather: Clark 
+Ashton Smith. 
+Smith's name may be absent from the famed Appendix N Gary Gygax 
+assembled in the Dungeon Masters Guide, but that error wasn't re­
+peated when Moldvay assembled the "Inspirational Source Material" 
+for the D&D Basic Set (19 8 1). Castle Amber clearly demonstrates 
+Moldvay's love of Smith, and he uses the author's fantastical French 
+region of Averoigne in the adventure to great effect. 
+Moldvay taught me an important lesson about game design: Never 
+fear your literary roots or letting others know that you have them. 
+"Castle Amber, written in 1981 
+by the incredibly talented (and much 
+missed) Tom Molday, is a love letter to 
+'weird fiction' in all its many forms." 
+Reading through Castle Amber, one cannot help but see that Moldvay 
+wasn't merely ripping off the stories of Clark Aston Smith and the 
+other weird writers to meet his word count. He loved these stories and 
+wanted to share that love with other gamers, allowing those who were 
+familiar with them to enjoy the homages and to introduce these sto­
+ries to those unfamiliar with them. I had a nearly identical experience 
+when writing 1he Chained Coffin, an adventure that was inspired by 
+Manly Wade Wellman's "Silver John" stories. It was only in retrospect 
+that I see I learned how to do this correctly thanks to Tom Moldvay. 
+"Moldvay taught me an important 
+lesson about game design: Never fear 
+your literary roots or letting others 
+know that you have them." 
+Some 30-odd years after being exposed to Castle Amber, I can look 
+back on my own game design work and see how much this adventure 
+affected my own design style. There's an element of chaos and change 
+that runs through my work. I'm a big fan of randomness whenever 
+it's applicable, making either dumb luck or player choice impact the 
+game. We see this in X2 in encounters such as "The Dining Room" 
+(sample the mushrooms in wine sauce with care!) and "Card Room" 
+(may you always pull Le Roi des Batom). 
+My own work is also pervaded with an underlying thread of menace, 
+madness, and horror. I'm not one for gore, but if I can send a chill 
+down the spine of the game master-which is what happened to me 
+when I read of the horrible fate awaiting Madeline Amber (as quoted 
+at the start of this essay)-or better yet, the players, I am a happy 
+game designer. Castle Amber shows that even when you have ogres 
+in dressing gowns, squirrels whose touch turns acorns to gold, and 
+Frankenstein 's Monster-esque boxing matches going on, you can still 
+evoke a sense of dread. 
+Is it the perfect adventure? No, not by a long shot. There's no such 
+thing first of all, but Castle Amber does have its flaws. It is without a 
+doubt a railroad. The PCs awaken inside the castle with no choice but 
+to proceed forward if they want to escape. That sort of heavy-handed 
+beginning is sometimes a necessary evil in the RPG industry when 
+you only have a certain thousand words to play with, but that doesn't 
+make it any less grating on the nerves of some players. As I discussed 
+earlier, one's tolerance for funhouse dungeons will also impact your 
+enjoyment of the adventure. Despite these flaws, there's a heck of a lot 
+of fun between the cardstock covers of Castle Amber and, if you can 
+suspend your disbelief and go with the flow, you'll never forget your 
+stay at the home of the D'Ambervilles. 
+0NGiIIAL A.DVEII'f'VRJ;S REiIICAR_IIA'f'ED • CASTLE A.lll BER 
+
+--- PAGE 11 ---
+
+Sources of Castle Amber 
+by James Maliszewski 
+A s I will mention in my next essay, Castle Amber played a huge role in introducing me to Averoigne and, through it, to Clark 
+Ashton Smith's larger body of work. Over the course of 10 tales 
+published berween 1930 and 1941, Smith introduced the readers 
+of Weird Tales to the fictional province of medieval France in which 
+they all took place. As described by Smith, Averoigne is home to all 
+manner of supernatural creatures and devilry , in addition to a cast 
+of foolish knights, corrupt priests, roguish troubadours, and clever 
+sorcerers-making it very close to the implied setting of most fantasy 
+RPGs, a fact that likely played a part in Tom Moldvay's decision to 
+make use of it in Castle Amber. 
+Though it is clear that Moldvay was a fan of all of Smith's Averoigne 
+stories, it is also clear that, in writing Castle Amber, several of them 
+loomed much larger in his imagination. In what follows, I draw the 
+reader's attention to these stories, highlighting those elements that 
+Moldvay incorporated into module X2. As you will see, Moldvay 
+occasionally takes liberties with Smith's material, most commonly 
+conflating the time periods in which they take place. As originally 
+written the Averoigne tales range in time berween the rwelfth and 
+eighteenth centuries, whereas Castle Amber would suggest that their 
+events are all contemporaneous. 
+With that small caveat out of the way, let us turn to the stories that 
+inspired Tom Moldv ay. 
+''A Rendezvous in Averoigne" appeared in the April/May 1931 issue 
+of Weird Tales and concerns the efforts of a troubadour named Gerard 
+de l' Automne to rescue his lover Fleurette from the clutches of the 
+Sieur du Malinbois, a vampire who masquerades as a living lord and 
+dwells within a crumbling castle in the forest. The story's main con­
+nection to Castle Amber is Gerard, who is included as a random en­
+counter (and whose description 
+makes an allusion to his battle 
+with the Sieur du Malinbois). 
+"The Mandrakes" appeared 
+in the February 1933 issue of 
+Weird Tales and is abour a sor­
+cerer named Gilles Grenier 
+who murders his wife Sabine 
+in a rage and then finds him­
+self seemingly reproached for 
+his actions by the very herbs 
+he uses to make love potions. 
+Other than Gilles himself, who 
+appears as a random encounter, 
+there are no other connections 
+to Castle Amber. 
+"The Beast of Averoigne" appeared 
+in the May 1933 issue of Weird Tales 
+and is a terrific yarn about the ap­
+pearance of a ravening monster in 
+medieval France. In its original ver­
+sion, which Smith preferred, the 
+story takes the form of three dif­
+ferent documents. Each document 
+describes the attacks of a bizarre 
+creature from the perspective of an 
+individual living in or around the 
+city of Pfrigon: the monk Gerome, 
+Abbot Theophile, and the alchemist 
+Luc le Chaudronnier. In the end, it 
+is Luc who recognizes that the titu­
+lar beast is not demonic or even terrestrial in nature but rather an 
+"evil of the stars" that has fallen to earth is and acting through the 
+unsuspecting Theophile. 
+Moldvay uses this as the basis for encounter 60 in Castle Amber, in 
+which the characters rescue Luc le Chaudronnier and then take his 
+place in confronting the Beast. Of note is that, in both the story and 
+in the adventure, the Ring of Eibon is featured. The ring is said to have 
+come down from ancient Hyperborea, another setting Smith developed 
+through a cycle of short stories published in the pages of the pulps. 
+"The Colossus ofYlourgne" appeared in the June 1934 issue of Weird 
+Tales and is one of the longest pieces of fiction Smith ever wrote, 
+consisting of more than 14,000 words. The story focuses on the dying 
+necromancer Nathaire, who, from his lair in the crumbling castle of 
+Ylourgne, plots revenge against the people (and, especially, the clergy) 
+of the city of Vyones. By means of magic, Nathaire creates a gigan­
+tic monster to attack Vyones and only his former pupil, Gaspard du 
+Nord, possesses the means to oppose him. 
+Perhaps moreso than any other Averoigne story, "The Colossus of 
+Ylourgne" has a strong connection to Castle Amber. The module's 
+cover (by the inimitable Ero! Otus) depicts Nathaire's monster in ac­
+tion and the events of the novelette form the basis for encounter 59 of 
+the adventure. Once again, the player characters take the place of the 
+"Though it is clear that Moldvay 
+was a fan of all of Smith's Averoigne 
+stories, it is also clear that, in writing 
+Castle Amber, several of them loomed 
+much larger in his imagination." 
+0Ri:GiIIAL A.DVEIITV�S REiIICA1'_IIATED • CASTLE A.lhBER 
+
+--- PAGE 12 ---
+
+story's protagonist, with Gaspard only providing them with the magic 
+powder needed to defeat the Colossus. 
+"The Holiness of Azedarac" appeared in the November 1933 issue of 
+Weird Tales. Ir tells the story of Brother Ambrose, a young Benedictine 
+monk, who is sent to the dry ofXimes to investigate rumors about its 
+bishop, the titular Azedarac, who is reputed to be a black magician. 
+Not only are the rumors true, but Azedarac has a plan to prevent 
+Ambrose from ever revealing them to anyone-by sending him 700 
+years back in time! In the past, Ambrose encounters the lovely sorcer­
+ess Moriamis, who helps him to return to what is, to her, the future so 
+that he might complete his assigned task. 
+"Perhaps moreso than any other Averoigne 
+story, 'The Colossus ofYlourgne' has a 
+strong connection to Castle Amber." 
+Moldvay borrowed elements of this story for inclusion in Castle Am­
+ber, most notably encounter 61. Likewise, Jehan Mauvaissoir and Mo­
+riamis are NPCs who might be encountered randomly in Averoigne. 
+The module consistently misspells the name of Azedarac as ''Azedarc," 
+unfortunately, suggesting that Moldvay was working from his memo­
+ries of the story rather than with Smith's text at hand while writing. 
+"The Enchantress of Sylaire" appeared in the July 1941 issue of Weird 
+Tales and is the last Averoigne story to appear in the pages of that 
+famed pulp magazine. It tells the story of Anselme, a young man 
+who is rejected by the object of his affections and later happens upon 
+the forest domain of Sylaire. There, he meets Sephora, a beautiful 
+sorceress-a recurring theme in Averoigne stories!-who is menaced 
+by a werewolf named Malachie du Marais. With aid of an enchanted 
+sword, Anselme protects Sephora and wins her love. 
+The story is the inspiration for encounter 58 in Castle Amber. Both 
+Sephora and Malachie appear in the encounter, as does the magical 
+sword of Sylaire. Poor Anselme is nowhere to be seen, however! 
+With all of this having been said, the bulk of Castle Amber is Tom 
+Moldvay's own invention, including the Amber family itself (though, 
+as I noted in the introduction to this volume, the name Amberville 
+does appear in a non-Averoigne story by Smith entitled "Genius 
+Loci"). Nevertheless, I hope that the brief overview I have given of 
+the sources on which Moldvay drew will encourage you to read (or 
+re-read) at least some of them. While not all of them are masterpieces, 
+most of those that directly inspired encounters in Castle Amber are 
+worthy of your attention. Referees in particular will find them help­
+ful in portraying the various NPCs that appear in the module, but I 
+unhesitatingly recommend them to players, too. 
+fames Maliszewski started role-playing in the late Fall of 1979, when he 
+opened up a copy of the Dungeom & Dragom Basic Set edited by Dr. J 
+Eric Holmes originally purchased for his father. More than 40 years later, 
+he's still playing. fames is known for his blog Grognardia, which was the 
+focal point of the OSR movement in its early days. 
+His memories and musings about role-playing games and related non­
+seme, as well as articles about the history of the hobby .from its earliest 
+beginnings to the present day, remain of interest to readers to this day. 
+• 
+• 
+TE il Jh:O� CLARK.ASHTOil smiTH 
+ST OR.iE S 
+The complete Averoigne Circle 
+of stories is listed elsewhere in 
+this work and they're a great 
+starting point for DMs and 
+players unfamiliar with Clark 
+Ashton Smith's stories. Once 
+you finish with those, you'll un­
+doubtedly be eager to explore 
+many more of his tales. Here 
+are 10 more stories to guide 
+you further on your quest, cho­
+sen in no particular order, from 
+amongst those works generally 
+considered to be his best: 
+1. "The Seven Ceases" 
+z. "The Double Shadow" 
+3. "The Return of the Sorcerer" 
+4. "The Tale of Satampra Zeiros" 
+s. "The Treader of the Dust" 
+Strange Tales, 
+September 1931: 
+first publication 
+of "Return of the 
+Sorcerer" 
+6. "The Empire of the Necromancers" 
+7. "The Isle of the Torturers" 
+8. "The Dark Eidolon" 
+9. "The Abominations ofYondo" 
+10. "A Vintage from Atlantis" 
+-Michael Curtis 
+0NGiDAL A.DVEDTVRJ;S REiDCARJIATED • CASTLE A.Dl:BER 
+• 
+• 
+
+--- PAGE 13 ---
+
+Memories Encased 
+in Amber 
+by James Maliszewski 
+I n my in�roduction to Original Adventures Reincarnated #4: The 
+Lost City, I referred to Tom Moldvay's "Pulp Fantasy Trilogy," 
+a collection of three adventure modules that draw heavily on the 
+themes and subject matter of fantasy tales found in the pages of the 
+pulp magazines of the first half of the 20th century. In order of publi­
+cation, the first module in this trilogy is The Isle of Dread (available as 
+an entry in the OAR series as well), while the third is the aforemen­
+tioned The Lost City. The middle entry, first published in 1981, is the 
+one you now hold in your hands, Castle Amber. Castle Amber stands 
+apart from the other two modules in numerous ways, but the most 
+significant is that it does more than merely allude to the fantastical 
+content of pulp magazines: it directly references the Averoigne stories 
+of Clark Ashton Smith. 
+I can't say for certain, but I think Castle Amber is what first introduced 
+me to Clark Ashton Smith. I knew of his name, of course, from hav­
+ing read, among other things, the "Inspirational Source Material" sec­
+tion of Moldvay's own Basic Rulebook. Interestingly, Moldvay singles 
+out the world ofXiccarph for special mention rather than Averoigne, 
+though he also lists the short story "Genius Loci," one of whose char­
+acters is named Amberville. In any case, Moldvay's acknowledgement 
+of the debt of inspiration he owed to Smith was enough to send me 
+scurrying to my local library looking for whatever books I could find 
+that contained his works. At the time, I wasn't very successful, and it 
+would be several more years before I succeeded in reading even one of 
+Smith's 11 Averoigne yarns. 
+Consequently, what makes me look back so fondly on Castle Amber is 
+that, even though I wasn't able to read most of Smith's literary corpus 
+until much later, I still "knew" Smith through Moldvay's rather bril­
+liant evocation of his spirit in this adventure. Most of the distinctive 
+Smithian features are here: decadence, ennui, the macabre, black hu­
+mor-all stirred together in an unsettling stew. I won't deny that, as 
+kid of 12, I found some of the elements of Castle Amber more than a 
+little unnerving, like the ghostly feast, the Brain Collector, the Indoor 
+Forest, and all the members of the Amber family behaving in bizarre 
+ways. None of this frightened me so much as weirdly fascinated me. 
+I knew there was something not quite right about the whole place 
+Moldvay was presenting, something I couldn't then put my finger on 
+and yet I loved it all the same. 
+Even now, with the benefit of age and hindsight, it's hard to articulate 
+precisely what it was that_ fascinated me about Castle Amber. On a su­
+perficial level, the module is just another "funhouse dungeon," filled 
+with nonsensical and whimsical encounters, such as the ogre who be­
+lieves himself to be a human woman, the troll under the bridge of the 
+Indoor Forest, and a jester who polymorphs opponents into white 
+apes, among many others. But what I think sets Castle Amber apart 
+from mere funhouse dungeons is two things. First, there is a degree of 
+internal consistency and unity to even its most peculiar encounters. 
+That is, there is an explanation for why the titular castle is in its cur­
+rent state and why its inhabitants behave as they do. Indeed, uncover­
+ing that explanation drives much of the action of the player characters 
+as they explore its haunted chambers and hallways. 
+Second, and perhaps more importantly for me, there's very little 
+outright malevolence in the place. There are many evil people inside 
+Castle Amber-most of the Amber family, for instance-and their 
+actions are objectively evil according to almost any moral compass 
+and yet, somehow, they come across not so much evil as bored. On 
+some level, that strikes me as much worse than if they behaved as they 
+do because they actively wished ill upon their victims. Instead, they're 
+just looking for something to do, something to alleviate their soul­
+crushing world weariness and tormenting the player characters (and 
+one another) seems to be their preferred means of diverting them­
+selves from their predicament. 
+With its Ero! Ocus cover, depicting the undead colossus attacking 
+the city ofVyones, Castle Amber has a phantasmagoric, fever-dream 
+quality that still holds up quite well after almost four decades. The 
+module is far from perfect-there are a number of disappointingly 
+unimaginative D&D-isms that break the frame, in my opinion­
+but it remains a good example of an approach to fantasy gaming 
+that was unusual even in 1981 and even more unusual today. Cas­
+tle Amber combines literary allusion, hallucinatory imagery, and a 
+deadly playfulness to produce a challenge for all but the most clever 
+of players. Even better, it combines a dungeon- Castle Amber it­
+self-with the mini-sandbox setting of Averoigne, thus making it a 
+useful teaching tool for referees looking for advice on how to com­
+bine the two styles of old school play into a unified whole. And all 
+in 26 pages! How many contemporary adventure modules pack so 
+much into so little space? 
+Over the years, I have refereed Castle Amber many times for multiple 
+groups of players. Each time was a different experience, in large part 
+because the module is admirably open-ended and thus replayable. 
+Depending on the personalities and desires of the players, events can 
+go in a variety of ways. I have had players who were very focused 
+simply on finding a way for their characters to escape from the castle 
+and others who reveled in the insanity of its inhabitants. Some play­
+ers were interested primarily in the vast sums of loot to be found by 
+ransacking the place and some were so delighted by the land beyond 
+the Gate of the Silver Keys that they almost forgot why they passed 
+through it in the first place. It is my hope that this publication will 
+enable not only a new generation to experience Castle Amber for the 
+first time but that it might also encourage old-timers to brave its dan­
+gers again after all these years. Ifie introduces a few more people to the 
+stories of Clark Ashton Smith, all the better. 
+Enjoy! 
+0RiGiilAL A.DVEilTV�S REiilCA R_ IlATED • CASTLE A.Jb:BER 
+
+--- PAGE 14 ---
+
+Ed itor' s Diary 
+by Tim Wadzinski 
+C astle Amber is my favorite old-school standalone module. I dis­tinctly remember my grandmother buying it for me at a toy 
+store called The Big Balloon in Wilmette, Illinois, when I was IO or II 
+years old. I'm fairly certain it was the first shrink-wrapped module I 
+ever possessed, and I tore open that plastic the moment we got back 
+into the car. I absolutely loved the Ero! Otus cover art and the adven­
+ture's sheer wackiness. I still have that copy, nearly 40 years later. 
+As edit or, to say I'm excited at having a hand in this project is a 
+gross understatement. I have been pining for Castle Amber to get 
+the Original Adventures Reincarnated treatment since the day the 
+product line was conceived. I've read through it and run it countless 
+times over the years (as you'll see below). I relished the opportunity 
+to revisit it again and to go over it with my fine-toothed Editor' s 
+Comb. The expanded encounters designed by Michael Curtis and 
+Bob Brinkman add great depth to the mysterious Amber family, and 
+I know players will enjoy the extended, detailed tromp around the 
+French countryside in Averoigne! 
+I learned to play in 6th grade in 198r. My classmate Brian was my 
+first DM, and he ran a blazingly chaotic mix of B/X D&D and 
+AD&D. When rolling up my first character , using a sheet photo­
+copied from the Basic booklet, I asked, "Hey , what's Alignment? 
+What should I write?" Brian responded, "Just put CE. It's the best 
+one." Okay, next. Eve ntually we cobbled together five or six other 
+kids and started having sleepover D&D parties complete with pizza, 
+soda, and diversionary video game breaks on Jason's big-screen pro­
+jection TV (His dad was loaded!) 
+When the school year ended, I quickly fell into the role of DM be­
+cause I had ample free time (remember that?) and tons of ideas. My 
+neighborhood buddies were down with running through the latest 
+module my grandma bought me or whatever I slapped together on 
+my own. While "designing," I had absolutely no idea what I was 
+doing, but I'd lock myself away, meticulously drawing maps and 
+writing up room descriptions on my pile of "for-school-use-only" 
+loose-leaf paper. I loved modeling my maps after the Amber famil y's 
+chateau. And dungeon ecology? What's that? If Stephen Amber' s 
+tomb could have a crazy menagerie of guardians, then so could my 
+dungeons! I started up creatures and items from cartoons, movies, 
+and TV commercials and used them all. My friends would, some­
+times, literally be at my beck and call; I would finish writing, phone 
+up Jimmy, Mike, and Matt, and IO minutes later, we'd be playing 
+my fresh creation, outside on my front stoop. 
+Jimmy and I had extended families who lived elsewhere, with step­
+brothers and, in my case, a stepsister's boyfriend (in high school!) 
+and an aunt's boyfriend (in college!) who also played. When we got 
+together, hearing their stories and gaming with people "outside the 
+group" added an extra dimension to our sessions. I allowed Jimmy 
+to bring in characters from his other campaign, including a ranger 
+named Strider who had a "baby Juiblex" as a pet. (It could happen!) 
+When I ran my future uncle's lone PC through Haff of the Fire Giant 
+King, I gave him a ring of invisibility and a vorpal sword. (Stephen 
+Amber handed out generous gifts, so why coul dn't I?) Thanks to me 
+horribly misplaying the ring's power, that ranger (why did everyone 
+play a ranger?) made quick work of those pesky giants. 
+By the time 8th grade rolled around, I was running one-on-one 
+games for my friend Andr ew, who would play all a module's pre­
+generated characters, as well as for a coed group during homeroom 
+in Mr. Wolf's shop classroom. My players there were from a truly 
+amazing mix of stereotypes: jocks, preppies, brains, rich kids, (fu­
+ture) burnouts, etc. That stuff wasn't important. Nobody cared, be­
+cause we were kids and just wanted to have fun. It went so far that 
+on the last day of school Mr. Wolf-this was a cool man-even let 
+us make weapons and shields using the scrap wood in the back of his 
+shop. Some of us walked home that day, brandishing our new arms 
+throughout town, and went to my house where we mock battled in 
+the backyard. 
+I DM'd Castle Amber for many of these people, but my favorite 
+instance was for my college group, the Lords of the Atlas (which 
+included future DCC RPG co-designers Andrew Frielink and Todd 
+Kath). This is when I learned a valuable lesson: As DM, do not 
+let the players hoodwink you. Upon successfully freeing Stephen 
+Amber, I rolled -in plain sight-on the magical item tables in the 
+Dungeo n Masters Guide to determine each PC's reward. After receiv­
+ing a bunch of "l ame" items like +I swords and rings of warmth, they 
+convinced me to grant them one more prize to be used as a shared 
+party item. I acquiesced and rolled --<m ce again, in plain sight-a 
+rod of resurrection. Needless to say, the players were quite happy, and 
+this item went on to be a focal point of our campaign. (I made sure 
+it got used!) 
+Castle Amber is evergreen to me. I just keep going back to it, because 
+there's something for everyone: a dungeon crawl, wilderness adven­
+tures, gambling, puzzles, aliens, intrigue, French accents, and loads 
+of magic. You cannot not have fun with it. Thank you, Stephen 
+Amber . (And, thank you, Tom Moldvay and Clark Ashton Smith!) 
+Tim Wadzinski is a lead editor with Goodman Games, having worked 
+on the Alphabet books and the Fifth Edition Fantasy, Original Adven­
+tures Reincarnated, and DCC RPG product lines, among others. He 
+lives in the northwest suburbs of Chicago with his wife, daughter, and 
+their two rakasta warriors, and looks forward to running Castle Amber 
+yet again, using this tome. 
+0NGiIIAL ADVEIITVRJ;:S REiIICARJIATED • CASTLE AlhBER 
+
+--- PAGE 15 ---
+
+Painting the Worl<s of 
+Clari< Ashton Smith 
+by Dou g Kovacs 
+P ublisher's Note: We are very fortunate to have Doug Kovacs con­tribute an original painting to this volume of Original Adventures 
+Reincarnated. Doug is a longtime Jan of Clark Ashton Smith, the writer 
+and artist who inspired Castle Amber. (Doug was actually the person 
+who first introduced this publisher to the works of Smith.) 
+Clark Ashton Smith is best known as a writer but was also a painter 
+and sculptor. While his fiction has been continuously reprinted, most of 
+his artistic legacy was relatively unknown until Centipede Press recently 
+published a collection. If you can find this now out-of print book, In the 
+Realms of Mystery and Wonder, it is an excellent collection of Smith's 
+prose poems and artwork. As an artist, Doug referenced the material in 
+that book as well as Smith's fiction and, of course, the Castle Amber 
+adventure module to paint the end.sheets in this book. 
+Unlike many modern artists, Doug still works in physical media. His 
+art involves actual pencil and paper, and real paints and brushes. We 
+asked him to talk a little about his process and show readers some of the 
+in-progress shots of the work. 
+You can see the finished painting on the front end.sheets of this book. 
+I've been reading Clark Ashton Smith since I first discovered the 
+story "The Weird of Avoosl Wuthoqquan" when I was a teenager. 
+Since then I have frequently returned to Smith's work, drawing in­
+spiration for both my art and role-playing games. 
+Now that so much of CAS' s work is available on audio book, I have 
+also been enjoying re-digesting work I've previously read as well as 
+finding stories I had missed. I felt well primed to work on anything 
+specifically inspired by his writing largely because I feel like it has 
+informed so much of my preferred Bavor of fantasy. 
+The core visual idea for the art of this book's endsheets was to take in­
+spiration from both the visual art of CAS himself (as seen in the Cen­
+tipede Press book, In the Realms of Mystery and Wond er) and various 
+paintings by the Early Renaissance painter Botticelli. Though there 
+were probably many European painters I could have referenced and 
+cross-pollinated with CAS art, Botticelli seemed to have various for­
+mal and pagan elements that resonated specifically with the Averoigne 
+stories to set me in the correct frame of mind. 
+Doug Kovacs makes art and plays D&D. He is both smart and cool. 
+Illustration 1. Rough pencil sketch of figures for woman and bear. 
+Illustration 2. Rough pencil and ink sketch of gargoyles. 
+Illustration 3. Pencil sketch of full image layout. 
+0NGiilAL ADVEilTVIU:S REiilCARJIATED • CASTLE Alll BER 
+
+--- PAGE 16 ---
+
+[No text extracted]
+
+--- PAGE 17 ---
+
+[No text extracted]
+
+--- PAGE 18 ---
+
+CHAPTER TWO 
+X2: Castle Amber 
+Ori'ginal Publication 
+C astle Amber is distinct among early TSR modules in that it was 
+reprinted only once, and the only changes between printings 
+were related to publisher technicalities (ISBN and product 
+number placement). In previous volumes of the OAR series we have 
+used this chapter introduction to discuss the differences between 
+TSR print runs. In this case, however, there is little to discuss! 
+Therefore, we present without much preamble the original TSR 
+publication of Castle Amber. As the second volume in the "X" series, 
+it followed its much-more-popular predecessor The Isle of Dread. 
+Castle Amber was first printed in 1981, and it has retained a cult 
+status among Clark Ashton Smith fans ever since. This particular 
+scan is from the second printing. We hope you enjoy it! 
+0RjGiilAL ADVEil'f'VRf;S REiilCAR.._IlA'fED • CASTLE AJh:BER 
+
+--- PAGE 19 ---
+
+[No text extracted]
+
+--- PAGE 20 ---
+
+[No text extracted]

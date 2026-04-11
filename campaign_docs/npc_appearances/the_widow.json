@@ -1,0 +1,28 @@
+{
+  "name": "The Widow",
+  "species": "Unknown (appears humanoid, but details shift subtly when not directly observed)",
+  "faction": "Obsidian Lotus",
+  "rank": "Mastermind — Leader of the Obsidian Lotus",
+  "role": "mercenary",
+  "home_district": "warrens",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "tall, slender figure draped in black shadow-woven cloak embroidered with iridescent lotus flowers made of fractured black glass, their petals shimmering like liquid obsidian; face half-obscured by a veil of shifting darkness that fractures into pale skin and ink-black hair in rapid, unresolved patterns, eyes glinting between pale silver and deep obsidian as if reflecting multiple realities; chainmail under weathered leather armor bears faint etchings of memory vials dangling like pendant jewelry, each glass bulb pulsing faintly with trapped light, while a warhammer with a lotus-shaped grip rests across one hip and a crossbow hangs at the other, its trigger etched with faded runes of forgotten contracts.",
+  "faction_visual": "black shadow-woven clothing, lotus flower motifs in black glass, memory vials as jewellery",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

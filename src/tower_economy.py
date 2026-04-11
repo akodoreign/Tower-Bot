@@ -9,7 +9,7 @@ TIA: A fictional stock-market-style index of 8 Undercity "industries". Values
 shift each tick with small random drift plus occasional event-driven spikes.
 Formatted as a scrolling ticker for Discord.
 
-Both persist to JSON in campaign_docs/.
+Both persist to MySQL via db_api.
 """
 
 from __future__ import annotations
@@ -22,10 +22,9 @@ from pathlib import Path
 from typing import List, Dict, Optional
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
-DOCS_DIR         = Path(__file__).resolve().parent.parent / "campaign_docs"
-TOWERBAY_FILE    = DOCS_DIR / "towerbay.json"
-TIA_FILE         = DOCS_DIR / "tia.json"
+DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 
 # ---------------------------------------------------------------------------
 # TIA News Reaction System
@@ -193,27 +192,43 @@ _SHOCK_SYMPATHY_DRAG = 0.04   # all non-affected sectors drop this much on a sho
 
 # Cooldown between reaction events (seconds)
 _REACTION_COOLDOWN = 30 * 60  # 30 minutes
-_REACTION_COOLDOWN_FILE = DOCS_DIR / "tia_reaction_cooldown.json"
 
 
 def _load_reaction_cooldown() -> Optional[datetime]:
-    if not _REACTION_COOLDOWN_FILE.exists():
-        return None
+    """Load reaction cooldown from global_state table."""
     try:
-        data = json.loads(_REACTION_COOLDOWN_FILE.read_text(encoding="utf-8"))
-        return datetime.fromisoformat(data.get("last_reaction_at", ""))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'tia_reaction_cooldown'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return datetime.fromisoformat(data.get("last_reaction_at", ""))
+        return None
     except Exception:
         return None
 
 
 def _save_reaction_cooldown() -> None:
+    """Save reaction cooldown to global_state table."""
     try:
-        _REACTION_COOLDOWN_FILE.write_text(
-            json.dumps({"last_reaction_at": datetime.now().isoformat()}),
-            encoding="utf-8"
+        data = json.dumps({"last_reaction_at": datetime.now().isoformat()})
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'tia_reaction_cooldown'"
         )
-    except Exception:
-        pass
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'tia_reaction_cooldown'",
+                (data,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "tia_reaction_cooldown",
+                "state_value": data
+            })
+    except Exception as e:
+        logger.error(f"Reaction cooldown save error: {e}")
 
 
 def _on_cooldown() -> bool:
@@ -437,19 +452,101 @@ _SEED_ITEMS = [
 
 
 def _load_towerbay() -> List[Dict]:
-    if not TOWERBAY_FILE.exists():
-        return []
+    """Load TowerBay listings from database."""
     try:
-        return json.loads(TOWERBAY_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT * FROM towerbay_auctions ORDER BY id")
+        listings = []
+        for row in rows:
+            # Start with auction_json for rich fields (description, category, condition, bid_count, etc.)
+            aj = row.get("auction_json") or {}
+            if isinstance(aj, str):
+                try:
+                    aj = json.loads(aj)
+                except Exception:
+                    aj = {}
+
+            # Base dict from auction_json, then override with live DB columns
+            listing = {
+                "description": "",
+                "category": "Utility Gear",
+                "condition": "Unknown",
+                "bid_count": 0,
+                "listed_at": None,
+                **{k: v for k, v in aj.items() if k != "id" and v not in (None, "", [])},
+                # DB columns always win for live state
+                "id": row.get("id"),
+                "name": row.get("item_name") or aj.get("name", "Unknown"),
+                "seller": row.get("seller_name") or aj.get("seller", "Anonymous"),
+                "seller_id": row.get("seller_id"),
+                "current_bid": row.get("current_bid", aj.get("current_bid", 10000)),
+                "starting_bid": aj.get("starting_bid", row.get("current_bid", 10000)),
+                "buy_now_price": row.get("buy_now_price"),
+                "expires_at": row.get("expires_at").isoformat() if row.get("expires_at") else aj.get("expires_at"),
+                "sold": row.get("status") == "sold",
+                "winner_id": row.get("winner_id"),
+            }
+            listings.append(listing)
+        return listings
+    except Exception as e:
+        logger.error(f"TowerBay load error: {e}")
         return []
 
 
 def _save_towerbay(listings: List[Dict]) -> None:
+    """Save all TowerBay listings to database."""
     try:
-        TOWERBAY_FILE.write_text(json.dumps(listings, indent=2), encoding="utf-8")
+        for item in listings:
+            _save_towerbay_item(item)
     except Exception as e:
         logger.error(f"TowerBay save error: {e}")
+
+
+def _save_towerbay_item(item: Dict) -> None:
+    """Save a single TowerBay item to database."""
+    try:
+        item_id = item.get("id")
+        name = item.get("name", "Unknown Item")
+        status = "sold" if item.get("sold") else "active"
+        
+        # Parse dates for DB columns
+        expires_at = None
+        if item.get("expires_at"):
+            try:
+                expires_at = datetime.fromisoformat(item["expires_at"]).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                expires_at = None
+        
+        current_bid = item.get("current_bid", item.get("starting_bid", 10000))
+        buy_now_price = item.get("buy_now_price")
+        seller_name = item.get("seller", "Anonymous")
+        
+        # Serialize full item dict as auction_json for rich field preservation
+        auction_json_str = json.dumps({k: v for k, v in item.items() if k != "id"}, ensure_ascii=False, default=str)
+
+        if item_id:
+            # Check if exists
+            existing = raw_query("SELECT id FROM towerbay_auctions WHERE id = %s", (item_id,))
+            if existing:
+                raw_execute(
+                    "UPDATE towerbay_auctions SET item_name = %s, current_bid = %s, status = %s, "
+                    "expires_at = %s, seller_name = %s, auction_json = %s WHERE id = %s",
+                    (name, current_bid, status, expires_at, seller_name, auction_json_str, item_id)
+                )
+                return
+
+        # Insert new
+        new_id = db.insert("towerbay_auctions", {
+            "item_name": name,
+            "current_bid": current_bid,
+            "buy_now_price": buy_now_price,
+            "seller_name": seller_name,
+            "status": status,
+            "expires_at": expires_at,
+            "auction_json": auction_json_str,
+        })
+        item["id"] = new_id
+    except Exception as e:
+        logger.error(f"TowerBay item save error for {item.get('name', '?')}: {e}")
 
 
 def _seed_towerbay() -> List[Dict]:
@@ -531,18 +628,19 @@ RULES:
 - The item should feel like it has a history.
 - Output ONLY the JSON. No markdown fences, no preamble."""
 
-    ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
-    ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 
     try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(ollama_url, json={
+        from src.ollama_queue import call_ollama, OllamaBusyError
+        data = await call_ollama(
+            payload={
                 "model":    ollama_model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream":   False,
-            })
-            resp.raise_for_status()
-            data = resp.json()
+            },
+            timeout=90.0,
+            caller="tower_economy",
+        )
 
         text = ""
         if isinstance(data, dict):
@@ -696,17 +794,80 @@ _TIA_EVENTS = [
 
 
 def _load_tia() -> Dict:
-    if not TIA_FILE.exists():
-        return {}
+    """Load TIA state from database."""
     try:
-        return json.loads(TIA_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT * FROM tia_market")
+        if not rows:
+            return {}
+        
+        state = {
+            "sectors": {},
+            "last_updated": None,
+            "last_event": None,
+        }
+        
+        for row in rows:
+            sector_key = row.get("sector")
+            if not sector_key:
+                continue
+
+            value = float(row.get("value", 100.0))
+            # Use stored prev_value if available; fall back to current value
+            prev_value = row.get("prev_value")
+            prev_value = float(prev_value) if prev_value is not None else value
+            trend = row.get("trend", "") or ""
+
+            sector_info = next((s for s in TIA_SECTORS if s["key"] == sector_key), None)
+            sector_name = sector_info["name"] if sector_info else sector_key
+
+            change_pct = round(((value - prev_value) / prev_value) * 100, 2) if prev_value else 0.0
+
+            state["sectors"][sector_key] = {
+                "name": sector_name,
+                "value": value,
+                "prev_value": prev_value,
+                "change_pct": change_pct,
+            }
+
+            if trend and state["last_event"] is None:
+                state["last_event"] = trend if not trend.startswith("{") else None
+
+            if row.get("updated_at") and state["last_updated"] is None:
+                state["last_updated"] = row["updated_at"].isoformat() if hasattr(row["updated_at"], 'isoformat') else str(row["updated_at"])
+        
+        return state
+    except Exception as e:
+        logger.error(f"TIA load error: {e}")
         return {}
 
 
 def _save_tia(state: Dict) -> None:
+    """Save TIA state to database."""
     try:
-        TIA_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        sectors = state.get("sectors", {})
+        last_event = state.get("last_event", "") or "stable"
+
+        for sector_key, sector_data in sectors.items():
+            value = sector_data.get("value", 100.0)
+            prev_value = sector_data.get("prev_value", value)
+
+            existing = raw_query(
+                "SELECT id FROM tia_market WHERE sector = %s",
+                (sector_key,)
+            )
+
+            if existing:
+                raw_execute(
+                    "UPDATE tia_market SET value = %s, prev_value = %s, trend = %s, updated_at = NOW() WHERE sector = %s",
+                    (value, prev_value, last_event, sector_key)
+                )
+            else:
+                db.insert("tia_market", {
+                    "sector": sector_key,
+                    "value": value,
+                    "prev_value": prev_value,
+                    "trend": last_event,
+                })
     except Exception as e:
         logger.error(f"TIA save error: {e}")
 
@@ -794,6 +955,14 @@ def format_tia_bulletin(event_desc: Optional[str] = None) -> str:
 
     all_vals   = [s["value"] for s in state["sectors"].values()]
     all_prevs  = [s["prev_value"] for s in state["sectors"].values()]
+    
+    # Guard against empty sectors (ZeroDivisionError fix)
+    if not all_vals:
+        state = _init_tia()
+        _save_tia(state)
+        all_vals  = [s["value"] for s in state["sectors"].values()]
+        all_prevs = [s["prev_value"] for s in state["sectors"].values()]
+    
     index_now  = sum(all_vals)  / len(all_vals)
     index_prev = sum(all_prevs) / len(all_prevs)
     index_chg  = ((index_now - index_prev) / index_prev) * 100 if index_prev else 0

@@ -372,31 +372,31 @@ def setup(client):
         await interaction.response.defer(ephemeral=True)
 
         from src.npc_appearance import NPC_ROSTER_FILE, _profile_path, generate_all_npc_appearances
-        from src.party_profiles import PARTY_PROFILE_DIR, load_profile
-        from src.mission_board import _load_party_list, USED_PARTIES_FILE
+        from src.party_profiles import load_profile
+        from src.mission_board import _load_party_list, _load_used_parties
+        from src.db_api import raw_query as _rq
         import json as _json
 
-        if NPC_ROSTER_FILE.exists():
-            roster = _json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
-        else:
-            roster = []
+        # Load NPC roster from DB
+        try:
+            _npc_rows = _rq("SELECT name FROM npcs WHERE status IN ('alive','injured') ORDER BY name") or []
+            roster = [{"name": r["name"]} for r in _npc_rows]
+        except Exception:
+            roster = _json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8")) if NPC_ROSTER_FILE.exists() else []
         npc_total   = len(roster)
         npc_already = sum(1 for n in roster if _profile_path(n.get("name", "")).exists())
         npc_pending = npc_total - npc_already
 
+        # Load party names from DB
         party_names = set(_load_party_list())
-        if USED_PARTIES_FILE.exists():
-            try:
-                party_names.update(_json.loads(USED_PARTIES_FILE.read_text(encoding="utf-8")))
-            except Exception:
-                pass
-        for f in PARTY_PROFILE_DIR.glob("*.json"):
-            try:
-                d = _json.loads(f.read_text(encoding="utf-8"))
-                if "name" in d:
-                    party_names.add(d["name"])
-            except Exception:
-                pass
+        party_names.update(_load_used_parties())
+        try:
+            db_party_rows = _rq("SELECT party_name FROM party_profiles") or []
+            for r in db_party_rows:
+                if r.get("party_name"):
+                    party_names.add(r["party_name"])
+        except Exception:
+            pass
         party_total   = len(party_names)
         party_already = sum(1 for n in party_names if (lambda p: p is not None and p.get("generated"))(load_profile(n)))
         party_pending = party_total - party_already

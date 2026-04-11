@@ -1,0 +1,28 @@
+{
+  "name": "Elaris Moonshadow",
+  "species": "Half-Elf",
+  "faction": "Independent",
+  "rank": "Known Operator",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "graceful half-elf figure, slightly taller than human, with subtly pointed ears and a lithe, sinewy build, their silver-streaked black hair cropped short around a jagged scar slicing the left scalp, eyes sharp and pale gold like fractured amber, skin bronzed from underground forges; layered in weathered leather harnesses over scale-mail that glints faintly with rusted iron, one hand gripping a splintered warhammer, the other holding a crossbow slung across their back, a faded serpent tattoo coiled around a dagger peeking from beneath torn sleeve, its edges smudged with ash and soot.",
+  "faction_visual": "eclectic mix, deliberately no faction marks, one defining personal item",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

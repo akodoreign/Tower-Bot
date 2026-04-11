@@ -1,0 +1,28 @@
+{
+  "name": "Serrik Dhal",
+  "species": "Human",
+  "faction": "Iron Fang Consortium",
+  "rank": "Guildmaster — Head of the Iron Fang Consortium",
+  "role": "mercenary",
+  "home_district": "markets infinite",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "A gaunt human of average height, skin pallid as ash, iron-grey hair cropped short with a military buzzcut, eyes sharp and pale gold despite the hollow, fading flesh around them. Wears a deep burgundy coat lined with gunmetal scales, the Iron Fang mark etched faintly into the lapel, over worn leather and chainmail bearing the patina of decades of contracts. A rust-stained warhammer hangs at his side, its blade dulled by countless strikes, and a crossbow slung across his back, its stock cracked and stained with old blood, while his hands tremble faintly as he grips a rusted iron ring carved with forgotten sigils.",
+  "faction_visual": "deep burgundy and gunmetal coat, Iron Fang mark subtle on lapel, always armed",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

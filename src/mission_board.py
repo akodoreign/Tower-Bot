@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from src.log import logger
+from src.db_api import raw_query, raw_execute, db
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 MISSION_MEMORY_FILE    = DOCS_DIR / "mission_memory.json"
@@ -213,27 +214,123 @@ A Rift mission should feel like an emergency, not a routine posting. Rift missio
 # ---------------------------------------------------------------------------
 
 def _load_missions() -> List[dict]:
-    if not MISSION_MEMORY_FILE.exists():
-        return []
+    """Load all missions from database."""
     try:
-        return json.loads(MISSION_MEMORY_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        rows = raw_query("SELECT * FROM missions ORDER BY id")
+        missions = []
+        for row in rows:
+            mission_data = row.get("mission_json")
+            # Handle NULL or empty mission_json
+            if mission_data is None:
+                mission_data = {}
+            elif isinstance(mission_data, str):
+                mission_data = json.loads(mission_data) if mission_data else {}
+            # Merge DB columns with JSON data
+            # message_id is VARCHAR(50) in DB → always cast to int so it matches
+            # discord payload.message_id (which is always an int)
+            _raw_mid = row.get("message_id") or mission_data.get("message_id")
+            try:
+                _msg_id = int(_raw_mid) if _raw_mid is not None else None
+            except (ValueError, TypeError):
+                _msg_id = _raw_mid
+            mission = {
+                **mission_data,
+                "id": row.get("id"),
+                "title": row.get("title") or mission_data.get("title", "Unknown"),
+                "faction": row.get("faction") or mission_data.get("faction", ""),
+                "tier": row.get("tier") or mission_data.get("tier", "standard"),
+                "status": row.get("status") or "active",
+                "message_id": _msg_id,
+            }
+            # Map DB status to legacy flags
+            status = row.get("status", "active")
+            mission["resolved"] = status in ("resolved", "completed", "failed", "expired")
+            mission["completed"] = status == "completed"
+            mission["failed"] = status == "failed"
+            missions.append(mission)
+        return missions
+    except Exception as e:
+        logger.error(f"Mission load error: {e}")
         return []
 
 
 def _save_missions(missions: List[dict]) -> None:
+    """Save all missions to database."""
     try:
-        MISSION_MEMORY_FILE.write_text(
-            json.dumps(missions, indent=2), encoding="utf-8"
-        )
-    except Exception:
-        pass
+        for mission in missions:
+            _save_mission(mission)
+    except Exception as e:
+        logger.error(f"Mission save error: {e}")
+
+
+def _save_mission(mission: dict) -> None:
+    """Save a single mission to database."""
+    try:
+        mission_id = mission.get("id")
+        title = mission.get("title", "Unknown Contract")
+        faction = mission.get("faction", "")
+        tier = mission.get("tier", "standard")
+        message_id = mission.get("message_id")
+        
+        # Determine status from legacy flags
+        if mission.get("completed"):
+            status = "completed"
+        elif mission.get("failed"):
+            status = "failed"
+        elif mission.get("resolved"):
+            status = "resolved"
+        elif mission.get("claimed") or mission.get("npc_claimed"):
+            status = "claimed"
+        else:
+            status = "active"
+        
+        # Prepare mission_json (full mission data)
+        mission_json = json.dumps(mission, ensure_ascii=False, default=str)
+        
+        # Parse dates for DB columns
+        posted_at = None
+        expires_at = None
+        if mission.get("posted_at"):
+            try:
+                posted_at = datetime.fromisoformat(mission["posted_at"]).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                posted_at = None
+        if mission.get("expires_at"):
+            try:
+                expires_at = datetime.fromisoformat(mission["expires_at"]).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                expires_at = None
+        
+        if mission_id:
+            # Check if exists
+            existing = raw_query("SELECT id FROM missions WHERE id = %s", (mission_id,))
+            if existing:
+                raw_execute(
+                    "UPDATE missions SET title = %s, faction = %s, tier = %s, status = %s, "
+                    "message_id = %s, mission_json = %s, posted_at = %s, expires_at = %s WHERE id = %s",
+                    (title, faction, tier, status, message_id, mission_json, posted_at, expires_at, mission_id)
+                )
+                return
+        
+        # Insert new
+        new_id = db.insert("missions", {
+            "title": title,
+            "faction": faction,
+            "tier": tier,
+            "status": status,
+            "message_id": message_id,
+            "mission_json": mission_json,
+            "posted_at": posted_at,
+            "expires_at": expires_at,
+        })
+        mission["id"] = new_id
+    except Exception as e:
+        logger.error(f"Mission save error for {mission.get('title', '?')}: {e}")
 
 
 def _add_mission(mission: dict) -> None:
-    missions = _load_missions()
-    missions.append(mission)
-    _save_missions(missions)
+    """Add a new mission to database."""
+    _save_mission(mission)
 
 
 def _count_active_normal() -> int:
@@ -262,11 +359,28 @@ def _count_active_personal(character_name: str) -> int:
 
 
 def _update_mission(message_id: int, updates: dict) -> None:
-    missions = _load_missions()
-    for m in missions:
-        if m.get("message_id") == message_id:
-            m.update(updates)
-    _save_missions(missions)
+    """Update a mission by its Discord message_id."""
+    try:
+        # Find the mission by message_id
+        rows = raw_query("SELECT id, mission_json FROM missions WHERE message_id = %s", (message_id,))
+        if not rows:
+            return
+        
+        row = rows[0]
+        mission_id = row.get("id")
+        mission_data = row.get("mission_json", {})
+        if isinstance(mission_data, str):
+            mission_data = json.loads(mission_data) if mission_data else {}
+        
+        # Apply updates
+        mission_data.update(updates)
+        mission_data["id"] = mission_id
+        mission_data["message_id"] = message_id
+        
+        # Save back
+        _save_mission(mission_data)
+    except Exception as e:
+        logger.error(f"Mission update error for message_id {message_id}: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -320,32 +434,53 @@ _MISSION_TYPES = [
 # ---------------------------------------------------------------------------
 
 def _load_generated_mission_types() -> List[str]:
-    """Load AI-generated mission types from disk."""
-    if not MISSION_TYPES_FILE.exists():
-        return []
+    """Load AI-generated mission types from database."""
     try:
-        data = json.loads(MISSION_TYPES_FILE.read_text(encoding="utf-8"))
-        return data.get("types", [])
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'generated_mission_types'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data.get("types", [])
+        return []
     except Exception:
         return []
 
 
 def _save_generated_mission_types(types: List[str], generated_date: str) -> None:
+    """Save AI-generated mission types to database."""
     try:
-        MISSION_TYPES_FILE.write_text(
-            json.dumps({"generated_date": generated_date, "types": types}, indent=2),
-            encoding="utf-8"
+        data = json.dumps({"generated_date": generated_date, "types": types})
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'generated_mission_types'"
         )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'generated_mission_types'",
+                (data,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "generated_mission_types",
+                "state_value": data
+            })
     except Exception:
         pass
 
 
 def _needs_new_mission_types() -> bool:
-    """Returns True if types file is missing or was generated on a previous UTC day."""
-    if not MISSION_TYPES_FILE.exists():
-        return True
+    """Returns True if types are missing or were generated on a previous UTC day."""
     try:
-        data = json.loads(MISSION_TYPES_FILE.read_text(encoding="utf-8"))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'generated_mission_types'"
+        )
+        if not rows or not rows[0].get("state_value"):
+            return True
+        data = rows[0]["state_value"]
+        if isinstance(data, str):
+            data = json.loads(data)
         last = data.get("generated_date", "")
         return last != datetime.utcnow().strftime("%Y-%m-%d")
     except Exception:
@@ -625,7 +760,32 @@ def _parse_mission(text: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def _load_characters() -> List[dict]:
-    """Parse character_memory.txt into a list of character dicts."""
+    """Load player characters from MySQL player_characters table."""
+    try:
+        rows = raw_query(
+            "SELECT name, class_name, species, player_name, oracle_notes, profile_json "
+            "FROM player_characters ORDER BY name"
+        ) or []
+        characters = []
+        for row in rows:
+            pj = row.get("profile_json") or {}
+            if isinstance(pj, str):
+                try:
+                    pj = json.loads(pj)
+                except Exception:
+                    pj = {}
+            char = {**pj}
+            char["NAME"] = row["name"]
+            char["CLASS"] = row.get("class_name") or char.get("CLASS", "")
+            char["SPECIES"] = row.get("species") or char.get("SPECIES", "")
+            char["PLAYER"] = row.get("player_name") or char.get("PLAYER", "")
+            char["ORACLE NOTES"] = row.get("oracle_notes") or char.get("ORACLE_NOTES", "")
+            characters.append(char)
+        if characters:
+            return characters
+    except Exception as e:
+        logger.warning(f"_load_characters: DB query failed ({e}), falling back to file")
+    # Fallback to txt file
     if not CHARACTER_MEMORY_FILE.exists():
         return []
     try:
@@ -659,19 +819,38 @@ def _personal_expiry_for_tier(tier: str) -> datetime:
 # ---------------------------------------------------------------------------
 
 def _load_personal_tracker() -> dict:
-    if not PERSONAL_MISSION_TRACKER.exists():
-        return {}
+    """Load personal mission tracker from database."""
     try:
-        return json.loads(PERSONAL_MISSION_TRACKER.read_text(encoding="utf-8"))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'personal_mission_tracker'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data
+        return {}
     except Exception:
         return {}
 
 
 def _save_personal_tracker(tracker: dict) -> None:
+    """Save personal mission tracker to database."""
     try:
-        PERSONAL_MISSION_TRACKER.write_text(
-            json.dumps(tracker, indent=2), encoding="utf-8"
+        data = json.dumps(tracker, ensure_ascii=False, default=str)
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'personal_mission_tracker'"
         )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'personal_mission_tracker'",
+                (data,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "personal_mission_tracker",
+                "state_value": data
+            })
     except Exception:
         pass
 
@@ -818,7 +997,14 @@ def next_personal_mission_seconds() -> int:
 # ---------------------------------------------------------------------------
 
 def _load_party_list() -> List[str]:
-    """Load named parties from adventurer_parties.txt, skipping comments."""
+    """Load named parties from MySQL (falls back to adventurer_parties.txt)."""
+    try:
+        rows = raw_query("SELECT party_name FROM adventurer_parties ORDER BY party_name") or []
+        if rows:
+            return [r["party_name"] for r in rows]
+    except Exception as e:
+        logger.warning(f"_load_party_list DB error: {e}")
+    # Fallback to file
     if not PARTY_LIST_FILE.exists():
         return []
     lines = PARTY_LIST_FILE.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -826,17 +1012,38 @@ def _load_party_list() -> List[str]:
 
 
 def _load_used_parties() -> List[str]:
-    if not USED_PARTIES_FILE.exists():
-        return []
+    """Load used parties list from database."""
     try:
-        return json.loads(USED_PARTIES_FILE.read_text(encoding="utf-8"))
+        rows = raw_query(
+            "SELECT state_value FROM global_state WHERE state_key = 'used_parties'"
+        )
+        if rows and rows[0].get("state_value"):
+            data = rows[0]["state_value"]
+            if isinstance(data, str):
+                data = json.loads(data)
+            return data if isinstance(data, list) else []
+        return []
     except Exception:
         return []
 
 
 def _save_used_parties(used: List[str]) -> None:
+    """Save used parties list to database."""
     try:
-        USED_PARTIES_FILE.write_text(json.dumps(used, indent=2), encoding="utf-8")
+        data = json.dumps(used, ensure_ascii=False)
+        existing = raw_query(
+            "SELECT id FROM global_state WHERE state_key = 'used_parties'"
+        )
+        if existing:
+            raw_execute(
+                "UPDATE global_state SET state_value = %s WHERE state_key = 'used_parties'",
+                (data,)
+            )
+        else:
+            db.insert("global_state", {
+                "state_key": "used_parties",
+                "state_value": data
+            })
     except Exception:
         pass
 
@@ -856,12 +1063,25 @@ async def _get_party_name() -> str:
     if len(available) < 5:
         new_names = await _generate_party_names(20)
         if new_names:
-            # Append new names to the file
-            existing_text = PARTY_LIST_FILE.read_text(encoding="utf-8") if PARTY_LIST_FILE.exists() else ""
-            with open(PARTY_LIST_FILE, "a", encoding="utf-8") as f:
+            # Insert new names into DB (and file for fallback)
+            existing_set = set(all_parties)
+            try:
                 for name in new_names:
-                    if name not in existing_text:
-                        f.write(f"\n{name}")
+                    if name not in existing_set:
+                        raw_execute(
+                            "INSERT IGNORE INTO adventurer_parties (party_name) VALUES (%s)", (name,)
+                        )
+            except Exception as _e:
+                logger.warning(f"_get_party_name DB insert error: {_e}")
+            # Also append to file for fallback
+            try:
+                existing_text = PARTY_LIST_FILE.read_text(encoding="utf-8") if PARTY_LIST_FILE.exists() else ""
+                with open(PARTY_LIST_FILE, "a", encoding="utf-8") as f:
+                    for name in new_names:
+                        if name not in existing_text:
+                            f.write(f"\n{name}")
+            except Exception:
+                pass
             # Reset used list so the full expanded list is available
             used_parties = []
             _save_used_parties([])

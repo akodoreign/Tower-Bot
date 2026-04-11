@@ -23,14 +23,24 @@ _gazetteer_cache: Optional[dict] = None
 
 
 def load_gazetteer() -> dict:
-    """Load the city gazetteer from disk. Cached after first call."""
+    """Load the city gazetteer from MySQL (cached after first call, falls back to file)."""
     global _gazetteer_cache
     if _gazetteer_cache is not None:
         return _gazetteer_cache
-    
+
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT content_json FROM gazetteer LIMIT 1") or []
+        if rows and rows[0].get("content_json"):
+            cj = rows[0]["content_json"]
+            _gazetteer_cache = json.loads(cj) if isinstance(cj, str) else cj
+            return _gazetteer_cache
+    except Exception:
+        pass
+
     if not GAZETTEER_FILE.exists():
         return {"districts": {}, "warrens_distribution": [], "underground_network": {}}
-    
+
     try:
         _gazetteer_cache = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
         return _gazetteer_cache

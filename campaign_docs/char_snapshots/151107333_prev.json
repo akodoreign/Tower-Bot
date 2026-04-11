@@ -1,0 +1,52 @@
+{
+  "name": "S'kree",
+  "classes": {
+    "Fighter": 1,
+    "Rogue": 3
+  },
+  "total_level": 4,
+  "max_hp": 26,
+  "ac_override": null,
+  "stats": {
+    "STR": 12,
+    "DEX": 16,
+    "CON": 15,
+    "INT": 9,
+    "WIS": 9,
+    "CHA": 9
+  },
+  "xp": 900,
+  "currencies": {
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 0,
+    "pp": 0
+  },
+  "inventory": {
+    "Combat shotgun": 1,
+    "Tech armor (Light)": 1,
+    "Firearm  - Derringer (Single Shot Pistol)": 1,
+    "Dagger": 1,
+    "Scimitar": 1,
+    "Crossbow, Heavy": 1,
+    "Case, Crossbow Bolt": 1,
+    "Thieves' Tools": 5,
+    "Rations": 4
+  },
+  "feats": [
+    "Archery",
+    "Dark Bargain",
+    "Opportunistic Thief",
+    "Weapon Mastery",
+    "Weapon Mastery"
+  ],
+  "spell_slots": {},
+  "notes": {
+    "otherNotes": "As the only known Pipeline, S'Kree is very unique and his feathers are highly prized by a certain group of collectors.",
+    "organizations": "New recruit for one of the guilds, \"The Sky Commanders.\"",
+    "enemies": "A rival guild, The Nightcrawlers.",
+    "backstory": "Created accidentally while attempting to create a new race of soldiers who could fly. The idea was conceived due to the discovery of angels."
+  },
+  "fetched_at": "2026-03-14T16:47:16.176027"
+}

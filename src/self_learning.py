@@ -24,10 +24,11 @@ import httpx
 from src.log import logger
 from src.skill_loader import load_skills, SKILLS_DIR, _tokenize
 from src.agents import AgentOrchestrator
+from src.module_quality_trainer import study_module_quality
 
 # ── Config ─────────────────────────────────────────────────────────────
 
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
 # Learning window (24h clock, local time)
@@ -117,19 +118,31 @@ async def _ask_ollama(prompt: str, system: str = "", timeout: int = 120) -> str:
 # ── Study Functions ────────────────────────────────────────────────────
 
 async def _study_news_memory() -> Optional[str]:
-    """Read news_memory.txt and extract recurring themes, NPCs, and patterns."""
-    news_path = CAMPAIGN_DOCS / "news_memory.txt"
-    if not news_path.exists():
-        return None
-
+    """Read recent news bulletins from MySQL and extract recurring themes."""
     try:
-        text = news_path.read_text(encoding="utf-8")
-        # Take the last ~30 entries (most recent)
-        entries = text.split("---ENTRY---")
-        recent = entries[-30:] if len(entries) > 30 else entries
-        recent_text = "\n---\n".join(recent)
-    except Exception as e:
-        logger.warning(f"self_learning: cannot read news_memory: {e}")
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT bulletin_text, facts, created_at FROM news_memory "
+            "ORDER BY id DESC LIMIT 30"
+        ) or []
+        recent_text = "\n---\n".join(
+            r.get("facts") or r.get("bulletin_text") or "" for r in rows if r.get("bulletin_text") or r.get("facts")
+        )
+    except Exception:
+        recent_text = ""
+    if not recent_text:
+        news_path = CAMPAIGN_DOCS / "news_memory.txt"
+        if not news_path.exists():
+            return None
+        try:
+            text = news_path.read_text(encoding="utf-8")
+            entries = text.split("---ENTRY---")
+            recent = entries[-30:] if len(entries) > 30 else entries
+            recent_text = "\n---\n".join(recent)
+        except Exception as e:
+            logger.warning(f"self_learning: cannot read news_memory: {e}")
+            return None
+    if not recent_text.strip():
         return None
 
     prompt = f"""You are analyzing recent news bulletins from a D&D campaign set in the Undercity.
@@ -154,18 +167,63 @@ Then write the content in clear sections. Keep it under 2000 characters total.""
     return await _ask_ollama(prompt, system="You are a campaign knowledge assistant. Be concise and factual.")
 
 
-async def _study_mission_patterns() -> Optional[str]:
-    """Analyze mission_memory.json for patterns in mission types and outcomes."""
-    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
-    if not mission_path.exists():
-        return None
-
+def _load_missions_from_db(limit: int = 50) -> List[Dict]:
+    """Load recent missions from MySQL."""
     try:
-        with open(mission_path, "r", encoding="utf-8") as f:
-            missions = json.load(f)
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT title, status, tier, faction, mission_json FROM missions "
+            "ORDER BY id DESC LIMIT %s", (limit,)
+        ) or []
+        missions = []
+        for row in rows:
+            mj = row.get("mission_json") or {}
+            if isinstance(mj, str):
+                try:
+                    mj = json.loads(mj)
+                except Exception:
+                    mj = {}
+            m = {**mj, "title": row["title"], "status": row["status"],
+                 "tier": row["tier"], "faction": row["faction"]}
+            # Normalise legacy keys
+            if row["status"] in ("completed",):
+                m.setdefault("resolved", True)
+                m.setdefault("outcome", "completed")
+            elif row["status"] in ("failed",):
+                m.setdefault("resolved", True)
+                m.setdefault("outcome", "failed")
+            elif row["status"] == "expired":
+                m.setdefault("resolved", True)
+                m.setdefault("outcome", "expired")
+            missions.append(m)
+        return missions
     except Exception:
-        return None
+        return []
 
+
+def _load_faction_rep_from_db() -> Dict:
+    """Load all faction reputations from MySQL as a dict keyed by faction name."""
+    try:
+        from src.db_api import get_all_faction_reputations
+        rows = get_all_faction_reputations() or []
+        return {r["faction_name"]: {"tier": r["tier"], "points": r["reputation_score"]}
+                for r in rows}
+    except Exception:
+        return {}
+
+
+async def _study_mission_patterns() -> Optional[str]:
+    """Analyze missions for patterns in mission types and outcomes."""
+    missions = _load_missions_from_db(limit=30)
+    if not missions:
+        # fallback to file
+        mission_path = CAMPAIGN_DOCS / "mission_memory.json"
+        if mission_path.exists():
+            try:
+                with open(mission_path, "r", encoding="utf-8") as f:
+                    missions = json.load(f)
+            except Exception:
+                pass
     if not missions:
         return None
 
@@ -204,16 +262,24 @@ Keep it under 1500 characters."""
 
 async def _study_npc_roster() -> Optional[str]:
     """Study the current NPC roster for relationship mapping."""
-    roster_path = CAMPAIGN_DOCS / "npc_roster.json"
-    if not roster_path.exists():
-        return None
-
     try:
-        with open(roster_path, "r", encoding="utf-8") as f:
-            roster = json.load(f)
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT name, faction, role, location, status FROM npcs "
+            "WHERE status IN ('alive','injured') ORDER BY name LIMIT 50"
+        ) or []
+        roster = [dict(r) for r in rows]
     except Exception:
-        return None
-
+        roster = []
+    if not roster:
+        # fallback to file
+        roster_path = CAMPAIGN_DOCS / "npc_roster.json"
+        if roster_path.exists():
+            try:
+                with open(roster_path, "r", encoding="utf-8") as f:
+                    roster = json.load(f)
+            except Exception:
+                pass
     if not roster:
         return None
 
@@ -252,14 +318,17 @@ Keep it under 1500 characters."""
 
 async def _study_faction_reputation() -> Optional[str]:
     """Study faction reputation data for current political landscape."""
-    rep_path = CAMPAIGN_DOCS / "faction_reputation.json"
-    if not rep_path.exists():
-        return None
-
-    try:
-        with open(rep_path, "r", encoding="utf-8") as f:
-            rep_data = json.load(f)
-    except Exception:
+    rep_data = _load_faction_rep_from_db()
+    if not rep_data:
+        # fallback to file
+        rep_path = CAMPAIGN_DOCS / "faction_reputation.json"
+        if rep_path.exists():
+            try:
+                with open(rep_path, "r", encoding="utf-8") as f:
+                    rep_data = json.load(f)
+            except Exception:
+                pass
+    if not rep_data:
         return None
 
     rep_text = json.dumps(rep_data, indent=2)[:3000]
@@ -347,10 +416,16 @@ async def _study_failure_logs() -> Optional[str]:
             logger.warning(f"Could not read error log: {e}")
     
     # Check mission failures/expirations
-    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
-    if mission_path.exists():
+    missions = _load_missions_from_db(limit=100)
+    if not missions:
+        mission_path = CAMPAIGN_DOCS / "mission_memory.json"
+        if mission_path.exists():
+            try:
+                missions = json.loads(mission_path.read_text(encoding="utf-8"))
+            except Exception:
+                missions = []
+    if missions:
         try:
-            missions = json.loads(mission_path.read_text(encoding="utf-8"))
             failed_missions = [m for m in missions if m.get("outcome") == "failed"]
             expired_missions = [m for m in missions if m.get("outcome") == "expired"]
             
@@ -416,45 +491,65 @@ async def _study_world_state() -> Optional[str]:
     world_data = []
     
     # Mission data
-    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
-    if mission_path.exists():
-        try:
-            missions = json.loads(mission_path.read_text(encoding="utf-8"))
-            recent = missions[-15:] if len(missions) > 15 else missions
-            completed = sum(1 for m in recent if m.get("resolved") and m.get("outcome") == "completed")
-            failed = sum(1 for m in recent if m.get("resolved") and m.get("outcome") == "failed")
-            expired = sum(1 for m in recent if m.get("resolved") and m.get("outcome") == "expired")
-            world_data.append(f"MISSIONS (last 15): {completed} completed, {failed} failed, {expired} expired")
-        except Exception:
-            pass
+    _missions = _load_missions_from_db(limit=15)
+    if not _missions:
+        mission_path = CAMPAIGN_DOCS / "mission_memory.json"
+        if mission_path.exists():
+            try:
+                _all = json.loads(mission_path.read_text(encoding="utf-8"))
+                _missions = _all[-15:] if len(_all) > 15 else _all
+            except Exception:
+                pass
+    if _missions:
+        completed = sum(1 for m in _missions if m.get("outcome") == "completed")
+        failed    = sum(1 for m in _missions if m.get("outcome") == "failed")
+        expired   = sum(1 for m in _missions if m.get("outcome") == "expired")
+        world_data.append(f"MISSIONS (last {len(_missions)}): {completed} completed, {failed} failed, {expired} expired")
     
-    # PC data
-    char_path = CAMPAIGN_DOCS / "character_memory.txt"
-    if char_path.exists():
-        try:
-            char_text = char_path.read_text(encoding="utf-8")[:2000]
+    # PC data — from MySQL
+    try:
+        from src.db_api import get_character_memory_text
+        char_text = get_character_memory_text()[:2000]
+        if char_text:
             world_data.append(f"PC DATA:\n{char_text}")
-        except Exception:
-            pass
+    except Exception:
+        char_path = CAMPAIGN_DOCS / "character_memory.txt"
+        if char_path.exists():
+            try:
+                world_data.append(f"PC DATA:\n{char_path.read_text(encoding='utf-8')[:2000]}")
+            except Exception:
+                pass
     
-    # Recent news tone
-    news_path = CAMPAIGN_DOCS / "news_memory.txt"
-    if news_path.exists():
-        try:
-            news_text = news_path.read_text(encoding="utf-8")
-            entries = news_text.split("---ENTRY---")[-10:]
-            world_data.append(f"RECENT NEWS THEMES:\n" + "\n".join(entries)[:1500])
-        except Exception:
-            pass
+    # Recent news tone — from MySQL
+    try:
+        from src.db_api import raw_query as _rq_news
+        _news_rows = _rq_news(
+            "SELECT facts FROM news_memory ORDER BY id DESC LIMIT 10"
+        ) or []
+        _news_text = "\n".join(r.get("facts") or "" for r in _news_rows if r.get("facts"))
+        if _news_text:
+            world_data.append(f"RECENT NEWS THEMES:\n{_news_text[:1500]}")
+    except Exception:
+        news_path = CAMPAIGN_DOCS / "news_memory.txt"
+        if news_path.exists():
+            try:
+                news_text = news_path.read_text(encoding="utf-8")
+                entries = news_text.split("---ENTRY---")[-10:]
+                world_data.append("RECENT NEWS THEMES:\n" + "\n".join(entries)[:1500])
+            except Exception:
+                pass
     
     # Faction reputation
-    rep_path = CAMPAIGN_DOCS / "faction_reputation.json"
-    if rep_path.exists():
-        try:
-            rep_data = json.loads(rep_path.read_text(encoding="utf-8"))
-            world_data.append(f"FACTION STANDINGS: {json.dumps(rep_data, indent=2)[:800]}")
-        except Exception:
-            pass
+    _rep = _load_faction_rep_from_db()
+    if not _rep:
+        rep_path = CAMPAIGN_DOCS / "faction_reputation.json"
+        if rep_path.exists():
+            try:
+                _rep = json.loads(rep_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+    if _rep:
+        world_data.append(f"FACTION STANDINGS: {json.dumps(_rep, indent=2)[:800]}")
     
     if not world_data:
         return None
@@ -509,20 +604,17 @@ async def _study_mission_quality() -> Optional[str]:
     Reads the mission_quality_analysis.md skill and applies its criteria
     to evaluate recent missions for patterns and problems.
     """
-    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
-    types_path = CAMPAIGN_DOCS / "generated_mission_types.json"
-    
-    if not mission_path.exists():
+    missions = _load_missions_from_db(limit=30)
+    if not missions:
+        mission_path = CAMPAIGN_DOCS / "mission_memory.json"
+        if mission_path.exists():
+            try:
+                missions = json.loads(mission_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+    if not missions or len(missions) < 5:
         return None
-    
-    try:
-        missions = json.loads(mission_path.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    
-    if len(missions) < 5:
-        return None  # Need enough data to analyze
-    
+
     # Get recent missions with full detail
     recent = missions[-20:] if len(missions) > 20 else missions
     
@@ -563,12 +655,26 @@ async def _study_mission_quality() -> Optional[str]:
     
     # Load current generated types for analysis
     types_text = ""
-    if types_path.exists():
-        try:
-            types_data = json.loads(types_path.read_text(encoding="utf-8"))
-            types_text = "\n".join(types_data.get("types", []))
-        except Exception:
-            pass
+    try:
+        from src.db_api import raw_query as _rq
+        _type_rows = _rq(
+            "SELECT state_value FROM global_state WHERE state_key = 'generated_mission_types'"
+        )
+        if _type_rows and _type_rows[0].get("state_value"):
+            _td = _type_rows[0]["state_value"]
+            if isinstance(_td, str):
+                _td = json.loads(_td)
+            types_text = "\n".join(_td.get("types", []))
+    except Exception:
+        pass
+    if not types_text:
+        _types_path = CAMPAIGN_DOCS / "generated_mission_types.json"
+        if _types_path.exists():
+            try:
+                _td = json.loads(_types_path.read_text(encoding="utf-8"))
+                types_text = "\n".join(_td.get("types", []))
+            except Exception:
+                pass
     
     stats_block = f"""MISSION STATISTICS (last {len(recent)} missions):
 - Completion: {completed} completed, {failed} failed, {expired} expired
@@ -622,26 +728,41 @@ async def _study_mission_type_variety() -> Optional[str]:
     Analyze mission type distribution and generate innovative new types.
     Reads mission_type_innovation.md skill and applies its methods.
     """
-    mission_path = CAMPAIGN_DOCS / "mission_memory.json"
-    types_path = CAMPAIGN_DOCS / "generated_mission_types.json"
-    
-    # Gather current state
+    # Load generated types from DB
     current_types = []
-    if types_path.exists():
-        try:
-            data = json.loads(types_path.read_text(encoding="utf-8"))
-            current_types = data.get("types", [])
-        except Exception:
-            pass
-    
+    try:
+        from src.db_api import raw_query as _rq2
+        _tr = _rq2("SELECT state_value FROM global_state WHERE state_key = 'generated_mission_types'")
+        if _tr and _tr[0].get("state_value"):
+            _td2 = _tr[0]["state_value"]
+            if isinstance(_td2, str):
+                _td2 = json.loads(_td2)
+            current_types = _td2.get("types", [])
+    except Exception:
+        pass
+    if not current_types:
+        _tp = CAMPAIGN_DOCS / "generated_mission_types.json"
+        if _tp.exists():
+            try:
+                current_types = json.loads(_tp.read_text(encoding="utf-8")).get("types", [])
+            except Exception:
+                pass
+
     # Analyze recent mission titles for type patterns
     recent_titles = []
     faction_missions: Dict[str, int] = {}
     objective_words: Dict[str, int] = {}
-    
-    if mission_path.exists():
+
+    missions = _load_missions_from_db(limit=30)
+    if not missions:
+        _mp = CAMPAIGN_DOCS / "mission_memory.json"
+        if _mp.exists():
+            try:
+                missions = json.loads(_mp.read_text(encoding="utf-8"))
+            except Exception:
+                missions = []
+    if missions:
         try:
-            missions = json.loads(mission_path.read_text(encoding="utf-8"))
             for m in missions[-30:]:
                 title = m.get("title", "")
                 recent_titles.append(title)
@@ -719,14 +840,21 @@ Keep it under 1800 characters. Focus on the seeds."""
 # ── Skill File Writer ──────────────────────────────────────────────────
 
 def _count_learned_skills() -> int:
-    """Count how many self-learned skills currently exist."""
+    """Count how many self-learned skills currently exist (from DB, file fallback)."""
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT COUNT(*) AS cnt FROM skills WHERE source LIKE '%self%'") or []
+        if rows:
+            return int(rows[0].get("cnt", 0))
+    except Exception:
+        pass
+    # Fallback: count files
     if not SKILLS_DIR.exists():
         return 0
     count = 0
     for p in SKILLS_DIR.glob("*.md"):
         try:
-            text = p.read_text(encoding="utf-8")
-            if "self-learned" in text.lower():
+            if "self-learned" in p.read_text(encoding="utf-8").lower():
                 count += 1
         except Exception:
             pass
@@ -734,47 +862,54 @@ def _count_learned_skills() -> int:
 
 
 def _save_learned_skill(content: str, name_hint: str) -> bool:
-    """Save a self-learned skill to disk."""
+    """Save a self-learned skill to MySQL (and write-through to file)."""
     if not content or len(content) < 50:
         return False
 
-    # Check limit
     if _count_learned_skills() >= MAX_LEARNED_SKILLS:
         logger.warning("self_learning: max learned skills reached, skipping save")
         _journal(f"SKIPPED: {name_hint} — max learned skills ({MAX_LEARNED_SKILLS}) reached")
         return False
 
-    # Generate filename
     slug = re.sub(r"[^a-z0-9]+", "_", name_hint.lower()).strip("_")
-    ts = datetime.now().strftime("%Y%m%d")
+    ts   = datetime.now().strftime("%Y%m%d")
     filename = f"learned_{slug}_{ts}.md"
-    filepath = SKILLS_DIR / filename
 
-    # If a file with similar name already exists, overwrite it (updated version)
-    existing = list(SKILLS_DIR.glob(f"learned_{slug}_*.md"))
-    if existing:
-        filepath = existing[0]  # overwrite the existing one
-
+    # If a record with a similar slug already exists, reuse its filename
     try:
-        # Bump the version number if overwriting
-        if filepath.exists():
-            old_text = filepath.read_text(encoding="utf-8")
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT filename, body FROM skills WHERE filename LIKE %s LIMIT 1",
+                   (f"learned_{slug}_%",)) or []
+        if rows:
+            filename = rows[0]["filename"]
+            # Bump version number
+            old_text = rows[0].get("body") or ""
             old_version = re.search(r"\*\*Version:\*\*\s*(\d+)", old_text)
             if old_version:
                 new_version = int(old_version.group(1)) + 1
-                content = re.sub(
-                    r"(\*\*Version:\*\*\s*)\d+",
-                    f"\\g<1>{new_version}",
-                    content,
-                )
+                content = re.sub(r"(\*\*Version:\*\*\s*)\d+", f"\\g<1>{new_version}", content)
+    except Exception:
+        # File-based version bump fallback
+        existing = list(SKILLS_DIR.glob(f"learned_{slug}_*.md")) if SKILLS_DIR.exists() else []
+        if existing:
+            filename = existing[0].name
+            try:
+                old_text = existing[0].read_text(encoding="utf-8")
+                old_version = re.search(r"\*\*Version:\*\*\s*(\d+)", old_text)
+                if old_version:
+                    new_version = int(old_version.group(1)) + 1
+                    content = re.sub(r"(\*\*Version:\*\*\s*)\d+", f"\\g<1>{new_version}", content)
+            except Exception:
+                pass
 
-        filepath.write_text(content, encoding="utf-8")
-        logger.info(f"🧠 self_learning: saved skill → {filepath.name}")
-        _journal(f"SAVED: {filepath.name} ({len(content)} chars)")
-        return True
-    except Exception as e:
-        logger.error(f"self_learning: failed to save {filepath.name}: {e}")
-        return False
+    from src.skill_loader import save_skill_to_db
+    ok = save_skill_to_db(content, filename)
+    if ok:
+        logger.info(f"🧠 self_learning: saved skill → {filename}")
+        _journal(f"SAVED: {filename} ({len(content)} chars)")
+    else:
+        logger.error(f"self_learning: failed to save {filename}")
+    return ok
 
 
 # ── Main Learning Routine ──────────────────────────────────────────────
@@ -812,6 +947,8 @@ async def run_learning_session():
         ("failure_analysis",   _study_failure_logs,       "failure_analysis"),
         # World state assessment runs first — guided by LEARNING_PHILOSOPHY
         ("world_state",        _study_world_state,         "world_assessment"),
+        # MODULE QUALITY TRAINING — generates test mission and compares to PDFs
+        ("module_quality_training", study_module_quality,   "module_quality_report"),
         ("news_memory",        _study_news_memory,        "current_events"),
         ("mission_patterns",   _study_mission_patterns,   "mission_patterns"),
         # Mission quality analysis — deep dive into mission health

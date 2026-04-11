@@ -1,0 +1,658 @@
+
+
+--- PAGE 1 ---
+
+[No text extracted]
+
+--- PAGE 2 ---
+
+
+  
+Mother Okawa is a 5e adventure designed for 3-6 Level 4 characters for use with the 5thEdition ruleset.
+P roduct Identity: The following item s are hereby identified as P roduct Identity, as defined in the Open Gam e License version 1.0a,
+Section 1(e), and are not Open Content: All tradem arks, registered tradem arks, proper nam es (characters, deities, etc.), dialogue,
+plots, storylines, locations, characters, artwork, and trade dress. (Elem ents that have previously been designated as Open Gam e
+Content or are in the public dom ain are not included in this declaration.)  
+Open Content: Except for m aterial designated as P roduct Identity (see above), the gam e m echanics of this M onkeyDM  gam e
+product are Open Gam e Content, as defined in the Open Gam ing License version 1.0a Section 1(d). N o portion of this work other
+than the m aterial designated as Open Gam e Content m ay be reproduced in any form  without written perm ission.
+N other Okawa is published by M onkeyDM  under the Open Gam e License version 1.0a. Copyright 2021 M onkeyDM  P ublishing. All
+Rights Reserved
+2
+
+
+--- PAGE 3 ---
+
+
+On the snowy trail that would lead one to the north of Bricia,
+on the m ountainous side of it, m ore precisely, rests Okawa's
+Bath house. For m ost adventurers, this sm all inn with
+oriental design is a safe haven, far from  the otherwise dem on-
+polluted pathways this far north. Here, traders and
+adventurers alike leave behind their worries and let
+them selves be taken care of by Okawa N akam ura Irasawa.
+Despite aging, the hostess has not lost her beauty. Her
+beautiful silver hair and m otherly body have m ade her quite
+beloved around these parts, but even she needs help from
+tim e to tim e.
+However, unbeknownst to the m any travelers and also the
+nearby villagers, M other Okawa, as she is often referred to, is
+not as innocent and as kindly as they m ay think. In truth, the
+m any dem ons that guard the trail and attack whoever dares
+to get near it are little m ore than her devout followers.
+Trickster dem ons, other evil attackers, all of which serve her,
+their Oni M other.
+So when those who are hunted retreat into her inn, hoping
+to be safe, they are treated with a warm  m eal, a cup of
+poisoned tea, and an endless slum ber. The following
+m orning, as far as everyone is concerned, they are back on
+their way, as the Oni M other's favorite followers,
+shapeshifters, take over their place in society and spread her
+influence. Such is Oni M other Okawa's way of gathering
+power. And her plan is alm ost finished.
+W hen dealing with the adventurers, the Oni M other will be
+kind and welcom ing, giving no reason to ever be doubted.
+She's a schem er with a knack for the dram atic.
+    
+This is the first part of a two-part adventure, revolving around
+Oni M other Okawa and her bath house. In case you are
+interested in only a short one-shot, you m ay run this
+adventure independently, as it does not need the second part
+to m ake sense. The second part also does not require this
+first one. Alternatively, you can include these within a
+cam paign for a nice side-quest.
+The first part details her requesting the aid of the players
+in retrieving an old relic with which she says dem ons can be
+repelled. Then, in the second part, she will open a pathway to
+the realm  of spirits in hopes of gaining m ore power. In the
+base adventure, she is defeated at the end of the second part,
+but you can choose to m ake her escape, allowing for further
+encounters later in the story.
+  
+Due to the narrative nature of this adventure, there are three
+possible plot hooks one can give to adventurers.
+On the W ay. M aybe it just so happens that the
+adventurers are heading northwards through the snowy
+m ountains, when they just so happen to stum ble upon the
+m arvelous bath house. Of course, they m ight intend it to
+be just a short stop, but fate has other plans for them .
+W ords Spread Far. Throughout the lands, people praise
+M other Okawa's am azing Bath house, with its spiced teas,
+its unique food and its calm ing hot springs. Hearing all
+that praise, the adventurers have com e for a snack and a
+rest.
+Dem onic Duties. W ord on the streets is that there are a
+whole lot of dem ons around this area, and if there's one
+thing adventurers love to take care of, it is dem ons. N ow
+they've com e by to ensure that these dem ons are indeed
+taken care of.
+Regardless of which plot hook you choose, the adventure
+will proceed in the sam e way.
+      
+  
+In which the players arrive at the bath house.
+      
+Read this:
+'Trudging through the snow, the trip to Okawa's Bath house is
+by no means easy. Whether it be for experienced travellers,
+weary adventurers or just determined traders, this trail is by no
+means easy. Even less so due to the noises that accompany it.
+Out of fear that a demon might hide at every step, every rush
+of wind is cause for concern. One can never be too careful
+around these parts. But that is now all in the past. Not long
+ago, you found yourself at the entrance to a beautiful wooden
+building, with shining lights all around. And there you are now,
+inside the warm interior of the bath house, taking off your
+large winter coats and scarves and finally revealing your faces
+once more.'
+This is a perfect tim e for the characters to introduce
+them selves, that is if they don't know each other already.
+Once that is done, you m ay bring them  to m ap 1, right next to
+area 1.
+        
+1 - Front Desk
+At the front desk, a sm iling young wom an welcom es the
+party. She is M ayeda ( succubus ). Her hair is neatly kept in a
+bun and her kim ono shapes a beautiful physique.
+Mayeda
+Information: An evil spirit and trusted ally of Okawa,Mayeda deceitfully maintains herself as the personat the front desk. She offers nothing but grace,calmness and welcoming. She is also the one incharge of making sure Okawa knows of everyonewho comes in.
+3
+
+
+--- PAGE 4 ---
+
+W ith open arm s and a breathy voice, M ayeda will welcom e
+the adventurers to the inn, stating that lately, things have
+been a little m ore dangerous, so she feels m uch safer now
+than they are here. Any party m em bers who don't believe her
+m ay m ake DC 18 W isdom  (Insight) checks. On a success,
+they figure out she is either being extrem ely polite, or flat-out
+lying. In any case, she offers them  a full stay for one night, 1
+gold a piece each. This price can be negotiated with a DC 14
+Charism a (P ersuasion) check to as low as 8 silver each.
+Once they've discussed with her, she will encourage them  to
+go past her in the com m on room , if they so wish. If instead
+they wish to go straight to the steam  baths, they m ay do that
+too.
+She will also discuss with them  about any other questions
+they m ay have. If they ask about the dem ons nearby, she will
+m ention they have to do with the cave behind the bath house
+once being used by a cult. After receiving this inform ation,
+any party m em ber proficient in the Religion skill m ay m ake a
+DC 14 Intelligence (Religion) check. On a success, they
+rem em ber that there was indeed a cult who used this area as
+grounds for breaking the barrier between worlds and
+sum m oning dem ons.
+GM NOTE: While foreshadowing is nice, be sure tobe very careful as to what tone Mayeda and theother NPCs will use with the party. For theadventure to have a powerful effect, the party can'tdoubt the NPCs too much or too quickly. Whilethis MAY happen, try to prevent it.
+2 - Common Room
+Read this:
+'Stepping through the front doors and straight into a common
+room adorned with a few tables, the smell is what instantly
+draws your attention. A mix of spice, sweetness and steam,
+which you cannot help but feel drawn in by. A meal could
+surely be in order.'
+The players can now choose to sit down and have a m eal if
+they wish to. Once they sit down at a table, a server will bring
+them  hot food way quicker than they expect it. Alongside the
+m ain plates of food, there are also sm all crispy bits of bread,
+sim ilar to fortune cookies, which, when eaten, reveal one of
+the following m essages.
+d4Cookie Message And Effect
+1 Beware! Fighting is upon you! The creature who atethis receives a +5 to initiative.
+2 Your body is a temple. The creature who ate this hasadvantage on saving throws against being poisoned.
+3 That which you think you know, you do not know. Thecreature who ate this has advantage on all Wisdom(Insight) checks.
+4 You are a bastion of inner peace. The creature who atethis is immune to being frightened.
+Any creature m ay only benefit from  only one cookie effect
+at a tim e. If they eat another cookie, the effect of the previous
+one disappears. The effect last for 24 hours.
+Upon having a m eal, the party m ay choose to go wherever
+they wish, but the server will encourage them  to partake in
+their hot steam ed baths.
+GM NOTE: For the story to continue, the partymust go outside. If they choose not to, however,give them a few seconds of silence, before combatnoises start from the outside. Then, they shouldfeel the urge.
+3 - Fire
+Read this:
+'Calmly gathered around the fire, you observe three large
+human men, laughing loudly and warming themselves. They
+seem excited and happy, especially at the sight of brand new
+companions. They look at you with friendly gazes, gesturing
+that you get near them.'
+This is a group of three dretches , all of which are drinking
+Okawa's Shapeshifting Tea. They are trying to keep the party
+close, as they were told to by Okawa. They will try to be as
+friendly as possible and present them selves as Ofo, Yano and
+Hago. They will keep their true identity hidden until com bat
+breaks out.
+Any creature with passive P erception above 16 will notice
+that their bodies are alm ost one with the benches, like they're
+sludge. Also, their sweat seem s to have a weirdly caustic
+sm ell. The party can also m ake a DC 15 W isdom  (Insight)
+check on them . On a success, they realise som ething a little…
+unnatural about them . Their m ovem ents are sluggish and the
+corners of their m outh seem  to m ove too m uch with every
+sm ile.
+If pressed on why they are here, the three will say they are
+travelling m erchants. If pressed further or detected, they will
+attack the party. W hen this happens, proceed to the next
+chapter.
+4
+    
+Potion, rare
+Upon drinking this potion, you gain the ability toshapeshift into a medium humanoid for 1 hour.
+
+
+--- PAGE 5 ---
+
+4 - Frog Pond
+Read this:
+'Lowly croaking from their pond, you observe two seemingly
+innocent toads, both of which are looking at you with an
+intense look, though it is also filled with frog-like indifference.'
+The two toads are actually shapeshifted quasits , which will
+slowly begin approaching the party and the dretches. Any
+party m em ber m ay observe them  with a DC 14 Intelligence
+(Nature) check, realising that in this clim ate they should
+surely be freezing to death or boiling alive in the water.
+Once they are within m elee with any party m em ber or
+som eone has tried touching them , they will spring into the
+sky and turn into their true form , thus beginning com bat.
+W hen this happens, proceed to the next chapter.
+5 - Bath
+Read this:
+'Off to the side, you notice five or so commoners, male and
+female alike, all enjoying their time in silence, revelling in the
+warm waters, with everything but their heads submerged.'
+In this area, five com m oners, both m ale and fem ale alike, are
+bathing in the warm  water, enjoying rest. Once the fight
+breaks out, they will com ically run away, still naked, until they
+get inside. This should add to the sense of urgency the party
+feels, as they m ust defend this bastion of rest.
+6 - Bath
+Read this:
+'Off to the other side, you notice another group of
+commoners, all of them in the water, with one man of amazing
+beauty also enjoying his time within the water.'
+Just like in the previous area, com m oners are resting in the
+water. Am ongst them  is also Saito ( incubus ), who will not
+attack the party, but rather watch and observe their strengths.
+He is also a follower of Okawa.
+7 - Cave
+Read this:
+'Majestic and yet frightening, the back of this large courtyard
+gives way to a gigantic skull, the nature of which you are
+unsure, but it is most likely demonic. It seems to lead way into
+a dark, deep cave, but you see it has mostly been sealed off
+with well-placed rocks and planks of wood. Yet, some small
+cracks are ever apparent, to such an extent that you can see a
+bat resting at the top of the skull. You are unsure what it's
+waiting for, but it is there, ever-watchful.'
+Map Created by Ori The Cartographer
+Join their Patreon to access to multiple variationsof this map and more !
+MAP 1: Okawa's Bath house
+5
+
+
+--- PAGE 6 ---
+
+The bat is a third quasit , who is watching. If the party gets
+near the cave, it will drop down and instantly attack them .
+W hen this happens, proceed to the next chapter.
+In addition, the party can stealthily m ove past the bat with
+a DC 16 Dexterity (Stealth) check, which allows them  to
+get within the skull. The skull can then be analyzed with a DC
+16 Intelligence (Arcana) check, revealing it is m ost
+definitely that of a gigantic dem on. Once the quasits and
+dretches are defeated, the party can explore the insides of the
+skull without needing to be stealthy.
+8 - Kitchen
+The entrance to this location is locked, but it is where Okawa
+is currently residing, m aking food for the guests.
+      
+Once com bat has been prom pted, either by attacking the
+frogs, discovering the identity of the dretches or angering the
+bat, the party will have to fight 3 quasits and 3 dretches.
+W hile this happens, all the com m oners will begin running
+away inside the inn and the dretches return to their true
+form .
+Throughout the battle, the quasits will speak to each other
+in abyssal. If any party m em ber understands abyssal, they'll
+hear them  say things like:
+"This plan better work!"
+"I'm  going back to the Abyss for this!"
+"Adventurers… yuck!"
+After they are all defeated, read this:
+'As you lay waste to the final remains of the demonic presence
+around you, you begin the rapid sound of sandals stepping on
+stone and snow. From behind you, you notice a beautiful
+female figure. Despite her age, there is no doubt this woman
+is still within her prime. A mane of beautiful silver-white hair
+descends upon her shoulders and her stunning, perfectly-
+symmetrical face. She comes towards all of you with a
+concerned look. "Are you alright?" she asks, visibly frightened.
+"I am Mother Okawa. Are you hurt?" She says, looking around
+frantically.'
+This is, in fact, Oni M other Okawa.
+Oni Mother Okawa
+Information: Upon hearing adventurers have comein her direction, she has set up a manipulative plan,through which she'll trick them into getting her thelast thing she needs in order to open a portal to thespirit realm and grow even more powerful thanbefore. For now, she'll play up her fear and ask fortheir aid.
+To start off, M other Okawa will thank them  for saving her
+patrons, before asking them  to join her around the fire.
+There, she'll explain that the only reason her Bath house has
+survived in a land with so m any dem ons is because of her
+enchanting. Upon hearing this, any party m em ber with
+proficiency in the Arcana skill m ay m ake a DC 18
+Intelligence (Arcana) check. On a success, they deduce that
+to defend an entire building from  dem ons, her powers are
+either arcane or holy, but either way they are of a high power
+level. Okawa will explain that she drains the power of relics
+that she buys, in order to ensure the safety of the bath house.
+However, this power is slowly being drained and now dem ons
+can push through even within this safe haven.
+For the entire duration of this discussion, any party
+m em ber m ay attem pt a DC 18 W isdom  (Insight) check to
+see if she is telling the truth. On a success, they notice she is
+not telling a com plete story, although they can't exactly place
+what she is being deceitful about.
+Then, she will ask the party to join her som ewhere safer,
+where they can talk in private. W hen she does, proceed to the
+next chapter.
+    
+Read this:
+'With a quickened pace and a gentle step, Mother Okawa takes
+you to the side of the main building you had made your way
+into originally. She unlocks a sliding door, before leading you
+inside what you instantly recognize to be a small kitchen. The
+smells are intense and poignant and there barely is enough
+room for one person, let alone the whole lot of you. Despite
+that, she locks the door behind you with a sigh. "I feel much
+safer talking in private. I no longer know who to trust and who
+to be weary of. I must show you something." She utters those
+words, before she begins searching around frantically.'
+The party now finds them selves in the kitchen (area 8). Any
+party m em ber with a passive P erception higher than 16 will
+notice a few sm all vials in the corner of the room , as well as
+incense and sm all bones. They will also notice a strong sm ell
+of Crestbloom , a local flower. They m ay attem pt to steal any
+of these with a DC 16 Dexterity (Sleight of Hand) check.
+On a failure, Okawa will spot them , get extrem ely defensive
+and say that those things are for her own protection spells,
+not for their taking.
+If stolen, the incense is 50 gold's worth, the vials seem  to
+be blood of som e sort. The blood vials and the bones can be
+analyzed with a DC 20 Intelligence (M edicine) check,
+revealing them  to be hum anoid child bones and blood.
+6
+
+
+--- PAGE 7 ---
+
+After a few seconds inside the cham ber, read this:
+'After a short bit of rummaging, Okawa takes out a large,
+leather-bound tome. It looks vaguely dusty and it carries its
+own lock. You watch as she takes a key from around her neck,
+unlocks the tome and flips it over to a page, about midday
+through. "Through this tome, I search for artifacts to help
+repel the demons of this region. One particularly powerful one
+is said to not be too far off. I even paid a few adventurers to go
+and fetch it and yet… they never came back. But I fear it might
+be my only chance. By now, demons have gotten inside the
+bath house itself. We're too close to danger. Please, I need
+your aid! It's not too far off from here. Most certainly, you'll
+find it in a cave nearby. It's our only chance to maintain the
+bath house." Okawa then points your attention towards a
+drawing on the page she opened. It depicts an amulet of sorts,
+with a large gem in the middle.'
+Any player proficient in the Arcana or Religion skill m ay ask
+for a look over the book. If they do, they m ust m ake a DC 20
+Intelligence (Arcana) or (Religion) check, noticing that the
+am ulet, alongside the look of the book, gives off a ritualistic
+and occult sensation, alm ost as if their m agic is of a different
+kind altogether. Okawa will then propose to the party that
+they aid her, telling her she'll pay them  3000 gold in return for
+their aid. Any player m ay m ake a DC 18 W isdom  (Insight)
+check to see if she is telling the truth and they will find that
+she is com pletely and utterly truthful.
+Once the party agrees to do this for her, she'll suggest they
+either take a short or long rest, before they finally get going.
+Once they start their journey, proceed to the next chapter.
+        
+In which the players go on a journey through the frost and
+find an artifact.
+    
+GM NOTE: As this is supposed to be a one-shot,the travel portion of this adventure isn't too long.Alternatively, of course, you may add any amountof length to it, in case you'd like to make this into alonger arc. What should be noted, however, is thatif you want to run the second part of the adventure,your players should be level 5.
+Read this:
+'Not long after your arrival at this beautiful bath house, you
+once again find yourselves out in the cold, outfitted with
+whatever warm tea and rations Okawa could spare for you. As
+far as she knows, the journey shouldn't lead you too far, only a
+short climb a way, in fact, through the snow makes it all the
+more difficult to navigate the surrounding area.'
+To start off the expedition, ask the party for a m arching order.
+The first person in the m arching order m ust m ake a DC 15
+W isdom  (Survival) check to help navigate the party
+throughout the snow. On a success, they walk at a continuous
+pace. On a failure, the party becom es lost for a while. All
+party m em bers that are not resistant to cold dam age m ust
+m ake a DC 15 Constitution saving throw. On a failure, they
+take 2d8 cold dam age from  the trek through the snow.
+Map Created by Ori The Cartographer
+Join their Patreon to access to multiple variationsof this map and more !
+MAP 2: Snowy Path
+7
+
+
+--- PAGE 8 ---
+
+After they've found their way, the party will continue, finding
+them selves in a gorge. Bring them  onto m ap 2.
+Then, read this:
+'You push through the harsh weather and feel the distant
+storm approaching. Due to the clouds, you're unsure if you're
+close to nightfall or not, but what you are sure of is that soon
+enough, a storm will come, so you have to push through
+before it catches you out.'
+At any point, any player m ay choose to look around, m aking a
+DC 14 W isdom  (P erception) check. On a success, they
+notice sm all flakes of frost and ice slowly form . In addition, if
+they roll 18 or higher, they also begin to hear subtle laughter.
+Read this:
+'As you continue on, you begin to hear the wind picking up.
+You see as icy fog gathers around you and the only things
+distinguishable in the darkness here and there are icicles of
+sorts, set up almost like outcroppings which one could hold
+onto to push themselves forward.'
+All of the icicles are hidden ice m ephits. There are 6 of them
+in total. W hen the party gets closer to them , they will am bush
+them  with cackling laughter, thus triggering a com bat
+encounter. Once all of them  are defeated, proceed to the next
+chapter.
+        
+W ith the ice m ephits defeated, the party presses on, but the
+storm  begins to catch them  from  behind. Snowfall gets m ore
+and m ore prom inent and pushing through becom es even
+harder than it was before. In order to continue on, each party
+m em ber m ust m ake a DC 15 Strength (Athletics) check,
+m oving through the snowy terrain. On a failure, they take 2d6
+bludgeoning dam age and have their m ovem ent speed halved
+until they take a long rest.
+Read this:
+'You push as hard as you can, and yet the weather doesn't
+seem to ease, as if the spirits of this entire land are pushing
+you away and fighting against you, willing you to stop. And yet,
+you were told that the cave is nearby… Surely, you can find it.
+It can't be too far off.'
+In order to find the cave, the party m ust now m ake a final
+push through the storm . They m ust all m ake a DC 16
+W isdom  (P erception) check. If at least one of the party
+m em bers succeeded, they notice a large outcropping of rock,
+which seem s to indicate a cave entrance akin to that which
+Okawa described.
+GM NOTE: In the sad situation where all yourplayers fail this check, simply have them makeanother DC 15 Constitution saving throw , taking2d8 cold damage on a failure. Then, allow them totry the check again. Repeat the process until theysucceed. Hopefully this won't take too many tries,or someone might die.
+W hen they finally reach the cave, read this:
+'Pushing through the final leg of your journey, you fall to the
+ground under the cover of rock and stone, at the entrance of a
+cave of sorts. Though the cold is still as strong here, you find
+yourself thankful that the wind is prevented, same for the
+snowfall. You take in a deep breath, before listening to the
+wind. It's only going to get worse. Hopefully, this is the cave
+you're looking for. What strikes you as odd, as you begin
+walking inside the cave, is that light is coming from inside. A
+consistent and low blue light. Yet you are unsure what this
+could be.'
+Before going any further, any party m em ber with a passive
+P erception above 16 will hear distant howls, deep within the
+storm .
+Then, bring them  to m ap 3.
+W ithin every cham ber, they can choose to inspect and look
+around with a DC 14 Intelligence (Investigation) check, but
+they won't find anything like the am ulet. If they choose to just
+perceive, they can m ake a DC 14 W isdom  (P erception)
+check, which will reveal a sound com ing from  the back part
+of the cave, like that of a consistent pulse.
+The sources of light can also be exam ined with a DC 14
+Intelligence (Arcana) check, revealing they are indeed
+m agical in nature.
+      
+1 - Monster Skull
+Read this:
+'The moment you walk in, the first thing you notice is quite a
+large skull, bestial in nature, which looks to be picked clean of
+any muscle, flesh or anything of the like. Bits of it seem
+scratched and broken, but you are unsure of the source.'
+The skull can be inspected with a DC 14 Intelligence
+(M edicine) check. On a success, they notice that the bite and
+scratch pattern is consistent with that of a wolf or a pack of
+wolves.
+8
+
+
+--- PAGE 9 ---
+
+2 - Narrow Tunnel
+Read this:
+'Moving through the narrow tunnel, you begin to observe bits
+of fur stuck on the rock and stone, with some places having
+more than others, as if someone, or something, was
+scratching themselves with their back against that portion of
+rock.'
+M oving through, every creature m ust m ake a DC 14
+Dexterity (Acrobatics) check. On a failed check, they
+scratch them selves against the rocks and take 1d4 slashing
+dam age.
+GM NOTE: The damage is low, but this will helpease in the dramatic tension of this tunnel beingnarrow and them not knowing what is at the otherend.
+3 - Blood Pool
+Read this:
+'P ast the tunnel, in a sm all, circular cham ber, you find what
+can only be described as the rem nants of bone m arrow, the
+contents of which are leaking into a natural pool form ed on
+the stone. You are unsure, once again, what creature has
+caused this, but the bones are incredibly large. W hatever
+creature calls this place its own, it's not friendly.'
+4 - Piles of Gold
+Here, the lucky adventurers can find 2000 gold coins, m aking
+their journey here worth it.
+GM NOTE: If you are playing in a world where goldis much scarcer, do not be afraid to lower thisamount.
+5 - Amulet Puzzle
+Read this:
+'You feel as if you are nearing the source of the pulse, when
+you turn and the sound is indeed greater. A chamber, quite
+narrow and uncomfortable, in which rest six pillars. The central
+one, pulsing with bright blue light, seems to hold aloft,
+levitating, the amulet. Its silvery necklace and sapphire gem
+shine beautifully. The other 5 pillars also all shine, from small
+runic rocks, but most of them in different colors.'
+In order to retrieve the am ulet, the party m ust solve the
+puzzle. The am ulet itself will be locked behind a wall of force
+until they do.
+Map Created by Ori The Cartographer
+Join their Patreon to access to multiple variationsof this map and more !
+MAP 3: Cave
+9
+
+
+--- PAGE 10 ---
+
+GM NOTE: In order to better understand thispuzzle, I recommend writing it down on a piece ofscrap paper. I'll try my best to explain it in writing,but the visuals are somewhat necessary.
+There are 5 pillars with runes on them . For the purposes of
+explaining the puzzle, they will be called 5A, 5B, 5C, 5D and
+5E. Each of the 5 pillars has 1 color and when a rune is
+touched, it will switch in color. The order of the colors is the
+following:
+Blue - Red - Green - Yellow
+After that, it will repeat, going in the sam e order (so after
+Yellow, you go once again to Blue, then Red, then Green).
+The pillars start with the following colors:
+A is Blue
+B is Green
+C is Blue
+D is Yellow
+E is Red
+If any of their runes are touched, they will trigger the
+following rules:
+If A is touched, no rune will shift color. A will always be
+blue.
+If B is touched, B, C, D and E will all change color.
+If C is touched, C, D and E will change color.
+If D is touched, D will change color.
+If E is touched, D and E will change color.
+The aim  of the gam e, which should be evident from  the fact
+that A never changes color, is to press the runes in such a way
+that all of them  are blue. Once they have all been m ade blue,
+the wall of force will dissipate and the necklace will be
+accessible.
+GM NOTE: If the players are lost, allow them tomake a DC 14 Intelligence (Arcana) check. If they aresuccessful, give them clues as to how to solve thepuzzle. Such clues may be something as vague astelling them to press runes further or something asstraight-forward as telling them they are fishing fora specific color. This is up to how difficult youwant it to be for them.
+Once the puzzle has been solved, read this:
+'As you turn all five of the runes blue, you hear the sound of
+stone turning against stone. You hesitate for a second,
+uncertain if you should stay or flee. Then, the sound of pulsing
+magic dissipates and you watch as the amulet drops to your
+feet.'
+Once the am ulet is reclaim ed, proceed to the next chapter.
+        
+Read this:
+'With the amulet in your hands, you move yourselves with a
+quickened step, dashing back through the cave and all the way
+to the entrance. You look outside, only to see that the storm is
+still brewing. Then, the storm snarls. From the frost and snow
+outside, a ferocious beast vaults into the cave, larger than all
+of you and bearing its teeth. A gigantic winter wolf stares you
+down, looking at you with an angry look. "What are you
+doing?" He speaks in a growling, weirdly humanoid voice.
+"That amulet is not yours for the taking!" Then, he begins to
+draw in a frosted breath, ready to release his fury. Roll
+initiative!'
+The party m ust now fight the winter wolf guardian of the
+am ulet, alongside two other ice m ephits that will join him
+from  the outside of the cave. The winter wolf will exclusively
+target the creature carrying the am ulet, even to the point of
+death, so the party should try to bounce the am ulet between
+each other in order to keep them selves healthy. To do this
+easier, allow them  to throw the am ulet between each other
+with a DC 14 Dexterity check as a bonus action.
+Once the winter wolf is finally defeated, he will howl out a
+final tim e, as the storm  outside picks up even m ore.
+Encourage the party to sleep in the cave by describing just
+how intense the storm  looks. Then, after a long rest, the next
+m orning, give the players a level up.
+P roceed to the next chapter.
+      
+
+In which the party trium phantly returns hom e.
+      
+Read this:
+'Not long after you stir awake, you watch the sky has cleared
+up and the clouds have lifted. You get up and begin your
+journey back home victorious. A few hours later, with the
+amulet in hand, you move through, the pathway being much
+easier to travel with now clouds around. Not long after, you
+find your way home, in front of Okawa's Bath house, where
+Mayeda welcomes you with a bright smile. "Mother Okawa will
+be so joyous you have brought this! I can't wait to tell her!"
+She smirks, before leaving to find Mother Okawa.'
+The party is now back at the bath house and they m ay rest.
+After a few m om ents, M other Okawa returns with their pay
+and takes the am ulet.
+10
+
+
+--- PAGE 11 ---
+
+GM NOTE: If you intend on only running this partof the adventure, or would like to keep MotherOkawa around a little longer before revealing hertrue identity, you may end the adventure here.Otherwise, if you want to leave players with acliffhanger, proceed to the next session.
+          
+After getting the am ulet and paying the players, M other
+Okawa once again asks them  to join her around the fire
+outside, saying she has prepared a cup of tea for all of them .
+She says this tea will refresh their strength. Only a DC 20
+W isdom  (Insight) check will reveal she is lying.
+Once everyone has drank from  the tea, read this:
+'Taking a sip of her own tea, Okawa begins to speak. "I am so
+very thankful for your aid. This amulet will aid me in finally
+being safe… Well, more than safe. Strong. You see, there is a
+little bit of deceit that comes with what I do. I must offer the
+complete illusion of safety, even when it's only partial. Like in
+this case…" As she smiles, she grabs onto her hair and begins
+to untighten it, letting it flow loose over her body. Weirdly
+enough, you watch as her skin also turns a different shade…
+Almost… redder. She smirks. Her voice now rings with a
+demonic element to it. "Few would think their saviour in such
+a place is also their damnation. But no bother. The tea should
+be paralyzing you right about now. And with this amulet, I can
+finally open the path to the spirit realm." She smirks, and looks
+towards Mayeda, who has come out. "Mayeda, bring out the
+sacrifices!" Maydea nods her head, "Yes, Oni Mother." She
+says, as your body begins to tense and the magical tea
+paralyzes all of you.'
+And that's where the adventure ends. Or does it?
+11
+
+
+--- PAGE 12 ---
+
+Thank You !Thank You !Thank You !Thank You !Thank You !
+A big thank you to all of those who follow and
+support me, without you I couldn't have brought
+this project to life.
+Cover art by Rerin_kin, used with permission.
+Maps created by Ori The Cartographer.
+And now onto the next project...
+Cheers !
+If you enjoyed this one-shot, you can joinus on Patreon to access plenty of otheradventures ! As well as tons of contentfor 5e to amaze players and GMs !
+A massive thank you to all mypatrons !

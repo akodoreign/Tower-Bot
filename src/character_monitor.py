@@ -30,6 +30,10 @@ from typing import Optional
 import httpx
 
 from src.log import logger
+from src.db_api import (
+    get_character_snapshot, save_character_snapshot,
+    get_previous_snapshot, cleanup_old_snapshots
+)
 
 # ---------------------------------------------------------------------------
 # Campaign characters — IDs hardcoded, names for display
@@ -49,8 +53,9 @@ CAMPAIGN_CHARACTERS = [
 DDB_BASE      = "https://character-service.dndbeyond.com/character/v5/character"
 POLL_INTERVAL = 30 * 60   # 30 minutes between full sweeps
 REQUEST_GAP   = 8         # seconds between individual character fetches
-SNAPSHOT_DIR  = Path(__file__).resolve().parent.parent / "campaign_docs" / "char_snapshots"
-SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+
+# Keep file-based backup for character_memory.txt updates
+DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 
 # Stat IDs as DDB returns them
 _STAT_NAMES = {1: "STR", 2: "DEX", 3: "CON", 4: "INT", 5: "WIS", 6: "CHA"}
@@ -71,46 +76,31 @@ _NOTE_FIELDS = [
 
 
 # ---------------------------------------------------------------------------
-# Snapshot persistence
+# Snapshot persistence (DATABASE-BACKED)
 # ---------------------------------------------------------------------------
 
-def _snapshot_path(char_id: int) -> Path:
-    """Current snapshot path."""
-    return SNAPSHOT_DIR / f"{char_id}.json"
-
-
-def _prev_snapshot_path(char_id: int) -> Path:
-    """Previous snapshot — the last known state before the current one."""
-    return SNAPSHOT_DIR / f"{char_id}_prev.json"
-
-
 def _load_snapshot(char_id: int) -> Optional[dict]:
-    """Load current snapshot."""
-    p = _snapshot_path(char_id)
-    if not p.exists():
-        return None
+    """Load latest snapshot from database."""
+    result = get_character_snapshot(char_id)
+    if result and result.get("snapshot_json"):
+        return result["snapshot_json"]
+    return None
+
+
+def _load_previous_snapshot(char_id: int) -> Optional[dict]:
+    """Load previous snapshot from database."""
+    result = get_previous_snapshot(char_id)
+    if result and result.get("snapshot_json"):
+        return result["snapshot_json"]
+    return None
+
+
+def _save_snapshot(char_id: int, char_name: str, player: str, snapshot: dict) -> None:
+    """Save new snapshot to database. Keeps only last 5 snapshots per character."""
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-
-
-def _save_snapshot(char_id: int, snapshot: dict) -> None:
-    """Save new snapshot. Rotates: current → prev, new → current.
-    Only keeps 2 versions per character — prev is deleted after next save."""
-    cur_path  = _snapshot_path(char_id)
-    prev_path = _prev_snapshot_path(char_id)
-
-    try:
-        # Rotate: current becomes previous (overwrite old prev)
-        if cur_path.exists():
-            import shutil
-            shutil.copy2(str(cur_path), str(prev_path))
-
-        # Write new current
-        cur_path.write_text(
-            json.dumps(snapshot, indent=2), encoding="utf-8"
-        )
+        save_character_snapshot(char_id, char_name, player, snapshot)
+        # Cleanup old snapshots (keep last 5)
+        cleanup_old_snapshots(char_id, keep_count=5)
     except Exception as e:
         logger.error(f"📊 Snapshot save error for {char_id}: {e}")
 
@@ -428,13 +418,48 @@ def _find_character_block(text: str, char_name: str) -> tuple[int, int] | None:
 
 def _update_character_memory(char_name: str, snap: dict) -> bool:
     """
-    Update the matching character block in character_memory.txt with fresh DDB data.
+    Update mechanical fields for a character in MySQL player_characters table.
+    Also keeps character_memory.txt in sync as a fallback/RAG source.
     Only updates mechanical fields (class, HP, stats, XP, currency, inventory).
     Preserves manual fields (ORACLE NOTES, PERSONALITY, etc).
-    
+
     Returns:
         True if updated successfully, False otherwise
     """
+    import json as _json
+    # --- MySQL update ---
+    try:
+        from src.db_api import raw_query as _rq, raw_execute as _rx
+        rows = _rq("SELECT id, profile_json FROM player_characters WHERE name=%s", (char_name,))
+        if rows:
+            profile = rows[0].get("profile_json") or {}
+            if isinstance(profile, str):
+                try:
+                    profile = _json.loads(profile)
+                except Exception:
+                    profile = {}
+            # Overwrite mechanical keys
+            if snap.get("classes"):
+                profile["CLASS"] = " / ".join(f"{c} {l}" for c, l in snap["classes"].items())
+            if snap.get("max_hp"):
+                profile["HP"] = str(snap["max_hp"])
+            if snap.get("stats"):
+                profile["STATS"] = " | ".join(f"{k} {v}" for k, v in snap["stats"].items())
+            if snap.get("currencies"):
+                cur_parts = [f"{v}{k.upper()}" for k, v in snap["currencies"].items() if v > 0]
+                profile["CURRENCY"] = ", ".join(cur_parts) if cur_parts else "0GP"
+            if snap.get("xp") is not None:
+                profile["XP"] = str(snap["xp"])
+            cls_str = profile.get("CLASS", "")
+            _rx(
+                "UPDATE player_characters SET class_name=%s, profile_json=%s, updated_at=NOW() WHERE id=%s",
+                (cls_str, _json.dumps(profile, ensure_ascii=False), rows[0]["id"])
+            )
+            logger.info(f"📊 {char_name}: player_characters DB updated")
+    except Exception as e:
+        logger.warning(f"📊 {char_name}: DB update failed ({e}), falling back to file only")
+
+    # --- txt file update (keep in sync for RAG) ---
     mem_file = Path(__file__).resolve().parent.parent / "campaign_docs" / "character_memory.txt"
     if not mem_file.exists():
         logger.warning(f"📊 character_memory.txt not found")
@@ -532,14 +557,14 @@ async def run_character_monitor(channel) -> None:
     logger.info("📊 Character monitor loop started")
 
     # On first run, seed snapshots silently so we have a baseline to diff against.
-    first_run = not any(_snapshot_path(c["id"]).exists() for c in CAMPAIGN_CHARACTERS)
+    first_run = not any(_load_snapshot(c["id"]) for c in CAMPAIGN_CHARACTERS)
     if first_run:
         logger.info("📊 First run — seeding character snapshots silently...")
         for char_info in CAMPAIGN_CHARACTERS:
             data = await _fetch_character(char_info["id"])
             if data:
                 snap = _parse_snapshot(data)
-                _save_snapshot(char_info["id"], snap)
+                _save_snapshot(char_info["id"], char_info["name"], char_info["player"], snap)
                 logger.info(f"📊 Seeded: {snap['name']} (level {snap['total_level']})")
             await asyncio.sleep(REQUEST_GAP)
         logger.info("📊 Snapshots seeded. Monitoring begins next cycle.")
@@ -588,7 +613,7 @@ async def _check_character(char_info: dict, channel) -> str:
 
     # First time seeing this character — save silently
     if old_snap is None:
-        _save_snapshot(char_id, new_snap)
+        _save_snapshot(char_id, char_name, player, new_snap)
         logger.info(f"📊 {char_name}: initial snapshot saved")
         return "seeded"
 
@@ -599,16 +624,18 @@ async def _check_character(char_info: dict, channel) -> str:
         return "ok"
 
     # Something changed — save new snapshot and post embed
-    _save_snapshot(char_id, new_snap)
+    _save_snapshot(char_id, char_name, player, new_snap)
     logger.info(f"📊 {char_name}: {len(changes)} change(s) detected")
 
     # Update character_memory.txt so the Oracle has fresh data
+    # Use the DDB name (new_snap["name"]) which matches character_memory.txt format
+    ddb_name = new_snap.get("name", char_name)
     try:
-        success = _update_character_memory(char_name, new_snap)
+        success = _update_character_memory(ddb_name, new_snap)
         if not success:
-            logger.warning(f"⚠️ {char_name}: character_memory.txt update failed — Oracle data may be stale")
+            logger.warning(f"⚠️ {ddb_name}: character_memory.txt update failed — Oracle data may be stale")
     except Exception as e:
-        logger.error(f"❌ {char_name}: character_memory.txt update exception: {e}")
+        logger.error(f"❌ {ddb_name}: character_memory.txt update exception: {e}")
 
     if channel is None:
         return "changed"  # changes detected but no channel to post to
@@ -652,6 +679,9 @@ async def _check_character(char_info: dict, channel) -> str:
                 value=f"[D&D Beyond](https://www.dndbeyond.com/characters/{char_id})",
                 inline=True,
             )
-        await channel.send(embed=embed)
+        try:
+            await channel.send(embed=embed)
+        except Exception as send_err:
+            logger.error(f"📊 Failed to send embed for {new_snap['name']}: {send_err}")
 
     return "changed"

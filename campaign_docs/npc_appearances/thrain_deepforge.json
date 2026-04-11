@@ -1,0 +1,28 @@
+{
+  "name": "Thrain Deepforge",
+  "species": "Dwarf",
+  "faction": "Serpent Choir",
+  "rank": "Petitioner",
+  "role": "mercenary",
+  "home_district": "",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "a stocky dwarf of roughly 4.5 feet, broad-shouldered and dense-muscled, his weathered bronze skin etched with faint runes and a jagged scar across his brow, eyes sharp and amber-bright beneath a thick shock of ash-gray beard; he leans against a rusted crate in the Black Market Bazaar, his tunic of frayed jade-green silk slashed with serpent-scale patterns, chainmail links glinting beneath soot-streaked leather, a crossbow slung across his back and a warhammer scarred with old battle-rust, one hand clutching a contract seal pendant coiled like a living serpent around his neck.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}

@@ -6,7 +6,7 @@ KimiAgent is optimized for complex, multi-step reasoning tasks:
     - Mission generation (multiple interconnected elements)
     - Multi-step analysis
 
-Uses a larger local model (e.g., qwen:32b, mistral, llama3:70b) via Ollama.
+Uses a larger local model (e.g., qwen3-8b-slim:latest, qwen:32b, llama3:70b) via Ollama.
 Runs 100% locally — no cloud required.
 
 Configuration via environment variables:
@@ -33,7 +33,7 @@ class KimiAgent(BaseAgent):
     Uses a larger local model for tasks requiring more reasoning depth
     than QwenAgent. Runs 100% locally — no cloud required.
     
-    Recommended models: qwen:32b, mistral, llama3:70b, mixtral
+    Recommended models: qwen3-8b-slim:latest, qwen:32b, llama3:70b
     
     Best for:
         - News bulletin generation
@@ -50,7 +50,7 @@ class KimiAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         """Return Kimi-specific configuration."""
-        model = os.getenv("KIMI_MODEL", "qwen:32b")  # Local model default
+        model = os.getenv("KIMI_MODEL", "qwen3-8b-slim:latest")  # Local model default
         base_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
         enable_subagents = os.getenv("KIMI_ENABLE_SUBAGENTS", "false").lower() == "true"  # Disabled by default
         

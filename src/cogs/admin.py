@@ -1,7 +1,9 @@
 """Admin, settings, and utility commands — /sync, /provider, /switchpersona,
-/private, /replyall, /help, /towerbay, /myauctions, /newsdraft."""
+/private, /replyall, /help, /towerbay, /myauctions, /newsdraft, /patches."""
 
 import os
+import re
+from pathlib import Path
 import discord
 from discord import app_commands
 
@@ -9,6 +11,217 @@ from src.log import logger
 from src.providers import ProviderType
 from src import personas
 from src.player_listings import _TowerBayModal, format_player_listings_embed
+
+
+# ---------------------------------------------------------------------------
+# Patch approval system
+# ---------------------------------------------------------------------------
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PATCHES_FILE = PROJECT_ROOT / "skills" / "module-quality" / "PATCHES.md"
+
+
+def _parse_pending_patches() -> list:
+    """
+    Parse PATCHES.md and return list of pending patches.
+    
+    Each patch dict has: id, timestamp, mission, score, content, status
+    """
+    if not PATCHES_FILE.exists():
+        return []
+    
+    try:
+        text = PATCHES_FILE.read_text(encoding="utf-8")
+    except Exception:
+        return []
+    
+    patches = []
+    
+    # Find patch sections: "## Patches from YYYY-MM-DD HH:MM"
+    sections = re.split(r"\n---\n", text)
+    
+    for section in sections:
+        if "## Patches from" not in section:
+            continue
+        
+        # Extract header info
+        header_match = re.search(r"## Patches from (\d{4}-\d{2}-\d{2} \d{2}:\d{2})", section)
+        mission_match = re.search(r"\*\*Test Mission:\*\*\s*(.+)", section)
+        score_match = re.search(r"\*\*Quality Score:\*\*\s*(\d+)/10", section)
+        
+        timestamp = header_match.group(1) if header_match else "Unknown"
+        mission = mission_match.group(1).strip() if mission_match else "Unknown"
+        score = score_match.group(1) if score_match else "?"
+        
+        # Find individual patches: "### Patch N"
+        patch_blocks = re.split(r"### Patch \d+", section)
+        
+        for i, block in enumerate(patch_blocks[1:], 1):  # Skip first (header)
+            # Extract content between ``` markers
+            content_match = re.search(r"```\n?(.+?)\n?```", block, re.DOTALL)
+            status_match = re.search(r"\*\*Status:\*\*\s*(⏳|✅|❌|�\udd04)\s*(\w+)", block)
+            
+            content = content_match.group(1).strip() if content_match else block.strip()[:500]
+            status = status_match.group(2) if status_match else "PENDING"
+            
+            if status == "PENDING":
+                patch_id = f"{timestamp.replace(' ', '_').replace(':', '')}_{i}"
+                patches.append({
+                    "id": patch_id,
+                    "timestamp": timestamp,
+                    "mission": mission,
+                    "score": score,
+                    "content": content,
+                    "status": status,
+                    "index": i,
+                })
+    
+    return patches
+
+
+def _update_patch_status(patch_id: str, new_status: str) -> bool:
+    """
+    Update a patch's status in PATCHES.md.
+    
+    Args:
+        patch_id: Patch identifier (timestamp_index)
+        new_status: New status ("✅ APPROVED", "❌ REJECTED", "�\udd04 MODIFIED")
+    
+    Returns:
+        True if updated, False if not found
+    """
+    if not PATCHES_FILE.exists():
+        return False
+    
+    try:
+        text = PATCHES_FILE.read_text(encoding="utf-8")
+    except Exception:
+        return False
+    
+    # Parse patch_id to get timestamp and index
+    parts = patch_id.rsplit("_", 1)
+    if len(parts) != 2:
+        return False
+    
+    ts_part, idx_str = parts
+    # Reconstruct timestamp format: "YYYY-MM-DD_HHMM" -> "YYYY-MM-DD HH:MM"
+    ts_formatted = ts_part[:10] + " " + ts_part[11:13] + ":" + ts_part[13:15]
+    patch_idx = int(idx_str)
+    
+    # Find the section with this timestamp
+    pattern = rf"(## Patches from {re.escape(ts_formatted)}.*?### Patch {patch_idx}.*?\*\*Status:\*\*\s*)⏳ PENDING"
+    
+    new_text = re.sub(
+        pattern,
+        rf"\g<1>{new_status}",
+        text,
+        flags=re.DOTALL,
+    )
+    
+    if new_text == text:
+        return False
+    
+    try:
+        PATCHES_FILE.write_text(new_text, encoding="utf-8")
+        return True
+    except Exception:
+        return False
+
+
+class _PatchApprovalView(discord.ui.View):
+    """DM view for reviewing a prompt patch."""
+
+    def __init__(self, patch: dict, all_patches: list, current_index: int):
+        super().__init__(timeout=600)  # 10 minute timeout
+        self.patch = patch
+        self.all_patches = all_patches
+        self.current_index = current_index
+
+    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green, emoji="✅")
+    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
+        success = _update_patch_status(self.patch["id"], "✅ APPROVED")
+        if success:
+            await interaction.response.edit_message(
+                content=f"✅ **Patch APPROVED:** `{self.patch['id']}`\n\nApply this to prompts in:\n"
+                        f"- `src/agents/learning_agents.py` (ProAuthorAgent)\n"
+                        f"- `src/mission_compiler.py` (section system prompt)\n"
+                        f"- `skills/module-quality/SKILL.md`",
+                view=None,
+            )
+        else:
+            await interaction.response.edit_message(
+                content="❌ Failed to update patch status.", view=None
+            )
+        # Send next patch if available
+        await self._send_next_patch(interaction)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.red, emoji="❌")
+    async def reject(self, interaction: discord.Interaction, button: discord.ui.Button):
+        success = _update_patch_status(self.patch["id"], "❌ REJECTED")
+        if success:
+            await interaction.response.edit_message(
+                content=f"❌ **Patch REJECTED:** `{self.patch['id']}`",
+                view=None,
+            )
+        else:
+            await interaction.response.edit_message(
+                content="❌ Failed to update patch status.", view=None
+            )
+        await self._send_next_patch(interaction)
+
+    @discord.ui.button(label="Skip", style=discord.ButtonStyle.grey, emoji="⏭️")
+    async def skip(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.edit_message(
+            content=f"⏭️ **Skipped patch:** `{self.patch['id']}` (still pending)",
+            view=None,
+        )
+        await self._send_next_patch(interaction)
+
+    async def _send_next_patch(self, interaction: discord.Interaction):
+        """Send the next pending patch if available."""
+        # Refresh patch list
+        patches = _parse_pending_patches()
+        if not patches:
+            await interaction.followup.send(
+                "🎉 **All patches reviewed!** No more pending patches.",
+                ephemeral=True,
+            )
+            return
+        
+        # Send first remaining patch
+        patch = patches[0]
+        embed = _build_patch_embed(patch, 1, len(patches))
+        view = _PatchApprovalView(patch, patches, 0)
+        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+
+
+def _build_patch_embed(patch: dict, current: int, total: int) -> discord.Embed:
+    """Build an embed for displaying a patch."""
+    embed = discord.Embed(
+        title=f"�\udcdd Patch Review ({current}/{total})",
+        color=discord.Color.blue(),
+    )
+    embed.add_field(
+        name="Source",
+        value=f"**Mission:** {patch['mission']}\n"
+              f"**Score:** {patch['score']}/10\n"
+              f"**Generated:** {patch['timestamp']}",
+        inline=False,
+    )
+    
+    # Truncate content if too long
+    content = patch["content"]
+    if len(content) > 900:
+        content = content[:900] + "\n... [truncated]"
+    
+    embed.add_field(
+        name="Proposed Prompt Addition",
+        value=f"```\n{content}\n```",
+        inline=False,
+    )
+    embed.set_footer(text=f"Patch ID: {patch['id']}")
+    
+    return embed
 
 
 # ---------------------------------------------------------------------------

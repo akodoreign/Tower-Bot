@@ -27,6 +27,7 @@
     "Combat shotgun": 1,
     "Tech armor (Light)": 1,
     "Firearm  - Derringer (Single Shot Pistol)": 1,
+    "Cloak Of The Billowing Shadows": 1,
     "Dagger": 1,
     "Scimitar": 1,
     "Crossbow, Heavy": 1,
@@ -48,5 +49,5 @@
     "enemies": "A rival guild, The Nightcrawlers.",
     "backstory": "Created accidentally while attempting to create a new race of soldiers who could fly. The idea was conceived due to the discovery of angels."
   },
-  "fetched_at": "2026-03-14T16:47:16.176027"
+  "fetched_at": "2026-04-03T12:14:01.864169"
 }

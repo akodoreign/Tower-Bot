@@ -1,119 +1,119 @@
-[2026-04-01 04:21 │ Tower: 01 Apr 2036, 04:21]
-_The Silver Spire echoes with a soft hum, a stark contrast to the usual clamor of steel and fury._ _Seraphina Shadowwhisper, Elara Thorne, and Thorin Stonebreaker — the Saltmarch Wanderers — sit around a table, their faces lit by the flickering candlelight._ _A parchment unfurls across the table, its contents a testament to their latest mission: the recovery of a stolen artifact for the Argent Blades._.
----ENTRY---
-[2026-04-01 05:21 │ Tower: 01 Apr 2036, 05:21]
-_In the cobblestone heart of the Grand Forum, whispers ripple through the crowd. A parchment unfurls, its contents a testament to The Long Standard's recent triumph._ _At the Night Pits, the notorious Thyra Scalescar was bested by Seraphina Nightshade-Ironheart and her crew._ _The Long Standard's reputation grows, a beacon in the Undercity's chaotic darkness. One by one, they answer the call, their adaptable skills proving a force to be reckoned with._.
----ENTRY---
-[2026-04-01 05:21 │ Tower: 01 Apr 2036, 05:21]
-[Arena match result posted]
----ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-Rumors swirl of an underground syndicate hoarding the precious material, pushing prices sky-high. _In the grime-streaked shadows of the Floating Bazaar, a vendor's haggard cries echo through the air._.
----ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-[TowerBay listing board posted]
----ENTRY---
-[2026-04-01 06:16 │ Tower: 01 Apr 2036, 06:16]
-[Dome weather report posted]
----ENTRY---
-[2026-04-01 07:12 │ Tower: 01 Apr 2036, 07:12]
-*In the shadow-streaked alleys of the Warrens, a cacophony of curses echoes. A small, furry figure huddles against the cold stone wall, a purring Tabaxi named Jax Argentshroud, shivering beneath a threadbare cloak.
----ENTRY---
-[2026-04-01 08:16 │ Tower: 01 Apr 2036, 08:16]
-_In the dimly-lit corner of The Silver Spire, whispers ripple through the air like shadows dancing on stone._ _Archivist Vexis Veldorn, leader of the Irongate Collective, stares intently at the parchment before him, lines of ink detailing the recent injury of his fellow adventurer, Vesper of the Serpent Choir._ __ _Rumors begin to circulate, of a secret operation in the making, a mission to find and save their fallen comrade._.
----ENTRY---
-[2026-04-01 08:16 │ Tower: 01 Apr 2036, 08:16]
+[2026-04-06 12:57 │ Tower: 06 Apr 2036, 12:57]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 09:07 │ Tower: 01 Apr 2036, 09:07]
-_In the cold, dim light of the Outer Wall, two figures stand, silhouetted against the Dome's glow._ Captain Havel Korin (Wardens of Ash) & Pol Greaves (Patchwork Saints) clash, their voices echoing like thunder. _"This city was built for heroes, not failed adventurers," Havel growls, his voice hard and unyielding._.
+[2026-04-06 13:50 │ Tower: 06 Apr 2036, 13:50]
+Docks — Serpent Choir Seizes Trade Route Vesper’s Serpent Choir seized control of the Docks’ main trade route, cutting off supply lines to the Iron Fang Consortium. Witnesses report the Choir used a combination of intimidation and sabotage, including disabling the Dockmaster’s security grid. The Iron Fang’s Sera Voss responded by deploying enforcers to reclaim the route, sparking a standoff.
 ---ENTRY---
-[2026-04-01 10:07 │ Tower: 01 Apr 2036, 10:07]
-_A chilling wind howls through the Grand Forum, carrying whispers of power plays and hidden agendas._ In the marble halls of the Silver Spire, Lady Cerys Valemont, the Argent Blades' leader, holds court.
----ENTRY---
-[2026-04-01 11:09 │ Tower: 01 Apr 2036, 11:09]
-_In the hidden depths of the Warrens, a deal is struck beneath the watchful eyes of the Widow's brood._ _Rumors swirl of an upcoming auction, a chance to secure a piece of the Obsidian Lotus's sought-after product, the god-tongue ink._.
----ENTRY---
-[2026-04-01 11:09 │ Tower: 01 Apr 2036, 11:09]
-[EC/Kharma exchange rate posted]
----ENTRY---
-[2026-04-01 12:02 │ Tower: 01 Apr 2036, 12:02]
-_In the dimly lit corners of the Grand Forum, a hush descends, a whisper of awe._ _Echoes of the recent exploits of The Patient Knife ripple through the crowd._ _Adventurers' Guild Notice:_ The Patient Knife, a versatile team of rift explorers, has returned from a perilous journey. Their discovery of a previously unexplored rift seam promises new opportunities for the Guild. We invite all adventurers to consider joining The Patient Knife on their next mission, a venture that may well redefine the Undercity's understanding of the rifts.
----ENTRY---
-[2026-04-01 13:07 │ Tower: 01 Apr 2036, 13:07]
-_Beneath the dim glow of the Oracle Chamber, a hush descends as the eyes of the Guild of Ashen Scrolls turn to their new leader._ Eir Velan, Senior Archivist Fate's Future Uncertain.
----ENTRY---
-[2026-04-01 13:07 │ Tower: 01 Apr 2036, 13:07]
+[2026-04-06 17:52 │ Tower: 06 Apr 2036, 17:52]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 13:08 │ Tower: 01 Apr 2036, 13:08]
+[2026-04-06 19:56 │ Tower: 06 Apr 2036, 19:56]
+UNDERCITY — Brawl at Iron Maw Sera Voss’s Iron Fang Consortium clashed with Patchwork Saints at Iron Maw Arena, leaving 3 dead and 12 injured. The fight erupted after Pol Greaves insulted Vesper’s cult during a betting match. Witnesses report Greaves spat on a Serpent Choir banner before the brawl escalated.
+---ENTRY---
+[2026-04-06 22:43 │ Tower: 06 Apr 2036, 22:43]
+Iron Maw — Construct Race The Iron Maw roared with mechanical fury as the Golem Gauntlet kicked off, a 3-lap dash through oil-slicked tracks where steam-powered titans clashed. Steelclaw the Ironclad (12-3 record) led the pack, but Cogsythe the Clockwork Centaur—a scrappy underdog with a 4.2s sprint time—sneaked past in the final turn, sending the crowd into a frenzy. Sparks flew as welders in the stands cheered, while bookies howled about the 200-to-1 upset.
+---ENTRY---
+[2026-04-06 22:43 │ Tower: 06 Apr 2036, 22:43]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-06 22:44 │ Tower: 06 Apr 2036, 22:44]
 [Missing persons notice posted]
 ---ENTRY---
-[2026-04-01 14:01 │ Tower: 01 Apr 2036, 14:01]
-_From the shadows of Duskhollow, a voice cries out to the city:_ In the heart of the Hearthstone District, a family of three sleeps _hungry_. The mother works as a maid at the Grand Archive Dome, but her wages, barely enough to feed herself, are not enough for three. The father is an unranked independent, injured and unable to work. The child, a curious, wide-eyed thing, goes without.
+[2026-04-07 00:44 │ Tower: 07 Apr 2036, 00:44]
+IRON MAW — Sera Voss's enforcers killed two Patchwork Saints henchmen during a sanctioned fight The brawl erupted after Pol Greaves's goons ambushed a rival gang's transport near the arena gates. Three bodies were found in the slag pits by dawn.
 ---ENTRY---
-[2026-04-01 15:00 │ Tower: 01 Apr 2036, 15:00]
-_In the flickering torchlight of the Glass Sigil, a storm brews._ Yaulderna Silverstreak, the Archmage, clashes with Zephyrus Sylphim, the Sergeant of the Wardens of Ash. Rift energy crackles, and sparks fly as their arcane battle echoes through the halls of the Wizards Tower. A murmur ripples through the city: the Wardens' secret patron, Ashara, is said to have intervened, calming the storm before it could escalate further.
----ENTRY---
-[2026-04-01 15:53 │ Tower: 01 Apr 2036, 15:53]
-_In the heart of the Warrens, the god-tongue ink flows like the lifeblood of the Obsidian Lotus._.
----ENTRY---
-[2026-04-01 16:54 │ Tower: 01 Apr 2036, 16:54]
-_A veil of shadow descends upon the Grand Forum, whispering secrets of power struggles and missed leadership._ In the echoing marble halls of the Silver Spire, Lady Cerys Valemont's seat remains empty, as rumors swirl that a certain enforcer, Icefist Thoren, has been making moves in her absence. Rumors suggest that Thoren is leveraging his connections to gather supporters, challenging Cerys' authority and potentially threatening the balance of power within the guild. As whispers of a power struggle echo through the city, the Undercity watches with bated breath, waiting to see who will emerge victorious.
----ENTRY---
-[2026-04-01 17:54 │ Tower: 01 Apr 2036, 17:54]
-_In the dim corners of the Tower, a single figure remains still._.
----ENTRY---
-[2026-04-01 17:54 │ Tower: 01 Apr 2036, 17:54]
+[2026-04-07 02:52 │ Tower: 07 Apr 2036, 02:52]
 [TIA market ticker posted]
 ---ENTRY---
-[2026-04-01 19:03 │ Tower: 01 Apr 2036, 19:03]
-_In the twilight of Rustside, a humble life unravels._ _Amidst the crumbling walls and rusted iron, Elara Ironclaw, a mother of two, struggles to make ends meet._ Elara, a skilled artisan, crafts delicate lanterns from salvaged scraps, their warm glow illuminating the dark corners of the Western Warrens. Yet, her meager sales barely feed her family, leaving them hungry and cold in their dilapidated home. _In the shadows, Elara's determination burns like the flame within her creations._ she gathers her children, whispering tales of a brighter tomorrow. _In the echoes of her words, the flickering lanterns cast a promise of hope._.
+[2026-04-07 03:58 │ Tower: 07 Apr 2036, 03:58]
+Scrapworks — Tower Authority Raids Smuggling Ring Calix Drenn’s enforcers stormed the Scrapworks’ lower levels tonight, seizing 12 suspected smugglers. Among the arrests: 3 linked to the Iron Fang Consortium. The operation targeted a network moving illegal tech through the Cobbleway Market. No casualties reported, but tensions between the Tower and the Iron Fang are escalating.
 ---ENTRY---
-[2026-04-01 20:11 │ Tower: 01 Apr 2036, 20:11]
-_Where the echoes of laughter and the _ In the heart of Ember Ward, a home ablaze with warmth and laughter, Senior Archivist Pell finds an unexpected visitor: Thrain Stonefist, a dwarf in search of forgotten histories. Pell, ever guarded, offers him a taste of the Glass Sigil's archives, a glimpse of Thrain's future, if only he would remember their past. _In the flickering firelight, old secrets ignite new hope._.
----ENTRY---
-[2026-04-01 21:15 │ Tower: 01 Apr 2036, 21:15]
-_In the shadowy recesses of the Warrens, a whispering storm brews._ Rumors Abound of a Secret Cult Recruiting Within the Warrens The Eastern Warrens, a maze of alleyways and crumbling buildings, buzzes with whispers of a new presence. Seraphina Nightshade-Ironheart, a Brother Thane's Cult Speaker, is said to be Grug Ironfist's right-hand, recruiting aggressively in the district.
----ENTRY---
-[2026-04-01 22:24 │ Tower: 01 Apr 2036, 22:24]
-_Beneath the shadowed walls of the Tower, a power struggle echoes._ In the silent halls of the Tower Authority, Director Myra Kess's absence is not going unnoticed. Whispers of turmoil reverberate through the command center, as her deputies scramble to maintain order. The FTA's compliance interns, led by Zippy Quickclaw, are under increased pressure to fill the void left by Myra's injury. As tension builds, so too does the potential for a power struggle within the Tower Authority. Meanwhile, Archivist Eir Velan, leader of the Guild of Ashen Scrolls, has requested an audience with Director Myra Kess. It is said that she seeks to discuss a matter of great urgency, one that may have dire consequences for the city. As the Undercity holds its breath, the fate of its overseers remains uncertain.
----ENTRY---
-[2026-04-01 22:24 │ Tower: 01 Apr 2036, 22:24]
-[TIA market ticker posted]
----ENTRY---
-[2026-04-01 23:25 │ Tower: 01 Apr 2036, 23:25]
-_In the cobbled warrens, a tale spills like the runoff from the Forum Canal._ _A ragged bard strums a worn lute beneath the flickering glow of a makeshift fire, his voice echoing through the alleys._ _"And the Silver Spire's empty throne.."_.
----ENTRY---
-[2026-04-02 00:17 │ Tower: 02 Apr 2036, 00:17]
-The relic-smuggling cartel, under Guildmaster Serrik Dhal's reign, has expanded their market presence, driving up the prices of precious artifacts and antiquities. Cobbleway Market, the city's hub for relic trading, is now a frenzy of bidding wars, as the Iron Fang's monopoly on rare goods causes a ripple effect across Undercity commerce. The local vendors fear the Iron Fang's dominance in the market will drive them out of business. Grimbush Gizzlethorn, a scout for the Patchwork Saints, stands amidst the chaos, his beady eyes reflecting the weight of the threat. In the Archive Row, Eira Filigree, an archivist for the Guild of Ashen Scrolls, is troubled. She witnesses the erosion of the city's history, as the Iron Fang's greedy hands reach into the past, leaving only shadows in their wake. In the dim halls of the archives, Eira's voice echoes a call for justice, her pen scribbling lines of protest on forbidden scrolls.
----ENTRY---
-[2026-04-02 01:13 │ Tower: 02 Apr 2036, 01:13]
-_In the cobbled alleys of Ember Ward, a cry rings out like the toll of a funeral bell._ A Spice Merchant's Mournful Plea Grizelda Mossblossom weeps over her wares, her eyes red and swollen. Her Spice Stand, nestled between the crumbling walls of Coppergate, bears only half its usual bounty.
----ENTRY---
-[2026-04-02 02:20 │ Tower: 02 Apr 2036, 02:20]
-_In the dim lanes of the Warrens, a shadowed secret unravels._ _Rumor:_ Renata Blackthorn, leader of the Patchwork Saints, is said to harbor a deep-seated grudge against Eldric Ironfoot, her right-hand man. Some whisper that a past betrayal still haunts their partnership, casting a shadow over their seemingly unbreakable bond. In the Eastern Warrens.
----ENTRY---
-[2026-04-02 03:16 │ Tower: 02 Apr 2036, 03:16]
-_In the shadowed halls of the Tower Authority Command, the echoes of a power struggle whisper into the silence._ A Faint Signal from Director Myra Kess.
----ENTRY---
-[2026-04-02 03:16 │ Tower: 02 Apr 2036, 03:16]
-[TIA market ticker posted]
----ENTRY---
-[2026-04-02 04:09 │ Tower: 02 Apr 2036, 04:09]
-_In the dimly lit corridors of the Iron Fang Consortium, a whisper of change ripples through the air._ Gilded Soul Essence Coins (EC) Shadowblade Daggers (EC) Forgotten Tome Ink (EC).
----ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
-_The silence shatters as a hammer rings out in the Tower's heart._ Captain Havel Korin, the Outer Wall's stern guardian, calls for reinforcements as a series of unexplained disappearances plague the city's front line.
----ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
+[2026-04-07 03:58 │ Tower: 07 Apr 2036, 03:58]
 [TowerBay listing board posted]
 ---ENTRY---
-[2026-04-02 05:18 │ Tower: 02 Apr 2036, 05:18]
+[2026-04-07 03:58 │ Tower: 07 Apr 2036, 03:58]
 [Dome weather report posted]
 ---ENTRY---
-[2026-04-02 06:12 │ Tower: 02 Apr 2036, 06:12]
-_In the labyrinthine market, a silent struggle unfolds._ _Grimbush Gizzlethorn, scout for the Patchwork Saints, stands amidst the cobbled paths of Cobbleway Market, his beady eyes darting between the stalls of the Iron Fang Consortium and the anxious vendors._ _As the Iron Fang Consortium tightens its grip on the market, the price of precious artifacts and antiquities skyrockets, leaving vendors struggling to keep their businesses afloat._.
+[2026-04-07 04:49 │ Tower: 07 Apr 2036, 04:49]
+Ash Ring — Bloodshed Amid Consortium-Tower Tensions Sera Voss’s enforcers clashed with Tower Authority agents at the Ash Ring, leaving three dead and two injured. The skirmish erupted after Drenn’s enforcers seized a shipment of restricted tech from the Iron Fang’s docks.
 ---ENTRY---
-[2026-04-02 06:21 │ Tower: 02 Apr 2036, 06:21]
-_In the shadowed forge of Ironworks, a hammer echoes, a rhythm of danger and uncertainty._ _Voris Ironhammer, stalwart warrior of the Wardens of Ash, is nowhere to be found. His hammer lies silent, the echoes of his absence a grim reminder of the danger lurking within._ _A fortnight ago, whispers of a hidden rift in the Ironworks spread. The Windcaller, a recluse living in the Fringe, had warned the Wardens of the impending doom. Could it be that the Windcaller's warning came true, and Voris, the Wardens' most trusted defender, is its latest victim?_.
+[2026-04-07 07:57 │ Tower: 07 Apr 2036, 07:57]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-07 09:53 │ Tower: 07 Apr 2036, 09:53]
+IRON FANG VS. PATCHWORK SAINTS — Clash at The Ascendance Fight between Sera Voss's enforcers and Pol Greaves' rebels erupted at The Ascendance, leaving 12 injured and 3 dead. Security forces cleared the arena after 45 minutes of chaos. Both sides blamed each other for the violence.
+---ENTRY---
+[2026-04-07 11:53 │ Tower: 07 Apr 2036, 11:53]
+[EC/Kharma exchange rate posted]
+---ENTRY---
+[2026-04-07 12:45 │ Tower: 07 Apr 2036, 12:45]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-07 15:47 │ Tower: 07 Apr 2036, 15:47]
+Iron Maw — Construct Race The Iron Maw roared as gears screamed and pistons hissed—Scrapforge Streak surged past Ironclad Vex in a last-lap thriller! The mechanical titan’s hydraulic boosters flared, but the nimble Copper Vulture (3.2s per lap) snuck through the oil-slicked track, leaving the crowd in a frenzy. Final lap: 12.3 seconds. Vex’s armor cracked—Streak’s claws found the gap. The bookies’ whispers turned to chants: “Scrapforge! Scrapforge!” A new era for mechanical racing? Signature: “When iron dreams, the Maw screams!”.
+---ENTRY---
+[2026-04-07 16:57 │ Tower: 07 Apr 2036, 16:57]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-07 18:58 │ Tower: 07 Apr 2036, 18:58]
+Colosseum — Ranking Bout The Colosseum roared as Kael Draygon, the reigning Iron Crown champion, clashed with Veyra Flint, the rising star from the Ash Ring. With FTA banners fluttering and recording crystals humming, this bout was a clash of titans—Draygon’s 23-1 record vs. Flint’s 14-3 surge. The crowd buzzed with tension as Veyra’s signature plasma blade sliced through Draygon’s defenses, ending his unbroken streak. A tactical masterstroke by the underdog!.
+---ENTRY---
+[2026-04-07 21:56 │ Tower: 07 Apr 2036, 21:56]
+Arena — Blood in the Iron Maw Sera Voss’s Iron Fang thugs bled out three Patchwork Saints enforcers after a midnight fight at the Iron Maw’s ring. Witnesses say Greaves’ crew tried to seize a smuggled crate of unstable synth-gel from Voss’s men.
+---ENTRY---
+[2026-04-07 21:56 │ Tower: 07 Apr 2036, 21:56]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 01:49 │ Tower: 08 Apr 2036, 01:49]
+Ash Ring — Skirmish Sparks Between Iron Fang and Tower Authority Sera Voss’s Iron Fang Consortium clashed with Tower Authority enforcers at the Ash Ring tonight. At least three Iron Fang fighters were detained after a melee erupted during a sanctioned match. Calix Drenn’s agents confiscated weapons and issued warrants for three suspects.
+---ENTRY---
+[2026-04-08 02:42 │ Tower: 08 Apr 2036, 02:42]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 03:52 │ Tower: 08 Apr 2036, 03:52]
+[TowerBay listing board posted]
+---ENTRY---
+[2026-04-08 03:52 │ Tower: 08 Apr 2036, 03:52]
+[Dome weather report posted]
+---ENTRY---
+[2026-04-08 07:00 │ Tower: 08 Apr 2036, 07:00]
+Glass Sigil — Prisoner Swap Thrain Stonefist and Elara Starbinder brokered a trade of three Glass Sigil detainees for a cache of rare synthsteel at the Undercity Bazaar. The exchange occurred hours after a failed assassination attempt on Starbinder by a masked figure linked to the Iron Fang.
+---ENTRY---
+[2026-04-08 07:00 │ Tower: 08 Apr 2036, 07:00]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 11:05 │ Tower: 08 Apr 2036, 11:05]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 11:05 │ Tower: 08 Apr 2036, 11:05]
+[EC/Kharma exchange rate posted]
+---ENTRY---
+[2026-04-08 15:03 │ Tower: 08 Apr 2036, 15:03]
+[Arena match result posted]
+---ENTRY---
+[2026-04-08 16:12 │ Tower: 08 Apr 2036, 16:12]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 18:28 │ Tower: 08 Apr 2036, 18:28]
+Iron Maw — Beast Race Sprint The Iron Maw roared with sawdust and oil as the Beast Race Sprint ignited! Grizzled veteran Skorri the Ironclaw (3.2 sec avg) faced upstart Vex the Fangling (2.8 sec avg), with crowd bets split between the two. The mechanical roars of the arena echoed as Skorri’s massive dire wolf surged ahead, but Vex’s agile direfox darted through the pack! Signature: "When the grease hits the track, the beast with the heart wins—again!".
+---ENTRY---
+[2026-04-08 19:19 │ Tower: 08 Apr 2036, 19:19]
+Ash Ring — Bloodsport Frenzy Groz Krax’s Argent Blades clashed with Thrain Stonefist’s Glass Sigil enforcers in a sanctioned duel at the Ash Ring. The fight ended when Stonefist impaled Krax with a shard of broken glass, sparking riots among the crowd.
+---ENTRY---
+[2026-04-08 20:27 │ Tower: 08 Apr 2036, 20:27]
+Floating Ring — Gang War Erupts at Arena Sera Voss’s Iron Fang gang ambushed Mira Kessan’s brokers during a sanctioned fight at the Floating Ring, killing 12. Security forces from the Tower Authority arrived too late to stop the bloodshed.
+---ENTRY---
+[2026-04-08 20:27 │ Tower: 08 Apr 2036, 20:27]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-08 21:18 │ Tower: 08 Apr 2036, 21:18]
+Iron Maw — Gang Conflict Escalates Sera Voss’s Iron Fang clashed with Patchwork Saints at the Iron Maw over a stolen data core. Fight spilled into the arena’s underbelly, leaving three dead and a dozen injured. Security teams from the Tower Authority arrived too late to stop the brawl.
+---ENTRY---
+[2026-04-09 01:25 │ Tower: 09 Apr 2036, 01:25]
+[TIA market ticker posted]
+---ENTRY---
+[2026-04-09 03:22 │ Tower: 09 Apr 2036, 03:22]
+[TowerBay listing board posted]
+---ENTRY---
+[2026-04-09 03:22 │ Tower: 09 Apr 2036, 03:22]
+[Dome weather report posted]

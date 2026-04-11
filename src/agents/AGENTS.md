@@ -65,12 +65,12 @@ KIMI_MODEL=qwen:32b          # or mistral, llama3:70b, mixtral
 KIMI_ENABLE_SUBAGENTS=false  # Disabled for local-only setup
 
 # Legacy (still supported)
-OLLAMA_MODEL=mistral         # Fallback model
+OLLAMA_MODEL=qwen3-8b-slim:latest         # Fallback model
 ```
 
 **Recommended Local Models:**
-- Fast (QwenAgent): `qwen`, `qwen:7b`, `mistral:7b`, `phi3`
-- Complex (KimiAgent): `qwen:32b`, `mistral`, `llama3:70b`, `mixtral`
+- Fast (QwenAgent): `qwen`, `qwen:7b`, `qwen3-8b-slim:latest`, `phi3`
+- Complex (KimiAgent): `qwen:32b`, `qwen3-8b-slim:latest`, `llama3:70b`
 
 ## API Endpoints
 

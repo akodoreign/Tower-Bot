@@ -47,6 +47,19 @@ from src.agents.learning_agents import (
 )
 from src.agents.orchestrator import AgentOrchestrator
 
+# News editorial agents
+from src.agents.news_agents import (
+    NewsEditorAgent,
+    GossipEditorAgent,
+    SportsColumnistAgent,
+    BulletinResult,
+    FactCheckerMixin,
+    get_news_agent,
+    generate_news_bulletin,
+    generate_gossip_bulletin,
+    generate_sports_bulletin,
+)
+
 __all__ = [
     "BaseAgent",
     "AgentConfig", 
@@ -67,4 +80,14 @@ __all__ = [
     "DNDVeteranAgent",
     "AICriticAgent",
     "AgentOrchestrator",
+    # News editorial agents
+    "NewsEditorAgent",
+    "GossipEditorAgent",
+    "SportsColumnistAgent",
+    "BulletinResult",
+    "FactCheckerMixin",
+    "get_news_agent",
+    "generate_news_bulletin",
+    "generate_gossip_bulletin",
+    "generate_sports_bulletin",
 ]

@@ -1,0 +1,28 @@
+{
+  "name": "High Apostle Yzura",
+  "species": "Tiefling",
+  "faction": "Serpent Choir",
+  "rank": "High Apostle — Leader of the Serpent Choir",
+  "role": "mercenary",
+  "home_district": "sanctum quarter",
+  "stats": {
+    "primary": [
+      "STR 15",
+      "CON 14",
+      "DEX 13"
+    ],
+    "secondary": [
+      "WIS 11",
+      "CHA 10",
+      "INT 9"
+    ],
+    "hp_range": "45–60"
+  },
+  "equipment": {
+    "weapons": "warhammer, crossbow",
+    "armour": "chain mail or scale mail"
+  },
+  "sd_appearance": "tall, lithe tiefling with deep crimson skin the hue of aged wine, horns curving backward like molten iron, and eyes gleaming solid gold without a single iris or pupil—pupils absent, yet burning with a cold, calculating light. layered jade-green and black robes shimmer with coiled serpent embroidery, their fabric stiff with dried blood and ink from centuries of contracts, while a warhammer rests across her hip, its haft etched with fading sigils and a crossbow hangs at her thigh, its grip stained with ash and old incense. her tail flicks restlessly, tipped with a single obsidian claw, and a chainmail cuirass clings to her torso, its links scarred by scorch marks and the faint glow of divine fire.",
+  "faction_visual": "jade green and black divine silk robes, coiled serpent motif, contract seals as pendants",
+  "style_note": "worn leather and chainmail, equipment that tells a story of past contracts"
+}
