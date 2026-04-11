@@ -567,11 +567,11 @@
     "condition": "Well-used",
     "seller": "The Anonymous Weaver of Tears",
     "starting_bid": 26688,
-    "current_bid": 674540,
-    "bid_count": 48,
+    "current_bid": 169734,
+    "bid_count": 28,
     "listed_at": "2026-03-30T17:51:04.029686",
     "expires_at": "2026-04-06T17:51:04.029686",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1774911066,
@@ -581,11 +581,11 @@
     "condition": "Mint",
     "seller": "Anonymous: The Whispering Market",
     "starting_bid": 71746,
-    "current_bid": 1953657,
-    "bid_count": 43,
+    "current_bid": 585597,
+    "bid_count": 26,
     "listed_at": "2026-03-30T17:51:06.362629",
     "expires_at": "2026-04-06T17:51:06.362629",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1774911068,
@@ -595,11 +595,11 @@
     "condition": "Mint",
     "seller": "Whispers of the Veil",
     "starting_bid": 18285,
-    "current_bid": 165231,
-    "bid_count": 31,
+    "current_bid": 54524,
+    "bid_count": 16,
     "listed_at": "2026-03-30T17:51:08.545698",
     "expires_at": "2026-04-06T17:51:08.545698",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1774997895,
@@ -609,11 +609,11 @@
     "condition": "Well-used",
     "seller": "The Inquisitor's Guild - Auctioned under duress",
     "starting_bid": 52607,
-    "current_bid": 865771,
-    "bid_count": 39,
+    "current_bid": 142629,
+    "bid_count": 14,
     "listed_at": "2026-03-31T17:58:15.914367",
     "expires_at": "2026-04-07T17:58:15.914367",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1774997898,
@@ -623,11 +623,11 @@
     "condition": "Well-used",
     "seller": "The Shadow Broker",
     "starting_bid": 15999,
-    "current_bid": 277068,
-    "bid_count": 39,
+    "current_bid": 43778,
+    "bid_count": 13,
     "listed_at": "2026-03-31T17:58:18.422611",
     "expires_at": "2026-04-07T17:58:18.422611",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1775084059,
@@ -637,11 +637,11 @@
     "condition": "Mint",
     "seller": "Anonymous Gravedigger",
     "starting_bid": 24297,
-    "current_bid": 1120719,
-    "bid_count": 55,
+    "current_bid": 56874,
+    "bid_count": 11,
     "listed_at": "2026-04-01T17:54:19.800805",
     "expires_at": "2026-04-08T17:54:19.800805",
-    "sold": true
+    "sold": false
   },
   {
     "id": 1775176054,
@@ -651,8 +651,8 @@
     "condition": "Well-used",
     "seller": "The Drowned King's Vault (Anonymous)",
     "starting_bid": 32751,
-    "current_bid": 634853,
-    "bid_count": 43,
+    "current_bid": 47473,
+    "bid_count": 5,
     "listed_at": "2026-04-02T19:27:34.824174",
     "expires_at": "2026-04-09T19:27:34.824174",
     "sold": false
@@ -665,8 +665,8 @@
     "condition": "Well-used",
     "seller": "The Veiled Chorus",
     "starting_bid": 35904,
-    "current_bid": 2499179,
-    "bid_count": 55,
+    "current_bid": 57593,
+    "bid_count": 6,
     "listed_at": "2026-04-02T19:28:59.215317",
     "expires_at": "2026-04-09T19:28:59.215317",
     "sold": false
@@ -679,8 +679,8 @@
     "condition": "Well-used",
     "seller": "The Drowned King's Last Heirloom",
     "starting_bid": 58568,
-    "current_bid": 1235073,
-    "bid_count": 45,
+    "current_bid": 71447,
+    "bid_count": 4,
     "listed_at": "2026-04-02T19:30:02.961772",
     "expires_at": "2026-04-09T19:30:02.961772",
     "sold": false
@@ -693,94 +693,10 @@
     "condition": "Well-used",
     "seller": "The Hollow Veil",
     "starting_bid": 49782,
-    "current_bid": 492700,
-    "bid_count": 28,
+    "current_bid": 61159,
+    "bid_count": 3,
     "listed_at": "2026-04-02T19:31:04.952457",
     "expires_at": "2026-04-09T19:31:04.952457",
-    "sold": false
-  },
-  {
-    "id": 1775515900,
-    "name": "The Drowned Gear of the Iron Maw",
-    "description": "A rusted gear, once part of a clockwork leviathan that drowned the Sunken Spire. Its teeth are lined with bioluminescent algae, humming a dirge when submerged. The Maw's engineers claim it can still drain water from the deepest trenches, but the whispers say it's hungry for more.",
-    "category": "Utility Gear",
-    "condition": "Well-used",
-    "seller": "The Iron Maw",
-    "starting_bid": 53376,
-    "current_bid": 234211,
-    "bid_count": 22,
-    "listed_at": "2026-04-06T17:51:40.357369",
-    "expires_at": "2026-04-13T17:51:40.357369",
-    "sold": false
-  },
-  {
-    "id": 1775515908,
-    "name": "The Drowned King's Last Sigh",
-    "description": "A vial of shimmering black liquid distilled from the final breath of a drowned sovereign, trapped in a sealed gourd carved from a merfolk's ribcage. Legends claim\u996e\u7528 it grants visions of submerged realms\u2014but the drinker\u2019s lungs fill with brine and their voice echoes with the weight of tidal graves.",
-    "category": "Consumables",
-    "condition": "Well-used",
-    "seller": "The Drowned Court's Heirloom Vault",
-    "starting_bid": 68790,
-    "current_bid": 221363,
-    "bid_count": 18,
-    "listed_at": "2026-04-06T17:51:48.110740",
-    "expires_at": "2026-04-13T17:51:48.110740",
-    "sold": false
-  },
-  {
-    "id": 1775515924,
-    "name": "The Drowned King's Final Vial",
-    "description": "A vial of liquid memory, harvested from the last breath of a drowned king. Those who drink it glimpse his final moments\u2014only to find their own memories unraveling into the abyss. Provenance: Recovered from the ruins of the Iron Maw, where the walls still weep.",
-    "category": "Consumables",
-    "condition": "Well-used",
-    "seller": "The Veiled Syndicate",
-    "starting_bid": 42955,
-    "current_bid": 178166,
-    "bid_count": 20,
-    "listed_at": "2026-04-06T17:52:04.685345",
-    "expires_at": "2026-04-13T17:52:04.685345",
-    "sold": false
-  },
-  {
-    "id": 1775606337,
-    "name": "The Iron Maw's Cursed Chariot",
-    "description": "A chariot forged from the remnants of the Iron Maw's last stand, its gears shriek with the whispers of drowned kings. Once used to crush rebellions, now it seeks its next victim. Its driver? A shadow that never speaks, but always knows where to point the wheels.",
-    "category": "Vehicles & Mounts",
-    "condition": "Well-used",
-    "seller": "The Iron Maw's Remnant",
-    "starting_bid": 43945,
-    "current_bid": 111411,
-    "bid_count": 13,
-    "listed_at": "2026-04-07T18:58:57.502258",
-    "expires_at": "2026-04-14T18:58:57.502258",
-    "sold": false
-  },
-  {
-    "id": 1775606345,
-    "name": "Shroud of the Drowned",
-    "description": "Forged from the scales of a leviathan slain in the Abyssal Trenches, this armour hums with the echoes of its wearer\u2019s last breath. Legend claims it was worn by the Drowned King\u2019s final guard, who drowned screaming in a tide of his own regrets. The plating is etched with bioluminescent runes that pulse like a dying heartbeat.",
-    "category": "Armour",
-    "condition": "Well-used",
-    "seller": "The Drowned King's Relic Guild",
-    "starting_bid": 77238,
-    "current_bid": 154232,
-    "bid_count": 10,
-    "listed_at": "2026-04-07T18:59:05.373895",
-    "expires_at": "2026-04-14T18:59:05.373895",
-    "sold": false
-  },
-  {
-    "id": 1775690913,
-    "name": "The Drowned Clockmaker's Final Tick",
-    "description": "A skeletal clockwork armillary sphere, its gears forged from bleached bone and corroded silver, still ticks in perfect sync with the Dome's pressure cycles. Believed to belong to a 19th-century clockmaker sealed alive in the Iron Maw's depths, its hands point only to the hour of doom. Scholars swear the ticking echoes the lament of the drowned king's last breath.",
-    "category": "Occult Curiosities",
-    "condition": "Well-used",
-    "seller": "The Hollow Guild",
-    "starting_bid": 40648,
-    "current_bid": 59797,
-    "bid_count": 5,
-    "listed_at": "2026-04-08T18:28:33.618687",
-    "expires_at": "2026-04-15T18:28:33.618687",
     "sold": false
   }
 ]

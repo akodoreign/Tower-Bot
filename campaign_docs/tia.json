@@ -2,53 +2,53 @@
   "sectors": {
     "relic": {
       "name": "Relic & Antiquities",
-      "value": 112.89,
-      "prev_value": 113.71,
-      "change_pct": -0.72
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "essence": {
       "name": "Essence Coin Exchange",
-      "value": 149.35,
-      "prev_value": 147.38,
-      "change_pct": 1.34
+      "value": 100.9,
+      "prev_value": 100,
+      "change_pct": 0.9
     },
     "adventurer": {
       "name": "Adventurer Contracts",
-      "value": 109.07,
-      "prev_value": 107.87,
-      "change_pct": 1.11
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "divine": {
       "name": "Divine Services & Kharma",
-      "value": 107.86,
-      "prev_value": 108.0,
-      "change_pct": -0.13
+      "value": 100.76,
+      "prev_value": 100,
+      "change_pct": 0.76
     },
     "smuggling": {
       "name": "Grey Market Logistics",
-      "value": 102.61,
-      "prev_value": 103.86,
-      "change_pct": -1.2
+      "value": 100,
+      "prev_value": 100,
+      "change_pct": 0.0
     },
     "memory": {
       "name": "Memory & Information",
-      "value": 122.93,
-      "prev_value": 123.52,
-      "change_pct": -0.48
+      "value": 101.4,
+      "prev_value": 100.2,
+      "change_pct": 1.2
     },
     "security": {
       "name": "Security & Enforcement",
-      "value": 100.67,
-      "prev_value": 100.99,
-      "change_pct": -0.32
+      "value": 100.9,
+      "prev_value": 100,
+      "change_pct": 0.9
     },
     "rift_tech": {
       "name": "Rift Technology",
-      "value": 3083657384011306.5,
-      "prev_value": 3027516805376084.0,
-      "change_pct": 1.85
+      "value": 2266636788723785.0,
+      "prev_value": 2263443975849212.0,
+      "change_pct": 0.14
     }
   },
-  "last_updated": "2026-04-09T05:16:56.054979",
-  "last_event": "FTA seizure of unlicensed relics floods market"
+  "last_updated": "2026-04-03T05:27:42.085727",
+  "last_event": "Active Rift event: contract board freezes, security costs spike, containment stocks surge"
 }

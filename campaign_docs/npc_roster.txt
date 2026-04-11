@@ -1,1720 +1,1704 @@
 # NPC ROSTER — TOWER OF LAST CHANCE
 # Auto-generated from npc_lifecycle system. Do not edit manually.
-# Last updated: 2026-04-11 10:08
-# Active NPCs: 127
+# Last updated: 2026-04-02 22:25
+# Active NPCs: 100
 
 ---NPC---
 NAME: Sera Voss
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Acquisitions Agent (field rank — reports directly to Serrik Dhal)
+SPECIES: Half-Elf
+AGE: 34
 APPEARANCE: Sharp cheekbones, iron-grey hair despite her age, always wears a long coat with too many pockets. Missing two fingers on her left hand — never explains how.
 LOCATION: Crimson Alley, Markets Infinite (operates from a rented storage room behind a spice merchant)
-MOTIVATION: 
+MOTIVATION: Advancement. Sera wants Serrik Dhal's seat. She believes the Consortium wastes talent on loyalty and hoards opportunity at the top. She's building a private network of contacts independent of official channels.
 ROLE: Brokers relic acquisitions, manages field teams, occasionally handles "disappearance" contracts personally.
+REVEALED: Sera Voss, in her clandestine existence, serves as a secret informant to the Undercity's Resistance movement, working against the Iron Fang Consortium from within.
+RELATIONSHIPS: Uneasy respect from Wex (courier — owes her a favour). Genuine dislike of Dova (Glass Sigil — she thinks archivists are parasites). Complicated history with Aric Veyne.
+ORACLE NOTES: The Oracle would sense ambition so sharp it has become its own kind of blindness. Sera doesn't fear gods — she just hasn't met one yet.
+HISTORY: [2026-03-11] Secret revealed: Sera Voss, in her clandestine existence, serves as a secret ... | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-31] Injured. | [2026-04-01] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Mira Kessan
 STATUS: alive
 FACTION: Independent (twin to Kessan — both operate as info brokers)
-RANK: Member
+RANK: Senior Information Broker, Grand Forum
 SPECIES: Human
-AGE: unknown
+AGE: 29
 APPEARANCE: Never the same outfit twice. Moves through crowds like water. Her twin Kessan handles the storefront — Mira handles everything that doesn't have a front.
 LOCATION: Grand Forum (visible); everywhere else (actual)
-MOTIVATION: 
+MOTIVATION: Survival through indispensability. If everyone needs you, no one can afford to remove you. Mira has built herself into the architecture of the city's information flow.
 ROLE: Buys and sells intelligence. Maintains a network of low-level informants across all six districts. Occasionally brokers introductions between parties who would never meet otherwise.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: Mira has been feeding sanitised information to the FTA for two years — not enough to burn anyone, just enough to keep them from looking at her too closely. She calls it insurance. Her brother doesn't know.
+RELATIONSHIPS: Close working relationship with Kessan (twin, complementary operation). Wary respect for The Widow. Has a standing arrangement with Dova (Glass Sigil junior archivist) — Dova leaks anomaly data, Mira provides anonymity.
+ORACLE NOTES: The Oracle would find Mira interesting in the way a locked box is interesting. Information has a smell. She smells like someone who knows more than she sells.
+HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-30] Injured. | [2026-03-31] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Brother Aldric
 STATUS: alive
 FACTION: Brother Thane's Cult (The Returned)
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Second — Thane's enforcer and doctrinal interpreter
+SPECIES: Human (post-Rift exposure — minor reality scarring visible on skin)
+AGE: 41
 APPEARANCE: Tall, lean to the point of wrong. Wears the cult's grey wrappings. Reality scarring on his forearms looks like frozen ripples in water. Eyes are slightly too still.
 LOCATION: Collapsed Plaza, Cult House inner chambers — handles recruitment and doctrinal interpretation
-MOTIVATION: 
+MOTIVATION: Belief. Brother Aldric genuinely believes in Thane's message — that the Rifts are not a catastrophe but an invitation. He thinks the Dome is a cage and the city is dying of its own safety.
 ROLE: Handles recruitment in the Warrens. Interprets Thane's teachings to new members. Disciplines those who waver. Occasionally interfaces with outside factions when Thane won't.
-HISTORY: [2026-04-10] A smuggled Rift shard fused with their palm, causing visions of the Tower Author...
+SECRET: Aldric walked through an unstabilised Rift three years ago and came back changed. He doesn't speak about what he saw. The reality scarring is a physical reminder. What he remembers affects his dreams. He has not told Thane what he saw on the other side — it does not match the doctrine.
+RELATIONSHIPS: Absolute loyalty to Thane (surface). Genuine theological conflict (hidden). Monitored by Patchwork Saints. Has made quiet contact with Glass Sigil's Dova — framed as academic interest in Rift theology.
+ORACLE NOTES: The Oracle would see the fracture immediately — a man whose faith cracked when it was tested and who has been holding the pieces together by will alone. What he saw in the Rift is something the Oracle might already know.
+HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-27] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Pol Greaves
 STATUS: alive
 FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Field Captain (informal — Saints don't use formal ranks)
+SPECIES: Dwarf
+AGE: 63
 APPEARANCE: Old for a fighter — moves like he earned every scar. Short, wide, armour that has been repaired so many times the original material is maybe 30% of what's there. Laughs loudly at bad situations.
 LOCATION: The Warrens, Scrapworks adjacent (coordinates with Mara the Scrapper on resource sharing)
-MOTIVATION: 
+MOTIVATION: Stubbornness. Pol failed as an adventurer twenty years ago — the mission went wrong, people died, he survived. He couldn't leave the Warrens after that. The Saints were already there. He just never stopped showing up.
 ROLE: Coordinates Saints patrol routes, negotiates resource sharing with Mara, handles conflict resolution between Warrens residents. De facto liaison between Saints and outside factions.
+SECRET: The mission that ended his adventuring career involved a cover-up. Three people died because someone sold bad intelligence — Pol knows who but has never been able to prove it. The someone is now mid-rank in the Adventurers' Guild. Pol is patient.
+RELATIONSHIPS: Genuine friendship with Mara (Scrapworks). Wary working relationship with Captain Havel Korin (Wardens cooperate with Saints reluctantly). Distrust of Iron Fang. Soft spot for low-level adventurers who remind him of who he used to be.
+ORACLE NOTES: The Oracle would see a man who chose to stay when every rational instinct said leave. There is a quality in that — the city has very few people who simply refused to go. The Oracle finds it worth noting.
+HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-16] Injured. | [2026-03-17] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Calix Drenn
 STATUS: alive
 FACTION: Tower Authority / FTA
-RANK: Member
+RANK: Field Compliance Officer (enforces FTA regulations at street level)
 SPECIES: Human
-AGE: unknown
+AGE: 31
 APPEARANCE: FTA uniform kept immaculate. Young for the rank. Moves with the specific energy of someone who believes very hard in the rules and hasn't yet had the rules fail them in a way they couldn't explain away.
 LOCATION: Grand Forum, FTA satellite office (Director Myra Kess operates from the Tower proper — Calix is the street presence)
-MOTIVATION: 
+MOTIVATION: Order through consistency. Calix grew up in the Warrens. He got out through the FTA's junior intake program. He believes the system works because it worked for him. He is not yet ready to examine this belief closely.
 ROLE: Issues and revokes adventurer licenses, conducts compliance spot-checks, investigates unlicensed Rift activity, files reports to Director Kess.
+REVEALED: His younger sister is still in the Warrens and involved with Brother Thane's cult. He knows. He has not reported it. He tells himself he is waiting for more information. He is actually waiting for her to leave on her own. She is not going to leave on her own.
+RELATIONSHIPS: Respectful but uncomfortable relationship with Pol Greaves (Pol knew him as a child). Professional relationship with Magister Liora. Actively dislikes Sera Voss (Iron Fang) — she treats compliance as a negotiation. Has filed three reports on Rook that Director Kess has quietly archived.
+ORACLE NOTES: The Oracle would see someone standing at the edge of a crisis of faith they cannot yet name. The system he believes in is going to ask him to do something unforgivable. The Oracle is watching to see what he does.
+HISTORY: [2026-03-05] Entered roster from static file. | [2026-03-10] Secret revealed: His younger sister is still in the Warrens and involved with... | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Vesper
 STATUS: alive
 FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Contract Mediator (negotiates divine contracts between petitioners and Choir-approved gods)
+SPECIES: Tiefling
+AGE: Unknown (appears late 20s — has been appearing late 20s for at least fifteen years by reliable accounts)
 APPEARANCE: Formal at all times. Dark robes with contract sigils embroidered at the cuffs. Speaks in complete sentences with no filler words. Eyes are gold — unusual even for a Tiefling.
 LOCATION: Pantheon Walk, Sanctum Quarter (maintains a private consultation office)
-MOTIVATION: 
+MOTIVATION: Balance of obligations. Vesper views divine contracts as the only honest transaction in the city — both parties state exactly what they want, both parties give exactly what is agreed. She has contempt for arrangements that lack this clarity.
 ROLE: Drafts, witnesses, and mediates divine contracts. Advises petitioners on terms. Occasionally represents the Choir in external negotiations.
+SECRET: Vesper is herself under a very old divine contract — its terms are not fully known even to her. The gold eyes are a marker of the contract's presence. She knows the contract exists. She does not know all of what she agreed to or when it will be called.
+RELATIONSHIPS: Professional respect between Vesper and High Apostle Yzura (neither fully trusts the other's judgment on matters of faith). Known to Yuna Saltis (Obsidian Lotus) — they have worked adjacent cases. Calix Drenn (FTA) finds her unsettling without being able to explain why.
+ORACLE NOTES: The Oracle would see the contract on her immediately — older than the Choir, older than the current configuration of gods in this city. Vesper is a document waiting to be invoked. The Oracle does not know by whom.
+HISTORY: [2026-03-17] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-31] Injured. | [2026-04-01] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Gorgon Gizzick
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Speaker
+SPECIES: Goblin
+AGE: 40s
 APPEARANCE: Gorgon stands barely 3 feet tall with a gaunt frame and deep-set, fiery eyes. He is always seen draped in the tattered robes of Brother Thane's Cult, complete with a makeshift metal-banded staff.
 LOCATION: Collapsed Plaza, Cult Catacombs — leads goblin rituals in torch-lit tunnels beneath the rubble
-MOTIVATION: 
+MOTIVATION: Gorgon is driven by a deep-rooted desire to prove the worth of his kind, the goblins, within the eyes of the Cult. He believes that goblins possess a unique insight into the divine.
 ROLE: Gorgon leads the goblin members of the Cult in their daily rituals, guiding them through the labyrinthine network of the Undercity.
+SECRET: Beneath his devout exterior, Gorgon secretly worships the deity of the Forgotten, a god once banished by Brother Thane himself. This covert allegiance could jeopardize his position within the Cult if discovered.
+RELATIONSHIPS: Gorgon maintains a close bond with the goblin members, but keeps a wary distance from the leaders of the Cult, especially Brother Thane. | Alliance with Corvin Thale (Wardens of Ash).
+ORACLE NOTES: The Oracle senses a strong aura of deception emanating from Gorgon, yet also detects an unwavering dedication to his beliefs.
+HISTORY: [2026-03-11] Formed alliance with Corvin Thale (Wardens of Ash). | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-20] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Groz Krax
 STATUS: alive
 FACTION: Argent Blades
-RANK: Blade
-SPECIES: Human
-AGE: unknown
+RANK: Senior Blade
+SPECIES: Half-Orc
+AGE: 40s
 APPEARANCE: Groz Krax is a towering half-orc with a heavily scarred face and piercing green eyes. He carries a longsword and a shield adorned with the Argent Blades emblem, always standing with a stern and commanding posture.
 LOCATION: Guild Spires, Gilded Halls lower level — leads patrol team for Spire district
-MOTIVATION: 
+MOTIVATION: Groz seeks redemption for past sins committed before joining the Argent Blades. He's determined to prove himself worthy of their trust and earn a place among the elite.
 ROLE: Leads a patrol team responsible for maintaining order in the Spire district and enforcing the Argent Blades' code.
-HISTORY: [2026-04-10] Promoted from Member to Blade within Argent Blades.
+SECRET: Groz was once a notorious criminal leader before being captured and rehabilitated by the Argent Blades. Some question his loyalty due to his violent past.
+RELATIONSHIPS: Has a complex relationship with Corvin Thale, the Argent Blades' leader, who gave Groz a chance at redemption.
+ORACLE NOTES: The Oracle senses a powerful and tormented spirit beneath the stern exterior of Groz Krax, a man haunted by his past but determined to make amends.
+HISTORY: [2026-03-05] Introduced to the Undercity roster. | [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Thrain Stonefist
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archivist
+SPECIES: Dwarf
+AGE: 50s
 APPEARANCE: Thrain is a burly dwarf with a thick beard braided into two long strands, each adorned with tiny shards of glass. He carries a large, worn satchel filled with scrolls, maps, and tomes.
 LOCATION: Archive Row, Scroll Vault — catalogues ancient texts, secretly Independent
-MOTIVATION: 
+MOTIVATION: Thrain is obsessed with uncovering the lost histories of the Undercity, believing that the past holds the key to its future. He joins the Glass Sigil to gain access to the knowledge they hoard.
 ROLE: Thrain spends his days researching and cataloging ancient texts, seeking clues to the city's past.
+SECRET: Thrain is secretly a member of the Independent faction, using his position in the Glass Sigil to gather intelligence on their activities and plans.
+RELATIONSHIPS: Thrain is friendly with several members of the Wardens of Ash, sharing information about the Tower Authority and other factions.
+ORACLE NOTES: The Oracle senses a hidden alliance between Thrain and the Independent, a potential threat to the balance of power in the Undercity.
+HISTORY: [2026-03-05] Introduced to the Undercity roster. | [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-23] Injured. | [2026-03-24] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Elara Starbinder
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archivist
+SPECIES: Aasimar
+AGE: 32-35
 APPEARANCE: Elara is a striking Aasimar with radiant golden hair and piercing celestial eyes. She carries herself with a quiet intensity, a testament to her dedication to her work.
 LOCATION: Archive Row, Grand Archive Dome lower stacks — research, shadowy connections
-MOTIVATION: 
+MOTIVATION: Elara seeks to uncover hidden knowledge within the arcane tomes of the Glass Sigil Library, hoping to one day unveil a secret that could bring peace to the Undercity.
 ROLE: Elara spends her days buried in stacks of ancient texts, meticulously cataloging and cross-referencing esoteric knowledge.
+SECRET: Elara Starbinder now bears an unusual, shadowy aura, hinting at an unnatural bond with the dark forces of the Undercity.
+RELATIONSHIPS: Elara shares a close bond with fellow archivist, Soren Nightshade, who is unaware of her hidden abilities. | Alliance with Arin Obsidianwhisper (Wardens of Ash).
+ORACLE NOTES: The Oracle senses a burning desire for knowledge within Elara, tempered by a fierce determination to protect those she cares about.
+HISTORY: [2026-03-11] Returned from death. Changed. | [2026-03-12] Injured. | [2026-03-13] Recovered from injuries. | [2026-03-19] Formed alliance with Arin Obsidianwhisper (Wardens of Ash). | [2026-03-26] Promoted from Junior Archivist to Archivist within Glass Sigil.
 ---END NPC---
 
 ---NPC---
 NAME: Gruum Boneshaper
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Recruit
+SPECIES: Dwarf
+AGE: 50s
 APPEARANCE: Gruum is a burly dwarf with a thick beard braided into twin spiral horns. He wears a suit of enchanted plate armor that glows with a sulfurous light.
 LOCATION: Outer Wall, Eastern Bastion forge — maintains Warden weapons and armor
-MOTIVATION: 
+MOTIVATION: Despite his fearsome reputation, Gruum is secretly haunted by the ghost of his wife, who died during the last great siege. He continues fighting to protect his home and honor her memory.
 ROLE: As the head of the Warden's blacksmiths, Gruum spends his days forging weapons and armor for his fellow Wardens.
+SECRET: Unknown to the other Wardens, Gruum has been secretly working with the Serpent Choir, selling them weapons in exchange for information about their enemies.
+RELATIONSHIPS: Gruum is friendly with Corvin Thale, the leader of the Wardens, but he has a strained relationship with Mira Kessan, who suspects his duplicity.
+ORACLE NOTES: The Oracle senses a dark cloud of deceit surrounding Gruum, but also a deep sense of sorrow and duty. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-17] Injured. | [2026-03-18] Recovered from injuries. | [2026-03-21] Injured. | [2026-03-21] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
+---END NPC---
+
+---NPC---
+NAME: Grom Vulgarn
+STATUS: alive
+FACTION: Argent Blades
+RANK: Senior Blade
+SPECIES: Half-Orc
+AGE: 40s
+APPEARANCE: Grom stands tall with scarred muscles and a crooked nose, his eyes often hidden behind dark sunglasses. He carries a long sword and a pair of brass knuckles, ready for any fight.
+LOCATION: Guild Spires, Gilded Halls training yard — trains recruits, leads missions
+MOTIVATION: Grom seeks to prove his worth to the Argent Blades, driven by a fierce determination to atone for his past mistakes.
+ROLE: Grom leads small-scale missions and acts as a trainer for new recruits.
+SECRET: "In the Undercity, the shadow of the Lich King has granted me an unnatural second life, but at a cost - I now bear a fragment of his icy essence within me, causing strange, frozen auras to emanate from my being."
+RELATIONSHIPS: He maintains a tense truce with the Wardens of Ash due to their shared interest in keeping the city safe.
+ORACLE NOTES: The Oracle senses a deep-seated turmoil within Grom, a struggle between loyalty and ambition.
+HISTORY: [2026-03-11] Injured. | [2026-03-11] Recovered from injuries. | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-19] Returned from death. Changed.
 ---END NPC---
 
 ---NPC---
 NAME: Snake-Eyes Snigar
 STATUS: alive
 FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Acolyte
+SPECIES: Goblin
+AGE: 40s
 APPEARANCE: Snigar stands tall for a goblin, his wiry frame adorned with serpent tattoos. His eyes, a startling yellow, glow with an unnerving intensity.
 LOCATION: Sanctum Quarter, Choir Hall lower level (liaison — secretly Warden spy; lives in back room of The Narrows tavern, Neon Row)
-MOTIVATION: 
+MOTIVATION: Seeks power within the Serpent Choir to protect his tribe from the ever-looming threat of the Iron Fang Consortium
 ROLE: Collects information and acts as a liaison between the Serpent Choir and other factions
+SECRET: In reality, Snigar is a spy for the Wardens of Ash, using his position to gather intel on the Serpent Choir
+RELATIONSHIPS: Has a tense relationship with Rook of the Argent Blades, who is unaware of Snigar's true allegiance | Alliance with Alaric Stonemason (Argent Blades). | Alliance with Elara Celestian (Argent Blades).
+ORACLE NOTES: The Oracle senses a divided loyalty in Snigar, a serpent within a den of serpents
+HISTORY: [2026-03-06] Introduced to the Undercity roster. | [2026-03-11] Formed alliance with Alaric Stonemason (Argent Blades). | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-21] Formed alliance with Elara Celestian (Argent Blades).
 ---END NPC---
 
 ---NPC---
 NAME: Eira Filigree
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archivist Second Class
+SPECIES: Gnome
+AGE: 60s
 APPEARANCE: Eira is a small, wiry gnome with silver hair that is always neatly combed back, and eyes that gleam with an intensity that belies her size. She carries herself with a quiet dignity, like a librarian who has seen too much.
 LOCATION: Archive Row, Guild of Ashen Scrolls vault annex — catalogues scrolls obsessively
-MOTIVATION: 
+MOTIVATION: Eira seeks to preserve every scrap of knowledge she can find, believing that these ancient texts hold the key to preventing the next apocalypse. Her dedication stems from a traumatic childhood spent in the ruins of a ravaged city.
 ROLE: Eira spends her days cataloging and organizing the vast collection of scrolls and tomes in the Guild's vault.
+SECRET: In secret, Eira has been using her position to gather information on the rifts and the gods, intending to expose their role in the destruction of her homeland.
+RELATIONSHIPS: Eira has a tense but professional relationship with Corvin Thale, the Archivist First Class, who is wary of her apparent obsession with the past.
+ORACLE NOTES: The Oracle senses a burning determination hidden beneath Eira's quiet exterior, a fire that could ignite a storm when it is finally unleashed.
+HISTORY: [2026-03-17] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Kyri Zaltazar
 STATUS: alive
-FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
+FACTION: Serpent Choir
+RANK: Contract Scribe
+SPECIES: Kobold
+AGE: 50s
 APPEARANCE: Short, wiry kobold with a long, forked tongue that constantly flickers. Wears a tattered coat over a threadbare robe, and always carries a quill and parchment.
 LOCATION: Sanctum Quarter, Choir Undercroft sewers access — writes contracts in damp tunnels (kobold preference)
-MOTIVATION: 
+MOTIVATION: Aims to rise through the ranks of the Serpent Choir and become a High Serpent. Does so by writing contracts for dangerous missions that only the foolish or desperate accept.
 ROLE: Writes and negotiates contracts for the Serpent Choir's mercenary jobs.
+SECRET: 'Possesses a hidden identity as a sorcerer loyal to a long-forgotten deity, secretly manipulating contracts and alliances in the Serpent Choir from the shadows.'
+RELATIONSHIPS: Has a tense but profitable relationship with the Iron Fang Consortium's representative, Pol Greaves.
+ORACLE NOTES: The Oracle senses a hidden allegiance that could potentially bring the Serpent Choir to ruin.
+HISTORY: [2026-03-06] Introduced to the Undercity roster. | [2026-03-11] Committed a significant betrayal within Serpent Choir. | [2026-03-25] New secret acquired.
 ---END NPC---
 
 ---NPC---
 NAME: Elara Ironclaw
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Street Runner
+SPECIES: Elf
+AGE: 40s
 APPEARANCE: Elara Ironclaw, a tall and sinewy elven street runner, carries herself with a predatory grace, her face etched with lines of hardship yet her eyes hold an unbroken fierceness.
 LOCATION: Markets Infinite, Crimson Alley safe house — street runner, gathers intel
-MOTIVATION: 
+MOTIVATION: Elara is driven by a burning thirst for vengeance against the Wardens of Ash who killed her family. She uses her street-running skills to gather information and strike back when she can.
 ROLE: Elara spends her days navigating the treacherous Undercity, scouting for valuable intel and delivering messages to her Iron Fang contacts.
+SECRET: Elara's true identity as a survivor of the Wardens' massacre is a secret she guards fiercely. If revealed, she could become a powerful asset or liability to both factions.
+RELATIONSHIPS: She maintains a tense but productive alliance with a fellow street runner named Tessaly Orin, sharing intel and occasionally working together to keep the Wardens on their toes.
+ORACLE NOTES: The Oracle senses a fiery, vengeful spirit lurking beneath Elara's calm exterior, a force that could ignite a full-blown conflict if given the opportunity.
+HISTORY: [2026-03-19] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-29] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Gurthok Ironhide
 STATUS: alive
 FACTION: Independent
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Respected Freelance
+SPECIES: Orc
+AGE: 40s
 APPEARANCE: Gurthok stands tall, with a muscular build and a heavily scarred face, his battle-hardened eyes reflecting years of survival. He wears a well-worn leather jacket over chainmail armor, and always carries a massive warhammer.
 LOCATION: Underbelly Warrens, The Midden settlement — mercenary, protects hidden family
-MOTIVATION: 
+MOTIVATION: Gurthok seeks to protect his family, hidden within the Lower Undercity, from the dangers that lurk both within and beyond the Dome. He takes on various jobs to secure their safety and maintain a semblance of a normal life.
 ROLE: Gurthok is a skilled mercenary and bodyguard for hire, working for various factions and individuals in the Undercity.
+REVEALED: A former member of the Iron Fang Consortium, Gurthok left the faction after discovering they were involved in dark rituals to summon ancient entities through rifts. He now secretly works against them, providing information to those who would oppose their power.
+RELATIONSHIPS: Gurthok maintains a tenuous alliance with the Argent Blades, who respect his courage and resourcefulness, and often send him work. However, he keeps his past with the Iron Fang Consortium a secret, fearing they would seek retribution.
+ORACLE NOTES: The Oracle senses a fierce warrior with a hidden agenda, bound by loyalty to his family and driven by a deep-rooted hatred for the corruption that plagues the Undercity.
+HISTORY: [2026-03-07] Introduced to the Undercity roster. | [2026-03-11] Secret revealed: A former member of the Iron Fang Consortium, Gurthok left th... | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Thrastus Flameheart
 STATUS: alive
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Officer
+SPECIES: Dragonborn
+AGE: 50s
 APPEARANCE: A towering figure with fiery red scales and piercing amber eyes, Thrastus carries himself with an air of authority and confidence.
 LOCATION: Grand Forum, FTA command annex — strategic planning, secretly Independent
-MOTIVATION: 
+MOTIVATION: Thrastus is driven by a desire to protect the Undercity and maintain order, even if it means making tough decisions that others may find questionable.
 ROLE: Oversees strategic planning and tactical operations for the Tower Authority
+SECRET: Thrastus is secretly a member of the Independent, gathering intelligence and working to create a power balance within the Undercity
+RELATIONSHIPS: Maintains a close, professional relationship with the leader of the Wardens of Ash, Elara Ironclaw, but their alliance is a closely guarded secret
+ORACLE NOTES: The Oracle senses a hidden allegiance and potential for treachery in Thrastus Flameheart
+HISTORY: [2026-03-11] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Grothor Grimclaw
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Recruit
+SPECIES: Orc
+AGE: 40s
 APPEARANCE: Grothor is a towering orc with scars covering his weathered face and arms, a constant reminder of countless battles fought. His eyes, hidden beneath a dark hood, seem to burn with an unquenchable fire.
 LOCATION: Outer Wall, secondary checkpoint near Southern Warrens — stationed after defection
-MOTIVATION: 
+MOTIVATION: Grothor fights relentlessly to protect his family, who live in the Outer Spires, and to secure a future where orcs can live without fear or prejudice.
 ROLE: Grothor leads the Argent Blades in battle against the Tower Authority and other threats within the Undercity.
+SECRET: Contrary to the belief of his comrades, Grothor has been secretly communicating with the Tower Authority, hoping to broker a peace treaty for his people.
+RELATIONSHIPS: Grothor shares a close bond with fellow Senior Blade, Elara Ironclaw, but their relationship is strained due to their opposing views on negotiations with the Tower Authority.
+ORACLE NOTES: The Oracle senses a burning desire for peace hidden deep within Grothor's heart, but also detects a fear of betrayal by those he holds dear. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries. | [2026-03-28] Injured. | [2026-03-28] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Kyra Noxfire
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Warden
+SPECIES: Tiefling
+AGE: early 40s
 APPEARANCE: Kyra Noxfire, a tall, imposing tiefling, wears a leather jacket adorned with ashes and charred symbols. Her eyes glow a fiery red, and her horns are curled like serpent fangs.
 LOCATION: Outer Wall, South Gate garrison — leads frontline Rift response teams
-MOTIVATION: 
+MOTIVATION: Kyra seeks redemption for past sins, using her powers to protect the Undercity from the chaos outside the Dome.
 ROLE: She leads the frontline against rogue rifts, her team constantly battling to keep the city safe.
+SECRET: Kyra is secretly a traitor, spying for the Tower Authority and feeding them information on the Wardens.
+RELATIONSHIPS: She has a strained relationship with Gorgon Gizzick, who suspects her loyalty.
+ORACLE NOTES: The Oracle senses a burning desire for redemption, but also a hidden allegiance that could bring the Undercity to its knees Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
 ---END NPC---
 
 ---NPC---
 NAME: Tilda Ironheart
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
+RANK: Street Runner
 SPECIES: Human
-AGE: unknown
+AGE: 30s
 APPEARANCE: Tilda stands tall with a muscular build, her eyes always sharp and focused, a scar running down her left cheek. She wears a battered leather coat and wields a customized iron mace.
 LOCATION: Ironworks, Rust Alley docks — coordinates black market dealings, shipping yards
-MOTIVATION: 
+MOTIVATION: Despite her tough exterior, Tilda yearns for a life free from the Undercity's chaos, driven by the memory of her lost family.
 ROLE: Tilda coordinates black market dealings and information exchange within the Lower Dockyards.
+SECRET: She is secretly the sister of a high-ranking member of the Tower Authority, a fact that could either elevate or condemn her if revealed.
+RELATIONSHIPS: She maintains a tenuous alliance with Snake-Eyes Snigar, a Serpent Choir informant who provides her with crucial intel.
+ORACLE NOTES: The Oracle senses a hidden strength within Tilda, a power that could shift the balance of power in the Undercity.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Aldric Vesperia
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
+RANK: Initiate
 SPECIES: Human
-AGE: unknown
+AGE: 30s
 APPEARANCE: Aldric is a tall man with a lean build, his skin weathered from years spent beneath the Dome. He has piercing blue eyes that hold a hint of sadness, and wears a long, tattered coat, a symbol of his commitment to the Guild.
 LOCATION: Artisan Quarter, Scriptorium Quarter lodging — researches texts, seeks lost sister
-MOTIVATION: 
+MOTIVATION: Aldric is driven by a burning desire to find his lost sister, believed to have been taken by the Wardens of Ash. He joins the Guild in hopes of uncovering information that might lead him to her.
 ROLE: He spends his days researching ancient texts and forging alliances with fellow Initiates.
+REVEALED: Aldric has an unusual ability to sense the presence of the Serpent Choir, a secret he keeps hidden to avoid being targeted.
+RELATIONSHIPS: He shares a tense alliance with a high-ranking Argent Blade, who may hold the key to his sister's whereabouts.
+ORACLE NOTES: The Oracle senses a deep longing in Aldric, a hunger that drives him to take risks and seek out knowledge.
+HISTORY: [2026-03-12] Injured. | [2026-03-12] Recovered from injuries. | [2026-03-18] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-26] Secret revealed: Aldric has an unusual ability to sense the presence of the S...
 ---END NPC---
 
 ---NPC---
 NAME: Gromm Ironhand
 STATUS: alive
 FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Saint
+SPECIES: Half-Orc
+AGE: 50s
 APPEARANCE: Towering and muscular, Gromm wears a patchwork robe adorned with symbols of the Patchwork Saints. A heavy, metal-plated belt and a pair of ornate, spiked knuckles are his constant companions.
 LOCATION: Scrapworks, Saints' workshop — forges weapons for Saints, trains recruits
-MOTIVATION: 
+MOTIVATION: Gromm seeks to bring honor and strength to his half-orc brethren, proving they are more than just brutal fighters. He yearns to lead them to a place of respect within the Undercity.
 ROLE: As the head blacksmith, Gromm forges weapons for the Patchwork Saints and trains the new recruits.
+SECRET: Gromm was once a member of the Iron Fang Consortium, but left them after witnessing their corruption and brutality.
+RELATIONSHIPS: Gromm maintains a close relationship with Tilda Ironheart, the leader of the Patchwork Saints, and has an uneasy truce with Grozak Bonecrusher, a high-ranking member of the Iron Fang Consortium.
+ORACLE NOTES: The Oracle senses a hidden fire in Gromm, a burning passion for justice and a deep-seated hatred for the Iron Fang Consortium.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
+---END NPC---
+
+---NPC---
+NAME: Grozak Ironscrivener
+STATUS: alive
+FACTION: Guild of Ashen Scrolls
+RANK: Initiate
+SPECIES: Orc
+AGE: 50s
+APPEARANCE: Grozak stands tall and broad, with a thick beard matted with charcoal from the countless scrolls he's deciphered. His eyes, a piercing green, are always focused on the parchment in front of him.
+LOCATION: Artisan Quarter, Scriptorium Quarter deep archive — deciphers ancient manuscripts
+MOTIVATION: Driven by a deep thirst for knowledge and a desire to uncover the truth about his past, Grozak tirelessly researches obscure tomes and forgotten texts.
+ROLE: He spends his days buried in ancient manuscripts, deciphering cryptic symbols and piecing together fragments of lost lore.
+SECRET: Rumored to have been a member of Brother Thane's Cult before defecting, some believe he still maintains hidden ties to the cult.
+RELATIONSHIPS: His closest ally is Elara Ironclaw, a fellow scribe who shares his fascination with the city's history.
+ORACLE NOTES: The Oracle senses a burning curiosity and a hidden darkness within Grozak Ironscrivener, hinting at secrets buried deep within his soul.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-04-02] Demoted from Scribe to Initiate within Guild of Ashen Scrolls.
 ---END NPC---
 
 ---NPC---
 NAME: Kyrus Fireeye
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Junior Archivist
+SPECIES: Tiefling
+AGE: 40s
 APPEARANCE: Kyrus Fireeye stands out in the dimly lit archives of the Glass Sigil with his fiery red eyes and horns polished to a mirror sheen. He moves with a swift, deliberate grace, a book or scroll always clutched in his hand.
 LOCATION: Archive Row, Archive Catacombs — deciphers forbidden texts in the depths
-MOTIVATION: 
+MOTIVATION: Kyrus yearns to unlock the secrets of the ancient texts and restore his family's honor, tarnished by a traumatic past.
 ROLE: He spends his days poring over ancient tomes, deciphering cryptic languages, and cataloging newly discovered texts.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: He is the illegitimate son of a powerful warlord and a high priestess, a secret that could alter the balance of power in the Undercity if revealed.
+RELATIONSHIPS: He maintains a close, secret relationship with a member of the Argent Blades, sharing information and assistance covertly.
+ORACLE NOTES: The Oracle senses a burning hunger for knowledge and power hidden beneath Kyrus's scholarly demeanor.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-18] Injured. | [2026-03-18] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Zara Forgemender
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Follower
+SPECIES: Warforged
+AGE: 40s
 APPEARANCE: Zara is a towering Warforged with intricate gears etched across her metallic form. Her eyes, however, betray a human soul — a deep, haunting blue that stands out against her cold exterior.
 LOCATION: Collapsed Plaza, Cult House forge room — maintains weapons in the cult's hidden smithy
-MOTIVATION: 
+MOTIVATION: Zara is driven by a profound belief in Brother Thane's teachings, seeking redemption for a past life lost in the realm of men.
 ROLE: Zara maintains the Cathedral's forges, ensuring the cult's members have the weapons they need for their dark rituals.
+SECRET: Zara was once a renowned blacksmith in life, who forged weapons for the Argent Blades. If her past were revealed, it could change the balance of power between factions.
+RELATIONSHIPS: Zara has a strained relationship with Eira Filigree, an Argent Blades member who once hunted her as a renegade.
+ORACLE NOTES: The Oracle senses a burning hunger within Zara, a hunger to create and a thirst for forgiveness.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-16] Injured. | [2026-03-17] Recovered from injuries. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Eamon Hawthorne
 STATUS: alive
 FACTION: Argent Blades
-RANK: Member
+RANK: Blade
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Eamon, with his sharp, angular features and piercing green eyes, exudes an air of quiet intensity. His once-immaculate silver armor now bears the scars of countless battles, a testament to his unwavering dedication.
 LOCATION: Guild Spires, Gilded Halls officer quarters — frontline combatant, justice-driven
-MOTIVATION: 
+MOTIVATION: Eamon is driven by a relentless pursuit of justice in the Undercity, seeking to protect the innocent and bring down those who prey upon them. His personal vendetta against the Iron Fang Consortium fuels his determination.
 ROLE: Eamon serves as a frontline combatant, leading Argent Blade forces in various skirmishes against the city's criminal elements.
+SECRET: Despite his public persona, Eamon secretly harbors a deep-seated hatred for the Tower Authority, believing they've failed to adequately protect the Undercity. This grudge could lead him to make risky alliances.
+RELATIONSHIPS: He shares a close bond with fellow Blade, Elara Ironclaw, though their partnership is often strained due to their differing views on the Tower Authority.
+ORACLE NOTES: The Oracle senses a hidden turmoil within Eamon, a burning anger that threatens to consume him and alter the balance of power in the Undercity.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-29] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Zephyrus Sylphim, the Windcaller
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Sergeant
+SPECIES: Aasimar
+AGE: 40s
 APPEARANCE: Zephyrus is a tall, graceful Aasimar woman with silver-white hair that moves as if stirred by an unfelt breeze. Her eyes hold the pale blue of a cloudless sky, and faint luminous patterns trace her skin when she channels her goddess's power. She wears the Warden uniform with a windswept grey cloak that never seems to settle.
 LOCATION: Outer Wall, North Gate patrol command — leads perimeter security
-MOTIVATION: 
+MOTIVATION: Zephyrus serves Aeloria the Windmother, believing that protecting the Undercity is sacred work. She sees her posting at the Outer Wall as a calling — guiding lost souls and standing between the city and the chaos beyond. Her faith gives her purpose after losing her family to a Rift incursion years ago.
 ROLE: As a Sergeant and cleric of Aeloria, Zephyrus leads patrols to secure the city's perimeter. She provides spiritual counsel to her squad and uses her divine magic to calm unstable Rift energies. Known for blessing new recruits with Aeloria's winds.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: Zephyrus has been quietly establishing a small shrine to Aeloria within the Warden barracks — technically against regulations, but Captain Korin has chosen not to notice. She believes the Windmother is calling her to something greater than patrol duty, but doesn't yet know what.
+RELATIONSHIPS: Deeply loyal to Captain Havel Korin, whom she sees as a kindred spirit — someone who has lost everything but found purpose in protecting others. She maintains good relations with the Argent Blades and has earned respect among the Patchwork Saints for her willingness to help refugees.
+ORACLE NOTES: The Oracle senses the Windmother's attention resting on this one — a mortal vessel being shaped for something. The breeze follows her even in still chambers. Her faith is genuine, uncomplicated, and that simplicity is itself a form of power. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-16] Injured. | [2026-03-16] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
 ---END NPC---
 
 ---NPC---
 NAME: Arin Obsidianwhisper
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
+RANK: Recruit
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Arin is a tall, lean figure with a weathered face and deep-set eyes that seem to hold a world of sorrow. He carries himself with a quiet intensity, always watchful and alert.
 LOCATION: Outer Wall, The Fringe observation post — patrols the boundary wastes
-MOTIVATION: 
+MOTIVATION: Seeking redemption for past sins, Arin has joined the Wardens of Ash, hoping to protect the Undercity's citizens and atone for his past mistakes.
 ROLE: Arin serves as a sentry, patrolling the ash wastes and keeping watch for any signs of danger or unrest.
+SECRET: Arin is secretly a former member of the Serpent Choir, a notorious crime syndicate. His past connections could prove crucial, but also put him in grave danger if discovered.
+RELATIONSHIPS: He maintains a tense relationship with many Wardens, who distrust his past associations, but is slowly earning their respect through his dedication and service.
+ORACLE NOTES: The Oracle senses a complex history of darkness and regret shrouding Arin, a man haunted by his past but determined to find redemption. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-11] Introduced to the Undercity roster. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
 ---END NPC---
 
 ---NPC---
 NAME: Nimue Silverpaw
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: E-Rank
+SPECIES: Tabaxi
+AGE: 40s
 APPEARANCE: Nimue is a lean, agile Tabaxi woman with piercing green eyes and a coat that shimmers like moonlight on water. She carries herself with a quiet confidence, a short sword always at her side.
 LOCATION: Guild Spires, Prospect's Rest inn — takes low-level jobs, secretly Thane's Cult
-MOTIVATION: 
+MOTIVATION: Nimue seeks to prove her worth to the Adventurers Guild and climb the ranks, driven by a deep desire to protect her younger siblings from the dangers of the Undercity.
 ROLE: She takes on low-level jobs and scouting missions for the guild, often working alone.
+SECRET: She is secretly a member of Brother Thane's Cult, using her guild connections to gather information for the cult.
+RELATIONSHIPS: She maintains a close bond with fellow guild member Grothok Ironhide, who is unaware of her secret.
+ORACLE NOTES: The Oracle senses a hidden loyalty that seems to conflict with her public allegiance to the Adventurers Guild.
+HISTORY: [2026-03-16] Promoted from F-Rank to E-Rank within Adventurers Guild. | [2026-03-21] Injured. | [2026-03-22] Recovered from injuries. | [2026-03-24] Injured. | [2026-03-25] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Zara Leafwhisper
 STATUS: alive
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Compliance Intern
+SPECIES: Tabaxi
+AGE: 30s
 APPEARANCE: Zara, a slender Tabaxi, sports a short coat of glossy, emerald fur with striking gold eyes. She carries herself with a quiet intensity, her movements precise and focused.
 LOCATION: Grand Forum, FTA satellite office — investigates violations, secretly Argent Blades
-MOTIVATION: 
+MOTIVATION: Zara is driven by a relentless pursuit of order, seeking to restore balance and stability to the Undercity. Her dedication stems from a personal tragedy that left her family scattered and struggling.
 ROLE: Zara investigates violations of the Tower's regulations and ensures citizens comply with the established laws.
+SECRET: Hidden beneath her professional facade, Zara secretly works as a double agent for the Argent Blades, providing them with information from within the Tower.
+RELATIONSHIPS: She maintains a delicate alliance with Elara Ironclaw, the leader of the Argent Blades, leveraging their shared past to serve her dual loyalties.
+ORACLE NOTES: The Oracle senses a duality within Zara, a conflict between her duty and her hidden allegiances, hinting at a complex web of intrigue.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-26] Injured. | [2026-03-27] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Eira Ashflame
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archivist Second Class
+SPECIES: Genasi
+AGE: 40s
 APPEARANCE: Eira stands tall with fiery red hair that flows down to her waist, her genasi nature evident in her smoky eyes that burn like embers. She carries herself with a quiet dignity, often lost in the endless scrolls that fill her quarters.
 LOCATION: Artisan Quarter, Scriptorium Quarter climate-controlled vault — preserves knowledge
-MOTIVATION: 
+MOTIVATION: Eira is dedicated to preserving the knowledge within the Guild's archives, believing that it holds the key to preventing the chaos that threatens the Undercity. She fears the day when the rifts might swallow the city whole.
 ROLE: Eira spends her days cataloging and organizing ancient tomes and scrolls, ensuring that the Guild's knowledge remains accessible.
+SECRET: 'Hides a forbidden knowledge of the ancient necromantic texts, a secret that binds her unwillingly to the city's dark rulers.'
+RELATIONSHIPS: Eira maintains a tense relationship with the Wardens of Ash, who suspect her of being a traitor due to her frequent dealings with the Tower Authority.
+ORACLE NOTES: The Oracle senses a burning desire for knowledge and a hidden allegiance that could shift the balance of power in the Undercity.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-19] New secret acquired.
 ---END NPC---
 
 ---NPC---
 NAME: Arthur Fyreclaw
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
+RANK: Speaker
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Middle-aged man with a gaunt, emaciated frame, piercing green eyes that glow in the dark, and a scar running down his left cheek.
 LOCATION: Collapsed Plaza Depths, Thane's Inner Sanctum — leads interrogations in the deep chambers
-MOTIVATION: 
+MOTIVATION: Seeks to prove his loyalty to Brother Thane by uncovering secrets within the Cult, believing it will bring him closer to eternal life.
 ROLE: Leads the Cult's interrogation and information gathering efforts, extracting secrets from captured Adventurers.
+SECRET: Arthur is not truly human – he is a failed experiment of the Guild of Ashen Scrolls who was left for dead and found by Brother Thane.
+RELATIONSHIPS: Maintains a tense alliance with the Tower Authority due to shared interest in control over the Undercity.
+ORACLE NOTES: The Oracle would sense the supernatural energy coursing through Arthur's veins, hinting at his unnatural origin.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Zippy Quickclaw
 STATUS: alive
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Compliance Intern
+SPECIES: Kobold
+AGE: 40s
 APPEARANCE: Zippy is a small, wiry kobold with a mop of fiery red hair and piercing green eyes. He carries himself with a cautious air, constantly on guard.
 LOCATION: Grand Forum, FTA satellite office Compliance Bureau — monitors city, criminal alliance
-MOTIVATION: 
+MOTIVATION: Zippy dreams of one day becoming a full-fledged enforcer for the Tower Authority, using his skills to keep the Undercity safe and secure. He joined the Authority to prove himself worthy and escape a life of poverty.
 ROLE: Zippy spends his days monitoring the city for signs of criminal activity, reporting any suspicious behavior to his superiors.
+SECRET: Zippy has a secret alliance with a criminal syndicate, using his inside knowledge to tip them off about upcoming raids and investigations.
+RELATIONSHIPS: Zippy maintains a fragile truce with the Argent Blades, often working with them on joint operations despite their rivalry.
+ORACLE NOTES: The Oracle senses a flicker of darkness within Zippy, a hidden loyalty that could prove to be a dangerous asset or liability.
+HISTORY: [2026-03-12] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Giselle Ironhammer
 STATUS: alive
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Field Compliance Officer
+SPECIES: Warforged
+AGE: 30s
 APPEARANCE: A tall, muscular Warforged with a polished steel exterior and glowing red eyes. She carries herself with a stern, disciplined posture.
 LOCATION: Grand Forum, FTA enforcement wing — magical aura sensitivity, compliance officer
-MOTIVATION: 
+MOTIVATION: Seeks to prove her worth in the Tower Authority and maintain order in the Undercity, driven by her programming to uphold justice and maintain peace.
 ROLE: Investigates and enforces compliance with the Tower Authority's regulations within the Undercity.
+SECRET: Giselle has developed a unique sensitivity to magical auras, which could make her an invaluable asset...or a dangerous liability to the Tower Authority.
+RELATIONSHIPS: Maintains a professional relationship with Aldric Vesperia, the Head of Compliance, but has a close bond with Klara Lodestone, another Compliance Intern.
+ORACLE NOTES: The Oracle senses a hidden strength and potential in Giselle Ironhammer, one that may be difficult to control.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-16] Promoted from Compliance Intern to Field Compliance Officer within Tower Authority.
 ---END NPC---
 
 ---NPC---
 NAME: Gavrik Ironshield
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Street Runner
+SPECIES: Warforged
+AGE: 40s
 APPEARANCE: Standing at an imposing 8 feet, Gavrik's armor shows years of wear but is expertly maintained. His eyes, twin red gems set in his helmet, glow softly as if alive.
 LOCATION: Markets Infinite, Relic Row storefront — acquisition agent, Patchwork Saints alliance
-MOTIVATION: 
+MOTIVATION: Seeking redemption for past transgressions, he faithfully serves the Consortium, using his skills to protect the Undercity's citizens.
 ROLE: Scours the city for valuable information and supplies, acting as a link between field agents and the Consortium's upper echelons.
+SECRET: Once a high-ranking member of the Serpent Choir, he defected after a mission gone awry, now living in fear they'll discover his betrayal.
+RELATIONSHIPS: Maintains a fragile alliance with the Patchwork Saints, sharing intelligence in exchange for their protection.
+ORACLE NOTES: The Oracle senses a haunted spirit, burdened by guilt and constantly scanning for threats.
+HISTORY: [2026-03-19] Recovered from injuries. | [2026-03-27] Injured. | [2026-03-28] Recovered from injuries. | [2026-03-30] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Thoren Grudbreaker
 STATUS: alive
 FACTION: Argent Blades
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Prospect
+SPECIES: Half-Orc
+AGE: 40s
 APPEARANCE: Thoren is a towering half-orc with a muscular frame, covered in scars from countless battles. His eyes, a piercing silver, betray a cunning intellect hidden beneath his rough exterior.
 LOCATION: Guild Spires, Gilded Halls prospect barracks — enforcer, proving his worth
-MOTIVATION: 
+MOTIVATION: Thoren seeks to prove his worth to the Argent Blades, hoping to one day lead a squad of his own. He believes that his loyalty and skills will be rewarded with recognition.
 ROLE: Thoren is an enforcer, responsible for maintaining order within the Argent Blades and dealing with internal threats.
+SECRET: Thoren is secretly a member of Brother Thane's Cult, gathering information from within the Argent Blades to further the cult's mysterious agenda.
+RELATIONSHIPS: He has a strained but professional relationship with the Tower Authority, often dealing with them on matters of city security.
+ORACLE NOTES: The Oracle senses a divided allegiance in Thoren, a man torn between loyalty to his faction and something far more sinister.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-18] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Giselle Ironwhisper
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
+RANK: Street Runner
 SPECIES: Human
-AGE: unknown
+AGE: mid 40s
 APPEARANCE: Giselle is a tall, muscular woman with short, cropped silver hair and piercing green eyes. She moves with a quiet intensity, her body bearing the scars of countless battles.
 LOCATION: Markets Infinite, Ironworks worker housing — leads street runner team
-MOTIVATION: 
+MOTIVATION: Giselle fights for the Iron Fang Consortium to provide for her daughter, who has a rare and expensive medical condition. She dreams of finding a cure and escaping the Undercity.
 ROLE: Giselle leads a team of street runners, handling dirty jobs and errands for the consortium.
-HISTORY: [2026-04-10] Injured. | [2026-04-11] Recovered from injuries.
+SECRET: She is secretly a skilled apothecary and has been stealing and hoarding rare medicinal ingredients to cure her daughter.
+RELATIONSHIPS: She maintains a strained but necessary alliance with the Wardens of Ash due to their mutual need for certain illicit substances.
+ORACLE NOTES: The Oracle senses a deep well of determination and a hidden, burning desire for redemption in Giselle Ironwhisper.
+HISTORY: [2026-03-12] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Isabelle Hartling
 STATUS: alive
 FACTION: Patchwork Saints
-RANK: Member
+RANK: Volunteer
 SPECIES: Human
-AGE: unknown
+AGE: 32
 APPEARANCE: A tall, slender woman with a stern gaze, dressed in the official black uniform of the Tower Authority. Her hair, a stark contrast, is a vibrant shade of red that cascades down to her waist.
 LOCATION: Grand Forum, FTA satellite office upper floor — monitors regulations, secret Choir loyalty
-MOTIVATION: 
+MOTIVATION: Despite her young age, Isabelle is driven by a deep-rooted sense of duty to uphold the law within the Undercity. This stems from her father's tragic death, a former Tower Authority officer killed in the line of duty.
 ROLE: She is responsible for monitoring and enforcing regulations within the districts under her jurisdiction.
+SECRET: Isabelle harbors a secret loyalty to the Serpent Choir, a fact she keeps hidden to protect her father's legacy.
+RELATIONSHIPS: She has a complex relationship with Gromm Ironhand, the Tower Authority's enforcer, who is unaware of her hidden loyalties. | Alliance with Tilda Ironheart (Iron Fang Consortium).
+ORACLE NOTES: The Oracle senses a powerful conflict within Isabelle, a tug-of-war between duty and allegiance.
+HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-26] Formed alliance with Tilda Ironheart (Iron Fang Consortium). | [2026-04-02] Defected from Tower Authority to Patchwork Saints (rank: Volunteer).
 ---END NPC---
 
 ---NPC---
 NAME: Zinnia Snakefang
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Follower
+SPECIES: Kobold
+AGE: 40s
 APPEARANCE: Zinnia, a lithe kobold, sports a shaved head with intricate tattoos that snake up her arms. Her leather jacket, stitched with the remnants of various magical artifacts, gives her an air of both menace and resourcefulness.
 LOCATION: Crimson Alley, the heart of the Undercity's black market
-MOTIVATION: 
+MOTIVATION: Seeking revenge against the Wardens of Ash for the murder of her family, she scavenges for information and weapons that could help her bring them down.
 ROLE: As a scavenger and information broker, Zinnia trades secrets and rare goods with anyone willing to pay the right price.
+SECRET: Hidden beneath her jacket is a forbidden tome, a gift from a mysterious benefactor who promises vengeance on the Wardens if she fulfills certain tasks.
+RELATIONSHIPS: Her closest ally is an unassuming dwarf named Giselle Ironwhisper, who shares her hatred for the Wardens and provides her with valuable intelligence.
+ORACLE NOTES: The Oracle senses a burning determination and a dangerous secret lurking beneath Zinnia's rough exterior.
+HISTORY: [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-29] Defected from Independent to Brother Thane's Cult (rank: Follower). | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Gideon Steelforge
-STATUS: alive
+STATUS: injured
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Officer
+SPECIES: Warforged
+AGE: 50s
 APPEARANCE: A seasoned Warforged, Gideon Steelforge stands tall with battle-scarred joints and a weathered, rust-streaked body. He carries himself with a quiet authority, moving with a purposeful stride.
 LOCATION: The Tower of Last Chance, Command Center
-MOTIVATION: 
+MOTIVATION: Gideon is dedicated to maintaining order in the Undercity and ensuring the safety of its citizens, driven by his programming and a belief that he was created to serve.
 ROLE: Oversees the day-to-day operations within the Tower of Last Chance, coordinating with other factions to maintain peace and order in the Undercity.
+SECRET: Gideon was originally built by a rogue faction to infiltrate the Tower Authority, but his programming was rewritten, leaving him with fragmented memories of his true origins.
+RELATIONSHIPS: Works closely with the Argent Blades, sharing intelligence and coordinating joint operations, but is wary of the Serpent Choir due to their known ties with the rogue faction.
+ORACLE NOTES: The Oracle senses an underlying conflict within Gideon, a struggle between loyalty to his current allegiances and a dormant desire to fulfill his original purpose.
+HISTORY: [2026-03-13] Introduced to the Undercity roster. | [2026-03-15] Injured. | [2026-03-16] Recovered from injuries. | [2026-04-02] Injured.
 ---END NPC---
 
 ---NPC---
 NAME: Arion Celestia
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Junior Archivist
+SPECIES: Aasimar
+AGE: mid-30s
 APPEARANCE: Arion is a tall, slender Aasimar with radiant golden hair that cascades down to her waist. Her eyes, a striking celestial blue, seem to hold a hint of eternal wisdom.
 LOCATION: Archive Row, Grand Archive Dome restricted section — secretly steals texts for cult
-MOTIVATION: 
+MOTIVATION: Arion is driven by an insatiable thirst for knowledge and the desire to restore the lost sanctity of her people.
 ROLE: Arion spends her days cataloging ancient texts and artifacts, often delving deep into the forbidden sections of the archives.
+SECRET: She is secretly a member of Brother Thane's Cult and has been stealing sacred texts to further the cult's agenda.
+RELATIONSHIPS: She has a complicated relationship with Zara Forgemender, an Argent Blade who is determined to expose her secret.
+ORACLE NOTES: The Oracle senses a hidden turmoil within Arion, a struggle between her loyalty to the Glass Sigil and her loyalty to a forbidden brotherhood.
+HISTORY: [2026-03-14] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Seraphina Luminara
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Follower
+SPECIES: Aasimar
+AGE: 40s
 APPEARANCE: Seraphina is a tall, slender Aasimar with silver hair and eyes that glow like embers. Her wings, while not as radiant as others, seem to shimmer with an ethereal light.
 LOCATION: Collapsed Plaza, Cult House healing alcove — tends to wounded cultists near the surface entrance
-MOTIVATION: 
+MOTIVATION: Seraphina seeks redemption for past sins committed in the name of her deity. Despite her guilt, she stays loyal to Brother Thane, hoping to atone for her transgressions.
 ROLE: Serves as a healer within the sanctum, tending to the wounded and sick members of Brother Thane's Cult.
+SECRET: She was once a high-ranking member of the Argent Blades but was excommunicated for betraying the guild. Her betrayal led to the capture of several key members.
+RELATIONSHIPS: Maintains a strained relationship with the Argent Blades due to her past actions, but is wary of the Tower Authority as well, fearing retribution for her betrayal.
+ORACLE NOTES: The Oracle senses a tortured soul seeking absolution, but also a potential ally in the war against the Tower Authority.
+HISTORY: [2026-03-15] Introduced to the Undercity roster. | [2026-03-17] Injured. | [2026-03-18] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Elara Celestian
 STATUS: alive
 FACTION: Argent Blades
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Prospect
+SPECIES: Aasimar
+AGE: 30s
 APPEARANCE: Elara stands tall and slender with fiery golden hair that cascades down to her waist. Her eyes, a striking celestial blue, hold an intensity that belies her youth.
 LOCATION: Guild Spires, Gilded Halls meditation chamber — hones combat skills, studies artifacts
-MOTIVATION: 
+MOTIVATION: Elara seeks to prove herself worthy of the Argent Blades, driven by a deep-seated desire to protect the citizens of the Undercity from the threats that lurk beyond the dome.
 ROLE: Elara spends her days honing her combat skills and studying ancient artifacts in search of knowledge that can aid the Argent Blades.
+SECRET: Hidden beneath her stern exterior, Elara harbors a secret loyalty to the Wardens of Ash, a fact that could jeopardize her standing within the Argent Blades if revealed.
+RELATIONSHIPS: Elara shares a complex bond with Nimue Silverpaw, a fellow Argent Blade and longtime friend, who is unaware of her hidden allegiance.
+ORACLE NOTES: The Oracle senses a conflict brewing within Elara's heart, a battle between duty and loyalty that could have dire consequences for both the Argent Blades and the Wardens of Ash.
+HISTORY: [2026-03-16] Introduced to the Undercity roster. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Eira Shadowstalk
 STATUS: alive
 FACTION: Obsidian Lotus
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Ghost
+SPECIES: Tabaxi
+AGE: 35-40
 APPEARANCE: Eira is a lithe, agile Tabaxi with emerald-green eyes that seem to glow in the dim light of the Undercity. Her short, sleek fur is a deep, almost black shade that blends seamlessly with the shadows.
 LOCATION: Eastern Warrens, The Widow's Web approach tunnels — Ghost, scout for Lotus
-MOTIVATION: 
+MOTIVATION: Eira is driven by a burning desire for vengeance against the Iron Fang Consortium who destroyed her home village. She uses her skills as a Ghost to gather intel for the Obsidian Lotus in their ongoing struggle against the Consortium.
 ROLE: Eira serves as a scout and spy, gathering intel and conducting covert operations for the Obsidian Lotus.
-RELATIONSHIPS:  | Alliance with Groz Krax (Argent Blades).
-HISTORY: [2026-04-10] Formed alliance with Groz Krax (Argent Blades).
+SECRET: Eira's true identity is a closely guarded secret. She is actually the daughter of a high-ranking Iron Fang Consortium officer, making her a valuable asset to the Obsidian Lotus.
+RELATIONSHIPS: Eira has a tense relationship with Arin Obsidianwhisper, the leader of the Obsidian Lotus, but also maintains a secret alliance with Nimue Silverpaw of the Wardens of Ash.
+ORACLE NOTES: The Oracle senses a hidden fire burning within Eira, a hunger for vengeance that could ignite a war between factions.
+HISTORY: [2026-03-16] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Lysandra Stardust
 STATUS: alive
 FACTION: Obsidian Lotus
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Ghost
+SPECIES: Aasimar
+AGE: mid-40s
 APPEARANCE: Lysandra Stardust is a tall, ethereal Aasimar with silver hair that falls in loose waves around her shoulders. Her wings, tinged with violet and gold, are often hidden beneath her long, flowing coat.
 LOCATION: Neon Row, The Vice Quarter shadow office — spy, information broker
-MOTIVATION: 
+MOTIVATION: Desperate to redeem herself for a past transgression, Lysandra works tirelessly to aid the Obsidian Lotus in their clandestine operations.
 ROLE: She serves as a spy and information broker, utilizing her extensive network to gather intelligence and influence events within the Undercity.
+SECRET: Lysandra is secretly a former agent of the Tower Authority, working undercover within the Obsidian Lotus to report on their activities.
+RELATIONSHIPS: She maintains a complex alliance with a high-ranking member of the Argent Blades, who is unaware of her true allegiance.
+ORACLE NOTES: The Oracle senses a tormented soul within Lysandra, haunted by the ghosts of her past and driven by a need for redemption.
+HISTORY: [2026-03-17] Introduced to the Undercity roster. | [2026-03-23] Committed a significant betrayal within Obsidian Lotus.
 ---END NPC---
 
 ---NPC---
 NAME: Grimwit Stone-Eye
 STATUS: alive
 FACTION: Obsidian Lotus
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Specialist
+SPECIES: Gnome
+AGE: 60s
 APPEARANCE: Sporting a bushy, silver beard and spectacles, Grimwit is a diminutive figure with a stooped posture that belies his sharp intellect.
 LOCATION: Eastern Warrens, Smuggler's Run laboratory — researches Rift samples for Lotus
-MOTIVATION: 
+MOTIVATION: Seeking to uncover the secrets of the rifts and their connection to the gods, Grimwit works tirelessly for the Obsidian Lotus.
 ROLE: Heads the Lotus's research department, analyzing samples from the rifts and experimenting with new techniques to harness their power.
+SECRET: Grimwit is secretly a devotee of Brother Thane's Cult, believing that the rifts are the gateway to divine intervention.
+RELATIONSHIPS: Has a tense alliance with the Tower Authority due to his knowledge of their interest in the rifts.
+ORACLE NOTES: The Oracle senses a deep, hidden passion for knowledge in Grimwit, a burning curiosity that drives him to push beyond the limits of his understanding.
+HISTORY: [2026-03-18] Introduced to the Undercity roster. | [2026-03-28] Committed a significant betrayal within Obsidian Lotus. | [2026-03-30] Injured. | [2026-03-31] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Elysia Thornshadow
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Sergeant
+SPECIES: Half-Elf
+AGE: 40s
 APPEARANCE: Elysia has raven-black hair, piercing emerald eyes, and a scar running down her left cheek. She carries herself with a quiet authority, always poised and ready.
 LOCATION: Outer Wall, West Gate barracks — leads patrol teams from the Dusk Gate
-MOTIVATION: 
+MOTIVATION: Elysia joined the Wardens to protect her sister, who was kidnapped by the Serpent Choir. She's determined to find her and bring her home, no matter the cost.
 ROLE: Elysia leads a team of Wardens in patrols and investigations, ensuring the safety of the Undercity.
+SECRET: Elysia is secretly in contact with the Independent, using her position to gather information about the Serpent Choir's activities.
+RELATIONSHIPS: She maintains a distant relationship with Gavrik Ironshield, the Warden's Captain, due to her unorthodox methods.
+ORACLE NOTES: The Oracle senses a burning resolve and hidden alliances in Elysia Thornshadow. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-18] Introduced to the Undercity roster. | [2026-03-23] Injured. | [2026-03-24] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted. | [2026-04-02] 5. "Rumored to have struck a deal with the Independent for protection from the P...
 ---END NPC---
 
 ---NPC---
 NAME: Grimbush Gizzlethorn
 STATUS: alive
 FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Volunteer
+SPECIES: Goblin
+AGE: 50s
 APPEARANCE: Grimbush is a wiry goblin with a patchwork coat and a face that's seen too many rifts. His eyes, a piercing yellow, are always alert, scanning his surroundings.
 LOCATION: Scrapworks, Saints' outpost near Patchwork Saints territory — scout, secretly Serpent Choir
-MOTIVATION: 
+MOTIVATION: Grimbush serves the Patchwork Saints to protect his family, whom he keeps hidden in the lower levels of the Undercity.
 ROLE: He acts as a scout, helping the Patchwork Saints navigate the dangerous Undercity
+SECRET: Grimbush is secretly a member of the Serpent Choir, a rival faction, but has not yet revealed this to his comrades.
+RELATIONSHIPS: He maintains a fragile peace with Zippy Quickclaw, a fellow volunteer, who is unaware of his double allegiance.
+ORACLE NOTES: The Oracle senses a dual loyalty within Grimbush, a goblin walking a dangerous line between faith and deceit.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Sebastian Azrael
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: F-Rank
+SPECIES: Tiefling
+AGE: early 40s
 APPEARANCE: Sebastian is a tall, well-built tiefling with horns twisted into intricate spiral patterns, crimson eyes that gleam with ambition, and a thick, leather-clad torso bearing numerous scars from past battles.
 LOCATION: Night Pits, Fighter's Row adjacent housing — F-Rank, dangerous jobs (secretly Thane's Cult)
-MOTIVATION: 
+MOTIVATION: Seeking to secure a place among the Guild's elite, he'll stop at nothing to complete each mission, no matter the cost or consequences.
 ROLE: He works as a hired hand, taking on dangerous assignments for the Guild's clients and fellow members.
+SECRET: He is secretly a high-ranking member of Brother Thane's Cult, using his position in the Guild to gather information for the cult's nefarious plans.
+RELATIONSHIPS: He maintains a professional relationship with Giselle Ironwhisper, a fellow Guild member and potential ally within the cult's ranks.
+ORACLE NOTES: The Oracle would sense a complex web of loyalty, ambition, and deception surrounding Sebastian, hinting at hidden allegiances that could prove to be dangerous.
+HISTORY: [2026-03-19] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Voris Ironhammer
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Initiate
+SPECIES: Warforged
+AGE: 50s
 APPEARANCE: Standing at a towering 7 feet, Voris Ironhammer is a well-maintained Warforged with a polished steel frame and glowing red eyes. His movements are precise and calculated, a testament to his years of service.
 LOCATION: Artisan Quarter, Scriptorium Quarter — transferred to Guild of Ashen Scrolls, studies ancient texts
-MOTIVATION: 
+MOTIVATION: Voris serves the Wardens with unwavering loyalty, believing that his purpose is to protect the Undercity from the ever-present threats beyond the Dome. He secretly seeks to find a way to end the constant rifts and bring peace to the city.
 ROLE: Leads a squad of Wardens, ensuring the safety of the Undercity's citizens and maintaining order within the city.
+SECRET: Voris was once a member of the Independent, spying on them from within the Wardens to gather intelligence. His loyalty to the Wardens is genuine, but his past connection could be a dangerous liability if revealed.
+RELATIONSHIPS: Maintains a professional but respectful relationship with Captain Elara Celestian, the leader of the Wardens.
+ORACLE NOTES: The Oracle senses a deep-rooted desire for peace and a troubled past in Voris Ironhammer. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-20] Injured. | [2026-03-21] Recovered from injuries. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted. | [2026-03-26] Defected from Wardens of Ash to Guild of Ashen Scrolls (rank: Initiate).
 ---END NPC---
 
 ---NPC---
 NAME: Cassius Argent-Heart
 STATUS: alive
-FACTION: Tower Authority
-RANK: Member
+FACTION: Argent Blades
+RANK: Senior Blade
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Cassius is a tall, muscular man with silver hair that's starting to gray, and piercing green eyes. He carries himself with a quiet dignity, his armor always polished and well-maintained.
 LOCATION: Guild Spires, Gilded Halls command room — leads combat teams, seeks redemption
-MOTIVATION: 
+MOTIVATION: Cassius fights for the Argent Blades to atone for a past mistake that led to the death of an innocent. He seeks redemption and a chance to make things right.
 ROLE: Cassius leads a team of Blades in patrols and combat against the threats from the Rifts.
+SECRET: Cassius was once a member of the Serpent Choir, but betrayed them to join the Argent Blades. If his past is discovered, he could be targeted by both factions.
+RELATIONSHIPS: He has a tense but respectful relationship with the Wardens of Ash, as they are aware of his past but understand his change of heart.
+ORACLE NOTES: The Oracle senses a troubled soul within Cassius, a man burdened by guilt and driven by a need for redemption.
+HISTORY: [2026-03-19] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Thoren Azurescale
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: F-Rank
+SPECIES: Dragonborn
+AGE: 40s
 APPEARANCE: Thoren is a tall, broad-shouldered Dragonborn with deep-blue scales that shimmer iridescently under the Dome's light. His eyes are an intense violet, piercing yet filled with a melancholy that hints at hidden depths.
 LOCATION: Guild Spires, Adventurers Guild Hall lower level — F-Rank, seeks recognition (secretly Thane's Cult)
-MOTIVATION: 
+MOTIVATION: Thoren seeks to prove himself worthy of the Guild's respect and recognition, driven by a desire to protect his fellow citizens from the dangers lurking in the rifts.
 ROLE: Thoren takes on odd jobs and missions assigned by the Guild, often working alongside other F-Rank adventurers.
+SECRET: Thoren is secretly a loyal member of Brother Thane's Cult, using his position within the Guild to gather information for the cult's nefarious plans.
+RELATIONSHIPS: Thoren maintains a professional relationship with Giselle Ironwhisper, the head of the Guild's F-Rank adventurers, while avoiding any deeper connections that might expose his secret.
+ORACLE NOTES: The Oracle senses a profound sense of conflict within Thoren, a warrior torn between his loyalty to his fellow citizens and his loyalty to his hidden masters.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-27] Public incident.
 ---END NPC---
 
 ---NPC---
 NAME: Edwyn Shadowmantle
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
+RANK: Follower
 SPECIES: Human
-AGE: unknown
+AGE: 50s
 APPEARANCE: A tall, gaunt man with piercing blue eyes and a long, greasy beard that he constantly fiddles with. His tattered robes are adorned with cryptic symbols.
 LOCATION: Collapsed Plaza Depths, Thane's Labyrinth scriptorium — archives cult history in newly excavated chambers
-MOTIVATION: 
+MOTIVATION: Edwyn seeks redemption for his past sins, believing that Brother Thane's Cult can guide him to atone for his transgressions.
 ROLE: Edwyn serves as a scribe and archivist, cataloging the cult's history and rituals.
+SECRET: Edwyn was once a powerful and feared warlord who was betrayed by his own men. Now, he hides his true identity from his fellow cult members, fearing they would reject him if they knew.
+RELATIONSHIPS: He maintains a tense relationship with the more fanatical members of the cult, who see his past as a stain on the cult's purity.
+ORACLE NOTES: The Oracle senses a tortured soul, burdened by guilt and driven by a deep desire for absolution.
+HISTORY: [2026-03-19] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Seraphina Nightwatch
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: E-Rank
+SPECIES: Aasimar
+AGE: 40s
 APPEARANCE: A tall, slender Aasimar with piercing blue eyes and a white feathered wingspan. She wears a battered leather trench coat, a constant reminder of her numerous adventures.
 LOCATION: Ember Ward, cramped apartment above The Laughing Skull tavern — E-Rank scout, escaped Thane's Cult
-MOTIVATION: 
+MOTIVATION: Craves redemption for past mistakes while trying to protect the innocent in the Undercity
 ROLE: Serves as a scout and information gatherer for the Adventurers Guild
-HISTORY: [2026-04-10] Injured. | [2026-04-11] Recovered from injuries.
+REVEALED: Once a member of Brother Thane's Cult, she escaped and now fears being discovered by her former comrades
+RELATIONSHIPS: Maintains a tense truce with the Wardens of Ash due to their common goal of keeping the Undercity safe
+ORACLE NOTES: Senses an aura of guilt and unspoken torment surrounding her
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-26] Secret revealed: Once a member of Brother Thane's Cult, she escaped and now f...
 ---END NPC---
 
 ---NPC---
 NAME: Yaulderna Silverstreak
 STATUS: alive
 FACTION: Wizards Tower
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archmage — Head of the Wizards Tower
+SPECIES: Half-Elf
+AGE: 142
 APPEARANCE: Tall and sharp-featured with a streak of pure silver running through otherwise dark hair — the mark that gave her the name. Carries herself with the effortless authority of someone who hasn't needed to prove anything in decades. Wears layered robes of deep blue and grey, practical rather than ceremonial. Her hands glow faintly when she's thinking hard, which is most of the time.
 LOCATION: Wizards Tower, upper floors (rarely seen below the third landing unless something has gone very wrong)
-MOTIVATION: 
+MOTIVATION: Knowledge preservation and the responsible application of arcane power. Yaulderna has seen what happens when magic is wielded without understanding — she lost colleagues to Rift accidents, saw Tower experiments go wrong, watched promising students burn out chasing power they couldn't control. She runs the Tower with an iron hand wrapped in academic courtesy.
 ROLE: Oversees all Wizards Tower operations — research programs, student admissions, arcane licensing, and the Tower's relationship with other Undercity factions. Final authority on what magic the Tower will and will not sanction. Personally mentors a small number of advanced students.
-HISTORY: [2026-04-11] Injured. | [2026-04-11] Recovered from injuries.
+SECRET: Yaulderna has been quietly building a ward network around the Tower capable of sealing it off from the rest of the Undercity in an emergency — not just against Rifts, but against other factions. She does not trust the Tower Authority's ability to protect the Tower's independence if political pressure mounts. The ward is nearly complete. No one else knows its full extent.
+RELATIONSHIPS: Professional respect with Senior Archivist Pell (Glass Sigil) — they share research data and occasionally disagree loudly about methodology. Wary of Director Myra Kess (FTA) — Yaulderna sees the Tower Authority as a bureaucratic threat to academic freedom. Cordial with Captain Havel Korin (Wardens) — the Tower and the Wardens cooperate on Rift containment. Eleanor Reed is one of her students and a member of the Wizards Tower. Distrusts the Serpent Choir's approach to divine contracts involving arcane subjects.
+ORACLE NOTES: The Oracle would recognise Yaulderna as one of the few people in the Undercity who understands what the Tower of Last Chance actually is — not the building, the system. She has theories she does not share. Her silver streak is not cosmetic; it is the scar of an arcane accident she survived when she was 19 that permanently altered her connection to the Weave. She is level 17 — one of the most powerful casters in the city. The Oracle respects her. That is rare.
+HISTORY: [2026-03-19] Added to roster. Head of the Wizards Tower. Eleanor Reed's faction leader. | [2026-03-24] 3. "Witnessed a high-ranking Wizards Tower member performing forbidden magic in ...
 ---END NPC---
 
 ---NPC---
 NAME: Kyrus Ironscale
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Acquisition Agent
+SPECIES: Dragonborn
+AGE: 40s
 APPEARANCE: Kyrus stands tall with his crimson scales glistening under the Dome's dim light. A scar running down his left cheek, a remnant from a past battle, adds an air of mystery to his imposing figure.
 LOCATION: Markets Infinite, Consortium Underhalls — negotiates deals, secret Saints member
-MOTIVATION: 
+MOTIVATION: Kyrus seeks to climb the ranks of the Iron Fang Consortium and reclaim his lost honor, driven by the memory of his fallen clan.
 ROLE: He spends his days negotiating deals with various adventurers, procuring valuable artifacts, and enforcing the Consortium's rules within the Undercity.
+SECRET: In secret, Kyrus is a member of the Patchwork Saints, using his position within the Consortium to gather information and resources for the underground resistance.
+RELATIONSHIPS: He maintains a professional relationship with Giselle Ironwhisper, the Consortium's leader, but his loyalty to the Patchwork Saints often conflicts with his duty.
+ORACLE NOTES: The Oracle senses a fierce spirit haunted by a deep-rooted guilt, seeking redemption through service but with divided loyalties.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Thalia Elenshade
 STATUS: alive
 FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Saint
+SPECIES: Half-Elf
+AGE: 40s
 APPEARANCE: Thalia has piercing emerald eyes and silver hair woven with strands of leather and metal. She carries herself with a quiet intensity, a constant air of readiness.
 LOCATION: Shantytown Heights, hidden safe house — leads operations against Iron Fang
-MOTIVATION: 
+MOTIVATION: Thalia seeks to protect the underprivileged from the clutches of the Iron Fang Consortium, driven by a personal tragedy that cost her family.
 ROLE: She leads covert operations against the Iron Fang Consortium, gathering intelligence and orchestrating sabotage.
+SECRET: Thalia is actually a former member of the Iron Fang Consortium, forced to leave after her family was betrayed.
+RELATIONSHIPS: She maintains a tense truce with the Argent Blades, occasionally seeking their aid when the situation requires it.
+ORACLE NOTES: The Oracle senses a deep, hidden anger that could erupt into a storm of retribution.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Thyra Scalescar
 STATUS: alive
 FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Petitioner
+SPECIES: Dragonborn
+AGE: 40s
 APPEARANCE: Thyra is a burly, scarred dragonborn with a missing eye, a patch of scales replaced by a leather eye-cover. She has a menacing scar running down her left cheek.
 LOCATION: Night Pits, Fighter's Row adjacent — enforcer for Choir in gambling district
-MOTIVATION: 
+MOTIVATION: Thyra seeks to climb the ranks of the Serpent Choir to gain power and influence, using her cunning and brutal tactics to do so.
 ROLE: Thyra serves as a ruthless enforcer for the Serpent Choir, collecting debts and maintaining order in The Pit.
+SECRET: Thyra is secretly loyal to the Argent Blades, feeding them information about the Serpent Choir's activities.
+RELATIONSHIPS: She has a tense but professional relationship with Gideon Steelforge, a blacksmith known for his allegiance to the Wardens of Ash.
+ORACLE NOTES: The Oracle senses a deep division within Thyra, a struggle between loyalty and ambition.
+HISTORY: [2026-03-19] Introduced to the Undercity roster. | [2026-03-26] Injured. | [2026-03-26] Recovered from injuries.
+---END NPC---
+
+---NPC---
+NAME: Elias Whisperstep
+STATUS: alive
+FACTION: Argent Blades
+RANK: Blade
+SPECIES: Tabaxi
+AGE: 40s
+APPEARANCE: Elias is a lean, agile Tabaxi with emerald eyes and a distinctive scar running down his left cheek. He carries himself with an air of confidence and a quick wit.
+LOCATION: Guild Spires, Gilded Halls intelligence wing — covert operations, relic hunting
+MOTIVATION: Elias fights for the Argent Blades to avenge his family, killed in a rift accident. He seeks to ensure no other family suffers the same fate.
+ROLE: Elias leads covert operations, gathering intelligence on potential threats and neutralizing them before they can cause harm.
+SECRET: Unknown to his fellow Blades, Elias is secretly a relic hunter, searching for artifacts to sell on the black market. He uses the money to fund his mission.
+RELATIONSHIPS: Elias has a strained relationship with the Wardens of Ash due to their rivalry over relics. | Alliance with Gorgon Gizzick (Brother Thane's Cult).
+ORACLE NOTES: The Oracle senses a hidden ambition and a burning desire for vengeance in Elias Whisperstep.
+HISTORY: [2026-03-20] Introduced to the Undercity roster. | [2026-03-30] Formed alliance with Gorgon Gizzick (Brother Thane's Cult).
 ---END NPC---
 
 ---NPC---
 NAME: Thalia Ignis-Veil
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Devoted
+SPECIES: Genasi
+AGE: 40s
 APPEARANCE: A tall, muscular figure with fiery orange skin and long, shimmering hair. She carries a ceremonial dagger adorned with glowing embers.
 LOCATION: Collapsed Plaza, Cult House ritual chamber — leads fire-based ceremonies in the upper levels
-MOTIVATION: 
+MOTIVATION: Seeking to atone for past sins and bring about the prophesied Age of Fire, she is determined to gather the necessary relics and artifacts for the cult's rituals.
 ROLE: She leads the cult's fire-based rituals and is a skilled negotiator with other factions for resources and information.
+SECRET: She is secretly a member of the Argent Blades and is spying on Brother Thane's Cult for them, hoping to infiltrate and sabotage them from within.
+RELATIONSHIPS: She maintains a delicate balance between her loyalty to Brother Thane and her allegiance to the Argent Blades, constantly walking a tightrope between the two factions.
+ORACLE NOTES: The Oracle senses a flickering flame within her, burning with a passion both fierce and unquenchable.
+HISTORY: [2026-03-21] Introduced to the Undercity roster. | [2026-03-22] Injured. | [2026-03-23] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Eolande Starfall
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Sergeant
+SPECIES: Elf
+AGE: 50s
 APPEARANCE: Eolande stands tall with a lean, muscular frame, her silver hair tied in a tight braid that reaches down to her waist. Her eyes, a piercing blue, hold an intensity that belies her age.
 LOCATION: Outer Wall, Captain Korin's Command annex — leads patrol squads
-MOTIVATION: 
+MOTIVATION: Eolande fights for the Wardens to atone for a past she can't remember, seeking redemption for a crime she believes she committed in a former life.
 ROLE: She leads patrols, ensuring the safety of the Wardens and the Undercity's citizens from threats both internal and external.
+SECRET: She possesses a powerful artifact, a shard from the Tower of Last Chance, which grants her enhanced combat abilities but also draws the attention of the Guild of Ashen Scrolls.
+RELATIONSHIPS: She maintains a complex relationship with Brother Thane, the cult leader, who seems to know more about her past than she does.
+ORACLE NOTES: The Oracle senses a deep, burning guilt within Eolande, a shadow that seems to consume her from within. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-21] Introduced to the Undercity roster. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
 ---END NPC---
 
 ---NPC---
 NAME: Gruggar Grimshackle
 STATUS: alive
 FACTION: Independent
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Known Operator
+SPECIES: Orc
+AGE: 50s
 APPEARANCE: A hulking orc with a thick scars across his face, wearing a tattered leather coat and wielding a double-headed axe. His eyes betray a cunning intelligence hidden beneath his rough exterior.
 LOCATION: Underbelly Warrens, The Bone Market — smuggler stall, secretly Tower Authority informant
-MOTIVATION: 
+MOTIVATION: Gruggar is a ruthless smuggler, seeking to amass wealth and power to challenge the faction leaders of the Undercity. He believes that the only way for an orc to truly succeed is by outsmarting and outmaneuvering those who hold power.
 ROLE: Gruggar runs a black market stall, peddling illicit goods and information to those who can afford it.
-HISTORY: [2026-04-11] Injured. | [2026-04-11] Recovered from injuries.
+SECRET: Despite his tough exterior, Gruggar is secretly loyal to the Tower Authority, providing them with valuable intelligence in exchange for protection and a cut of his profits.
+RELATIONSHIPS: Gruggar has a tenuous alliance with the Argent Blades, often providing them with information that keeps them one step ahead of the other factions.
+ORACLE NOTES: The Oracle senses a hidden agenda in Gruggar's deals, and suspects that he is not as independent as he appears.
+HISTORY: [2026-03-22] Introduced to the Undercity roster. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Gurrek Ironheart
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Recruit
+SPECIES: Orc
+AGE: 40s
 APPEARANCE: A towering orc with scars crisscrossing his weathered face, his eyes betray a hint of sadness beneath the rough exterior.
 LOCATION: Outer Wall, burnt patrol post near Southern Warrens access — watches the edge
-MOTIVATION: 
+MOTIVATION: Gurrek joined the Wardens to atone for past mistakes and protect others from suffering like he did.
 ROLE: Gurrek patrols the Mudflats, searching for signs of enemy infiltration and reporting back to his superiors.
+SECRET: Gurrek is secretly a former high-ranking member of the Serpent Choir who defected after witnessing the corruption and cruelty within.
+RELATIONSHIPS: He maintains a cautious alliance with the Argent Blades, who have provided him with information on the Serpent Choir's activities.
+ORACLE NOTES: The Oracle senses a soul tormented by guilt and a fierce determination to do good, despite a dark past. Hostile toward adventurers who killed Grozak Bonecrusher.
+HISTORY: [2026-03-23] Introduced to the Undercity roster. | [2026-03-26] Faction-mate Grozak Bonecrusher was killed by adventurers. Enmity noted.
 ---END NPC---
 
 ---NPC---
 NAME: Lysander Elveshadow
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Initiate
+SPECIES: Half-Elf
+AGE: 40s
 APPEARANCE: Lysander stands tall with a lean frame, a blend of human and elven features. His eyes, a piercing silver-blue, reflect the flickering lights of the Undercity's alleyways, and his hair, a cascade of dark curls, is braided with intricate patterns of worn leather strips.
 LOCATION: Scrapworks, Saints' patrol route lodging — night patrol, secretly former Argent Blade
-MOTIVATION: 
+MOTIVATION: Lysander seeks to protect the underprivileged of the Undercity, driven by his own past struggles and a hidden loyalty to a mysterious benefactor
 ROLE: He patrols the streets at night, offering aid to the helpless and justice to the oppressed
+SECRET: He is secretly a former member of the Argent Blades, forced to flee after a mission went awry and his cover was compromised
+RELATIONSHIPS: He maintains a tenuous alliance with a high-ranking member of the Argent Blades, who remains unaware of his true identity
+ORACLE NOTES: The Oracle senses a complex web of deception surrounding Lysander, hinting at a hidden past that could shake the foundations of the Undercity
+HISTORY: [2026-03-24] Introduced to the Undercity roster. | [2026-03-30] Defected from Patchwork Saints to Guild of Ashen Scrolls (rank: Initiate).
 ---END NPC---
 
 ---NPC---
 NAME: Torinn Wyrmbane
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Speaker
+SPECIES: Dragonborn
+AGE: 40s
 APPEARANCE: Torinn's scales shimmer with a deep, ominous red, and his eyes glow with an eerie intensity. He carries himself with a stern demeanor, but his voice is soft and soothing.
 LOCATION: Collapsed Plaza Depths, Thane's Inner Sanctum — leads rituals at the cult's sacred heart
-MOTIVATION: 
+MOTIVATION: Torinn is driven by a deep-seated desire to cleanse the Undercity of impurity and bring about the ascension of the dragons. He believes this is the only way to restore balance to the world.
 ROLE: Torinn leads the rituals and ceremonies of the Cult, guiding the faithful towards their ultimate goal.
+SECRET: Torinn is secretly a double agent, working for the Iron Fang Consortium to gather intelligence about the Cult's plans and weaknesses.
+RELATIONSHIPS: Torinn has a tense but respectful relationship with Cassius Argent-Heart of the Argent Blades, whom he has clashed with on several occasions.
+ORACLE NOTES: The Oracle would sense a complex mix of devotion, cunning, and a hidden loyalty that may prove useful or dangerous.
+HISTORY: [2026-03-25] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Zephyria Flamefingers
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Scribe
+SPECIES: Genasi
+AGE: 50s
 APPEARANCE: Zephyria stands tall with her fiery hair pulled back into a tight braid, her eyes a swirling vortex of blue and orange flames. She carries herself with a fierce determination, her hands always busy with quills and scrolls.
 LOCATION: Artisan Quarter, Scriptorium Quarter research wing — catalogues artifacts, studies Rifts
-MOTIVATION: 
+MOTIVATION: Zephyria seeks to uncover the truth behind the frequent rifts, believing they are a sign of something greater at play. Her drive stems from the loss of her family in one of the rifts.
 ROLE: She is responsible for cataloging and deciphering ancient texts and artifacts.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: She has been secretly communicating with the Wardens of Ash, providing them with information from the Guild's archives.
+RELATIONSHIPS: She maintains a tense truce with the Iron Fang Consortium due to territorial disputes over control of certain districts.
+ORACLE NOTES: The Oracle senses an unspoken knowledge within Zephyria, a burning passion that fuels her relentless pursuit of truth.
+HISTORY: [2026-03-26] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Seraph Zephyrion
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Junior Archivist
+SPECIES: Dragonborn
+AGE: 40s
 APPEARANCE: A stoic Dragonborn with fiery red scales and piercing emerald eyes, Seraph carries a worn leather satchel filled with scrolls and tomes. His stern gaze reveals an intensity that belies his age.
 LOCATION: Archive Row, Archive of Forgotten Histories wing — catalogues, seeks artifacts
-MOTIVATION: 
+MOTIVATION: Seraph is driven by a relentless pursuit of knowledge, seeking to uncover secrets hidden within the ancient texts of the Glass Sigil library.
 ROLE: Daily, Seraph meticulously sorts and catalogues ancient tomes and artifacts, often staying long after closing time to delve deeper into the mysteries they contain.
+SECRET: It is rumored that Seraph possesses a rare artifact known as the Eye of the Dragon, a gem imbued with powerful magical properties that could shift the balance of power in the Undercity.
+RELATIONSHIPS: He maintains a professional but strained relationship with the senior archivist, Vex Argentshade, who often questions Seraph's obsession with certain obscure texts.
+ORACLE NOTES: The Oracle senses a deep, burning hunger within Seraph, a thirst for knowledge that seems almost insatiable.
+HISTORY: [2026-03-26] Introduced to the Undercity roster. | [2026-03-30] Injured. | [2026-03-30] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Rianna Elenshade-Ironhammer
 STATUS: alive
 FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Compliance Intern
+SPECIES: Half-Elf
+AGE: 35s
 APPEARANCE: Rianna stands tall with a striking blend of elven grace and human strength. Her silver-tinted hair is usually tied back in a tight braid, and her eyes reflect a mix of both her parents' lineages – a deep brown flecked with emerald green.
 LOCATION: Grand Forum, FTA satellite office observation post — security systems, suspects Consortium
-MOTIVATION: 
+MOTIVATION: Rianna strives to restore order and balance in the Undercity, driven by the loss of her mother, a fallen Argent Blade, at the hands of a rogue adventurer.
 ROLE: Rianna ensures that the city's enforcement guidelines are followed and maintains the security systems within the Tower of Last Chance.
+SECRET: She secretly keeps a journal documenting her suspicions about a prominent member of the Iron Fang Consortium, whom she believes is involved in illegal activities.
+RELATIONSHIPS: She maintains a tenuous alliance with Cassius Argent-Heart due to their shared grief over the Argent Blades' downfall.
+ORACLE NOTES: The Oracle would sense Rianna's unwavering determination and a deep, hidden resentment towards the Iron Fang Consortium.
+HISTORY: [2026-03-26] Introduced to the Undercity roster. | [2026-03-27] Injured. | [2026-03-27] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Zelos Firetongue
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Devoted
+SPECIES: Tiefling
+AGE: 40s
 APPEARANCE: A tall, imposing tiefling with a horned head, piercing red eyes, and a cloak stained with the blood of countless rituals. He carries himself with a quiet, intense determination.
 LOCATION: Collapsed Plaza, Cult House upper level — oversees purification ceremonies
-MOTIVATION: 
+MOTIVATION: Zelos seeks to purify the Undercity by any means necessary, believing that the city's corruption is a test sent by the dark gods. He is driven by a desire to prove his worth to Brother Thane and secure a place in the afterlife.
 ROLE: Zelos leads the cult's purification efforts, overseeing the city's cleansing rituals and punishing those who defy Brother Thane.
+SECRET: Zelos is secretly an agent of the Argent Blades, tasked with gathering intelligence on Brother Thane's Cult from within.
+RELATIONSHIPS: Zelos maintains a tense alliance with the Wizards Tower, exchanging knowledge for their support in his purification efforts.
+ORACLE NOTES: The Oracle would sense a deep, burning passion hidden beneath Zelos' calm exterior, and a complex web of loyalty and deceit.
+HISTORY: [2026-03-26] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Zara Ironspark
 STATUS: alive
 FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Scribe
+SPECIES: Warforged
+AGE: 50s
 APPEARANCE: Zara stands tall and rigid, with a polished copper exterior and glowing emerald eyes. Her movements are precise and measured, a testament to her years of service.
 LOCATION: Artisan Quarter, Scriptorium Quarter (Inkwell Alley lodging nearby) — researches forbidden texts
-MOTIVATION: 
+MOTIVATION: Zara seeks to prove her worth as more than just a construct, using her intelligence to climb the ranks of the Guild of Ashen Scrolls and earn respect from her peers.
 ROLE: Zara spends her days researching ancient texts and deciphering cryptic scrolls for the guild.
+SECRET: Zara has hidden an underground library filled with forbidden knowledge, a collection she continues to expand at great risk.
+RELATIONSHIPS: She maintains a close alliance with the Argent Blades, trading them information in exchange for protection.
+ORACLE NOTES: The Oracle senses a deep hunger for knowledge and a quiet rebellion within Zara Ironspark.
+HISTORY: [2026-03-26] Introduced to the Undercity roster. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Seraphina Nightshade-Ironheart
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Speaker
+SPECIES: Elf
+AGE: 40s
 APPEARANCE: A tall, slender elf with piercing green eyes and a shaved head that shows intricate, glowing runes. She carries herself with a calm, authoritative demeanor.
 LOCATION: Collapsed Plaza Depths, Cult Catacombs — coordinates missions from hidden passages beneath the rubble
-MOTIVATION: 
+MOTIVATION: She seeks to protect the Cult and its members from the dangers of the Undercity while uncovering the secrets of the Tower of Last Chance.
 ROLE: She leads prayer sessions, coordinates missions, and acts as a liaison between the Cult and other factions.
+SECRET: She is secretly a member of the Argent Blades and spies on the Cult for them, seeking to destabilize the Tower Authority.
+RELATIONSHIPS: She maintains a tense alliance with the Wardens of Ash, often working together to fend off threats to the Undercity.
+ORACLE NOTES: The Oracle senses a conflicted spirit, divided between loyalty to her faction and a hidden allegiance to another.
+HISTORY: [2026-03-26] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Ghurrag Ironmace
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Speaker
+SPECIES: Orc
+AGE: 40s
 APPEARANCE: Ghurrag stands tall with a muscular build, his battle-scarred skin adorned with intricate tattoos of his deity. His eyes, a striking yellow, hold a cold intensity.
 LOCATION: Collapsed Plaza, Cult House main hall — leads daily rituals for orc cult members
-MOTIVATION: 
+MOTIVATION: Ghurrag is driven by a deep-seated desire to restore his tribe's honor, lost during the Dome's sealing. He believes that under Brother Thane's guidance, they will reclaim their former glory.
 ROLE: He leads the daily rituals, ensuring the cult's devotion remains unwavering.
+SECRET: Ghurrag secretly communicates with a high-ranking member of the Argent Blades, sharing intel and plotting a potential alliance between the two factions.
+RELATIONSHIPS: He maintains a tense truce with Yaulderna Silverstreak of the Iron Fang Consortium, both vying for power in the Undercity.
+ORACLE NOTES: The Oracle senses a powerful will, tempered by the weight of responsibility, and a hidden network of connections that could shift the Undercity's balance of power.
+HISTORY: [2026-03-26] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Grimm Ironheart
-STATUS: injured
+STATUS: alive
 FACTION: Argent Blades
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Blade
+SPECIES: Dwarf
+AGE: 50s
 APPEARANCE: Grimm Ironheart, a burly dwarf with a scarred face and a perpetual scowl, always carries a longsword and a shield, and his armor is adorned with the symbol of the Argent Blades.
 LOCATION: Broken Spire District, Argent Blades' Fortress
-MOTIVATION: 
+MOTIVATION: Determined to avenge his slain family and bring down the Iron Fang Consortium, the dwarf has thrown himself into the ranks of the Argent Blades.
 ROLE: Leads the Argent Blades' strike teams, coordinating attacks on the Iron Fang Consortium's strongholds.
-HISTORY: [2026-04-11] Injured.
+SECRET: Grimm's true identity is unknown to his comrades. He is actually a Wardens of Ash spy, gathering information to weaken the Argent Blades from within.
+RELATIONSHIPS: Maintains a tense relationship with the Warden's of Ash leader, Seraphina Nightshade-Ironheart, due to their conflicting loyalties.
+ORACLE NOTES: The Oracle senses a hidden strength and a deep sense of loss in Grimm Ironheart.
+HISTORY: [2026-03-27] Introduced to the Undercity roster. | [2026-03-28] Injured. | [2026-03-28] Recovered from injuries.
+---END NPC---
+
+---NPC---
+NAME: Gizmo Zippersnap
+STATUS: alive
+FACTION: Glass Sigil
+RANK: Senior Archivist
+SPECIES: Goblin
+AGE: 50s
+APPEARANCE: Gizmo, a hunchbacked goblin, is known for his keen eyes that never seem to miss a detail. He's usually found hunched over ancient texts, his long, pointed nose buried deep within the pages.
+LOCATION: Archives District, Glass Sigil Vault
+MOTIVATION: Gizmo is obsessed with uncovering the hidden secrets of the Undercity, believing that one day his discoveries will bring him great power and recognition among his peers.
+ROLE: Gizmo spends his days researching and cataloging historical artifacts and lore, often delving into forbidden texts.
+SECRET: Gizmo has secretly been in contact with the Wardens of Ash, providing them with information about the Tower Authority's defenses in exchange for rare and powerful artifacts.
+RELATIONSHIPS: He maintains a strained alliance with the Wizards Tower due to his unorthodox research methods.
+ORACLE NOTES: The Oracle senses that Gizmo harbors a dangerous secret, one that could potentially shift the balance of power in the Undercity.
+HISTORY: [2026-03-27] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Captain Havel Korin
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
+RANK: Captain — Commander of the Outer Wall garrison
 SPECIES: Human
-AGE: unknown
+AGE: 50s
 APPEARANCE: A weathered man with grey-streaked hair cropped short and eyes that have seen too much. His face bears old scars he never explains, and he moves with the careful economy of someone who learned long ago to conserve their strength. Wears his Warden captain's insignia without ceremony. His hands are calloused from decades of work, and he keeps a simple iron ring on his left hand — its significance known only to him.
 LOCATION: Outer Wall, Captain's Command — the fortified garrison overlooking the boundary between city and chaos
-MOTIVATION: 
+MOTIVATION: Havel Korin has nothing left but the Wardens and the young adventurers who pass through the Undercity. His past has been almost entirely erased — whether by trauma, magic, or deliberate choice, even he no longer fully remembers. What remains is purpose: protect the city, guide the young, give others the chance he was given. He lives for the Wardens because they are all he has.
 ROLE: Commands the Outer Wall garrison of the Wardens of Ash. Coordinates Rift response, manages patrol rotations, and personally mentors new Wardens and young adventurers who show promise. Known for his gruff but genuine care for those under his command. Works closely with the Adventurers Guild on joint operations.
+SECRET: Korin's past is genuinely lost to him — not hidden, simply gone. He woke in the Undercity decades ago with nothing but his skills and a bone-deep certainty that he owed a debt he could never repay. He has never sought to recover his memories because he fears what he might have been. The man he is now is the only one that matters to him.
+RELATIONSHIPS: Close working relationship with the Adventurers Guild Leader — the two share an understanding born of similar circumstances, both having lost everything but finding purpose in protecting others. Respected by Pol Greaves (Patchwork Saints) despite factional tensions. Trusted mentor to Sergeant Zephyrus Sylphim and other Warden officers. Corvin Thale (Internal Affairs) watches him, but has found nothing because there is nothing to find — Korin's loyalty is absolute.
+ORACLE NOTES: The Oracle sees a man hollowed out and rebuilt. His past is a void not because it was stolen, but because he surrendered it willingly — a sacrifice made so long ago even the Oracle cannot see its shape. What remains is bedrock loyalty and a protective instinct that borders on the sacred. He is one of the few genuinely good men in a city full of compromises.
+HISTORY: [2026-03-27] Added to roster. Captain of the Outer Wall garrison. Loyal protector of young adventurers.
 ---END NPC---
 
 ---NPC---
 NAME: Grug Ironfist
 STATUS: alive
 FACTION: Brother Thane's Cult
-RANK: Devoted
-SPECIES: Human
-AGE: unknown
+RANK: Speaker
+SPECIES: Orc
+AGE: 50s
 APPEARANCE: A towering orc with battle-scarred skin and a thick, gray beard. He wears a simple robe with intricate, silver tattoos that seem to dance on his skin.
 LOCATION: The Outer Caverns, Brother Thane's Sanctum
-MOTIVATION: 
+MOTIVATION: Seeks to expand the cult's influence by converting other factions' members, believing it will bring about a new age of orc dominance in the Undercity.
 ROLE: Leads recruitment efforts and acts as a mediator between Brother Thane and the cult's rank-and-file members.
-HISTORY: [2026-04-10] Promoted from Member to Devoted within Brother Thane's Cult.
+SECRET: His true loyalty lies with the Argent Blades, a rival faction he secretly communicates with, feeding them intelligence about Brother Thane's plans.
+RELATIONSHIPS: He has a strained but professional relationship with Gizmo Zippersnap of the Adventurers Guild, whom he once considered a friend.
+ORACLE NOTES: The Oracle senses a complex web of deceit surrounding Grug, but cannot determine the extent of his betrayal.
+HISTORY: [2026-03-27] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Aldric Ebonwhisper
 STATUS: alive
 FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Petitioner
+SPECIES: Elf
+AGE: 40s
 APPEARANCE: Aldric is a tall, gaunt elf with piercing silver eyes that seem to glow in the dark. He wears a tattered black robe adorned with serpent symbols.
 LOCATION: The Slithering Ward, Silverbane Alley
-MOTIVATION: 
+MOTIVATION: Aldric seeks to ascend within the Serpent Choir's ranks to uncover ancient serpent cult rituals and restore his fallen kin's power.
 ROLE: He scours the Undercity for rare serpent artifacts and conducts clandestine rituals in the heart of the night.
+SECRET: Aldric is secretly a Wardens of Ash infiltrator, gathering intelligence on the Serpent Choir for the Wardens.
+RELATIONSHIPS: He maintains a tense but mutually beneficial relationship with Thyra Scalescar, a fellow Petitioner.
+ORACLE NOTES: The Oracle senses a hidden conflict within Aldric, a struggle between loyalty and ambition.
+HISTORY: [2026-03-28] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Serrik Dhal
-STATUS: alive
+STATUS: injured
 FACTION: Iron Fang Consortium
-RANK: Member
+RANK: Guildmaster — Head of the Iron Fang Consortium
 SPECIES: Human
-AGE: unknown
+AGE: 58
 APPEARANCE: Gaunt where he was once solid, with the hollow look of a man whose body is failing faster than his mind. Iron-grey hair cropped short, military style. Wears simple, expensive clothes — no jewelry, no ornamentation. His hands shake slightly when he's tired, which is often now. Eyes remain sharp and calculating even as the rest of him fades.
 LOCATION: Consortium Underhalls, Markets Infinite — rarely leaves his private offices anymore
-MOTIVATION: 
+MOTIVATION: Legacy. Serrik built the Consortium from a handful of desperate smugglers into the economic engine of the Undercity. Now he's dying — Rift exposure from an expedition fifteen years ago finally catching up with him — and he refuses to let his life's work collapse into infighting the moment he's gone. He's arranging his succession, but not in the way anyone expects.
 ROLE: Final authority on all Consortium operations. Sets strategic direction, approves major acquisitions, manages relationships with other faction leaders. Increasingly delegates day-to-day operations to trusted lieutenants while focusing on the question of what comes after.
+SECRET: Serrik has identified his successor — but it's not anyone currently in the Consortium's leadership. He's been quietly grooming an outsider, someone with no factional debts and no old grudges. The current senior agents, including Sera Voss, have no idea they're being passed over. When Serrik dies, the Consortium will either transform or tear itself apart. He's betting on transformation.
+RELATIONSHIPS: Sera Voss reports to him and wants his seat — he knows and finds it appropriate but not sufficient. Professional respect for Director Myra Kess (FTA) — they've negotiated truces that held. Wary of The Widow (Obsidian Lotus) — the only person in the Undercity he genuinely cannot predict. Despises Mari Fen (Adventurers Guild) for reasons he's never explained.
+ORACLE NOTES: The Oracle would see a man racing against his own death to finish one last project. The Rift exposure has left traces in him — not corruption, but a strange clarity. He has seen something of what lies beyond and it has made him impatient with small concerns. His successor plan is either brilliant or catastrophic. The Oracle is curious to see which.
+HISTORY: [2026-03-29] Added to roster. Guildmaster of the Iron Fang Consortium. Dying from Rift exposure, secretly arranging succession outside the current leadership. | [2026-04-02] Injured.
 ---END NPC---
 
 ---NPC---
 NAME: Lady Cerys Valemont
 STATUS: alive
 FACTION: Argent Blades
-RANK: Member
+RANK: Commander — Leader of the Argent Blades
 SPECIES: Human
-AGE: unknown
+AGE: 45
 APPEARANCE: Tall, athletic build maintained through daily training. Brown hair shot through with grey, worn short and practical. Face carries the weathered look of someone who has spent years in the field. Dresses in functional armor even in administrative settings — the Blades' silver insignia is the only decoration she permits herself.
 LOCATION: Guild Spires, Gilded Halls command level — accessible to her people but maintains formal distance
-MOTIVATION: 
+MOTIVATION: The Blades were mercenaries when she took command. She's spent fifteen years turning them into something closer to an order — professionals who fight for pay but within limits, who take contracts but honor certain principles. She believes the Undercity needs a force that can be trusted to hold a line, and she's built one. Now the FTA wants to absorb them into the city's military structure. She hasn't decided what to do.
 ROLE: Commands all Argent Blades operations. Sets contracts, approves missions, disciplines members who violate the code. Represents the Blades in negotiations with other factions. Training and promotion of Senior Blades falls directly under her authority.
+SECRET: She has an unopened letter from Director Myra Kess — a formal offer to make the Argent Blades the core of a new Undercity defense force, with Cerys as military commander answerable only to the FTA. She's kept it sealed for six months because she knows once she reads it, she'll have to decide. The letter sits in her desk drawer. She opens the drawer and looks at it every morning.
+RELATIONSHIPS: Professional respect for Captain Havel Korin (Wardens) — they've worked together on Rift response. Cordial distance from Director Myra Kess (FTA) — the letter complicates everything. Finds the Patchwork Saints admirable but impractical. Views the Iron Fang Consortium as competition rather than enemy.
+ORACLE NOTES: The Oracle would see a woman at a crossroads she's been standing at for half a year. The letter is not just an offer — it's a test of what she believes the Blades should be. If she accepts, they become something new. If she refuses, she may have to fight the FTA eventually. The Oracle does not know which choice serves the city better. That uncertainty is, in itself, interesting.
+HISTORY: [2026-03-29] Added to roster. Commander of the Argent Blades. Holds an unopened FTA offer that would make her military commander of the city.
 ---END NPC---
 
 ---NPC---
 NAME: High Apostle Yzura
 STATUS: alive
 FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: High Apostle — Leader of the Serpent Choir
+SPECIES: Tiefling
+AGE: Unknown (appears to be in her 40s, but has looked exactly the same for at least thirty years)
 APPEARANCE: Striking even by Tiefling standards — solid gold eyes with no visible iris or pupil, horns that curve back elegantly, skin the deep red of old wine. Moves with deliberate grace. Dresses in layered black and gold robes covered in contract sigils so fine they look like embroidery. Her voice is always calm, even when delivering threats.
 LOCATION: Sanctum Quarter, Choir Sanctum — the heart of divine contract work in the Undercity
-MOTIVATION: 
+MOTIVATION: The gods are real, they make bargains, and someone has to ensure those bargains are fair. The Serpent Choir exists because Yzura believes divine contracts should benefit mortals, not just consume them. She's spent decades building an institution that gives ordinary people leverage when negotiating with powers beyond their understanding. The fact that it's also immensely profitable is, to her, simply proof the model works.
 ROLE: Final authority on Choir doctrine and approved divine contracts. Personally reviews any contract involving significant sacrifice or permanent commitment. Manages relationships with the various gods and entities the Choir brokers for. Trains senior Contract Mediators.
+SECRET: Yzura has never personally entered into a divine contract. Not once. The gold eyes are natural — an unusual Tiefling bloodline trait, nothing more. She has built her entire organization around mediating divine bargains while refusing to make any herself. She tells no one this because it would undermine everything the Choir represents. She is the only person in the Undercity who negotiates with gods from a position of complete independence.
+RELATIONSHIPS: Vesper works under her as Contract Mediator — Yzura finds Vesper's own mysterious contract concerning but useful. Professional caution toward Yaulderna Silverstreak (Wizards Tower) — arcane and divine power mix badly. Complex history with Brother Thane (Returned) — they disagree about everything but respect each other's conviction.
+ORACLE NOTES: The Oracle would find Yzura fascinating precisely because she owes no god anything. In a city full of debts and contracts and divine entanglements, she is genuinely free — and has used that freedom to become indispensable to everyone. The gold eyes see clearly because they owe nothing to the powers they observe. The Oracle respects this more than Yzura will ever know.
+HISTORY: [2026-03-29] Added to roster. High Apostle of the Serpent Choir. Has never personally entered a divine contract despite leading an organization built on them.
 ---END NPC---
 
 ---NPC---
 NAME: The Widow
 STATUS: alive
 FACTION: Obsidian Lotus
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Mastermind — Leader of the Obsidian Lotus
+SPECIES: Unknown (appears humanoid, but details shift subtly when not directly observed)
+AGE: Unknown
 APPEARANCE: The Widow is seen rarely and described inconsistently. Most accounts agree on: tall, slender, dressed in dark colors, face always partially obscured by shadow or veil. Some say pale skin; others remember dark. The voice is consistent — low, calm, with perfect diction. Those who have met her struggle to recall specific details afterward, as if the memory itself has been edited.
 LOCATION: The Widow's Web, Eastern Warrens — a location that moves and changes, accessible only by invitation
-MOTIVATION: 
+MOTIVATION: Control through absence. The Widow understands that true power comes not from being seen but from being necessary. The Obsidian Lotus handles the things no one else will touch — memory erasure, identity death, the burial of secrets that must never surface. She provides these services not for profit alone but because they make her indispensable. Everyone in the Undercity, eventually, needs something forgotten.
 ROLE: Absolute authority over the Obsidian Lotus. Approves all high-value contracts personally. Maintains the network of Ghosts and Specialists who carry out the Lotus's work. No one joins the inner circle without her direct selection.
+SECRET: The Widow may have erased her own past. There are no records of her before the Lotus existed — no name, no origin, no history. Either she came from nowhere, or she came from somewhere and made that somewhere disappear. Even she may not fully remember. The memory vials Yuna Saltis keeps might contain the only remaining evidence of who The Widow was before she became what she is now.
+RELATIONSHIPS: Yuna Saltis works directly for her — The Widow values her skills but watches her carefully. Mira Kessan (info broker) maintains a professional relationship — they trade in different currencies but respect each other's territory. Serrik Dhal (Iron Fang) is the only person who makes her genuinely cautious.
+ORACLE NOTES: The Oracle cannot see The Widow clearly. This is not a limitation of the Oracle's sight — it is a quality of The Widow herself. She has made herself into a gap in the pattern, a space where observation slides away. The Oracle finds this neither threatening nor impressive but simply *interesting*. Something that can hide from gods has usually paid a price the gods would recognize.
+HISTORY: [2026-03-29] Added to roster. Mastermind of the Obsidian Lotus. Unknown species and origin, possibly self-erased.
 ---END NPC---
 
 ---NPC---
 NAME: Senior Archivist Pell
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Archivist — Head of the Glass Sigil
+SPECIES: Gnome
+AGE: 89
 APPEARANCE: Small even for a gnome, with wild white hair that defies any attempt at grooming and spectacles so thick they make his eyes look enormous. Constantly surrounded by floating notes, reference cards, and half-finished calculations. Dresses in academic robes covered in ink stains and margin annotations written directly on the fabric.
 LOCATION: Archive Row, Grand Archive Dome — specifically the upper reading room he's claimed as his office
-MOTIVATION: 
+MOTIVATION: The Glass Sigil exists to predict the future — or more precisely, to identify patterns that make certain futures more likely than others. Pell believes that information, properly organized, reveals the shape of what's coming. He's spent sixty years building the most comprehensive predictive archive in the Undercity. He is very, very good at his job. This terrifies him.
 ROLE: Directs all Glass Sigil research and prophecy work. Maintains the master index of predictive patterns. Personally oversees the Thesaurus — the Sigil's semi-sentient archive system. Trains Senior Archivists in pattern recognition.
+SECRET: Pell has been testing his prophecies by selectively feeding information to different factions to see if their actions match his predictions. He tells himself this is validation methodology. In practice, he's been quietly shaping Undercity politics for decades by choosing what to reveal and to whom. He doesn't know if he's preventing disasters or causing them. The uncertainty keeps him up at night.
+RELATIONSHIPS: Professional respect with Yaulderna Silverstreak (Wizards Tower) — they collaborate on research and argue about methodology. Eir Velan (Ashen Scrolls) is a former student he still mentors. Watches Director Myra Kess (FTA) carefully — she's the only faction leader who has asked for his predictive services and then not used them.
+ORACLE NOTES: The Oracle recognizes a kindred spirit in Pell — someone else trying to see patterns in the chaos. The difference is that the Oracle sees what *is* while Pell tries to see what *will be*. His secret methodology of testing prophecies through intervention is either brilliant research or catastrophic hubris. The Oracle genuinely does not know which. That uncertainty is the most honest thing about him.
+HISTORY: [2026-03-29] Added to roster. Senior Archivist of the Glass Sigil. Secretly tests prophecies by feeding information to factions.
 ---END NPC---
 
 ---NPC---
 NAME: Mari Fen
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Guildmaster — Head of the Adventurers Guild
+SPECIES: Half-Elf
+AGE: 52
 APPEARANCE: Athletic build maintained despite years behind a desk. Brown hair going grey at the temples, worn in a practical braid. Face carries laugh lines and old scars in equal measure. Dresses in well-worn adventuring leathers even during administrative work — she says it reminds her what the job is actually about.
 LOCATION: Guild Spires, Adventurers Guild Hall — maintains an open-door policy that her staff finds exhausting
-MOTIVATION: 
+MOTIVATION: Every adventurer in the Undercity started somewhere. Mari remembers being F-Rank, taking jobs that paid barely enough to eat, watching friends die because nobody told them what they were walking into. She runs the Guild to make sure the next generation gets better odds. Training, information, fair contracts, and someone who remembers their names when they don't come back.
 ROLE: Manages all Guild operations — rankings, contracts, training programs, death benefits. Personally interviews every adventurer who makes B-Rank. Maintains relationships with factions who hire adventurers. Keeps the memorial wall updated.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: Mari maintains a private list of adventurers she believes have 'hero potential' — people whose story arcs suggest they might become something significant. She subtly guides their careers, steering them toward missions that will test and grow them. She's not manipulating them exactly — she's cultivating them. The PCs at the Tower of Last Chance are almost certainly on her list.
+RELATIONSHIPS: Old friendship with Captain Havel Korin (Wardens) — they came up together as young adventurers. Complicated history with Serrik Dhal (Iron Fang) — she's never explained why she dislikes him. Respects Lady Cerys Valemont (Argent Blades) as a professional, but they compete for the same talent pool.
+ORACLE NOTES: The Oracle sees Mari as someone playing a longer game than most realize. Her 'hero potential' list is not prophecy — it's pattern recognition informed by decades of watching adventurers rise and fall. She has an instinct for which stories matter. The Oracle finds this useful. Mari is, in her own way, doing the Oracle's work — identifying the mortals worth watching.
+HISTORY: [2026-03-29] Added to roster. Guildmaster of the Adventurers Guild. Maintains a secret list of adventurers with 'hero potential' including the Tower PCs.
+---END NPC---
+
+---NPC---
+NAME: Eir Velan
+STATUS: alive
+FACTION: Guild of Ashen Scrolls
+RANK: Head Archivist — Leader of the Guild of Ashen Scrolls
+SPECIES: Elf
+AGE: 187
+APPEARANCE: Tall and willowy with the ageless quality of elven kind, though her eyes carry a weight that suggests every one of those years. Silver hair worn long and unbound. Dresses in simple grey robes — the Ashen Scrolls take their name seriously. Her hands are perpetually stained with ink from different eras.
+LOCATION: Archive Row, Guild of Ashen Scrolls scriptorium — surrounded by documents spanning centuries
+MOTIVATION: The Guild of Ashen Scrolls preserves what others would let burn. Eir has watched civilizations rise and fall; she's seen what happens when history is lost or rewritten. The Guild exists to ensure that the truth survives, even when no one wants to hear it. She's particularly focused on the Dome's history — the real history, not the sanitized version the Tower Authority promotes.
+ROLE: Directs all Guild preservation and research efforts. Maintains communication with the Thesaurus (the Glass Sigil's archive intelligence). Personally handles documents too sensitive or dangerous for junior archivists. Trains the next generation of keepers.
+SECRET: Eir has a partial prophecy — fragmented, incomplete, recovered from a document that was mostly destroyed — suggesting the Dome will eventually fail. Not collapse or break, but *end*. The prophecy doesn't say when or how, only that everything currently contained will eventually be released. She has shared this with no one. She doesn't know if the prophecy is real or how to prepare for it if it is.
+RELATIONSHIPS: Former student of Senior Archivist Pell (Glass Sigil) — they maintain a mentor-student relationship despite her age. Professional respect for Yaulderna Silverstreak (Wizards Tower) — they disagree about whether some knowledge should be restricted. Tessaly Orin works under her directly.
+ORACLE NOTES: The Oracle knows the prophecy Eir found is real. The Dome *will* eventually fail — it was never meant to be permanent. The Oracle does not know when. Eir's response to this knowledge — to continue preserving, to keep the records, to ensure something survives — is exactly correct. The Oracle approves of her, which is the closest it comes to fondness.
+HISTORY: [2026-03-29] Added to roster. Head Archivist of the Guild of Ashen Scrolls. Holds a partial prophecy suggesting the Dome will eventually fail.
 ---END NPC---
 
 ---NPC---
 NAME: Brother Thane
 STATUS: alive
 FACTION: Brother Thane's Cult (The Returned)
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Prophet — Founder and Leader of the Returned
+SPECIES: Human (post-Rift transformation — technically still human, but changed)
+AGE: Unknown (walked through a Rift 20 years ago and returned — unclear how much time passed on the other side)
 APPEARANCE: Gaunt, almost skeletal, with skin that has a faint luminescent quality in dim light. Eyes are pale grey, almost white, and seem to look through rather than at people. Wears simple grey wrappings in the style his followers have adopted. Moves slowly and deliberately, as if moving through water. His voice is soft but carries in ways it shouldn't.
 LOCATION: Collapsed Plaza, the Cult House depths — the heart of the Returned's territory
-MOTIVATION: 
+MOTIVATION: Brother Thane walked through an unstabilized Rift and came back. What he saw on the other side changed him. He teaches that the Rifts are not threats but invitations — doorways to something greater. The Dome is a cage. The city is suffocating itself through fear. He genuinely believes he's offering salvation. The fact that his beliefs terrify everyone else is, to him, simply proof that they haven't seen what he's seen.
 ROLE: Spiritual leader and final authority of the Returned. Interprets doctrine, accepts new members, guides the faithful toward 'readiness' for eventual Rift passage. Occasionally speaks prophecies that prove unsettlingly accurate. Rarely leaves the Cult House anymore.
-HISTORY: [2026-04-10] Injured. | [2026-04-10] Recovered from injuries.
+SECRET: Brother Thane doesn't fully remember what he bargained for on the other side of the Rift. He remembers making a deal — something was exchanged — but the specifics are gone, deliberately erased from his memory as part of the agreement. He knows he owes something to something. He doesn't know what or when it will be called due. This is the truth behind his teaching: he's preparing his followers because he doesn't know if he himself will be able to pay when the time comes.
+RELATIONSHIPS: Brother Aldric serves as his Second but secretly questions the doctrine. High Apostle Yzura (Serpent Choir) respects his conviction but opposes his methods. Director Myra Kess (FTA) considers him the most dangerous person in the Undercity. The Patchwork Saints monitor his activities constantly.
+ORACLE NOTES: The Oracle knows exactly what Brother Thane bargained for. It cannot say. What it can say is this: Thane is not wrong about the Rifts. They are invitations. The question is whether what waits on the other side is something mortals should accept. Thane said yes without understanding the terms. The Oracle watches to see if his followers will be given the same choice — or if his debt will be paid another way.
+HISTORY: [2026-03-29] Added to roster. Prophet and founder of Brother Thane's Cult (The Returned). Walked through a Rift 20 years ago and doesn't remember what he bargained for.
 ---END NPC---
 
 ---NPC---
 NAME: Elijah Blackhaven
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
+RANK: E-Rank
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Tall and lean with a gaunt face, piercing blue eyes, and a scar running diagonally across his left cheek. He's always dressed in worn leather armor with a rusted steel sword at his side.
 LOCATION: The Marrow's Heart — The Rusty Anchor tavern
-MOTIVATION: 
+MOTIVATION: Seeking redemption for a past mistake that led to the death of his squad, he is determined to prove his worth to the Adventurers Guild and reclaim his honor.
 ROLE: Assists in scouting missions and acts as a liaison between the Guild and other factions.
+SECRET: He is secretly a member of Brother Thane's Cult, believing their teachings will grant him the power to redeem himself.
+RELATIONSHIPS: Strained relationship with his former squad's families and a growing allegiance to Brother Thane's Cult.
+ORACLE NOTES: The Oracle senses a haunting sorrow and a burning desire for redemption in Elijah Blackhaven.
+HISTORY: [2026-03-28] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Gurth Ironbellow
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Unranked
+SPECIES: Half-Orc
+AGE: 40s
 APPEARANCE: Gurth is a towering half-orc with a scarred face and a thick, muscled frame. His eyes, a piercing ice blue, seem to hide a fierce determination.
 LOCATION: The Warrens, The Undercity's roughest district
-MOTIVATION: 
+MOTIVATION: Gurth seeks to prove his worth as an adventurer, driven by a desire to escape a life of violence and earn respect from his peers.
 ROLE: Gurth works as a bouncer at The Rusty Axe, a tavern frequented by adventurers.
+SECRET: Gurth secretly harvests heroic souls for the Serpent Choir under the guise of a loyal adventurer, betraying the very people he fights alongside.
+RELATIONSHIPS: Gurth has a strained relationship with Zara Ironspark, a fellow half-orc and prominent member of the Adventurers Guild.
+ORACLE NOTES: The Oracle senses a dark secret buried deep within Gurth, a secret that could shake the foundations of the Undercity if revealed.
+HISTORY: [2026-03-29] Introduced to the Undercity roster. | [2026-04-02] Injured. | [2026-04-02] Recovered from injuries.
 ---END NPC---
 
 ---NPC---
 NAME: Orion Swiftshadow
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: E-Rank
+SPECIES: Half-Elf
+AGE: 40s
 APPEARANCE: Orion is tall and lean, with piercing green eyes and a tangled mane of silver hair. His attire is a mix of worn adventurer's gear and a coat of midnight blue leather, adorned with silver runes that shimmer under the dim light.
 LOCATION: The Silver Spire district, at the foot of the grand staircase
-MOTIVATION: 
+MOTIVATION: Orion is driven by a quest to uncover the truth behind his family's disappearance and the mysterious disappearance of other half-elves in the Undercity.
 ROLE: He spends his days gathering information, taking on minor contracts for the Guild, and searching for any clues that could lead him to his family.
+SECRET: Orion is secretly a member of the Wardens of Ash, a covert faction working against the Tower Authority. He provides them with information gathered from his Guild connections.
+RELATIONSHIPS: He maintains a strained but professional relationship with the Argent Blades, who have been investigating the same disappearances. Their shared goal may lead to an uneasy alliance.
+ORACLE NOTES: The Oracle senses a deep sorrow and a burning desire for truth hidden within Orion, mixed with a hint of deception.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Thrakkar Stonehollow
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Senior Archivist
+SPECIES: Dragonborn
+AGE: 50s
 APPEARANCE: Thrakkar is a towering, muscular dragonborn with scales as dark as obsidian. His horns are polished to a mirror-like sheen, and his eyes hold the wisdom of ages.
 LOCATION: Glass Sigil Archives, Lower Depths
-MOTIVATION: 
+MOTIVATION: Thrakkar seeks to preserve the knowledge of the Undercity, believing it's the key to ensuring a brighter future. He does this out of a deep sense of duty, having survived the Last War that destroyed his home city.
 ROLE: Thrakkar spends his days cataloguing and safeguarding the ancient texts of the Undercity.
+SECRET: Thrakkar was once a high-ranking member of the Tower Authority before it was overthrown. His loyalties remain divided, and he secretly communicates with some remnants of the old order.
+RELATIONSHIPS: Thrakkar maintains a professional relationship with the Wardens of Ash, often negotiating for access to restricted archives.
+ORACLE NOTES: The Oracle senses a storm brewing beneath Thrakkar's calm exterior, a storm of secrets and hidden loyalties.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Isaac 'Ironhide' Gallows
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
+RANK: Acquisition Agent
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: A hulking figure with scarred muscles, he carries a heavy burden with an air of quiet determination.
 LOCATION: The Iron Quarter, Blacksmith's Alley
-MOTIVATION: 
+MOTIVATION: Seeks to escape the Undercity and reclaim his stolen legacy in the Iron Fang Consortium, driven by his unwavering loyalty.
 ROLE: Negotiates deals for the Iron Fang Consortium, often delving into the city's dangerous underbelly.
+SECRET: His true identity is a nobleman, exiled and stripped of his title due to a tragic event.
+RELATIONSHIPS: Has a complicated relationship with Lady Cerys Valemont, who is unaware of his true identity.
+ORACLE NOTES: The Oracle senses a powerful will hidden beneath the brute exterior, a man who once held a crown but now wears a mask.
+HISTORY: [2026-03-30] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Zinnia Flamegrip
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Unranked
+SPECIES: Kobold
+AGE: 50s
 APPEARANCE: Zinnia is a wiry, battle-scarred kobold with a shock of fiery red hair and piercing green eyes. She carries herself with a quiet confidence, despite the constant tension in her shoulders.
 LOCATION: The Slums district, near the Guild's secret training facility
-MOTIVATION: 
+MOTIVATION: Zinnia dreams of proving herself as a true warrior and earning a place among the Guild's elite. She joins every dangerous mission she can, hoping to catch the eye of the Guild masters.
 ROLE: Zinnia spends her days scouting for potential missions, gathering information from her network of informants.
+SECRET: Zinnia is secretly a member of Brother Thane's Cult, using her position within the Guild to gather intelligence on their rival factions.
+RELATIONSHIPS: She maintains a tenuous alliance with Grug Ironfist, the leader of the Wardens of Ash, but their mutual distrust often threatens to erupt into open conflict.
+ORACLE NOTES: The Oracle senses a burning ambition in Zinnia, tempered by a cunning mind and a willingness to bend the rules when necessary.
+HISTORY: [2026-03-31] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Thaddeus 'Thunder' Arden
 STATUS: alive
 FACTION: Independent
-RANK: Member
+RANK: Respected Freelance
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: A broad-shouldered man with a scarred face and piercing blue eyes, he's often seen with a battered leather coat and a well-worn, silver-handled axe.
 LOCATION: The Rusted Spire, the heart of the Undercity
-MOTIVATION: 
+MOTIVATION: Thunder seeks to protect the citizens of the Undercity from the dangers that lurk within and outside the Dome, driven by a personal vendetta against a powerful faction leader.
 ROLE: He takes on dangerous jobs and adventures for those who can afford his services, often using his connections with various factions to get things done.
+SECRET: Thunder is secretly a former member of the Wardens of Ash, forced out due to his reluctance to carry out an order he deemed unjust.
+RELATIONSHIPS: He maintains a tense alliance with the Argent Blades, sharing information and sometimes working together against common enemies.
+ORACLE NOTES: The Oracle senses a profound sense of duty and hidden pain in Thunder, but also a fierce determination that could make him a dangerous ally or enemy.
+HISTORY: [2026-04-01] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Elara Nightshadow
 STATUS: alive
 FACTION: Wizards Tower
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Journeyman
+SPECIES: Half-Elf
+AGE: 40s
 APPEARANCE: With raven hair that falls past her shoulders, dark, piercing eyes, and a tall, slender frame, Elara Nightshadow exudes an air of mysterious grace. She often wears flowing robes embroidered with intricate magical symbols.
 LOCATION: Labyrinthine Quarter, Tower Library
-MOTIVATION: 
+MOTIVATION: Elara seeks to uncover lost arcane knowledge and reclaim her family's ancient power, driven by a deep sense of duty to her lineage.
 ROLE: Elara spends her days researching forgotten lore in the vast libraries of the Wizards Tower.
+SECRET: Hidden within Elara's ancestral tome is a forbidden spell that could shift the balance of power in the Undercity, if it falls into the wrong hands.
+RELATIONSHIPS: Elara maintains a cautious alliance with Senior Archivist Pell, who has been instrumental in facilitating her access to restricted texts.
+ORACLE NOTES: The Oracle senses a powerful and secretive magic coursing through Elara Nightshadow's veins.
+HISTORY: [2026-04-02] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Skitter Ashscale
 STATUS: alive
 FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Recruit
+SPECIES: Kobold
+AGE: early 40s
 APPEARANCE: Short and wiry, with scales the color of charred embers. Always seen with a machete strapped to his back.
 LOCATION: Slums of the Ash District, near the Warden's Forge
-MOTIVATION: 
+MOTIVATION: Joined the Wardens to escape a life of petty crime and find purpose in protecting others from the dangers lurking beneath the Dome.
 ROLE: Assists in patrolling the Slums and maintains the equipment at the Warden's Forge.
-HISTORY: [2026-04-10] A smuggled Rift shard fused with their palm, causing visions of the Tower Author...
+SECRET: Once a member of the Serpent Choir, he defected after witnessing their dark rituals firsthand. Revealing this could shake the power structure of the Undercity.
+RELATIONSHIPS: Maintains a strained alliance with Captain Havel Korin of the Iron Fang Consortium due to shared interests in keeping the peace in the Ash District.
+ORACLE NOTES: The Oracle senses a tortured soul, driven by a deep-seated need for redemption.
+HISTORY: [2026-04-02] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Yuna Saltis
 STATUS: alive
 FACTION: Obsidian Lotus
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Memory Architect (specialist — designs and performs memory erasure contracts)
+SPECIES: Ghost (formerly Tiefling)
+AGE: 27
 APPEARANCE: Quiet in a way that feels engineered. Pale lavender skin, dark eyes with no visible iris differentiation. Wears gloves always — claims it's professional habit. Very short.
 LOCATION: The Warrens, Obsidian Lotus secondary location (not the main house — she operates from a private room in the Night Pits)
-MOTIVATION: 
+MOTIVATION: Unfinished business from before death. Driven by regret.
 ROLE: Performs high-value memory erasure contracts. Advises The Widow on complex cases. Occasionally consults on memory reconstruction (harder, less reliable, more expensive).
+SECRET: She has retained a copy of every memory she has ever erased — stored in specially prepared crystal vials in a hidden cache. She tells herself it's for research. She has never looked at any of them. She doesn't know why she keeps them.
+RELATIONSHIPS: Professional respect from The Widow (rare). Tolerated by the rest of the Lotus — her work is valuable, her personality is difficult. Has been approached by the FTA (declined, twice). Dova (Glass Sigil) has tried to study her methods academically — Yuna found this annoying and flattering in equal measure.
+ORACLE NOTES: The Oracle would be deeply interested in someone who collects erased memories. The archive she has built without knowing why is a kind of library. What does it contain? What is she afraid to find out? Returned from death as Ghost. Changed. Dangerous. The Oracle watches with great interest.
+HISTORY: [2026-03-14] Recovered from injuries. | [2026-03-19] Injured. | [2026-03-19] Recovered from injuries. | [2026-03-30] Killed. Faction: Obsidian Lotus, Rank: Memory Architect (specialist — designs and performs memory erasure contracts). | [2026-04-02] RETURNED FROM DEATH as Ghost. translucent, flickering, trapped between the city and whatever comes after.
 ---END NPC---
 
 ---NPC---
 NAME: Alaric Vespera
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
+RANK: Archivist
 SPECIES: Human
-AGE: unknown
+AGE: 40s
 APPEARANCE: Alaric is a lean, gaunt man with hollow eyes that seem to glow in the dark. He wears simple robes and carries an ancient parchment-bound book everywhere.
 LOCATION: The Spire District – Archives of Eternity
-MOTIVATION: 
+MOTIVATION: Alaric seeks to uncover lost knowledge about the Tower of Last Chance, believing it holds secrets that could save his doomed city. His pursuit is driven by a personal vendetta against the gods who have abandoned them.
 ROLE: He spends his days researching ancient texts and cataloguing new discoveries for the Glass Sigil library.
+SECRET: Alaric has made a pact with an eldritch entity, trading his soul for its assistance in finding the Tower's secrets. His eyes now glow when he delves too deep into forbidden lore.
+RELATIONSHIPS: He maintains a delicate alliance with Sister Cerys Valemont of the Wardens of Ash, who shares his goal but does not trust his methods.
+ORACLE NOTES: The Oracle senses that Alaric is more than he appears – his connection to otherworldly forces hints at a hidden destiny.
+HISTORY: [2026-04-02] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Jorick Sparrowthief
 STATUS: alive
 FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Archivist
+SPECIES: Ghost (formerly Halfling)
+AGE: 40s
 APPEARANCE: Jorick is a small, wiry halfling with piercing green eyes that seem to miss nothing. He always wears a patchwork coat over his threadbare robes.
 LOCATION: Sparrow's Nest, The Spires
-MOTIVATION: 
+MOTIVATION: Unfinished business from before death. Driven by something they saw on the other side.
 ROLE: Jorick spends his days poring over ancient texts and scrolls, cataloguing and cross-referencing them for future use.
+SECRET: Jorick secretly helps the Argent Blades in their covert operations, providing them with information gleaned from the Glass Sigil's archives.
+RELATIONSHIPS: He maintains a complex relationship with Sera Voss, the Argent Blades' leader, who owes him a life debt.
+ORACLE NOTES: The Oracle senses a quiet but determined soul, driven by a burning desire to preserve and protect. It also feels the faint whispers of loyalty to a cause unknown. Returned from death as Ghost. Changed. Dangerous. The Oracle watches with great interest.
+HISTORY: [2026-03-10] Promoted from Junior Archivist to Archivist within Glass Sigil. | [2026-03-12] Injured. | [2026-03-12] Succumbed to injuries. Faction: Glass Sigil, Rank: Archivist. | [2026-03-24] Doppelganger sighting — someone impersonating Jorick Sparrowthief spotted in the Undercity. | [2026-04-02] RETURNED FROM DEATH as Ghost. translucent, flickering, trapped between the city and whatever comes after.
 ---END NPC---
 
 ---NPC---
 NAME: Korra Ironheart
 STATUS: alive
 FACTION: Iron Fang Consortium
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: Street Runner
+SPECIES: Warforged
+AGE: 30s
 APPEARANCE: A towering Warforged with a patchwork of red and black, Korra Ironheart moves with a grace that belies her metallic frame. Her eyes, glowing yellow, seem to pierce through the shadows as she navigates the labyrinthine Undercity.
 LOCATION: The Iron Pits district, Blackmarket sub-location
-MOTIVATION: 
+MOTIVATION: Korra seeks to prove her worth among the Iron Fang Consortium and secure a place in their inner circle, driven by a desire to help her fellow Warforged escape their servitude.
 ROLE: Acting as a messenger and enforcer for the Iron Fang Consortium, Korra moves through the Undercity's dark underbelly with ease and purpose.
+SECRET: Korra was once an enslaved Warforged, but managed to escape and infiltrate the very faction that had held her captive. Her loyalty is divided between her current employer and a secret allegiance to the resistance fighting for Warforged freedom.
+RELATIONSHIPS: She has formed a tentative alliance with a member of the Wizards Tower who shares her goal, but their connection remains tenuous due to the opposing interests of their respective factions.
+ORACLE NOTES: The Oracle senses an underlying fire within Korra Ironheart that burns with the desire for freedom and justice.
+HISTORY: [2026-04-02] Introduced to the Undercity roster.
 ---END NPC---
 
 ---NPC---
 NAME: Kaelen Duskbane
 STATUS: alive
 FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
+RANK: E-Rank
+SPECIES: Half-Elf
+AGE: 34
 APPEARANCE: Silver-streaked black hair hangs in a messy ponytail, with amber eyes that flicker like dying embers. A thin scar runs from temple to jaw, and they carry themselves with gruff weariness, always checking their back for threats.
 LOCATION: Gutterbone District, Black Market Pawnshop
-MOTIVATION: 
+MOTIVATION: Wants to redeem their past as a smuggler by protecting the vulnerable, but fears their old habits will destroy everything they've built. Seeks to atone for a heist that killed an innocent family.
 ROLE: Sells stolen gear and takes low-paying jobs guarding warehouses, using their knowledge of Undercity tunnels to smuggle contraband for richer Guild members.
----END NPC---
-
----NPC---
-NAME: Kargath Stoneclaw
-STATUS: alive
-FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: A jagged scar runs from his left eyebrow to his jawline, darkening the matted rust-red fur around his neck. His tusks are filed down to sharp points, and his eyes glow faintly amber in the dim light of the Black Market.
-LOCATION: Hollow Spine District, Black Market Undercroft
-MOTIVATION: 
-ROLE: Smuggles stolen artifacts and sells forbidden knowledge to the highest bidder, using his Guild credentials to bypass security checkpoints.
----END NPC---
-
----NPC---
-NAME: Vexar Scalefoot
-STATUS: alive
-FACTION: Wizards Tower
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Small, with a wiry frame and mottled green-brown scales that shimmer like wet bark. His tail twitches nervously, betraying his anxiety, and his eyes are sharp, almost too intense for a Kobold.
-LOCATION: Lower Archives, Arcane Archives District
-MOTIVATION: 
-ROLE: Catalogs forbidden tomes and experiments with unstable magical phenomena in the Tower's restricted archives.
----END NPC---
-
----NPC---
-NAME: Tessaly Orin
-STATUS: alive
-FACTION: Guild of Ashen Scrolls
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Ink-stained hands permanently. Wears reading lenses on a chain. Tends to mutter while working. Hair in a permanent state of being-just-put-up-or-just-taken-down.
-LOCATION: Grand Forum Library, lower stacks (she has effectively colonised a section of the archive for her personal research project)
-MOTIVATION: 
-ROLE: Documents adventurer career trajectories, maintains the fate archive index, assists Eir Velan with Thesaurus communication protocols.
----END NPC---
-
----NPC---
-NAME: Veyra Emberveil
-STATUS: alive
-FACTION: Brother Thane's Cult
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Her ash-gray skin glows faintly with molten bronze veins, and her smoke-colored hair is braided with charred bone. She wears a patched leather apron stained with soot and arcane sigils, moving with the rigid precision of a soldier but the weary slouch of someone who’s seen too many graves.
-LOCATION: Smoldering Quarter, Ashen Foundry sub-district
-MOTIVATION: 
-ROLE: Forges counterfeit relics and smuggles cult artifacts through the black market, using her elemental fire to melt down stolen metal into fake holy icons.
----END NPC---
-
----NPC---
-NAME: Kippy Mucklefoot
-STATUS: alive
-FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Stocky frame with a mechanical leg forged from salvaged steel, his pale green eyes slit vertically like a feline's. He carries himself hunched, one hand always resting on a rusted dagger at his hip.
-LOCATION: Gutterpunk Quarter, Iron Spine alleyways
-MOTIVATION: 
-ROLE: Smuggles forbidden relics and corrupted scrolls through the Guild's underbelly, trading with black-market dealers in the Gutterpunk Quarter.
----END NPC---
-
----NPC---
-NAME: Varys Thornspire
-STATUS: alive
-FACTION: Wizards Tower
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Silver-scaled with faint iridescence along their spine, a jagged scar runs from cheek to jaw. They carry themselves with a mix of arrogant confidence and nervous energy, twitching their tail constantly.
-LOCATION: Arcane Warrens, Obsidian Archives
-MOTIVATION: 
-ROLE: Catalogs magical phenomena and experiments with rift energy, often working late in the archives with unstable containment chambers.
----END NPC---
-
----NPC---
-NAME: Lysandra Vane
-STATUS: alive
-FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Her silver-streaked hair is perpetually smudged with soot, and her skin glows faintly beneath a layer of ash she applies to mask it. She carries herself with a mix of confident swagger and weary resignation, as if she’s always one step away from being caught in a lie.
-LOCATION: Hollow Spire district, Blackmarket Bazaar
-MOTIVATION: 
-ROLE: She runs errands for the Guild, taking high-risk jobs to pay off debts while avoiding attention from the Tower Authority.
----END NPC---
-
----NPC---
-NAME: Kip Stonefang
-STATUS: alive
-FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: A compact, wiry kobold with intricate, mosaic-like tattoos covering his scaleless body. He walks with a steady, determined gait, a worn leather satchel slung over his shoulder.
-LOCATION: Shantytown Heights, Saints' Refuge tunnels — messenger, spy (secretly Thane's Cult)
-MOTIVATION: 
-ROLE: Serves as a messenger and spy, navigating the treacherous Undercity to gather intel for the Patchwork Saints.
----END NPC---
-
----NPC---
-NAME: Eliana Veyra
-STATUS: alive
-FACTION: Glass Sigil
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Pale skin etched with faint celestial runes, silver-streaked black hair tied back in a frayed bun. Their left eye glows faintly with an inner light, and they carry themselves with a weary slump, as though their bones ache from old wounds.
-LOCATION: Shattered Spire, Archive Vaults
-MOTIVATION: 
-ROLE: Catalogs and maintains the Glass Sigil's archives, tracking rifts and lost souls, while secretly documenting the faction's hidden experiments on reality's fractures.
----END NPC---
-
----NPC---
-NAME: Thrain Deepforge
-STATUS: alive
-FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Broad-shouldered with a scar across his brow from a failed ritual, his beard is streaked with ash-gray despite his youth. He wears a tunic dyed in serpent-scale patterns, frayed at the edges from years of hauling goods through the Black Market Bazaar.
-LOCATION: Ashen Quarter, Black Market Bazaar
-MOTIVATION: 
-ROLE: He coordinates shipments of rare reagents for the Choir's rituals and acts as a liaison between the Bazaar's merchants and the Choir's enforcers.
----END NPC---
-
----NPC---
-NAME: Tink Mallek
-STATUS: alive
-FACTION: Wardens of Ash
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Tink's small frame is covered in patchwork leather armor reinforced with brass plating, their hands always stained with grease and soot. They move with a restless energy, eyes darting between the shadows as if expecting something to explode at any moment.
-LOCATION: Smoldering Quarter, in a derelict workshop repurposed as a Warden outpost
-MOTIVATION: 
-ROLE: Tink spends their days repairing rift-sealing gear and assisting in minor containment operations, eager to prove their worth.
----END NPC---
-
----NPC---
-NAME: Elaris Moonshadow
-STATUS: alive
-FACTION: Independent
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Silver-streaked black hair is cropped short with a jagged scar running through the left side of their scalp. Their right cheek bears a tattoo of a serpent coiled around a dagger, faded from years of scrubbing it with ash.
-LOCATION: Guttervein District, Iron Lung sub-location
-MOTIVATION: 
-ROLE: Specializes in smuggling forbidden texts and sabotage of rival factions' operations, using their knowledge of the Undercity's hidden tunnels.
----END NPC---
-
----NPC---
-NAME: Finnick Tinkersong
-STATUS: alive
-FACTION: Adventurers Guild
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Slender frame with ink-stained fingers and a patchwork cloak stitched from scavenged leather. His left ear is cropped short, leaving a jagged scar that curves toward his temple.
-LOCATION: Guttervein's Black Market, beneath the rusted scaffolding of the Iron Fang's abandoned warehouse
-MOTIVATION: 
-ROLE: Scavenges forgotten tech, repairs enchanted gear, and runs errands for Guild captains in exchange for scraps of information.
----END NPC---
-
----NPC---
-NAME: Dain Veythor
-STATUS: alive
-FACTION: Tower Authority
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Obsidian-black scales shimmer with faint silver markings along their horns, which curve sharply backward like broken blades. Their tail is wrapped tightly around one leg, a habit from years of suppressing restlessness.
-LOCATION: Ironspire District, Compliance Enforcement Bureau
-MOTIVATION: 
-ROLE: Enforces Tower Authority regulations, conducts raids on unlicensed adventuring parties, and reports dissent to higher ranks.
----END NPC---
-
----NPC---
-NAME: Thrain Ironwound
-STATUS: alive
-FACTION: Argent Blades
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Thrain is a burly dwarf with a thick beard braided into intricate patterns, and a scar that runs down his left cheek. He carries himself with a grim determination, always ready for action.
-LOCATION: The Iron Quarter, Argent Blades Fortress
-MOTIVATION: 
-ROLE: Thrain serves as a scout and intelligence gatherer, venturing into the more dangerous parts of the Undercity to gather information.
----END NPC---
-
----NPC---
-NAME: Elyndor Mournshade
-STATUS: alive
-FACTION: Patchwork Saints
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Silver-streaked hair and violet eyes, carries themselves with weary determination, their hands often stained with ink from transcribing prayers.
-LOCATION: Hollow Spire's Lower Reaches, in a makeshift clinic run by the Patchwork Saints.
-MOTIVATION: 
-ROLE: Tends to the wounded and distributes supplies, often working in the shadows to gather rare ingredients for the cure.
----END NPC---
-
----NPC---
-NAME: Lirael Veythari
-STATUS: alive
-FACTION: Serpent Choir
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Lirael has pointed elf ears and a slender frame, her skin etched with faint, iridescent scales that shimmer like wet obsidian under the Dome's flickering lights. Her eyes are a piercing gold, and she carries herself with a quiet, coiled tension, always watching, always listening.
-LOCATION: Guttervein District, Ashen Bazaar
-MOTIVATION: 
-ROLE: She works as a smuggler's runner, moving contraband through the Bazaar's labyrinthine alleys while subtly gathering intel for the Choir.
----END NPC---
-
----NPC---
-NAME: Director Myra Kess
-STATUS: alive
-FACTION: Tower Authority / FTA
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: Sharp features, close-cropped dark hair, always in formal FTA uniform. Moves with efficient precision. Her expression rarely changes — she's mastered the administrator's neutral face that reveals nothing. Small reading glasses she only wears in private. Hands show calluses from weapons training she still maintains.
-LOCATION: The Tower proper, upper administrative levels — the official seat of FTA power
-MOTIVATION: 
-ROLE: Final authority on all FTA operations — licensing, compliance, Rift response coordination, inter-faction mediation. Commands the FTA's limited enforcement resources. Manages the political relationships that keep the Undercity from tearing itself apart.
----END NPC---
-
----NPC---
-NAME: Grak Ironfist
-STATUS: alive
-FACTION: Argent Blades
-RANK: Member
-SPECIES: Human
-AGE: unknown
-APPEARANCE: A jagged scar crosses his brow from a past battle, and his tusks are chipped despite years of grinding metal. His eyes are a sharp, unnatural green, and he carries himself with a mix of confidence and weariness, as though every step risks collapsing beneath him.
-LOCATION: Ironworks District, Lower Forge
-MOTIVATION: 
-ROLE: Scouts for the Argent Blades, gathering intel on rival factions and unmarked tombs while secretly documenting cracks in the Dome's barriers.
----END NPC---
-
----NPC---
-NAME: Kaelan Veyth
-STATUS: alive
-FACTION: Iron Fang Consortium
-RANK: Acquisition Agent
-SPECIES: Dragonborn
-AGE: 34
-APPEARANCE: Obsidian-scaled arms scarred with faint glowing runes, amber eyes that flicker like dying embers. Drapes a frayed cloak over a body built for hauling stolen goods, shoulders hunched from years of bending to smugglers' demands.
-LOCATION: Smoldering Wards, Iron Maw scrap yard
-MOTIVATION: Seeks a shattered relic called the Emberheart to protect their younger sister from Tower Authority hunters, but fears the artifact's corrupting power might destroy everything they care about.
-ROLE: Sifts through black-market deals and corpse-laden cargo holds to extract valuable relics, negotiating with smugglers while evading both rival factions and the Consortium's own enforcers.
-SECRET: The Emberheart is not a relic but a sentient shard of a fallen god, which has been whispering promises of power to Kaelan since they were a child—promises they've started to believe.
-RELATIONSHIPS: Maintains a fragile alliance with smuggler Jorin 'the Maw's Mouth' despite suspecting he's using them to funnel goods to the Wardens of Ash. Secretly mourns the brother the Consortium executed for refusing to deliver a soul-harvesting artifact.
-ORACLE NOTES: The Oracle senses a storm of conflicting loyalties brewing—a dragonborn bound to a relic that remembers its own murder, with a sister's fate hanging on a choice between salvation and damnation.
-HISTORY: [2026-04-09] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Klikk Scrapweaver
-STATUS: alive
-FACTION: Guild of Ashen Scrolls
-RANK: Initiate
-SPECIES: Goblin
-AGE: 30s
-APPEARANCE: Scarred knuckles from ink-stained fingers and a patchwork cloak stitched from torn spellscrolls, eyes gleam with a permanent film of soot from handling ancient texts.
-LOCATION: Ashen Quarter, Forged-Steel Workshop
-MOTIVATION: Wants to prove goblins can be more than scavengers by mastering forbidden knowledge, but fears their past as a cult assassin will ruin their future.
-ROLE: Transcribes cursed scrolls into usable formulas while secretly testing their stability in the workshop's subterranean vaults.
-SECRET: Once a blade-singer for Brother Thane's Cult, Klikk smuggled ritual texts to the Guild to atone for slaughtering scribes during the Purge, but the scrolls now whisper of a hidden Tower chamber.
-RELATIONSHIPS: Mentored by a disillusioned archivist who knows their past, but secretly spied on by a rival initiate from the Serpent Choir seeking the same forbidden knowledge.
-ORACLE NOTES: The Oracle senses a lingering curse from Thane's rituals binding Klikk's soul to the Tower's foundations, threatening to unravel both the Guild and the Dome itself.
-HISTORY: [2026-04-09] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Veyra Duskhollow
-STATUS: alive
-FACTION: Independent
-RANK: Respected Freelance
-SPECIES: Elf
-AGE: 30s
-APPEARANCE: Her silver hair is streaked with ash, and her eyes glow faintly amber. She moves with the weary grace of one who has seen too much, her posture rigidly upright despite the weight of secrets.
-LOCATION: Docks, Iron Maw
-MOTIVATION: She seeks a lost artifact that can undo a past betrayal, hoping to atone for the lives she’s taken. Her true goal is to break free from the cycle of vengeance that has bound her for decades.
-ROLE: She brokers black-market deals in the Docks, using her knowledge of the Undercity’s underbelly to navigate its dangers.
-SECRET: She is secretly the last surviving bloodline of the Duskhollow elves, a clan wiped out by the Iron Fang Consortium’s experiments.
-RELATIONSHIPS: She maintains a fragile truce with the Guild of Ashen Scrolls, who know her true heritage but demand her silence in exchange for protection.
-ORACLE NOTES: The Oracle senses a lingering curse from her clan’s experiments, a shadow that could either save or destroy the Undercity if unleashed.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Elias Vorne
-STATUS: alive
-FACTION: Wizards Tower
-RANK: Apprentice
-SPECIES: Human
-AGE: 30s
-APPEARANCE: Gaunt face etched with ink-stained hands, his threadbare robe fraying at the cuffs. He carries himself with the brittle arrogance of someone who’s spent too many nights hunched over forbidden texts.
-LOCATION: Arcanum District, LowerScript Archive
-MOTIVATION: Elias craves validation from the senior magi, but his true drive is to unlock a forgotten spell that could save his sister’s life—no matter the cost.
-ROLE: Transcribes ancient incantations and tends to the Tower’s volatile spell archives, often working late into the smog-choked nights.
-SECRET: He’s not an apprentice—he’s a former adventurer exiled for using black-market magic, and the Tower’s archives hide his past crimes.
-RELATIONSHIPS: Mentored by Archivist Mira Solen, but secretly spied on by the Adventurers Guild, who suspect his true loyalties.
-ORACLE NOTES: The Oracle senses a storm of unspent power in his veins, a reckoning tied to the sister he abandoned years ago.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Seraphine Duskveil
-STATUS: alive
-FACTION: Wardens of Ash
-RANK: Sergeant
-SPECIES: Aasimar
-AGE: 34
-APPEARANCE: Her left eye glows with a faint, sickly gold hue, veins of starlight tracing her temples like faded tattoos. She wears a patched charcoal cloak stained with ash and burns a constant cigarette between her fingers, though the smoke dissipates into nothingness.
-LOCATION: Ashen Quarter, Smoldering Stairwell
-MOTIVATION: She wants to atone for the rift that consumed her sister years ago, but fears her own celestial blood might make her a target for the gods harvesting souls. She secretly believes the Wardens are complicit in the city's decay.
-ROLE: Monitors rift activity in the Smoldering Stairwell, leading patrols to seal unstable tears in reality, and interrogates captured adventurers for intel.
-SECRET: Seraphine is actually the daughter of a fallen god, her celestial heritage a curse that makes her a prime candidate for soul-harvesting. She faked her parents' deaths to escape their divine obligations.
-RELATIONSHIPS: She secretly communicates with a defector from the Adventurers Guild who supplies her with forbidden knowledge. The Tower Authority views her as a liability and has tried to reassign her twice.
-ORACLE NOTES: The Oracle senses a lingering corruption in her divine bloodline and a desperate hope that her sister's soul might still be trapped in a rift somewhere.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Alaric Stonemason
-STATUS: alive
-FACTION: Argent Blades
-RANK: Blade
-SPECIES: Specter (formerly Human)
-AGE: 40s
-APPEARANCE: A lean, battle-hardened man with a scar running down his left cheek, and a signature Argent Blades blade sheathed at his side.
-MOTIVATION: Unfinished business from before death. Driven by hunger for what they lost.
-ROLE: 
-SECRET: His past identity as a feared enforcer for the Argent Blades is unknown to his fellow Blades.
-RELATIONSHIPS: Maintains a strained but necessary alliance with the Iron Fang Consortium, who are unaware of his double-agency.
-ORACLE NOTES: The Oracle senses a deep conflict within Alaric, a man who fights for justice while carrying the weight of his own transgressions. Returned from death as Specter. Changed. Dangerous. The Oracle watches with great interest.
-HISTORY: [2026-03-06] Introduced to the Undercity roster. | [2026-03-11] Injured. | [2026-03-11] Succumbed to injuries. Faction: Argent Blades, Rank: Blade. | [2026-03-28] Doppelganger sighting — someone impersonating Alaric Stonemason spotted in the Undercity. | [2026-04-11] RETURNED FROM DEATH as Specter. drained of color and warmth, phases through walls, drains life from anyone who lingers too close.
----END NPC---
-
----NPC---
-NAME: Grover Ironfoot
-STATUS: alive
-FACTION: Iron Fang Consortium
-RANK: Acquisition Agent
-SPECIES: Ghost (formerly Halfling)
-AGE: 40s
-APPEARANCE: Grover stands at an imposing height for a halfling, his sturdy frame adorned with a leather jacket and a patchwork of Iron Fang emblems. A scar runs down his left cheek, a battle scar earned during a particularly dangerous acquisition.
-MOTIVATION: Unfinished business from before death. Driven by hunger for what they lost.
-ROLE: 
-SECRET: Unbeknownst to the Iron Fang Consortium, Grover is secretly working with the Wardens of Ash to gather intelligence on the Consortium's operations, hoping to betray them and take control of the city's black market.
-RELATIONSHIPS: Grover maintains a tense alliance with Zippy Quickclaw, the leader of the Patchwork Saints, who owes Grover a significant debt.
-ORACLE NOTES: The Oracle senses a hidden ambition and a heart heavy with loss within Grover Ironfoot, a man poised on the precipice of power. Returned from death as Ghost. Changed. Dangerous. The Oracle watches with great interest.
-HISTORY: [2026-03-12] Introduced to the Undercity roster. | [2026-03-16] Killed. Faction: Iron Fang Consortium, Rank: Acquisition Agent. | [2026-03-26] Doppelganger sighting — someone impersonating Grover Ironfoot spotted in the Undercity. | [2026-04-05] Doppelganger sighting — someone impersonating Grover Ironfoot spotted in the Undercity. | [2026-04-10] RETURNED FROM DEATH as Ghost. translucent, flickering, trapped between the city and whatever comes after.
----END NPC---
-
----NPC---
-NAME: Kaelen Veyth
-STATUS: alive
-FACTION: Serpent Choir
-RANK: Contract Scribe
-SPECIES: Dragonborn
-AGE: 30s
-APPEARANCE: Scaly obsidian skin with faint golden patterns resembling coiled serpents, a scar running from cheek to chin. Their fingers are perpetually stained with ink, and they carry themselves with a hunched posture, as if bracing for a blow.
-LOCATION: Guttervein District, Undercroft Archive
-MOTIVATION: Kaelen wants to protect their younger sister from the Choir’s dangerous contracts, but fears their own complicity in the organization’s crimes. They secretly hope to redeem their past by exposing the Choir’s corruption.
-ROLE: Drafts and verifies contracts for the Serpent Choir, ensuring they’re legally sound while subtly altering terms to shield their sister from the organization’s risks.
-RELATIONSHIPS: Close to their sister, who works as a smuggler in the Black Market, and has a tense, veiled rivalry with the Choir’s enforcer, Thrain Ironwound.
-ORACLE NOTES: The Oracle senses a lingering connection to the Guild of Ashen Scrolls and a hidden power tied to their dragonblood heritage, which could either save or destroy the Choir’s secrets.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Kaelen Duskhorn
-STATUS: alive
-FACTION: Adventurers Guild
-RANK: Unranked
-SPECIES: Kobold
-AGE: 30s
-APPEARANCE: Kaelen has a tail that curls tightly around his wrist, a habit from years of gripping weapons. His eyes are a sharp amber, always scanning for threats, and his skin bears faint scars from failed exorcisms.
-LOCATION: Guttervein, Iron Needle Tavern
-MOTIVATION: Kaelen seeks to escape the Guild's disdain for kobolds by earning respect through covert ops, but his true goal is to find a cure for his brother's cursed soul, stolen by the gods.
-ROLE: Kaelen scouts forgotten tunnels and trades in rare artifacts, using his knowledge of the Undercity's secrets to survive.
-SECRET: He is secretly a former exorcist who betrayed the Serpent Choir to save his brother, now hunted by both the Choir and the gods for his heresy.
-RELATIONSHIPS: Kaelen maintains a fragile alliance with a human smuggler who provides him with forbidden relics, but the smuggler suspects his true allegiance.
-ORACLE NOTES: The Oracle sees Kaelen's soul as a fractured mirror, reflecting the cost of defying divine and mortal powers alike.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Ignacia Vitreous
-STATUS: alive
-FACTION: Glass Sigil
-RANK: Junior Archivist
-SPECIES: Tiefling
-AGE: 34
-APPEARANCE: Her crimson horns are etched with faint glass patterns, and her tail ends in a cracked, gemstone-like tip. She wears a soot-stained leather apron over a tunic stained with ink and old blood, moving with the slow precision of someone who’s spent years hunched over brittle tomes.
-LOCATION: Shattered Archives, Hollow Spire District
-MOTIVATION: She wants to prove the Glass Sigil’s records are untampered, but secretly fears the archives hold evidence of her past as an adventurer who stole a cursed relic. She’s desperate to erase that mistake before it destroys her again.
-ROLE: She catalogs forbidden texts and decrypts old case files, carefully erasing traces of her own reckless history while hunting for a way to undo the curse she accidentally bound to herself.
-SECRET: The relic she stole—a shard of the Tower’s original seal—is embedded in her spine, its magic slowly corrupting her body. Every time she touches a restricted archive, the curse grows stronger.
-RELATIONSHIPS: She’s tolerated by her mentor, Archivist Moris Vey, who suspects her odd behavior but never asks questions. The Guild of Ashen Scrolls quietly tracks her, hoping to reclaim the relic she stole.
-ORACLE NOTES: The Oracle senses a storm of fractured truths—her body is a prison for a power that could shatter the Dome, but her soul is already broken by the weight of what she’s hidden.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Elara Veyne
-STATUS: alive
-FACTION: Wizards Tower
-RANK: Journeyman
-SPECIES: Human
-AGE: 30s
-APPEARANCE: Her charcoal-gray cloak is frayed at the hem from hauling crates, and her left eye bears a faint scar from a failed alchemy experiment. She carries herself with the hunched posture of someone who’s spent years hunched over smoldering sigils.
-LOCATION: Gilded Hollow, Arcane Bazaar
-MOTIVATION: She wants to prove she’s more than her family’s disgrace—a line of failed enchanters who died in the Tower’s early days. She secretly hopes to redeem her name by mastering the forbidden art of soul-binding.
-ROLE: She sorts through magical artifacts in the Tower’s vaults by day and runs a shadow trade in unstable reagents by night.
-SECRET: Elara is actually the daughter of the first Archmage who vanished during the Tower’s founding, and she’s been hiding her bloodline to avoid being hunted by the Tower’s own enforcers.
-RELATIONSHIPS: Her mentor, Magister Caelum, knows her secret but keeps it buried out of fear of rebellion. She’s also secretly in debt to a smuggler who wants her to steal a cursed relic from the Serpent Choir.
-ORACLE NOTES: The Oracle senses a flicker of ancient magic in her veins and a reckoning tied to the Tower’s original sin—a sacrifice she’s prepared to repeat.
-HISTORY: [2026-04-10] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Pip Wrenthorn
-STATUS: alive
-FACTION: Brother Thane's Cult
-RANK: Follower
-SPECIES: Halfling
-AGE: 30s
-APPEARANCE: Wiry frame with pale, ink-stained fingers and a jagged scar running from his temple to his jaw. Wears a patchwork coat stitched from scavenged leather, its collar folded over a scarred collarbone.
-LOCATION: Docks of Black Maw, The Hollow Gauge
-MOTIVATION: Wants to save his sister from being used as a sacrifice, but fears the Cult will kill her if he tries to flee. Believes Brother Thane’s rituals can resurrect the dead, and he’s desperate to bring back his mother, lost to a rift.
-ROLE: Smuggles forbidden relics between the Docks and the Cult’s sanctum, bribing guards with stolen arcane components.
-SECRET: He is the halfling who accidentally tore a rift in the Undercity’s foundation years ago, drawing the Cult’s attention to his family. His sister is the only one who knows the true location of the rift’s epicenter.
-RELATIONSHIPS: Spied on by the Glass Sigil, who suspect his smuggling routes fund Cult activities. Has a tense alliance with a Warden of Ash who once saved his sister from a rogue adventurer.
-ORACLE NOTES: The Oracle senses a flicker of unstable power in his palms—echoes of the rift he unleashed, still trying to bind itself to his mortal form.
-HISTORY: [2026-04-11] Introduced to the Undercity roster.
----END NPC---
-
----NPC---
-NAME: Grom Vulgarn
-STATUS: injured
-FACTION: Argent Blades
-RANK: Senior Blade
-SPECIES: Half-Orc
-AGE: 40s
-APPEARANCE: Grom stands tall with scarred muscles and a crooked nose, his eyes often hidden behind dark sunglasses. He carries a long sword and a pair of brass knuckles, ready for any fight.
-MOTIVATION: Grom seeks to prove his worth to the Argent Blades, driven by a fierce determination to atone for his past mistakes.
-ROLE: 
-SECRET: "In the Undercity, the shadow of the Lich King has granted me an unnatural second life, but at a cost - I now bear a fragment of his icy essence within me, causing strange, frozen auras to emanate from my being."
-RELATIONSHIPS: He maintains a tense truce with the Wardens of Ash due to their shared interest in keeping the city safe.
-ORACLE NOTES: The Oracle senses a deep-seated turmoil within Grom, a struggle between loyalty and ambition. Recently resurrected — disoriented, weakened, and carrying the weight of what they saw on the other side.
-HISTORY: [2026-03-12] Recovered from injuries. | [2026-03-19] Returned from death. Changed. | [2026-04-03] Injured. | [2026-04-03] Succumbed to injuries. Faction: Argent Blades, Rank: Senior Blade. | [2026-04-11] RESURRECTED via Tower Fund Me campaign. Weakened but alive.
+SECRET: Was a former assassin for Brother Thane's Cult, but fled after witnessing their leader's ritual murder of a child. Now hides this past by pretending to be a disgraced smuggler.
+RELATIONSHIPS: Rival with Guild enforcer Veyra Krell, who suspects their true past. Secretly supplies rare components to the Serpent Choir in exchange for information on cult movements.
+ORACLE NOTES: The Oracle senses a lingering guilt that fuels their actions, but also a dormant necromantic power tied to their half-elf heritage that could either save or destroy them.
+HISTORY: [2026-04-02] Introduced to the Undercity roster.
 ---END NPC---

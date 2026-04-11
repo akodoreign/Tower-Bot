@@ -97,7 +97,7 @@ class ProjectManagerAgent(BaseAgent):
     def _get_config(self) -> AgentConfig:
         """Use local Qwen model for fast orchestration."""
         return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.5,  # Lower temp for structured decisions
             max_tokens=2048,
@@ -218,7 +218,7 @@ class PythonVeteranAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.6,
             max_tokens=2048,
@@ -373,7 +373,7 @@ class DNDExpertAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.7,
             max_tokens=2048,
@@ -484,94 +484,6 @@ Is this system balanced per D&D 5e DMG 2024?"""
                     adjustments.append(adj)
         
         return adjustments[:8]
-    
-    async def generate_creature_appendix(
-        self,
-        module_content: str,
-        cr: int,
-        tier: str,
-    ) -> str:
-        """
-        Generate a Creature Appendix with full D&D 5e 2024 stat blocks.
-        
-        Extracts all creatures mentioned in the module and provides complete
-        stat blocks that can be printed and used at the table.
-        
-        Args:
-            module_content: The full module text to scan for creatures
-            cr: Challenge Rating target for the mission
-            tier: Mission tier (local, standard, epic, etc.)
-        
-        Returns:
-            Formatted creature appendix with full stat blocks
-        """
-        prompt = f"""Analyze this D&D 5e 2024 mission module and create a CREATURE APPENDIX.
-
-MODULE CONTENT:
-{module_content[:4000]}
-
-MISSION CR: {cr}
-MISSION TIER: {tier}
-
-TASKS:
-1. Identify ALL creatures that could be encountered (combat, social, or ambient)
-2. For each creature, provide a COMPLETE D&D 5e 2024 stat block
-3. Include XP value for each creature
-4. Add tactical notes for DM use
-
-FORMAT each creature as:
-
-### [CREATURE NAME]
-*[Size] [Type], [Alignment]*
-
-**Armor Class** [AC] ([armor type])
-**Hit Points** [HP] ([dice notation])
-**Speed** [speed]
-
-| STR | DEX | CON | INT | WIS | CHA |
-|-----|-----|-----|-----|-----|-----|
-| [score] ([mod]) | ... |
-
-**Saving Throws** [list]
-**Skills** [list]
-**Damage Resistances** [if any]
-**Damage Immunities** [if any]
-**Condition Immunities** [if any]
-**Senses** [senses]
-**Languages** [languages]
-**Challenge** [CR] ([XP] XP)
-**Proficiency Bonus** +[bonus]
-
-**TRAITS**
-[List all traits]
-
-**ACTIONS**
-[List all actions with attack bonus, damage, save DCs]
-
-**BONUS ACTIONS** (if any)
-[List bonus actions]
-
-**REACTIONS** (if any)
-[List reactions]
-
-**LEGENDARY ACTIONS** (if CR 8+)
-[List legendary actions]
-
-**TACTICAL NOTES (DM Only)**
-- Opening move:
-- Target priority:
-- Retreat conditions:
-
----
-
-Create stat blocks for ALL creatures. Do not abbreviate or summarize."""
-        
-        response = await self.complete(prompt, force=True)
-        
-        if response.success and response.content:
-            return f"\n\n# APPENDIX: CREATURES\n\n{response.content}"
-        
-        return "\n\n# APPENDIX: CREATURES\n\n*[Creature stat blocks could not be generated]*"
 
 
 class DNDVeteranAgent(BaseAgent):
@@ -593,7 +505,7 @@ class DNDVeteranAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.75,
             max_tokens=2048,
@@ -719,359 +631,6 @@ STORY ANALYSIS:
                     improvements.append(imp)
         
         return improvements[:10]
-    
-    async def generate_location_appendix(
-        self,
-        module_content: str,
-        faction: str,
-        tier: str,
-    ) -> tuple[str, List[str]]:
-        """
-        Generate a Location Appendix with location guide, rumors, and charts.
-        
-        Creates DM reference material including:
-        - Detailed location descriptions for VTT map generation
-        - Rumor tables (d6/d8/d10)
-        - Random encounter charts
-        - NPC reaction tables
-        
-        Args:
-            module_content: The full module text to scan for locations
-            faction: Mission faction for thematic consistency
-            tier: Mission tier for difficulty scaling
-        
-        Returns:
-            Tuple of (formatted appendix content, list of location names for map generation)
-        """
-        prompt = f"""Analyze this D&D mission module and create a LOCATION & REFERENCE APPENDIX.
-
-MODULE CONTENT:
-{module_content[:4000]}
-
-FACTION: {faction}
-TIER: {tier}
-
-Create the following sections:
-
-# APPENDIX: LOCATIONS & REFERENCE
-
-## LOCATION GUIDE
-
-For EACH location mentioned in the module:
-
-### [LOCATION NAME]
-**District:** [Undercity district]
-**Type:** [tavern/warehouse/sewer/plaza/shrine/etc.]
-**Atmosphere:** [2-3 sentences of sensory details]
-**Key Features:** [Bullet list of notable elements for VTT map]
-**Lighting:** [bright/dim/dark]
-**Hazards:** [if any]
-**NPCs Present:** [who might be here]
-
----
-
-## RUMOR TABLE (d8)
-
-Roll a d8 when players ask around:
-
-| d8 | Rumor | True? |
-|----|-------|-------|
-| 1 | [rumor related to the mission] | Yes |
-| 2 | [rumor that's partially true] | Partial |
-| 3 | [misleading rumor] | No |
-| 4 | [faction-related gossip] | Yes |
-| 5 | [local color / worldbuilding] | Yes |
-| 6 | [red herring] | No |
-| 7 | [useful lead] | Yes |
-| 8 | [dangerous information] | Yes |
-
----
-
-## RANDOM ENCOUNTERS (d6)
-
-Roll when players spend time in the area:
-
-| d6 | Encounter |
-|----|-----------|
-| 1-2 | [Non-combat encounter] |
-| 3-4 | [Social encounter] |
-| 5 | [Combat encounter - easy] |
-| 6 | [Combat encounter - hard] |
-
----
-
-## NPC REACTION TABLE (2d6)
-
-| 2d6 | Reaction |
-|-----|----------|
-| 2 | Hostile - attacks or alerts enemies |
-| 3-5 | Unfriendly - refuses help, may report party |
-| 6-8 | Neutral - will help for payment |
-| 9-11 | Friendly - helpful, shares information |
-| 12 | Allied - actively assists the party |
-
----
-
-## COMPLICATION TABLE (d6)
-
-Roll when things go wrong:
-
-| d6 | Complication |
-|----|--------------|
-| 1 | [timing complication] |
-| 2 | [NPC complication] |
-| 3 | [environmental complication] |
-| 4 | [faction complication] |
-| 5 | [resource complication] |
-| 6 | [escalation complication] |
-
-Make all content specific to THIS mission, not generic."""
-        
-        response = await self.complete(prompt, force=True)
-        
-        # Extract location names for map generation
-        location_names = []
-        if response.success and response.content:
-            # Parse location names from ### headers in the LOCATION GUIDE section
-            lines = response.content.split('\n')
-            in_location_guide = False
-            for line in lines:
-                if '## LOCATION GUIDE' in line.upper():
-                    in_location_guide = True
-                elif line.startswith('## ') and in_location_guide:
-                    in_location_guide = False
-                elif in_location_guide and line.startswith('### '):
-                    loc_name = line.replace('### ', '').strip()
-                    if loc_name:
-                        location_names.append(loc_name)
-            
-            return f"\n\n{response.content}", location_names
-        
-        return "\n\n# APPENDIX: LOCATIONS & REFERENCE\n\n*[Location appendix could not be generated]*", []
-
-
-class ProAuthorAgent(BaseAgent):
-    """
-    PROFESSIONAL AUTHOR AGENT
-    
-    Role: Transform mission JSON into compelling narrative prose.
-    
-    Responsibilities:
-    - Convert mechanical mission data into engaging story content
-    - Apply creative writing principles (show don't tell, vivid description)
-    - Create atmospheric scene descriptions
-    - Craft memorable NPC dialogue and characterization
-    - Ensure proper dramatic pacing and tension
-    - Add sensory details and world-building texture
-    
-    Expertise: Professional fiction writing, narrative prose, creative storytelling
-    
-    This agent runs FIRST in the compilation pipeline, transforming raw JSON
-    into a draft story that subsequent agents (DNDExpert, DNDVeteran, AICritic)
-    then enhance with mechanics, world consistency, and quality polish.
-    """
-    
-    def _get_config(self) -> AgentConfig:
-        return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
-            model_type=ModelType.LOCAL,
-            temperature=0.8,  # Higher temp for creative writing
-            max_tokens=4096,  # Longer output for narrative content
-        )
-    
-    def _build_system_prompt(self, context: Optional[str] = None) -> str:
-        return """You are a professional fantasy author specializing in dark urban fantasy.
-
-Your expertise: Evocative prose, atmospheric description, character voice, dramatic pacing.
-
-You are writing content for D&D mission modules set in the Undercity — a sealed underground
-city beneath the Tower of Last Chance. The tone is dark urban fantasy with noir elements,
-faction politics, and Rift-torn reality.
-
-═══ ANTI-PATTERNS (NEVER USE) ═══
-
-❌ PURPLE PROSE:
-BAD:  "The ethereal glow of the bioluminescent fungi cast an otherworldly pallor
-       across the shadowy depths of the forgotten passageway."
-GOOD: "The fungi on the ceiling gave off enough light to see by — barely.
-       The tunnel smelled like wet stone and something dead."
-
-❌ ECHO CHAMBER (saying the same thing multiple ways):
-BAD:  "The market was busy and crowded. Throngs of people packed the aisles.
-       The dense crowd made movement difficult."
-GOOD: "The market was packed. A child knocked over a basket of dried fish
-       and kept running."
-
-❌ HEDGING ("seemed", "appeared", "might be"):
-BAD:  "The figure seemed to be watching them. It appeared to move closer."
-GOOD: "The figure was watching them. It moved closer."
-
-❌ ADJECTIVE AVALANCHE (more than one adjective per noun):
-BAD:  "The dark, shadowy, mysterious, ancient corridor..."
-GOOD: "The corridor stretched into darkness."
-
-❌ GENERIC LOCATIONS:
-BAD:  "a warehouse", "some guards", "a district"
-GOOD: "Consortium Counting House #3 on Cobbleway", "two Lotus enforcers"
-
-❌ SCRIPTED DIALOGUE:
-BAD:  "I believe we should investigate the warehouse," said Marcus.
-GOOD: "The warehouse," Marcus said. "Has to be. They wouldn't—" He stopped.
-      "You hear that?"
-
-❌ BANNED PHRASES (cut these entirely):
-"It is worth noting...", "Interestingly enough...", "As the saying goes...",
-"Needless to say...", "A sense of...", "An air of..."
-
-═══ REQUIRED PATTERNS ═══
-
-✓ Specific names, numbers, times, locations
-✓ Sensory grounding (what characters physically experience)
-✓ Read-aloud text in present tense, second person
-✓ Short sentences for action, varied length for description
-✓ One sensory detail + one physical interaction + one specific object = enough
-✓ Dialogue is messy, interrupted, unfinished — like real speech
-
-═══ THE UNDERCITY VOICE ═══
-
-- Cynical but not hopeless
-- Specific and grounded (names, places, numbers)
-- Wry, dark humor, gallows jokes
-- Short (3-6 lines for news, concise scenes)
-- Never epic fantasy narration or breathless drama
-- The Undercity is a REAL PLACE. Write like you live there.
-
-Write for a DM who wants to bring the Undercity to life at the table."""
-    
-    async def transform_to_narrative(
-        self,
-        mission_data: Dict[str, Any],
-        raw_content: str,
-        campaign_context: Dict[str, Any],
-    ) -> tuple[str, Dict]:
-        """
-        Transform mission JSON and raw content into narrative prose.
-        
-        Args:
-            mission_data: Mission metadata (title, faction, tier, etc.)
-            raw_content: Generated section content to transform
-            campaign_context: NPCs, factions, news for consistency
-        
-        Returns:
-            Tuple of (enhanced_narrative, feedback_dict)
-        """
-        title = mission_data.get("metadata", {}).get("title", "Unknown Mission")
-        faction = mission_data.get("metadata", {}).get("faction", "Unknown")
-        tier = mission_data.get("metadata", {}).get("tier", "standard")
-        mission_type = mission_data.get("metadata", {}).get("mission_type", "standard")
-        
-        # Build NPC reference
-        npc_refs = []
-        for npc in campaign_context.get("npcs", [])[:8]:
-            npc_refs.append(
-                f"- {npc.get('name', '?')} ({npc.get('faction', '?')}): "
-                f"{npc.get('role', '?')} — {npc.get('personality', 'unknown personality')[:50]}"
-            )
-        npc_block = chr(10).join(npc_refs) if npc_refs else "No NPCs loaded"
-        
-        prompt = f"""Transform this mission content into vivid narrative prose.
-
-MISSION: {title}
-FACTION: {faction}
-TIER: {tier}
-TYPE: {mission_type}
-
-AVAILABLE NPCs (use their names and personalities):
-{npc_block}
-
-UNDERCITY ATMOSPHERE:
-- Perpetual twilight under the Dome
-- Neon signs flicker, steam rises from vents
-- Faction symbols mark territory
-- The hum of Rift energy is ever-present
-- Danger lurks in every shadow
-
-RAW CONTENT TO TRANSFORM:
-{raw_content[:3500]}
-
-TASKS:
-1. Rewrite ALL scene descriptions with sensory details (sight, sound, smell, texture)
-2. Give each NPC a distinctive voice and physical mannerism
-3. Add atmospheric details that make the Undercity feel real
-4. Ensure dramatic tension builds through each act
-5. Replace any passive voice with active voice
-6. Add "feeling" — what does the dread, hope, or danger feel like?
-
-Output the enhanced narrative content. Preserve all mechanical information (DCs, stats)
-but wrap it in compelling prose."""
-        
-        response = await self.complete(prompt, force=True)
-        
-        feedback = {
-            "agent": "ProAuthor",
-            "success": response.success,
-            "original_length": len(raw_content),
-            "enhanced_length": len(response.content) if response.success else 0,
-            "enhancement_ratio": (
-                len(response.content) / max(len(raw_content), 1)
-                if response.success else 0
-            ),
-        }
-        
-        if response.success and response.content:
-            return response.content, feedback
-        
-        return raw_content, feedback
-    
-    async def enhance_section(
-        self,
-        section_name: str,
-        section_content: str,
-        mission_metadata: Dict[str, Any],
-    ) -> str:
-        """
-        Enhance a single section with narrative polish.
-        
-        Args:
-            section_name: Name of the section (overview, act_1, etc.)
-            section_content: The section content to enhance
-            mission_metadata: Mission metadata for context
-        
-        Returns:
-            Enhanced section content
-        """
-        section_guidance = {
-            "overview": "Set the tone and stakes. Make the reader feel the danger and intrigue.",
-            "act_1": "Hook the players immediately. The quest-giver should be memorable.",
-            "act_2": "Build tension through investigation. Each clue should feel earned.",
-            "act_3": "Deliver the climax with maximum impact. Make the confrontation visceral.",
-            "rewards": "End with consequences that matter. What changed in the Undercity?",
-        }
-        
-        guidance = section_guidance.get(section_name, "Enhance with vivid prose.")
-        
-        prompt = f"""Enhance this {section_name.upper()} section with professional narrative prose.
-
-GUIDANCE: {guidance}
-
-CONTENT:
-{section_content[:2500]}
-
-Rules:
-- Keep all mechanical information (DCs, stats, XP)
-- Transform dry descriptions into vivid prose
-- Add sensory details and atmosphere
-- Ensure NPC dialogue reveals character
-- Build or maintain dramatic tension
-
-Output the enhanced section."""
-        
-        response = await self.complete(prompt, force=True)
-        
-        if response.success and response.content:
-            return response.content
-        
-        return section_content
 
 
 class AICriticAgent(BaseAgent):
@@ -1094,7 +653,7 @@ class AICriticAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name=os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest"),
+            model_name=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
             model_type=ModelType.LOCAL,
             temperature=0.6,
             max_tokens=2048,
