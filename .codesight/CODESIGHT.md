@@ -1,0 +1,1663 @@
+# chatgpt-discord-bot — AI Context Map
+
+> **Stack:** flask | none | unknown | python
+> **Monorepo:** tower-module-builder, Webpage
+
+> 38 routes | 15 models | 0 components | 300 lib files | 137 env vars | 6 middleware | 6% test coverage
+> **Token savings:** this file is ~25,600 tokens. Without it, AI exploration would cost ~132,100 tokens. **Saves ~106,500 tokens per conversation.**
+> **Last scanned:** 2026-05-17 17:00 — re-run after significant changes
+
+---
+
+# Routes
+
+- `GET` `/` params() [auth, db, cache, payment] ✓
+- `GET` `/print` params() [auth, db, cache, payment]
+- `GET` `/api/status` params() [auth, db, cache, payment]
+- `GET` `/api/missions` params() [auth, db, cache, payment]
+- `GET` `/api/missions/<int:mission_id>` params(mission_id) [auth, db, cache, payment]
+- `POST` `/api/drafts` params() [auth, db, cache, payment]
+- `GET` `/api/npcs` params() [auth, db, cache, payment]
+- `GET` `/api/npcs/<path:npc_name>` params(npc_name) [auth, db, cache, payment]
+- `GET` `/api/districts` params() [auth, db, cache, payment]
+- `GET` `/api/districts/<district_name>/places` params(district_name) [auth, db, cache, payment]
+- `GET` `/api/districts/<district_name>/profile` params(district_name) [auth, db, cache, payment]
+- `GET` `/api/factions` params() [auth, db, cache, payment]
+- `GET` `/api/bulletins` params() [auth, db, cache, payment]
+- `GET` `/api/view-mode` params() [auth, db, cache, payment]
+- `POST` `/api/generate-mission` params() [auth, db, cache, payment]
+- `POST` `/api/complete-mission` params() [auth, db, cache, payment]
+- `GET` `/api/places` params() [auth, db, cache, payment]
+- `GET` `/api/image-refs` params() [auth, db, cache, payment]
+- `GET` `/media/project/<path:filename>` params(filename) [auth, db, cache, payment]
+- `GET` `/api/logs` params() [auth, db, cache, payment]
+- `GET` `/api/mission-types` params() [auth, db, cache, payment]
+- `GET` `/api/bounties` params() [auth, db, cache, payment]
+- `GET` `/api/parties` params() [auth, db, cache, payment]
+- `GET` `/api/modules` params() [auth, db, cache, payment]
+- `GET` `/modules/<slug>/` params(slug) [auth, db, cache, payment]
+- `GET` `/modules/<slug>` params(slug) [auth, db, cache, payment]
+- `GET` `/modules/<slug>/<path:filename>` params(filename, slug) [auth, db, cache, payment]
+- `GET` `/api/area-maps` params() [auth, db, cache, payment]
+- `GET` `/area-maps/<path:filename>` params(filename) [auth, db, cache, payment]
+- `POST` `/api/claim-mission` [auth, db, cache, queue, payment]
+- `GET` `/api/portraits` [auth, db, cache, queue, payment]
+- `POST` `/api/log-bug` [auth, db, cache, queue, payment]
+- `POST` `/api/post-mission-to-discord` [auth, db, cache, queue, payment]
+- `GET` `/api/arena` [auth, db, cache, queue, payment]
+- `GET` `/api/mission-maps` [auth, db, cache, queue, payment]
+- `GET` `/api/compendium/search` [auth, db, cache, queue, payment]
+- `GET` `/api/compendium/documents` [auth, db, cache, queue, payment]
+- `GET` `/api/compendium/document/<doc_id>` params(doc_id) [auth, db, cache, queue, payment]
+
+---
+
+# Schema
+
+### character_snapshots
+- id: int auto_increment (pk)
+- char_id: bigint (required, fk)
+- char_name: varchar (required)
+- player: varchar
+- snapshot_json: json
+- fetched_at: datetime (default)
+- fetched_at: desc
+
+### npcs
+- id: int auto_increment (pk)
+- name: varchar (unique)
+- faction: varchar
+- role: varchar
+- location: varchar
+- description: text
+- arrival_date: datetime
+- appearance_json: json
+
+### missions
+- id: int auto_increment (pk)
+- title: varchar (required)
+- description: text
+- difficulty: varchar
+- faction: varchar
+- npc_giver: varchar
+- reward_ec: integer (default)
+- expires_at: datetime
+- claimed_by: varchar
+- completed_at: datetime
+- message_id: varchar (fk)
+
+### bounties
+- id: int auto_increment (pk)
+- title: varchar (required)
+- target_type: varchar
+- target_name: varchar
+- reward_ec: integer (default)
+- status: varchar (default)
+- claimed_by: varchar
+
+### news_entries
+- id: int auto_increment (pk)
+- headline: varchar (required)
+- body: text
+- category: varchar
+- posted_at: datetime (default)
+- news_type: varchar
+- message_id: varchar (fk)
+
+### player_characters
+- id: int auto_increment (pk)
+- name: varchar (unique)
+- class_name: varchar
+- species: varchar
+- player_name: varchar
+- player_discord_id: varchar (fk)
+- profile_json: json
+
+### faction_reputation
+- id: int auto_increment (pk)
+- faction_name: varchar (unique)
+- reputation_score: integer (default)
+- tier: varchar
+- last_updated: datetime (pk, default)
+- current_weather: varchar
+- temperature: varchar
+- effects_json: json
+- ec_to_kharma_rate: decimal(10
+- trend: varchar
+- season_number: integer
+- champions_json: json
+- standings_json: json
+- started_at: datetime
+- faction: varchar
+- event_type: varchar
+- event_date: datetime
+- description: text
+
+### missing_persons
+- id: int auto_increment (pk)
+- person_name: varchar (required)
+- last_seen_location: varchar
+- reported_at: datetime (default)
+- status: varchar (default)
+- found_at: datetime
+
+### rift_state
+- id: int auto_increment (pk)
+- active: boolean (default)
+- intensity: integer (default)
+- location: varchar
+- effects_json: json
+- started_at: datetime
+- sector: varchar (unique)
+- value: decimal(10
+- trend: varchar
+- item_name: varchar (required)
+- seller_id: varchar (fk)
+- seller_name: varchar
+- current_bid: integer (default)
+- buy_now_price: integer
+- expires_at: datetime
+- status: varchar (default)
+- winner_id: varchar (fk)
+
+### player_listings
+- id: int auto_increment (pk)
+- player_id: varchar (fk)
+- player_name: varchar
+- item_name: varchar (required)
+- asking_price: integer
+- status: varchar (default)
+
+### npc_appearances
+- id: int auto_increment (pk)
+- npc_name: varchar (unique)
+- appearance_prompt: text
+- style: varchar
+- generated_at: datetime (pk, default)
+- party_name: varchar (unique)
+- members_json: json
+- reputation: integer (default)
+- formed_at: datetime (default)
+- status: varchar (pk, default)
+- entity_type: varchar (required)
+- entity_name: varchar (required)
+- image_path: varchar
+- ref_count: integer (default)
+
+### personal_missions
+- id: int auto_increment (pk)
+- character_name: varchar (required)
+- mission_data_json: json
+- status: varchar (default)
+- assigned_at: datetime (default)
+- completed_at: datetime
+
+### resurrection_queue
+- id: int auto_increment (pk)
+- npc_name: varchar (required)
+- died_at: datetime
+- resurrect_at: datetime
+- status: varchar (default)
+
+### news_types
+- id: int auto_increment (pk)
+- type_name: varchar (unique)
+- template: text
+- weight: decimal(5
+- usage_count: integer (default)
+
+### mission_types
+- id: int auto_increment (pk)
+- type_name: varchar (unique)
+- template: text
+- difficulty_range: varchar
+- usage_count: integer (pk, default)
+- event_type: varchar (required)
+- npc_name: varchar
+- event_data_json: json
+- occurred_at: datetime (default)
+
+---
+
+# Libraries
+
+- `archive\backups_old\backups\aclient_backup_before_default_provider_20251204100922.py` — class DiscordClient
+- `archive\backups_old\backups\aclient_before_set_default_free_20251204103204.py` — class DiscordClient
+- `archive\backups_old\backups\aclient_before_strip_fallback_text_20251204110249.py` — class DiscordClient
+- `archive\backups_old\backups\aclient_before_strip_trailing_utf8_20251204110707.py` — class DiscordClient
+- `archive\backups_old\backups\aclient_before_strip_warning_emoji_20251204110557.py` — class DiscordClient
+- `archive\backups_old\backups\codex_20260507_154833\boxset_utils.py`
+  - function write_component: (out_dir, slug, label, title, faction, body_md) -> str
+  - function write_maps_page: (out_dir, title, faction, image_paths) -> str | None
+  - function component_links: (has_maps) -> list[tuple[str, str]]
+- `archive\backups_old\backups\codex_20260507_154833\html_renderer.py`
+  - function render_module_structured: (module_data) -> str
+  - function render_chapter: (chapter_num, chapter_title, novel_title, body_md, faction) -> str
+  - function render_component: (component_label, novel_title, body_md, faction) -> str
+  - function render_maps_page: (novel_title, faction, image_paths, # list of Path objects relative to module dir
+    manifest_json) -> str
+- `archive\backups_old\backups\codex_20260507_155641\boxset_utils.py`
+  - function write_component: (out_dir, slug, label, title, faction, body_md) -> str
+  - function write_maps_page: (out_dir, title, faction, image_paths) -> str | None
+  - function component_links: (has_maps) -> list[tuple[str, str]]
+- `archive\backups_old\backups\codex_20260507_155641\html_renderer.py`
+  - function render_module_structured: (module_data) -> str
+  - function render_chapter: (chapter_num, chapter_title, novel_title, body_md, faction) -> str
+  - function render_component: (component_label, novel_title, body_md, faction) -> str
+  - function render_maps_page: (novel_title, faction, image_paths, # list of Path objects relative to module dir
+    manifest_json) -> str
+- `archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py`
+  - function wait_for_a1111_idle: (timeout, cooldown) -> bool
+  - function render_vtt_battlemap: (context, ai_png) -> bytes
+  - function write_grid_sidecar: (path, context) -> None
+  - function pretty_map_path: (path) -> Path
+  - function tactical_map_path: (path) -> Path
+  - function stylize_pretty_battlemap: (path, context, force) -> Optional[Path]
+  - _...1 more_
+- `archive\backups_old\backups\codex_20260507_171227\news_feed.py`
+  - function get_rift_mission_fuel: (limit) -> List[Dict]
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - _...11 more_
+- `archive\backups_old\backups\codex_20260507_171227\npc_appearance.py`
+  - function get_race_sd_traits: (species) -> str
+  - function infer_gender_tag: (text) -> str
+  - function get_npc_appearance: (name) -> Optional[dict]
+  - function get_npc_sd_prompt: (name) -> Optional[str]
+  - function get_all_npc_names: () -> list[str]
+  - function get_all_sd_prompts: () -> dict[str, str]
+  - _...3 more_
+- `archive\backups_old\backups\codex_20260507_171633\image_ref.py`
+  - function save_npc_ref: (name, img_bytes, metadata) -> Path
+  - function save_npc_alt_ref: (name, img_bytes, metadata) -> Path
+  - function get_npc_ref: (name) -> Optional[bytes]
+  - function get_npc_alt_ref: (name) -> Optional[bytes]
+  - function pin_npc_ref: (name, img_bytes) -> Path
+  - function has_npc_ref: (name) -> bool
+  - _...10 more_
+- `archive\backups_old\backups\codex_20260507_171633\news_feed.py`
+  - function get_rift_mission_fuel: (limit) -> List[Dict]
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - _...11 more_
+- `archive\backups_old\backups\codex_20260507_171633\npc_appearance.py`
+  - function current_visual_species: (species) -> str
+  - function species_visual_guard: (species) -> str
+  - function get_race_sd_traits: (species) -> str
+  - function infer_gender_tag: (text) -> str
+  - function get_npc_appearance: (name) -> Optional[dict]
+  - function get_npc_sd_prompt: (name) -> Optional[str]
+  - _...5 more_
+- `archive\backups_old\backups\codex_20260507_172046\app.py`
+  - function index: ()
+  - function print_view: ()
+  - function api_status: ()
+  - function api_missions: ()
+  - function api_mission_detail: (mission_id)
+  - function api_save_draft: ()
+  - _...22 more_
+- `archive\backups_old\backups\codex_20260507_172046\image_ref.py`
+  - function save_npc_ref: (name, img_bytes, metadata) -> Path
+  - function save_npc_alt_ref: (name, img_bytes, metadata) -> Path
+  - function get_npc_ref: (name) -> Optional[bytes]
+  - function get_npc_alt_ref: (name) -> Optional[bytes]
+  - function pin_npc_ref: (name, img_bytes) -> Path
+  - function has_npc_ref: (name) -> bool
+  - _...10 more_
+- `archive\backups_old\backups\codex_20260507_173656\app.py`
+  - function index: ()
+  - function print_view: ()
+  - function api_status: ()
+  - function api_missions: ()
+  - function api_mission_detail: (mission_id)
+  - function api_save_draft: ()
+  - _...22 more_
+- `archive\backups_old\backups\codex_20260507_174150\src\mission_builder\maps.py`
+  - function extract_map_scenes: (module_data, mission_type) -> List[Dict]
+  - function build_map_prompt: (scene, strategy) -> Tuple[str, str]
+  - function generate_vtt_map: (scene, ref_bytes, denoise) -> Optional[bytes]
+  - function generate_module_maps: (module_data, output_subdir, max_maps) -> List[Path]
+  - function post_maps_to_channel: (client, map_paths, module_data, retry_count, channel) -> bool
+- `archive\backups_old\backups\codex_20260507_174150\src\mission_builder\vtt_renderer.py`
+  - function wait_for_a1111_idle: (timeout, cooldown) -> bool
+  - function render_vtt_battlemap: (context, ai_png) -> bytes
+  - function write_grid_sidecar: (path, context) -> None
+  - function pretty_map_path: (path) -> Path
+  - function tactical_map_path: (path) -> Path
+  - function stylize_pretty_battlemap: (path, context, force) -> Optional[Path]
+  - _...1 more_
+- `archive\backups_old\backups\codex_20260507_175030\src\mimir_sync.py`
+  - function ensure_sync_table: () -> None
+  - function get_sync_engine: () -> MimirSyncEngine
+  - function trigger_npc_sync: (npc_id) -> None
+  - function trigger_faction_sync: (faction_name) -> None
+  - function trigger_pc_mimir_sync: (char_name) -> None
+  - function run_pc_gear_run: (force) -> dict
+  - _...4 more_
+- `archive\backups_old\backups\codex_20260507_175520\src\city_scene.py` — function generate_city_scene: () -> tuple
+- `archive\backups_old\backups\codex_20260507_175520\src\news_feed.py`
+  - function get_rift_mission_fuel: (limit) -> List[Dict]
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - _...11 more_
+- `archive\backups_old\backups\codex_20260508_bug10_image_refs_order\Webpage\app.py`
+  - function index: ()
+  - function print_view: ()
+  - function api_status: ()
+  - function api_missions: ()
+  - function api_mission_detail: (mission_id)
+  - function api_save_draft: ()
+  - _...22 more_
+- `archive\backups_old\backups\codex_20260508_bug2_map_contract\src\mission_builder\maps.py`
+  - function extract_map_scenes: (module_data, mission_type) -> List[Dict]
+  - function build_map_prompt: (scene, strategy) -> Tuple[str, str]
+  - function generate_vtt_map: (scene, ref_bytes, denoise) -> Optional[bytes]
+  - function generate_module_maps: (module_data, output_subdir, max_maps) -> List[Path]
+  - function post_maps_to_channel: (client, map_paths, module_data, retry_count, channel) -> bool
+- `archive\backups_old\backups\codex_20260508_bug2_map_contract\src\mission_builder\vtt_renderer.py`
+  - function wait_for_a1111_idle: (timeout, cooldown) -> bool
+  - function render_vtt_battlemap: (context, ai_png) -> bytes
+  - function write_grid_sidecar: (path, context) -> None
+  - function pretty_map_path: (path) -> Path
+  - function tactical_map_path: (path) -> Path
+  - function decode_useful_a1111_image: (image_b64) -> bytes | None
+  - _...2 more_
+- `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py`
+  - function get_npc: (name) -> Optional[Dict]
+  - function get_all_npcs: () -> List[Dict]
+  - function get_npcs_by_faction: (faction) -> List[Dict]
+  - function get_npcs_by_status: (status) -> List[Dict]
+  - function get_living_npcs: () -> List[Dict]
+  - function add_npc: (data) -> int
+  - _...58 more_
+- `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\encounters.py`
+  - function get_max_pc_level: () -> int
+  - function get_party_size: () -> int
+  - function get_cr: (tier) -> int
+  - function get_encounter_budget: (cr) -> dict
+  - function get_cr_xp: (cr) -> int
+  - function calculate_skill_dcs: (cr) -> dict
+  - _...4 more_
+- `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`
+  - function gather_context: (mission) -> dict
+  - function generate_module: (mission, player_name) -> Optional[Path]
+  - function post_module_to_channel: (client, index_path, mission, player_name) -> bool
+- `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\self_learning.py` — function run_learning_session: (discord_client), function self_learning_loop: (discord_client)
+- `archive\backups_old\backups\codex_20260508_bug7_gazetteer_cache\src\mission_builder\locations.py`
+  - function load_gazetteer: () -> dict
+  - function get_districts_by_faction: (faction) -> List[str]
+  - function get_districts_by_danger: (danger_level) -> List[str]
+  - function get_district_info: (district_name) -> Optional[dict]
+  - function get_establishments_in_district: (district_name, establishment_type) -> List[dict]
+  - function get_sub_areas: (district_name) -> List[dict]
+  - _...21 more_
+- `archive\backups_old\backups\codex_20260508_bug8_image_ref_lock\src\image_ref.py`
+  - function save_npc_ref: (name, img_bytes, metadata) -> Path
+  - function save_npc_alt_ref: (name, img_bytes, metadata) -> Path
+  - function get_npc_ref: (name) -> Optional[bytes]
+  - function get_npc_alt_ref: (name) -> Optional[bytes]
+  - function pin_npc_ref: (name, img_bytes) -> Path
+  - function has_npc_ref: (name) -> bool
+  - _...10 more_
+- `archive\backups_old\backups\codex_20260508_bug9_image_ref_versions\Webpage\app.py`
+  - function index: ()
+  - function print_view: ()
+  - function api_status: ()
+  - function api_missions: ()
+  - function api_mission_detail: (mission_id)
+  - function api_save_draft: ()
+  - _...22 more_
+- `archive\backups_old\backups\news_feed_new.py`
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - function next_image_interval_seconds: () -> int
+  - _...8 more_
+- `archive\backups_old\backups\providers_backup_before_stub.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_backup_before_stub_20251204100905.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_backup_before_stub_20251204100922.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_add_chat_completion_20251204103538.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_chat_async_20251204105547.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_clean_ollama_patch_20251204121608.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_fix_double_async_20251204105815.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_free_final_20251204104607.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_free_final_20251204105007.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_free_reenable_20251204103132.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_modelname_fix_20251204105129.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_ollama_free_20251204114329.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_towerrag_hook_20251204121418.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_before_towerrag_import_20251204121300.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\providers_FULLBACKUP_freeprovider_replace_20251204121656.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `archive\backups_old\backups\ROOT_character_profiles_stale.py`
+  - function load_character_profile: (user_id) -> str | None
+  - function save_character_profile: (user_id, profile_text) -> None
+  - function has_character_profile: (user_id) -> bool
+- `archive\backups_old\backups\ROOT_nudge_state_stale.py` — function has_been_nudged: (user_id) -> bool, function mark_nudged: (user_id)
+- `archive\root_scripts\apply_schema.py` — function apply_schema: ()
+- `archive\root_scripts\clear_commands.py` — function clear_all_guild_commands: ()
+- `archive\root_scripts\fix_migration.py`
+  - function fix_schema: ()
+  - function load_json: (filepath)
+  - function remigrate_npcs: ()
+  - function remigrate_rift_state: ()
+  - function remigrate_tia: ()
+  - function verify_migration: ()
+  - _...1 more_
+- `archive\root_scripts\fix_npc_roster.py` — function fix_gruum_boneshaper_raw: (content) -> str, function main: ()
+- `archive\root_scripts\merge_faction_leaders.py` — function main: ()
+- `archive\root_scripts\migrate_add_columns.py` — function run_migrations: ()
+- `archive\root_scripts\migrate_data.py`
+  - function log: (msg)
+  - function load_json: (filepath)
+  - function migrate_npcs: ()
+  - function migrate_missions: ()
+  - function migrate_faction_reputation: ()
+  - function migrate_news_memory: ()
+  - _...8 more_
+- `archive\root_scripts\mysql_setup.py` — function setup_database: ()
+- `archive\root_scripts\rag_sanity_check.py` — function main: ()
+- `archive\root_scripts\SKILLS_INTEGRATION_EXAMPLES.py`
+  - function example_news_feed_with_skills: ()
+  - function example_mission_board_with_skills: ()
+  - function example_character_with_skills: ()
+  - function example_npc_lifecycle_with_skills: ()
+  - function example_discord_command_with_skills: ()
+  - function example_bot_startup_with_skills: ()
+  - _...2 more_
+- `archive\root_scripts\sql_refactor_setup.py`
+  - function strip_thinking: (text) -> str
+  - function test_mysql: ()
+  - function generate_fallback_schema: () -> str
+  - function generate_db_api_code: () -> str
+  - function get_npc: (name) -> Optional[Dict]
+  - function get_all_npcs: () -> List[Dict]
+  - _...44 more_
+- `archive\root_scripts\test_dungeon_delve.py` — function main: ()
+- `archive\root_scripts\test_mission_builder.py`
+  - function test_imports: ()
+  - function test_compatibility_wrapper: ()
+  - function test_key_functions: ()
+  - function main: ()
+- `archive\root_scripts\test_skills_quick.py` — function main: ()
+- `archive\scripts_oneoff\cleanup_image_refs.py`
+  - function cleanup_entity_folders: (dry_run) -> dict
+  - function cleanup_team_folder: (dry_run) -> dict
+  - function main: ()
+- `archive\scripts_oneoff\extract_ddb_session.py` — function main: () -> None
+- `archive\scripts_oneoff\fix_ebp_types_only.py` — function main: ()
+- `archive\scripts_oneoff\merge_faction_leaders.py` — function main: ()
+- `archive\scripts_oneoff\migrate_characters.py` — function extract: (block, field)
+- `archive\scripts_oneoff\migrate_towerbay_bids.py` — function run: ()
+- `archive\scripts_oneoff\package_5etools_for_mimir.py` — function should_include: (inner_path) -> bool, function main: ()
+- `archive\scripts_oneoff\quarantine_duplicate_npc_refs.py`
+  - function find_duplicates: () -> list[dict]
+  - function run: (dry_run) -> None
+  - function main: () -> None
+- `archive\scripts_oneoff\repair_boxxo_chapters.py` — function repair: ()
+- `archive\scripts_oneoff\run_boxxo_module.py` — function main: ()
+- `archive\scripts_oneoff\run_full_ddb_import.py` — function run_pass: (staging_path, log_path, art_dir, label), function main: ()
+- `archive\scripts_oneoff\seed_unknown_party.py` — function main: ()
+- `archive\scripts_oneoff\test_module_quality_training.py` — function main: ()
+- `archive\scripts_oneoff\test_news_agents.py`
+  - function main: ()
+  - function test_agent: (editor_type)
+  - function test_all: ()
+- `archive\scripts_oneoff\test_one_art_edit.py` — function test: ()
+- `archive\scripts_oneoff\test_one_npc_import.py` — function test: ()
+- `archive\scripts_oneoff\test_wysiwyg.py` — function test: ()
+- `archive\scripts_oneoff\_test_ddb_form.py` — function extract_hidden: (html, name), function main: ()
+- `auto_login\AutoLogin.py` — class GoogleBardAutoLogin, class MicrosoftBingAutoLogin
+- `auto_login\AutoLoginTest.py` — class GoogleBardTest, class MicrosoftBingAutoLoginTest
+- `campaign_docs\TrainingPDFS\dump_chapter5.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_chapter5b.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level4.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level4_sb2.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level4_statblocks.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level5.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level5_sb.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level6.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level6b.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level6_sb.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level6_sb2.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level7_details.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\dump_level7_sb.py` — function dump_range: (start, end, label)
+- `campaign_docs\TrainingPDFS\extract_images.py`
+  - function file_hash: (data)
+  - function slugify: (text, maxlen)
+  - function unique_slug: (raw_slug)
+- `campaign_docs\TrainingPDFS\extract_level2.py` — function dump_range: (start, end, label)
+- `check_a1111_models.py` — function main: ()
+- `main.py` — function validate_environment: (), function main: ()
+- `scripts\backfill_discord_location_scenes.py` — function main: () -> None, function run: (channel_id, limit, dry_run) -> None
+- `scripts\backfill_discord_npc_portraits.py` — function main: () -> None, function run: (channel_id, limit, dry_run) -> None
+- `scripts\backfill_infestation_room_maps.py` — function backfill_module: (module_dir, *, nice, force, max_rooms, start_room) -> tuple[int, int], function main: () -> int
+- `scripts\backfill_module_tactical_maps.py` — function main: () -> int
+- `scripts\build_creature_staging.py`
+  - function parse_cr: (s) -> float
+  - function cr_to_str: (cr) -> str
+  - function cr_to_prof: (cr) -> int
+  - function norm_size: (s) -> str
+  - function norm_type: (s) -> str
+  - function hp_die_for_size: (size) -> str
+  - _...5 more_
+- `scripts\build_modules_saturday.py` — function build_contract: (), function build_flame: ()
+- `scripts\check_mimir.py` — function jload: (v)
+- `scripts\enrich_creatures_ddb.py`
+  - function log: (msg)
+  - function get_or_generate_portrait: (name, creature_type, cr) -> Optional[bytes]
+  - function get_or_generate_npc_portrait: (npc) -> Optional[bytes]
+  - function enrich_creature: (edit_url, data, portrait) -> bool
+  - function run_pass: (label, edit_urls, by_name, done, portrait_fn, enrich_log)
+  - function main: ()
+- `scripts\experiment_map_lanes.py` — function main: () -> int
+- `scripts\fix_ebp_types_and_art.py`
+  - function generate_art: (name, prompt) -> Optional[bytes]
+  - function edit_monster_ddb: (edit_slug, creature, correct_type_id, image_bytes) -> bool
+  - function main: ()
+- `scripts\gearrun_mimir.py` — function main: () -> int
+- `scripts\import_ebp_to_ddb.py` — function main: ()
+- `scripts\import_npcs_to_ddb.py`
+  - function log: (msg)
+  - function add_speed: (monster_id, movement_type, speed_ft) -> bool
+  - function create_npc: (npc, image_bytes) -> Optional[str]
+  - function get_or_generate_portrait: (npc) -> Optional[bytes]
+  - function main: ()
+- `scripts\npc_ddb_builder.py`
+  - function species_to_type_size: (species) -> tuple[str, str]
+  - function items_to_traits: (items) -> list[str]
+  - function build_actions: (stats, cls, level, pb, subclass, items) -> str
+  - function build_traits: (stats, cls, level, pb, subclass, species, faction, items, has_custom_sb) -> str
+  - function build_reactions: (stats, cls, level, pb) -> str
+  - function build_bonus_actions: (stats, cls, level, pb) -> str
+  - _...2 more_
+- `scripts\probe_ddb_edit.py` — function probe_edit: ()
+- `scripts\probe_ddb_fields.py` — function probe: ()
+- `scripts\probe_mimir_npc.py` — function jload: (v)
+- `scripts\purge_channel.py` — function purge: ()
+- `scripts\retry_map_pretty.py` — function post_file_to_discord: (channel_id, token, filepath, caption)
+- `scripts\retry_module_gen.py` — function post_module_rest: (out_dir, mission, player_name, token, channel_id), function main: ()
+- `scripts\survey_ddb_import_candidates.py` — function jload: (v), function main: ()
+- `scripts\survey_mission_creatures.py` — function jload: (path)
+- `scripts\sweep_all_missions.py` — function run: ()
+- `scripts\update_ebp_content.py`
+  - function log: (msg)
+  - function add_speed: (monster_id, movement_type, speed_ft) -> bool
+  - function edit_full: (edit_slug, base, enriched, image_bytes) -> bool
+  - function create_new: (nc, image_bytes) -> Optional[str]
+  - function main: ()
+- `skills\docx\scripts\accept_changes.py` — function accept_changes: (input_file, output_file) -> tuple[None, str]
+- `skills\docx\scripts\comment.py` — function add_comment: (unpacked_dir, comment_id, text, author, initials, parent_id) -> tuple[str, str]
+- `skills\docx\scripts\office\helpers\merge_runs.py` — function merge_runs: (input_dir) -> tuple[int, str]
+- `skills\docx\scripts\office\helpers\simplify_redlines.py`
+  - function simplify_redlines: (input_dir) -> tuple[int, str]
+  - function get_tracked_change_authors: (doc_xml_path) -> dict[str, int]
+  - function infer_author: (modified_dir, original_docx, default) -> str
+- `skills\docx\scripts\office\pack.py` — function pack: (input_directory, output_file, original_file, validate, infer_author_func) -> tuple[None, str]
+- `skills\docx\scripts\office\soffice.py` — function get_soffice_env: () -> dict, function run_soffice: (args, **kwargs) -> subprocess.CompletedProcess
+- `skills\docx\scripts\office\unpack.py` — function unpack: (input_file, output_directory, merge_runs, simplify_redlines) -> tuple[None, str]
+- `skills\docx\scripts\office\validate.py` — function main: ()
+- `skills\docx\scripts\office\validators\base.py` — class BaseSchemaValidator
+- `skills\docx\scripts\office\validators\docx.py` — class DOCXSchemaValidator
+- `skills\docx\scripts\office\validators\pptx.py` — class PPTXSchemaValidator
+- `skills\docx\scripts\office\validators\redlining.py` — class RedliningValidator
+- `skills\pdf\scripts\check_bounding_boxes.py` — function get_bounding_box_messages: (fields_json_stream) -> list[str], class RectAndField
+- `skills\pdf\scripts\convert_pdf_to_images.py` — function convert: (pdf_path, output_dir, max_dim)
+- `skills\pdf\scripts\create_validation_image.py` — function create_validation_image: (page_number, fields_json_path, input_path, output_path)
+- `skills\pdf\scripts\extract_form_field_info.py`
+  - function get_full_annotation_field_id: (annotation)
+  - function make_field_dict: (field, field_id)
+  - function get_field_info: (reader)
+  - function write_field_info: (pdf_path, json_output_path)
+- `skills\pdf\scripts\extract_form_structure.py` — function extract_form_structure: (pdf_path), function main: ()
+- `skills\pdf\scripts\fill_fillable_fields.py`
+  - function fill_pdf_fields: (input_pdf_path, fields_json_path, output_pdf_path)
+  - function validation_error_for_field_value: (field_info, field_value)
+  - function monkeypatch_pydpf_method: ()
+- `skills\pdf\scripts\fill_pdf_form_with_annotations.py`
+  - function transform_from_image_coords: (bbox, image_width, image_height, pdf_width, pdf_height)
+  - function transform_from_pdf_coords: (bbox, pdf_height)
+  - function fill_pdf_form: (input_pdf_path, fields_json_path, output_pdf_path)
+- `skills\skill-creator\eval-viewer\generate_review.py`
+  - function get_mime_type: (path) -> str
+  - function find_runs: (workspace) -> list[dict]
+  - function build_run: (root, run_dir) -> dict | None
+  - function embed_file: (path) -> dict
+  - function load_previous_iteration: (workspace) -> dict[str, dict]
+  - function generate_html: (runs, skill_name, previous, dict] | None, benchmark) -> str
+  - _...2 more_
+- `skills\skill-creator\scripts\aggregate_benchmark.py`
+  - function calculate_stats: (values) -> dict
+  - function load_run_results: (benchmark_dir) -> dict
+  - function aggregate_results: (results) -> dict
+  - function generate_benchmark: (benchmark_dir, skill_name, skill_path) -> dict
+  - function generate_markdown: (benchmark) -> str
+  - function main: ()
+- `skills\skill-creator\scripts\generate_report.py` — function generate_html: (data, auto_refresh, skill_name) -> str, function main: ()
+- `skills\skill-creator\scripts\improve_description.py` — function improve_description: (skill_name, skill_content, current_description, eval_results, history, model, test_results, log_dir, iteration) -> str, function main: ()
+- `skills\skill-creator\scripts\package_skill.py`
+  - function should_exclude: (rel_path) -> bool
+  - function package_skill: (skill_path, output_dir)
+  - function main: ()
+- `skills\skill-creator\scripts\quick_validate.py` — function validate_skill: (skill_path)
+- `skills\skill-creator\scripts\run_eval.py`
+  - function find_project_root: () -> Path
+  - function run_single_query: (query, skill_name, skill_description, timeout, project_root, model) -> bool
+  - function run_eval: (eval_set, skill_name, description, num_workers, timeout, project_root, runs_per_query, trigger_threshold, model) -> dict
+  - function main: ()
+- `skills\skill-creator\scripts\run_loop.py`
+  - function split_eval_set: (eval_set, holdout, seed) -> tuple[list[dict], list[dict]]
+  - function run_loop: (eval_set, skill_path, description_override, num_workers, timeout, max_iterations, runs_per_query, trigger_threshold, holdout, model, verbose, live_report_path, log_dir) -> dict
+  - function main: ()
+- `skills\skill-creator\scripts\utils.py` — function parse_skill_md: (skill_path) -> tuple[str, str, str]
+- `skills\slack-gif-creator\core\easing.py`
+  - function linear: (t) -> float
+  - function ease_in_quad: (t) -> float
+  - function ease_out_quad: (t) -> float
+  - function ease_in_out_quad: (t) -> float
+  - function ease_in_cubic: (t) -> float
+  - function ease_out_cubic: (t) -> float
+  - _...14 more_
+- `skills\slack-gif-creator\core\frame_composer.py`
+  - function draw_circle: (frame, center, int], radius, fill_color, int, int]], outline_color, int, int]], outline_width) -> Image.Image
+  - function create_gradient_background: (width, height, top_color, int, int], bottom_color, int, int]) -> Image.Image
+  - function draw_star: (frame, center, int], size, fill_color, int, int], outline_color, int, int]], outline_width) -> Image.Image
+- `skills\slack-gif-creator\core\gif_builder.py` — class GIFBuilder
+- `skills\slack-gif-creator\core\validators.py` — function validate_gif: (gif_path, is_emoji, verbose) -> tuple[bool, dict], function is_slack_ready: (gif_path, is_emoji, verbose) -> bool
+- `skills\webapp-testing\scripts\with_server.py` — function is_server_ready: (port, timeout), function main: ()
+- `src\a1111_runtime.py` — function ensure_a1111_model: (model, *, label, url) -> bool, function cool_down_a1111_after_generation: (*, cooldown) -> None
+- `src\aclient.py` — class DiscordClient
+- `src\ad_feed.py`
+  - function check_ad_tick: () -> bool
+  - function format_ad_embed: (ad) -> discord.Embed
+  - function get_next_ad: () -> dict
+  - function generate_dynamic_ad: (shop_name, district, dnd_tags) -> str
+- `src\agents\base.py`
+  - function quick_complete: (prompt, model, timeout) -> str
+  - class ModelType
+  - class AgentConfig
+  - class AgentResponse
+  - class BaseAgent
+- `src\agents\guild_council.py`
+  - class CouncilRuling
+  - class CouncilSession
+  - class GuildCouncil
+- `src\agents\helpers.py`
+  - function generate_with_qwen: (prompt, context, temperature, max_tokens) -> str
+  - function generate_with_kimi: (prompt, context, temperature, max_tokens) -> str
+  - function generate_bulletin: (news_type, instruction, memory_context, additional_context, max_lines) -> Optional[str]
+  - function generate_mission_text: (prompt, context, temperature) -> Optional[str]
+- `src\agents\kimi_agent.py` — class KimiAgent
+- `src\agents\learning_agents.py`
+  - class AgentAnalysis
+  - class LearningSession
+  - class ProjectManagerAgent
+  - class PythonVeteranAgent
+  - class DNDExpertAgent
+  - class DNDVeteranAgent
+  - _...6 more_
+- `src\agents\news_agents.py`
+  - function get_news_agent: (agent_type) -> BaseAgent
+  - function generate_news_bulletin: (news_type, instruction, context) -> BulletinResult
+  - function generate_gossip_bulletin: (topic, seed_npc, context) -> BulletinResult
+  - function generate_sports_bulletin: (event_type, venue, context) -> BulletinResult
+  - class FactCheckerMixin
+  - class BulletinResult
+  - _...3 more_
+- `src\agents\orchestrator.py` — class AgentOrchestrator
+- `src\agents\qwen_agent.py` — class QwenAgent
+- `src\archive_logs.py`
+  - function ensure_archive_dir: ()
+  - function parse_log_events: (log_path) -> dict
+  - function generate_summary: (stats) -> str
+  - function archive_log: ()
+- `src\area_generator.py`
+  - function get_area_profile: (district) -> Optional[dict]
+  - function get_all_district_names: () -> list[str]
+  - function get_area_map_path: (district) -> Optional[str]
+  - function generate_area_profile: (district, force) -> Optional[dict]
+  - function generate_all_area_profiles: (force, progress_callback) -> dict
+- `src\area_map_generator.py`
+  - function collect_areas_to_map: (gaz) -> List[Dict]
+  - function list_area_maps: () -> Dict[str, List[Dict]]
+  - function build_area_prompt: (area) -> Tuple[str, str]
+  - function generate_area_map_batch: (batch_size) -> int
+- `src\area_places.py` — function generate_places_for_district: (district, count, force) -> int, function generate_all_new_areas: (count_per_district, force, progress_callback) -> dict
+- `src\arena_season.py`
+  - function format_match_bulletin: (result, state) -> str
+  - function should_post_arena: () -> bool
+  - function format_standings_bulletin: () -> str
+  - function tick_arena: () -> Optional[str]
+- `src\art.py` — function get_image_provider: (provider_name), function draw: (model, prompt) -> str
+- `src\bot.py` — function run_discord_bot: ()
+- `src\bounty_board.py`
+  - function should_post_bounty: () -> bool
+  - function format_bounty_news_bulletin: (bounty) -> str
+  - function generate_bounty_post: (ollama_model, ollama_url) -> Optional[Dict]
+  - function check_bounty_expirations: (channel) -> None
+- `src\bulletin_cleaner.py`
+  - function strip_llm_reasoning: (text) -> str
+  - function filter_ec_references: (text) -> str
+  - function is_truncated: (text) -> bool
+  - function validate_bulletin: (text) -> tuple[bool, str]
+  - function clean_bulletin: (text) -> str
+  - function repair_incomplete_bulletin: (text) -> str
+  - _...1 more_
+- `src\bulletin_embeds.py` — function wrap_bulletin: (text, bulletin_type) -> discord.Embed, function wrap_bulletin_with_title: (text, title, color) -> discord.Embed
+- `src\character_monitor.py` — function run_character_monitor: (channel) -> None
+- `src\character_profiles.py`
+  - function load_character_profile: (user_id) -> str | None
+  - function save_character_profile: (user_id, profile_text) -> None
+  - function has_character_profile: (user_id) -> bool
+  - function load_character_appearance: (user_id) -> str | None
+  - function load_character_name: (user_id) -> str | None
+  - function save_character_appearance: (user_id, appearance_text, character_name) -> None
+  - _...2 more_
+- `src\city_scene.py` — function generate_city_scene: () -> tuple
+- `src\cogs\admin.py` — function setup: (client)
+- `src\cogs\character.py` — function setup: (client)
+- `src\cogs\chat.py` — function setup: (client)
+- `src\cogs\economy.py` — function setup: (client)
+- `src\cogs\images.py` — function setup: (client)
+- `src\cogs\missions.py` — function setup: (client)
+- `src\cogs\module_gen.py` — function setup: (client), function generate_and_post_module: (mission, player_name, client) -> None
+- `src\cogs\rules_lookup.py` — function setup: (client)
+- `src\cogs\skills.py` — function setup: (client)
+- `src\cogs\world.py` — function setup: (client)
+- `src\competitions\bracket_engine.py`
+  - function create_competition: (comp_type, pc_names, pc_factions, str]], round_interval_hours) -> int
+  - function get_active_competitions: () -> List[Dict]
+  - function get_pending_rounds: (comp_id) -> List[Dict]
+  - function is_pc_round: (match) -> bool
+  - function auto_resolve_npc_match: (comp_id, match) -> Dict
+  - function record_pc_result: (comp_id, match, winner) -> Dict
+  - _...1 more_
+- `src\competitions\competition_types.py`
+  - function get_competition_type: (slug) -> Optional[CompetitionType]
+  - function list_competition_types: () -> List[CompetitionType]
+  - class RoundPhase
+  - class CompetitionType
+- `src\competitions\mission_builder.py` — function generate_round_module: (comp_id, comp_type, round_number, total_rounds, contestant, # {"name", "faction", "entry_type", # same structure
+    match, # bracket match dict
+    round_date) -> Optional[str], function build_round_mission: (comp_id, comp_type, round_number, total_rounds, contestant, opponent, match) -> Optional[Dict]
+- `src\competitions\post_competition.py`
+  - function format_bracket_announcement: (comp, comp_type) -> str
+  - function format_npc_result_bulletin: (result, comp_name, comp_type) -> str
+  - function format_champion_bulletin: (champion, comp, comp_type) -> str
+  - function check_competition_tick: (mission_board_channel, news_channel, client) -> None
+- `src\db_api.py`
+  - function get_npc: (name) -> Optional[Dict]
+  - function get_all_npcs: () -> List[Dict]
+  - function get_npcs_by_faction: (faction) -> List[Dict]
+  - function get_npcs_by_status: (status) -> List[Dict]
+  - function get_living_npcs: () -> List[Dict]
+  - function add_npc: (data) -> int
+  - _...58 more_
+- `src\db_backup.py` — function run_backup: () -> Path, function db_backup_loop: () -> None
+- `src\ddb_homebrew.py`
+  - function shutdown_chrome: () -> None
+  - function ensure_chrome: () -> bool
+  - function push_monster: (name, cr, creature_type, size, ac, hp, hp_die, hp_die_count, str_, dex, con, int_, wis, cha, passive_perc, languages, actions, notes) -> Optional[str]
+  - function push_monster_http: (name, cr, creature_type, size, ac, hp, hp_die, hp_die_count, str_, dex, con, int_, wis, cha, passive_perc, languages, actions, notes) -> Optional[str]
+  - function push_mission_enemy: (enemy, cr_val, statblock) -> Optional[str]
+- `src\dome_weather.py`
+  - function tick_weather: () -> tuple
+  - function format_weather_bulletin: () -> str
+  - function should_post_weather: () -> bool
+  - function mark_weather_posted: () -> None
+- `src\ec_exchange.py`
+  - function get_rate: () -> float
+  - function tick_exchange: () -> float
+  - function apply_event_shock: (delta_pct, reason) -> tuple[float, float]
+  - function format_exchange_line: () -> str
+  - function format_exchange_bulletin: () -> str
+  - function format_price_table: (table_key) -> str
+  - _...1 more_
+- `src\expandable_bulletin.py`
+  - function get_archived_headlines: (limit) -> list[dict]
+  - function store_bulletin: (preview, full_content, headline, bulletin_type, source_attribution, venue) -> str
+  - function get_bulletin: (bulletin_id) -> Optional[StoredBulletin]
+  - function create_preview_embed: (preview, headline, bulletin_type, source_attribution, venue) -> discord.Embed
+  - function create_expanded_embed: (bulletin) -> discord.Embed
+  - function create_bulletin_message: (preview, full_content, headline, bulletin_type, source_attribution, venue) -> Tuple[discord.Embed, ui.View]
+  - _...8 more_
+- `src\faction_calendar.py`
+  - function tick_calendar: () -> List[Dict]
+  - function format_event_announce: (ev) -> str
+  - function get_pending_mission_spawns: () -> List[Dict]
+  - function mark_mission_spawned: (ev) -> None
+  - function get_mission_params: (ev) -> tuple
+  - function format_event_result: (ev) -> str
+- `src\faction_reputation.py`
+  - function get_faction_color: (faction) -> int
+  - function get_faction_tier_label: (faction) -> str
+  - function get_all_reputations: () -> Dict[str, dict]
+  - function get_reputation: (faction) -> dict
+  - function on_mission_complete: (faction) -> dict
+  - function on_mission_failed: (faction) -> dict
+  - _...10 more_
+- `src\fallen_adventurers.py` — function generate_fallen_bulletin: () -> Optional[str], function check_fallen_day_tick: () -> Optional[str]
+- `src\image_ref.py`
+  - function save_npc_ref: (name, img_bytes, metadata) -> Path
+  - function save_npc_alt_ref: (name, img_bytes, metadata) -> Path
+  - function get_npc_ref: (name) -> Optional[bytes]
+  - function get_npc_alt_ref: (name) -> Optional[bytes]
+  - function pin_npc_ref: (name, img_bytes) -> Path
+  - function has_npc_ref: (name) -> bool
+  - _...10 more_
+- `src\log.py` — function setup_logger: (module_name) -> logging.Logger, class CustomFormatter
+- `src\memory_strip.py` — function strip_to_facts: (text) -> str, function clean_memory_file: (memory_path, *, apply) -> str
+- `src\mimir_client.py` — function get_mimir: () -> MimirClient, class MimirClient
+- `src\mimir_sync.py`
+  - function ensure_sync_table: () -> None
+  - function get_sync_engine: () -> MimirSyncEngine
+  - function trigger_npc_sync: (npc_id) -> None
+  - function trigger_faction_sync: (faction_name) -> None
+  - function trigger_pc_mimir_sync: (char_name) -> None
+  - function run_pc_gear_run: (force) -> dict
+  - _...4 more_
+- `src\missing_persons.py`
+  - function should_post_missing: () -> bool
+  - function tick_missing_resolutions: () -> List[str]
+  - function generate_missing_bulletin: () -> Optional[str]
+- `src\mission_board.py`
+  - function next_personal_mission_seconds: () -> int
+  - function next_trickle_seconds: () -> int
+  - function refresh_mission_types_if_needed: () -> None
+  - function post_hostile_mission: (channel, faction) -> None
+  - function post_personal_mission: (channel, character) -> None
+  - function check_claims: (channel, client) -> None
+  - _...8 more_
+- `src\mission_builder\ambush_pipeline.py`
+  - function is_ambush_mission: (mission_type) -> bool
+  - function render_ambush_module: (mission, roles, str], target, target_details, guard, location, map_plan, briefing, strength, Any], map_path, out_dir) -> str
+  - function render_ambush_session: (mission, roles, str], target, guard, map_plan, strength, Any], map_path, out_dir) -> str
+  - function build_ambush_module: (mission, out_dir) -> Path
+- `src\mission_builder\api.py`
+  - function generate_mission: (title, faction, tier, body, player_name, reward, mission_type, personal_for, difficulty, difficulty_rating) -> Optional[Dict]
+  - function get_mission_output_path: (mission_title, timestamp) -> Path
+  - function get_recent_missions: (count, output_dir) -> list[Path]
+  - function list_missions: (output_dir) -> list[Dict]
+  - function generate_mission_async: (title, faction, tier, body, player_name, reward, mission_type, personal_for, difficulty, difficulty_rating) -> Optional[Dict]
+  - function generate_and_save_mission: (title, faction, tier, body, player_name, reward, mission_type, output_dir) -> Optional[Path]
+  - _...2 more_
+- `src\mission_builder\assassination_pipeline.py`
+  - function is_assassination_mission: (mission_type) -> bool
+  - function render_assassination_module: (mission, briefing, target, security, surveillance, approaches, exfil, map_path, out_dir) -> str
+  - function render_assassination_session: (mission, briefing, target, security, surveillance, approaches, exfil) -> str
+  - function build_assassination_module: (mission, out_dir) -> Path
+- `src\mission_builder\assault_pipeline.py`
+  - function is_assault_mission: (mission_type) -> bool
+  - function render_assault_module: (mission, position, defending_faction, attacker_force, defender_type, commander, briefing, chokepoints, attacker_morale, defender_morale, strength, Any], map_path, out_dir) -> str
+  - function render_assault_session: (mission, position, defending_faction, attacker_force, defender_type, commander, briefing, chokepoints, attacker_morale, defender_morale, map_path, out_dir) -> str
+  - function build_assault_module: (mission, out_dir) -> Path
+- `src\mission_builder\battle_pipeline.py`
+  - function is_battle_mission: (mission_type) -> bool
+  - function render_battle_module: (mission, conflict_type, hiring_faction, opposing_side, contact, location, briefing, pocket_fights, glory, glory_slot, support_actions, debrief, strength, map_path, out_dir) -> str
+  - function render_battle_session: (mission, conflict_type, hiring_faction, opposing_side, location, briefing, pocket_fights, glory, glory_slot, support_actions, map_path, out_dir) -> str
+  - function build_battle_module: (mission, out_dir) -> Path
+- `src\mission_builder\boxset_utils.py`
+  - function write_component: (out_dir, slug, label, title, faction, body_md) -> str
+  - function write_maps_page: (out_dir, title, faction, image_paths) -> str | None
+  - function component_links: (has_maps) -> list[tuple[str, str]]
+- `src\mission_builder\cr_scaling.py` — function party_strength: () -> Dict[str, Any], function mission_cr: (mission) -> int
+- `src\mission_builder\defense_pipeline.py`
+  - function is_defense_mission: (mission_type) -> bool
+  - function render_defense_module: (mission, location, profile, army, briefing, defenses, watch_events, intel_leads, waves, morale_pool, strength, Any], map_path, out_dir) -> str
+  - function render_defense_session: (mission, location, profile, army, briefing, defenses, waves, morale_pool, intel_leads, watch_events) -> str
+  - function build_defense_module: (mission, out_dir) -> Path
+- `src\mission_builder\discovery_pipeline.py`
+  - function is_discovery_mission: (mission_type) -> bool
+  - function render_module: (mission, dtype, context, Any], plan, Any], dcs, int], strength, Any]) -> str
+  - function render_session: (mission, plan, Any], dcs, int]) -> str
+  - function build_discovery_module: (mission, out_dir) -> Path
+- `src\mission_builder\docx_builder.py`
+  - function format_module_for_docx: (title, overview, acts_1_2, acts_3_4, act_5_rewards, metadata, # 5-chapter novel pipeline
+    chapter_1, chapter_2, chapter_3, chapter_4, chapter_5) -> dict
+  - function validate_module_data: (module_data) -> bool
+  - function get_output_dir: () -> Path
+  - function list_generated_modules: (limit) -> list
+  - function cleanup_old_modules: (days) -> int
+  - function build_docx: (module_data, filename, timeout) -> Optional[Path]
+- `src\mission_builder\dungeon_delve\docx_formatter.py` — function build_room_markdown: (room, content, room_number) -> str, function format_dungeon_delve_module: (dungeon_name, dungeon_lore, location_name, district, layout, room_content, dict], faction, tier, cr, party_level, reward, composite_map_path, player_name) -> dict
+- `src\mission_builder\dungeon_delve\layouts.py`
+  - function get_room_count_for_level: (party_level) -> int
+  - function generate_layout: (party_level, preferred_size) -> DungeonLayout
+  - function get_aesthetic_for_location: (location_name) -> str
+  - class RoomPosition
+  - class DungeonLayout
+- `src\mission_builder\dungeon_delve\room_generator.py`
+  - function generate_room_content: (room, room_num, total_rooms, context, use_llm) -> Dict
+  - function generate_all_rooms: (layout, context, use_llm, delay_between) -> Dict[str, Dict]
+  - class DungeonContext
+- `src\mission_builder\dungeon_delve\stitcher.py` — function stitch_dungeon_map: (layout, room_tiles, bytes], room_info, dict]], tile_size, padding) -> bytes, function create_placeholder_map: (layout, room_info, dict]], tile_size, padding) -> bytes
+- `src\mission_builder\dungeon_delve\tile_generator.py`
+  - function build_tile_prompt: (room, aesthetic) -> tuple[str, str]
+  - function generate_room_tile: (room, aesthetic, seed) -> Optional[bytes]
+  - function generate_all_tiles: (layout, aesthetic, base_seed, delay_between) -> Dict[str, bytes]
+- `src\mission_builder\dungeon_delve\__init__.py`
+  - function get_dungeon_locations: () -> List[Dict]
+  - function select_dungeon_location: (party_level, preferred_type) -> Dict
+  - function generate_dungeon_delve: (location_name, faction, party_level, tier, use_llm, generate_tiles, player_name, reward) -> Dict[str, Any]
+  - function save_dungeon_delve: (result, Any], output_dir) -> Dict[str, Path]
+- `src\mission_builder\encounters.py`
+  - function get_max_pc_level: () -> int
+  - function get_party_size: () -> int
+  - function get_cr: (tier) -> int
+  - function get_encounter_budget: (cr) -> dict
+  - function get_cr_xp: (cr) -> int
+  - function calculate_skill_dcs: (cr) -> dict
+  - _...4 more_
+- `src\mission_builder\escort_pipeline.py`
+  - function is_escort_mission: (mission_type) -> bool
+  - function render_escort_module: (mission, target, vet, briefing, personality, traps, pickup_location, delivery_location, delivery_scene, ambush_goal, strength, Any], clean_map, dm_map, out_dir) -> str
+  - function render_escort_session: (mission, target, vet, briefing, personality, clean_map, delivery_scene, out_dir) -> str
+  - function build_escort_module: (mission, out_dir) -> Path
+- `src\mission_builder\exploration_pipeline.py`
+  - function is_exploration_mission: (mission_type) -> bool
+  - function mark_area_historical: (place_id, replaced_by, reason) -> None
+  - function render_module: (mission, subtype, area, Any], plan, Any], strength, Any], dcs, int], map_path, out_dir) -> str
+  - function render_session: (mission, plan, Any], dcs, int]) -> str
+  - function build_exploration_module: (mission, out_dir) -> Path
+- `src\mission_builder\first_contact_pipeline.py`
+  - function is_first_contact_mission: (mission_type) -> bool
+  - function render_module: (mission, ctype, location, Any], plan, Any], dcs, int], strength, Any]) -> str
+  - function render_session: (mission, plan, Any], dcs, int]) -> str
+  - function build_first_contact_module: (mission, out_dir) -> Path
+- `src\mission_builder\gather_pipeline.py`
+  - function is_gather_mission: (mission_type) -> bool
+  - function render_gather_module: (mission, contact, gather_profile, item_data, contact_scene, location_desc, selected_encounters, strength, Any], map_path, out_dir) -> str
+  - function render_gather_session: (mission, contact, contact_scene, item_data, selected_encounters, map_path, out_dir) -> str
+  - function build_gather_module: (mission, out_dir) -> Path
+- `src\mission_builder\heist_pipeline.py`
+  - function is_heist_mission: (mission_type, faction) -> bool
+  - function render_heist_module: (mission, subtype, roles, str], target, str], location, str], plan, Any], strength, Any], options, Any], map_path, out_dir) -> str
+  - function render_heist_session: (mission, subtype, roles, str], target, str], plan, Any], strength, Any], options, Any], map_path, out_dir) -> str
+  - function build_heist_module: (mission, out_dir) -> Path
+- `src\mission_builder\html_renderer.py`
+  - function render_module_structured: (module_data) -> str
+  - function render_chapter: (chapter_num, chapter_title, novel_title, body_md, faction) -> str
+  - function render_component: (component_label, novel_title, body_md, faction) -> str
+  - function render_maps_page: (novel_title, faction, image_paths, # list of Path objects relative to module dir
+    manifest_json) -> str
+- `src\mission_builder\image_generator.py`
+  - function get_image_asset: (filename, type, size, int]], seed, prompt) -> ImageAsset
+  - function craft_battle_map_prompt: (room, style) -> str
+  - function craft_creature_prompt: (creature_name, creature_type) -> str
+  - function craft_location_prompt: (location_name, location_desc) -> str
+  - function render_ascii_grid_to_png: (ascii_grid, cell_size) -> bytes
+  - function generate_single_tile: (params) -> Optional[Image.Image]
+  - _...7 more_
+- `src\mission_builder\image_integration.py`
+  - function generate_mission_with_images_sync: (title, faction, tier, body, player_name, include_images, image_style, model_name) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]
+  - function extract_dungeon_rooms_from_mission: (mission_module) -> List[DungeonRoom]
+  - function example_usage: ()
+  - function generate_mission_with_images: (title, faction, tier, body, player_name, include_images, image_style, model_name) -> tuple[Optional[MissionModule], Optional[Dict[str, str]]]
+  - function generate_complete_mission: (title, faction, tier, body, player_name, output_dir, image_style) -> Optional[tuple[Path, Path]]
+  - function update_mission_with_images: (mission_file, include_dungeon_images, image_style) -> Optional[MissionModule]
+- `src\mission_builder\infestation_layout.py`
+  - function generate_layout: (subtype, room_count) -> InfestationLayout
+  - function render_ascii: (layout) -> str
+  - function layout_summary: (layout) -> str
+  - class InfestationRoom
+  - class InfestationLayout
+- `src\mission_builder\infestation_pipeline.py`
+  - function is_infestation_mission: (mission_type) -> bool
+  - function choose_subtype: (mission) -> str
+  - function render_infestation_module: (layout, monsters, room_contents, dict], room_maps, Path], # room_id → PNG path relative to out_dir
+    mission, strength, Any]]) -> str
+  - function generate_monster_roster: (subtype, cr, faction) -> dict
+  - function generate_room_batch: (rooms, layout, monsters, mission) -> Dict[int, dict]
+  - function generate_all_rooms: (layout, monsters, mission) -> Dict[int, dict]
+  - _...2 more_
+- `src\mission_builder\infiltration_pipeline.py`
+  - function is_infiltration_mission: (mission_type) -> bool
+  - function render_infiltration_module: (mission, roles, str], objectives, str], location, Any], briefing, Any], covers, Any]], cast, str]], scenes, pc_roles, str]], strength, Any], needs_map, map_path, out_dir) -> str
+  - function render_infiltration_session: (mission, roles, str], objectives, str], scenes, covers, Any]], strength, Any], needs_map, map_path, out_dir) -> str
+  - function build_infiltration_module: (mission, out_dir) -> Path
+- `src\mission_builder\investigation_pipeline.py`
+  - function is_investigation_mission: (mission_type) -> bool
+  - function render_investigation_module: (mission, case_type, roles, str], tones, str], plan, Any], locations, str]], suspects, str]], leads, Any]], strength, Any]) -> str
+  - function render_investigation_session: (mission, case_type, roles, str], plan, Any], suspects, str]], leads, Any]], strength, Any]) -> str
+  - function build_investigation_module: (mission, out_dir) -> Path
+- `src\mission_builder\json_generator.py`
+  - function set_use_skills: (enabled) -> None
+  - function save_module_json: (module, mission_id) -> Optional[Path]
+  - function generate_module_json: (mission, player_name) -> Optional[Dict]
+- `src\mission_builder\leads.py`
+  - function generate_lead: (lead_type, faction, district, mission_context) -> dict
+  - function generate_investigation_leads: (faction, tier, mission_type, count) -> List[dict]
+  - function format_leads_for_prompt: (leads, cr) -> str
+  - function format_lead_as_scene: (lead, cr) -> str
+  - function get_approach_guidance: (lead_type) -> dict
+- `src\mission_builder\locations.py`
+  - function invalidate_gazetteer_cache: () -> None
+  - function load_gazetteer: () -> dict
+  - function get_districts_by_faction: (faction) -> List[str]
+  - function get_districts_by_danger: (danger_level) -> List[str]
+  - function get_district_info: (district_name) -> Optional[dict]
+  - function get_establishments_in_district: (district_name, establishment_type) -> List[dict]
+  - _...22 more_
+- `src\mission_builder\maps.py`
+  - function extract_map_scenes: (module_data, mission_type) -> List[Dict]
+  - function build_map_prompt: (scene, strategy) -> Tuple[str, str]
+  - function generate_vtt_map: (scene, ref_bytes, denoise) -> Optional[bytes]
+  - function generate_module_maps: (module_data, output_subdir, max_maps) -> List[Path]
+  - function post_maps_to_channel: (client, map_paths, module_data, retry_count, channel) -> bool
+- `src\mission_builder\mimir_module.py`
+  - function render_mimir_section: (enemies, rewards, module_id) -> str
+  - function create_module: (mission, mission_type) -> Optional[str]
+  - function enrich_monsters: (module_id, enemies) -> list[dict]
+  - function enrich_items: (module_id, rewards) -> list[dict]
+  - function push_documents: (module_id, documents) -> None
+  - function upload_map: (module_id, map_path, map_name) -> bool
+- `src\mission_builder\mission_json_builder.py` — function create_mission_module: (title, faction, tier, mission_type, **metadata_kwargs) -> MissionJsonBuilder, class MissionJsonBuilder
+- `src\mission_builder\mission_types.py`
+  - function get_mission_type: (name) -> Optional[MissionType]
+  - function list_mission_types: () -> List[str]
+  - function map_difficulty_to_tier: (difficulty) -> str
+  - function map_difficulty_to_5e: (difficulty) -> str
+  - function get_difficulty_description: (difficulty) -> str
+  - function generate_dynamic_title: (mission_type, faction, theme_or_subject, difficulty, use_skills) -> str
+  - _...2 more_
+- `src\mission_builder\module_council.py` — function generate_with_council: (mission_title, subtype, area, Any], strength, Any], dcs, int], rifts, Any]], faction, briefing) -> Optional[Dict[str, Any]]
+- `src\mission_builder\monster_stat_gen.py` — function build_statblock: (name, cr, creature_type, size, hp_override, ac_override, attacks, notes) -> Dict[str, Any], function format_actions_for_ddb: (attacks) -> str
+- `src\mission_builder\negotiation_pipeline.py`
+  - function is_negotiation_mission: (mission_type) -> bool
+  - function render_negotiation_module: (mission, roles, str], situation, str], location, str], plan, Any], marker, dcs, int], strength, Any]) -> str
+  - function render_negotiation_session: (mission, roles, str], plan, Any], marker, dcs, int]) -> str
+  - function build_negotiation_module: (mission, out_dir) -> Path
+- `src\mission_builder\novel_outline.py` — function build_novel_outline: (ctx, force) -> list[dict]
+- `src\mission_builder\novel_pipeline.py` — function generate_novel_module: (mission, player_name) -> Optional[Path]
+- `src\mission_builder\npcs.py`
+  - function load_npc_roster: () -> List[dict]
+  - function get_faction_leader: (faction) -> Optional[dict]
+  - function get_faction_leader_name: (faction) -> str
+  - function get_npcs_by_faction: (faction, alive_only) -> List[dict]
+  - function get_npc_by_name: (name) -> Optional[dict]
+  - function get_npcs_by_location: (location) -> List[dict]
+  - _...9 more_
+- `src\mission_builder\published_pipeline.py` — function generate_published_module: (mission, player_name) -> Optional[Path]
+- `src\mission_builder\puzzle_pipeline.py`
+  - function is_puzzle_mission: (mission_type) -> bool
+  - function render_puzzle_module: (mission, sponsor, puzzle_type, plan, Any], research_routes, str]], strength, Any], calendar) -> str
+  - function render_puzzle_session: (mission, sponsor, puzzle_type, plan, Any], research_routes, str]], strength, Any], calendar) -> str
+  - function build_puzzle_module: (mission, out_dir) -> Path
+- `src\mission_builder\recovery_pipeline.py`
+  - function is_recovery_mission: (mission_type) -> bool
+  - function render_module: (mission, target_type, context, Any], plan, Any], dcs, int], strength, Any], reward, Any]) -> str
+  - function render_session: (mission, plan, Any], dcs, int], reward, Any]) -> str
+  - function build_recovery_module: (mission, out_dir) -> Path
+- `src\mission_builder\rescue_pipeline.py`
+  - function is_rescue_mission: (mission_type) -> bool
+  - function render_rescue_module: (mission, subtype, roles, str], target, str], location, Any], plan, Any], strength, Any], map_path, out_dir) -> str
+  - function render_rescue_session: (mission, subtype, roles, str], target, str], plan, Any], strength, Any], map_path, out_dir) -> str
+  - function build_rescue_module: (mission, out_dir) -> Path
+- `src\mission_builder\rewards.py`
+  - function scale_reward: (base, cr, tier) -> int
+  - function get_magic_item_tier: (cr) -> str
+  - function get_random_magic_item: (cr, count) -> List[str]
+  - function calculate_gold_reward: (tier, cr, party_size, pc_level) -> Tuple[int, int]
+  - function calculate_kharma_reward: (tier, cr) -> Tuple[int, int]
+  - function format_rewards_block: (tier, cr, faction, mission_reward_text, pc_level) -> str
+  - _...3 more_
+- `src\mission_builder\sabotage_pipeline.py`
+  - function is_sabotage_mission: (mission_type) -> bool
+  - function render_sabotage_module: (mission, subtype, roles, str], target, Any], place, Any], detector, str], plan, Any], strength, Any], map_path, out_dir) -> str
+  - function render_sabotage_session: (mission, subtype, roles, str], target, Any], plan, Any], strength, Any], map_path, out_dir) -> str
+  - function build_sabotage_module: (mission, out_dir) -> Path
+- `src\mission_builder\scene_dialogs.py`
+  - function build_dialog_html: (data) -> str
+  - function build_leaving_html: (leaving) -> str
+  - function extract_scenes_from_html: (module_html) -> List[Dict]
+  - function inject_dialogs_into_html: (module_html, scene_dialogs) -> str
+  - function inject_leaving_into_html: (module_html, leaving_sections) -> str
+  - function generate_all_scene_dialogs: (module_html, ctx, pause_secs) -> List[Dict]
+  - _...3 more_
+- `src\mission_builder\schemas.py`
+  - function validate_mission_module: (data, Any]) -> tuple[bool, List[str]]
+  - function log_validation_results: (is_valid, errors, mission_title)
+  - function get_mission_schema: () -> Dict[str, Any]
+  - class MissionMetadata
+  - class MissionContent
+  - class LocationInfo
+  - _...8 more_
+- `src\mission_builder\session_runner.py`
+  - function extract_scenes: (module_html_path) -> list[dict]
+  - function extract_module_meta: (module_html_path) -> dict
+  - function generate_session_html: (out_dir, mission_title, faction, tier, player_name, mission_id, scenes) -> Path
+- `src\mission_builder\strange_occurrences_pipeline.py`
+  - function is_strange_occurrences_mission: (mission_type) -> bool
+  - function render_module: (mission, occurrence_type, sponsor, str], locations, Any]], parties, str]], plan, Any], dcs, int], strength, Any]) -> str
+  - function render_session: (mission, sponsor, str], plan, Any]) -> str
+  - function build_strange_occurrences_module: (mission, out_dir) -> Path
+- `src\mission_builder\vtt_renderer.py`
+  - function wait_for_a1111_idle: (timeout, cooldown) -> bool
+  - function render_vtt_battlemap: (context, ai_png) -> bytes
+  - function write_grid_sidecar: (path, context) -> None
+  - function pretty_map_path: (path) -> Path
+  - function tactical_map_path: (path) -> Path
+  - function decode_useful_a1111_image: (image_b64) -> bytes | None
+  - _...3 more_
+- `src\mission_builder\__init__.py`
+  - function gather_context: (mission) -> dict
+  - function generate_module: (mission, player_name) -> Optional[Path]
+  - function post_module_to_channel: (client, index_path, mission, player_name) -> bool
+- `src\mission_compiler.py`
+  - function build_mission_json: (title, faction, tier, mission_type, **kwargs) -> Dict
+  - function compile_mission: (mission_dict, player_name, client) -> Optional[Path]
+  - class MissionCompiler
+- `src\mission_outcomes.py`
+  - function get_recent_outcomes: (n) -> List[Dict]
+  - function save_outcome: (outcome) -> None
+  - function archive_news_weekly: () -> Optional[str]
+  - function archive_outcomes_weekly: () -> Optional[str]
+  - function process_npc_deaths: (killed_text, mission_title) -> List[str]
+  - function process_outcome_consequences: (outcome) -> List[str]
+- `src\module_quality_trainer.py` — function study_module_quality: () -> Optional[str]
+- `src\news_feed.py`
+  - function get_rift_mission_fuel: (limit) -> List[Dict]
+  - function check_exchange_tick: () -> Optional[str]
+  - function check_tia_tick: () -> Optional[str]
+  - function check_weather_tick: () -> Optional[str]
+  - function check_calendar_tick: () -> list
+  - function next_interval_seconds: () -> int
+  - _...11 more_
+- `src\news_integration.py`
+  - function get_timestamp_line: () -> str
+  - function generate_editorial_bulletin: (editor_type, topic, venue) -> EditorialResult
+  - function generate_gossip_only: (topic, seed_npc) -> EditorialResult
+  - function generate_sports_only: (event_type, venue) -> EditorialResult
+  - function post_editorial_bulletin: (channel, editor_type, topic, venue, write_memory_func) -> Optional[discord.Message]
+  - function generate_for_command: (editor_type_str, topic) -> Tuple[Optional[discord.Embed], Optional[discord.ui.View], str]
+  - _...2 more_
+- `src\npc_appearance.py`
+  - function current_visual_species: (species) -> str
+  - function species_visual_guard: (species) -> str
+  - function species_portrait_constraints: (species) -> tuple[str, str]
+  - function get_race_sd_traits: (species) -> str
+  - function infer_gender_tag: (text) -> str
+  - function get_npc_appearance: (name) -> Optional[dict]
+  - _...6 more_
+- `src\npc_consequence.py`
+  - function scan_bulletin_for_consequences: (bulletin_text) -> List[Dict]
+  - function apply_consequences: (consequences) -> List[str]
+  - function check_resurrection_queue: () -> List[Dict]
+  - function check_resurrection_queue: () -> List[Dict]
+  - function resurrect_npc: (entry) -> Optional[Dict]
+  - function get_recently_deceased_block: (days) -> str
+  - _...1 more_
+- `src\npc_lifecycle.py`
+  - function get_home_district: (faction, rank, species) -> str
+  - function is_faction_leader: (npc_name) -> bool
+  - function get_leader_faction: (npc_name) -> Optional[str]
+  - function is_unknown_party_member: (npc_name) -> bool
+  - function get_party_member_data: (npc_name) -> Optional[dict]
+  - function next_lifecycle_seconds: () -> int
+  - _...4 more_
+- `src\npc_lookup.py`
+  - function extract_quoted_names: (text) -> List[str]
+  - function extract_and_lookup_npcs: (text) -> List[Dict]
+  - function get_npc_context_for_prompt: (text, include_appearance) -> str
+  - function get_npc_sd_prompt: (text) -> str
+  - function lookup_npc_by_name: (name) -> Optional[Dict]
+- `src\npc_statblock_backfill.py` — function backfill_one: (npc_row) -> bool, function run_statblock_backfill: (n) -> int
+- `src\nudge_state.py` — function has_been_nudged: (user_id) -> bool, function mark_nudged: (user_id)
+- `src\ollama_busy.py`
+  - function is_available: () -> bool
+  - function is_priority_busy: () -> bool
+  - function get_busy_reason: () -> str
+  - function mark_busy: (reason, model) -> None
+  - function mark_available: () -> None
+  - function mark_priority_busy: (reason, model) -> None
+  - _...2 more_
+- `src\ollama_queue.py`
+  - function call_ollama: (payload, Any], timeout, caller, force) -> Dict[str, Any]
+  - function call_ollama_quick: (payload, Any], timeout, caller) -> Dict[str, Any]
+  - class OllamaBusyError
+- `src\party_interview.py`
+  - function score_epic: (outcome) -> int
+  - function pick_sponsor: (party_profile) -> dict
+  - function archive_expired_interviews: () -> int
+  - function generate_interview: (outcome, party_profile, sponsor) -> str
+  - function maybe_trigger_interview: (outcome, mission, discord_client) -> None
+- `src\party_profiles.py`
+  - function load_profile: (name) -> Optional[dict]
+  - function save_profile: (profile) -> None
+  - function get_party_delta: (mission_tier) -> int
+  - function apply_party_outcome: (name, mission_tier, success) -> dict
+  - function is_exceptional_outcome: (mission_tier, success, party_tier) -> bool
+  - function profile_summary: (name) -> str
+  - _...5 more_
+- `src\patch_approval.py`
+  - function parse_pending_patches: () -> List[Dict]
+  - function update_patch_status: (patch_id, new_status, note) -> bool
+  - function setup: (client)
+  - class PatchApprovalView
+  - class PatchListView
+- `src\personas.py`
+  - function get_persona_prompt: (persona_name, user_id) -> str
+  - function is_jailbreak_persona: (persona_name) -> bool
+  - function is_admin_user: (user_id) -> bool
+  - function get_available_personas: (user_id) -> List[str]
+- `src\player_listings.py`
+  - function tick_player_listings: () -> List[Dict]
+  - function place_bid_on_player_listing: (listing_id, bidder_id, bidder_name, amount, proxy_max) -> Dict
+  - function buy_now_player_listing: (listing_id, buyer_id, buyer_name) -> Dict
+  - function create_listing: (player_id, player_name, item_name, description, min_bid, frozen, buy_now_price) -> Dict
+  - function format_player_listings_embed: () -> Optional[discord.Embed]
+  - function format_sold_notification: (item) -> discord.Embed
+- `src\providers.py`
+  - class ProviderType
+  - class ModelInfo
+  - class BaseProvider
+  - class FreeProvider
+  - class OpenAIProvider
+  - class ClaudeProvider
+  - _...3 more_
+- `src\rag_sanity_check.py` — function main: ()
+- `src\resource_cop.py`
+  - function active_pipelines_sync: () -> list[dict[str, Any]]
+  - function ask_a1111_sync: (label, *, model_hint, url) -> ResourceDecision
+  - function start_pipeline: (label, *, mission_title, mission_type, phase, **details) -> PipelineRun
+  - function set_pipeline_phase: (run_id, phase, **details) -> None
+  - function finish_pipeline: (run_id, *, status) -> None
+  - function append_pipeline_failure: (run_id, exc) -> None
+  - _...7 more_
+- `src\rules_agent.py`
+  - function answer_rules_question: (query) -> RulesAnswer
+  - function lookup_spell_or_feature: (name) -> str
+  - class RulesAnswer
+- `src\self_learning.py` — function run_learning_session: (discord_client), function self_learning_loop: (discord_client)
+- `src\skills.py`
+  - function load_skill_from_file: (skill_file) -> Optional[Skill]
+  - function load_all_skills: (skills_dir) -> Dict[str, Skill]
+  - function get_skill_for_task: (task, skills, Skill]]) -> Optional[Skill]
+  - function list_available_skills: (skills, Skill]]) -> List[Dict[str, Any]]
+  - function get_skill_content: (skill_name, skills, Skill]]) -> Optional[str]
+  - function build_system_prompt_with_skills: (base_prompt, task, skills, Skill]], use_multiple) -> str
+  - _...9 more_
+- `src\skill_loader.py`
+  - function load_skills: (force) -> List[Skill]
+  - function save_skill_to_db: (skill_text, filename) -> bool
+  - function score_skill: (skill, query_tokens) -> float
+  - function match_skills: (user_message, conversation_history, str]]], top_n, min_score) -> List[Skill]
+  - function format_skills_for_prompt: (skills, max_chars) -> str
+  - function get_skill_inventory: () -> List[Dict]
+  - _...2 more_
+- `src\style_agent.py`
+  - function faction_style_summary: (faction) -> str
+  - function describe_character_style: (char_name, char_class, faction, occasion, extra_notes) -> str
+  - function enrich_appearance_prompt: (base_description, char_class, faction) -> str
+- `src\text_mojibake.py` — function repair_mojibake: (text) -> str, function repair_payload: (value) -> Any
+- `src\tower_economy.py`
+  - function react_to_bulletin: (bulletin_text) -> Optional[str]
+  - function format_towerbay_bulletin: () -> str
+  - function tick_tia: () -> tuple
+  - function format_tia_bulletin: (event_desc) -> str
+  - function format_towerbay_embeds: ()
+  - function place_bid: (listing_id, bidder_id, bidder_name, amount, proxy_max) -> Dict
+  - _...4 more_
+- `src\tower_rag.py`
+  - function get_relevant_chunks: (query, top_k) -> List[str]
+  - function build_context_from_messages: (messages, str]], top_k, tone, scene) -> str
+  - function search_docs: (query, top_k) -> List[str]
+  - class Intent
+- `src\tts_engine.py` — function generate_tts_audio: (text, bulletin_type) -> bytes | None
+- `src\weekly_archive.py`
+  - function run_weekly_archive: () -> dict
+  - function load_archive: (category, week_date) -> list
+  - function load_all_archives: (category) -> list
+  - function search_archive: (category, query, max_results) -> list
+  - function list_archive_weeks: (category) -> list[str]
+  - function archive_summary: () -> dict
+- `utils\message_utils.py` — function send_split_message: (self, response, message, has_followed_up), function send_response_with_images: (self, response, message)
+- `Webpage\app.py`
+  - function index: ()
+  - function print_view: ()
+  - function api_status: ()
+  - function api_missions: ()
+  - function api_mission_detail: (mission_id)
+  - function api_claim_mission: ()
+  - _...31 more_
+
+---
+
+# Config
+
+## Environment Variables
+
+- `A1111_ANIME_MODEL` (has default) — .env
+- `A1111_EXPERIMENT_BASE_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_BASE_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_FLUX_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_FLUX_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_SDXL_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_SDXL_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_TIMEOUT` **required** — scripts\experiment_map_lanes.py
+- `A1111_FLUX_CHECKPOINT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_CHECKPOINT` (has default) — .env
+- `A1111_MAP_COOLDOWN_SECONDS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_DUNGEON_TRIGGERS` (has default) — .env
+- `A1111_MAP_IDLE_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_INTERIOR_TRIGGERS` (has default) — .env
+- `A1111_MAP_LORA` **required** — src\mission_builder\image_generator.py
+- `A1111_MAP_LORA_DUNGEON` (has default) — .env
+- `A1111_MAP_LORA_INTERIOR` (has default) — .env
+- `A1111_MAP_LORA_TOWN` (has default) — .env
+- `A1111_MAP_LORA_WEIGHT` (has default) — .env
+- `A1111_MAP_MAX_ROUNDS` **required** — archive\backups_old\backups\codex_20260508_bug2_map_contract\src\mission_builder\maps.py
+- `A1111_MAP_MODEL_SWAP_COOLDOWN` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_POLL_SECONDS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_TIMEOUT` **required** — src\mission_builder\image_generator.py
+- `A1111_MAP_TOWN_TRIGGERS` (has default) — .env
+- `A1111_MAP_VAE` (has default) — .env
+- `A1111_MAPCRAFT_ENABLED` (has default) — .env.example
+- `A1111_MAPCRAFT_FLUX_CHECKPOINT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_FLUX_LORA` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_FLUX_VAE` (has default) — .env
+- `A1111_MAPCRAFT_SDXL_CHECKPOINT` (has default) — .env
+- `A1111_MAPCRAFT_SDXL_LORA` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_SDXL_VAE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_TRIGGER` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MODEL` (has default) — .env
+- `A1111_MODEL_SWITCH_TIMEOUT` **required** — src\a1111_runtime.py
+- `A1111_NICE_MAP_CHECKPOINT` **required** — scripts\experiment_map_lanes.py
+- `A1111_NICE_MAP_SAMPLER` **required** — scripts\experiment_map_lanes.py
+- `A1111_OPTIONS_GET_TIMEOUT` **required** — src\a1111_runtime.py
+- `A1111_SCENE_MODEL_2` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_MODEL_3` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_VAE` (has default) — .env
+- `A1111_TILE_TIMEOUT` **required** — src\mission_builder\dungeon_delve\tile_generator.py
+- `A1111_URL` (has default) — .env
+- `ADMIN_USER_IDS` (has default) — .env.example
+- `CHAR_MONITOR_CHANNEL_ID` (has default) — .env
+- `CHROME_PATH` **required** — archive\scripts_oneoff\extract_ddb_session.py
+- `CLAUDE_KEY` (has default) — .env.example
+- `CONVERSATION_TRIM_SIZE` (has default) — .env.example
+- `DASHBOARD_EXTERNAL_PIN` **required** — Webpage\app.py
+- `DASHBOARD_PORT` (has default) — .env
+- `DDB_CDP_PORT` **required** — src\ddb_homebrew.py
+- `DDB_COBALT_SESSION` (has default) — .env
+- `DDB_COBALT_TOKEN` **required** — src\character_monitor.py
+- `DDB_HOMEBREW_ENABLED` **required** — src\ddb_homebrew.py
+- `DEFAULT_MODEL` (has default) — .env.example
+- `DEFAULT_PROVIDER` (has default) — .env.example
+- `DISCORD_BOT_TOKEN` **required** — .env.example
+- `DISCORD_CHANNEL_ID` **required** — .env.example
+- `DISCORD_GUILD_ID` (has default) — .env
+- `DM_USER_ID` (has default) — .env
+- `FLASK_DEBUG` **required** — archive\backups_old\backups\codex_20260507_172046\app.py
+- `GAZETTEER_CACHE_TTL` **required** — src\mission_builder\locations.py
+- `GEMINI_KEY` (has default) — .env.example
+- `GROK_KEY` (has default) — .env.example
+- `IMAGE_STYLE` (has default) — .env
+- `INFESTATION_ROOM_MAP_ATTEMPTS` **required** — src\mission_builder\infestation_pipeline.py
+- `INFESTATION_ROOM_MAP_RETRY_DELAY` **required** — src\mission_builder\infestation_pipeline.py
+- `INFESTATION_ROOM_MAP_WAIT_SECONDS` **required** — src\mission_builder\infestation_pipeline.py
+- `KIMI_ENABLE_SUBAGENTS` (has default) — .env.example
+- `KIMI_MODEL` (has default) — .env.example
+- `LEARN_HOUR_END` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\self_learning.py
+- `LEARN_HOUR_START` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\self_learning.py
+- `LOGGING` (has default) — .env.example
+- `MAPS_CHANNEL_ID` **required** — archive\backups_old\backups\codex_20260507_174150\src\mission_builder\maps.py
+- `MAX_CONVERSATION_LENGTH` (has default) — .env.example
+- `MIMIR_CAMPAIGN_ID` (has default) — .env
+- `MIMIR_CAMPAIGN_NAME` **required** — src\mimir_client.py
+- `MIMIR_DATABASE_PATH` (has default) — .env
+- `MIMIR_LOG_LEVEL` **required** — src\mimir_client.py
+- `MIMIR_MCP_PATH` (has default) — .env
+- `MIMIR_PULL_NPC_SLEEP` **required** — src\mimir_sync.py
+- `MIMIR_PULL_PROGRESS_EVERY` **required** — src\mimir_sync.py
+- `MIMIR_SYNC_INTERVAL` **required** — archive\backups_old\backups\codex_20260507_175030\src\mimir_sync.py
+- `MISSION_BOARD_CHANNEL_ID` (has default) — .env.example
+- `MISSION_RESULTS_CHANNEL_ID` (has default) — .env
+- `MODULE_BLUEPRINT_TIMEOUT` **required** — src\mission_builder\published_pipeline.py
+- `MODULE_BLUEPRINT_TOKENS` **required** — src\mission_builder\published_pipeline.py
+- `MODULE_GENERATE_MAPS` (has default) — .env.example
+- `MODULE_OUTPUT_CHANNEL_ID` (has default) — .env
+- `MODULE_PIPELINE` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py
+- `MODULE_USE_COUNCIL` (has default) — .env.example
+- `MODULE_USE_LLM_BLUEPRINT` (has default) — .env
+- `MYSQL_DB` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_HOST` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_PASSWORD` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_PORT` **required** — src\db_backup.py
+- `MYSQL_USER` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQLDUMP_PATH` **required** — src\db_backup.py
+- `NPC_LIFECYCLE_BUSY_RETRY_SECONDS` **required** — src\aclient.py
+- `OLLAMA_AGENT_CTX` (has default) — .env
+- `OLLAMA_AGENT_THINK` **required** — src\agents\base.py
+- `OLLAMA_FAST_MODEL` (has default) — .env.example
+- `OLLAMA_FLASH_ATTENTION` (has default) — .env
+- `OLLAMA_KEEP_ALIVE` (has default) — .env
+- `OLLAMA_MODEL` (has default) — .env.example
+- `OLLAMA_NUM_CTX` (has default) — .env
+- `OLLAMA_NUM_GPU` (has default) — .env
+- `OLLAMA_QUICK_TIMEOUT` **required** — src\ollama_queue.py
+- `OLLAMA_URL` (has default) — .env.example
+- `OLLAMA_VISION_MODEL` (has default) — .env
+- `OPENAI_ENABLED` **required** — src\art.py
+- `OPENAI_KEY` (has default) — .env.example
+- `QWEN_MODEL` (has default) — .env.example
+- `REAL_WEATHER_LOCATION` (has default) — .env.example
+- `REPLYING_ALL` (has default) — .env.example
+- `REPLYING_ALL_DISCORD_CHANNEL_ID` **required** — .env.example
+- `RESOURCE_COP_A1111_MAX_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_A1111_TIMEOUT` **required** — src\resource_cop.py
+- `RESOURCE_COP_A1111_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_BUSY_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_MAX_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_TIMEOUT` **required** — src\resource_cop.py
+- `RUST_LOG` **required** — src\mimir_client.py
+- `VTT_MAP_ALLOW_AI_TEXTURE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_GRID_CELLS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY` (has default) — .env.example
+- `VTT_MAP_PRETTY_CFG` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_DENOISE` (has default) — .env.example
+- `VTT_MAP_PRETTY_INCLUDE_FLUX` (has default) — .env.example
+- `VTT_MAP_PRETTY_MAPCRAFT_TEXT2IMG` (has default) — .env.example
+- `VTT_MAP_PRETTY_SAMPLER` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_SIZE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_STEPS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_SIZE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_STRICT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+
+## Config Files
+
+- `.env.example`
+- `Dockerfile`
+- `docker-compose.yml`
+
+## Key Dependencies
+
+- openai: ^6.32.0
+
+---
+
+# Middleware
+
+## custom
+- migrate_add_columns — `archive\root_scripts\migrate_add_columns.py`
+- migrate_data — `archive\root_scripts\migrate_data.py`
+- migrate_characters — `archive\scripts_oneoff\migrate_characters.py`
+- migrate_towerbay_bids — `archive\scripts_oneoff\migrate_towerbay_bids.py`
+- generate_review — `skills\skill-creator\eval-viewer\generate_review.py`
+- generate_report — `skills\skill-creator\scripts\generate_report.py`
+
+---
+
+# Dependency Graph
+
+## Most Imported Files (change these carefully)
+
+- `/schemas.py` — imported by **6** files
+- `/layouts.py` — imported by **5** files
+- `/competition_types.py` — imported by **4** files
+- `/locations.py` — imported by **3** files
+- `/encounters.py` — imported by **3** files
+- `/mission_json_builder.py` — imported by **3** files
+- `/base.py` — imported by **3** files
+- `/leads.py` — imported by **2** files
+- `/npcs.py` — imported by **2** files
+- `/rewards.py` — imported by **2** files
+- `/docx_builder.py` — imported by **2** files
+- `/maps.py` — imported by **2** files
+- `/docx.py` — imported by **1** files
+- `/pptx.py` — imported by **1** files
+- `/redlining.py` — imported by **1** files
+- `/bracket_engine.py` — imported by **1** files
+- `/room_generator.py` — imported by **1** files
+- `/tile_generator.py` — imported by **1** files
+- `/stitcher.py` — imported by **1** files
+- `/json_generator.py` — imported by **1** files
+
+## Import Map (who imports what)
+
+- `/schemas.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\image_generator.py`, `src\mission_builder\image_integration.py`, `src\mission_builder\json_generator.py`, `src\mission_builder\mission_json_builder.py` +1 more
+- `/layouts.py` ← `src\mission_builder\dungeon_delve\docx_formatter.py`, `src\mission_builder\dungeon_delve\room_generator.py`, `src\mission_builder\dungeon_delve\stitcher.py`, `src\mission_builder\dungeon_delve\tile_generator.py`, `src\mission_builder\dungeon_delve\__init__.py`
+- `/competition_types.py` ← `src\competitions\bracket_engine.py`, `src\competitions\mission_builder.py`, `src\competitions\post_competition.py`, `src\competitions\__init__.py`
+- `/locations.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\leads.py`, `src\mission_builder\__init__.py`
+- `/encounters.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\json_generator.py`, `src\mission_builder\__init__.py`
+- `/mission_json_builder.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\json_generator.py`, `src\mission_builder\__init__.py`
+- `/base.py` ← `skills\docx\scripts\office\validators\docx.py`, `skills\docx\scripts\office\validators\pptx.py`, `skills\docx\scripts\office\validators\__init__.py`
+- `/leads.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\__init__.py`
+- `/npcs.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\__init__.py`
+- `/rewards.py` ← `archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py`, `src\mission_builder\__init__.py`
+
+---
+
+# Test Coverage
+
+> **6%** of routes and models are covered by tests
+> 27 test files found
+
+## Covered Routes
+
+- GET:/
+
+## Covered Models
+
+- npcs
+- missions
+
+---
+
+_Generated by [codesight](https://github.com/Houseofmvps/codesight) — see your codebase clearly_

@@ -1,0 +1,1208 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-03-27",
+    "description": "Master gazetteer for the Undercity - all districts, underground locations, and establishments"
+  },
+  "ring_structure": [
+    {
+      "ring": 0,
+      "name": "Tower Core",
+      "distance_from_tower": "0-0.5 miles",
+      "description": "The Tower of Last Chance itself. Restricted access.",
+      "districts": ["Tower of Last Chance"]
+    },
+    {
+      "ring": 1,
+      "name": "Grand Forum Ring",
+      "distance_from_tower": "0.5-8 miles",
+      "description": "Administrative heart. Archives, courts, guild HQs.",
+      "districts": ["Grand Forum", "Guild Spires", "Archive Row", "Diplomats Row"]
+    },
+    {
+      "ring": 2,
+      "name": "Sanctum Ring",
+      "distance_from_tower": "8-18 miles",
+      "description": "Religious and scholarly. Temples, academies, research.",
+      "districts": ["Sanctum Quarter", "Temple Row", "Academy Heights", "The Reliquary", "Cult Corners"]
+    },
+    {
+      "ring": 3,
+      "name": "Commerce Ring",
+      "distance_from_tower": "18-35 miles",
+      "description": "Markets, entertainment, industry. Economic engine.",
+      "districts": ["Cobbleway Market", "Floating Bazaar", "Neon Row", "Night Pits", "Scrapworks", "Artisan Quarter", "Markets Infinite"]
+    },
+    {
+      "ring": 4,
+      "name": "Residential Ring",
+      "distance_from_tower": "35-55 miles",
+      "description": "Where most citizens live. Middle to lower class.",
+      "districts": ["Hearthstone District", "Ember Ward", "Coppergate", "Ashfall Terraces", "Duskhollow"]
+    },
+    {
+      "ring": 5,
+      "name": "Outer Ring",
+      "distance_from_tower": "55-65 miles",
+      "description": "Industrial, military, Warrens pockets. The edge.",
+      "districts": ["Outer Wall", "Ironworks", "Shantytown Heights", "Collapsed Plaza", "The Fringe"]
+    }
+  ],
+  "districts": {
+    "Tower of Last Chance": {
+      "ring": 0,
+      "description": "The ancient semi-sentient structure at the heart of the Undercity. The Oracle dwells within.",
+      "faction_presence": ["Tower Authority"],
+      "danger_level": "restricted",
+      "sub_areas": [
+        {"name": "The Oracle Chamber", "description": "Where the Oracle speaks to those deemed worthy"},
+        {"name": "The Great Beam", "description": "Energy column rising from the Tower apex, visible everywhere"},
+        {"name": "Tower Authority Command", "description": "Director Myra Kess's administrative offices"},
+        {"name": "Archival Vaults", "description": "Deep storage of records the Tower Authority deems sensitive"}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Resonance Steps", "type": "landmark", "description": "Stone stairs leading to the Tower entrance that hum faintly with arcane energy. Suppliants wait here for days.", "dnd_relevance": "Casting detect magic here reveals an overwhelming aura of divination and conjuration"},
+        {"name": "The First Gate", "type": "monument", "description": "Massive sealed gate of unknown alloy. No key exists. It opens only for the Oracle's chosen.", "dnd_relevance": "Knock and arcane lock spells have no effect"}
+      ],
+      "small_shops": [],
+      "parks": [
+        {"name": "The Moat Garden", "description": "Narrow bioluminescent garden ringing the Tower base. Maintained by Tower Authority. Public access permitted.", "features": ["bioluminescent blue moss", "carved stone benches", "warding glyphs etched into the path"]}
+      ],
+      "malls": []
+    },
+    "Grand Forum": {
+      "ring": 1,
+      "description": "The open plaza at the city's political heart. Public announcements, political maneuvering, information brokers.",
+      "faction_presence": ["Tower Authority", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Announcement Stone", "description": "Where official proclamations are made"},
+        {"name": "Broker's Corner", "description": "Where information changes hands"},
+        {"name": "Petitioner's Steps", "description": "Where citizens wait for audience with officials"},
+        {"name": "Forum Undercroft", "locations": ["The Whisper Gallery", "Broker's Cache", "Old Forum Cistern"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Gilded Quill", "type": "tavern", "description": "Upscale establishment favored by diplomats and info brokers"},
+        {"name": "Kessan & Mira's Booth", "type": "info_broker", "description": "The twins' visible operation point"},
+        {"name": "Grand Forum Library", "type": "library", "description": "Guild of Ashen Scrolls main archive"}
+      ],
+      "places_of_interest": [
+        {"name": "The Proclamation Pillars", "type": "monument", "description": "Seven stone pillars carved with every major law passed since the city's founding. Lawyers and archivists gather here to argue interpretations.", "dnd_relevance": "comprehend languages reveals older edicts in three extinct dialects"},
+        {"name": "The Forum Clock", "type": "landmark", "description": "A massive mechanical timepiece suspended above the plaza, powered by arcane clockwork. The only public clock in Ring 1.", "dnd_relevance": "mending keeps it running; it has resisted dispel magic for 80 years"},
+        {"name": "The Sorrow Wall", "type": "attraction", "description": "A long marble wall etched with the names of every citizen who died in a Rift event. New names are added weekly.", "dnd_relevance": "speak with dead cast near the wall sometimes produces unexpected responses"}
+      ],
+      "small_shops": [
+        {"name": "The Gilded Quill Trading Post", "type": "specialty", "description": "Maps, dungeon survey reports, and Rift zone charts sold by verified brokers.", "signature_item": "Verified Rift zone map (Ring 3-5 coverage)", "dnd_relevance": "maps grant advantage on Survival checks in charted areas"},
+        {"name": "Forum Cartographers", "type": "specialty", "description": "Custom survey maps of any district. Warden-certified accuracy guaranteed.", "signature_item": "Custom district survey scroll", "dnd_relevance": "grants proficiency-equivalent navigation in mapped area for 24h"},
+        {"name": "The Notary's Stall", "type": "general", "description": "Document authentication, contract witnessing, and official seal application.", "signature_item": "Authenticated contract scroll (binding)", "dnd_relevance": "contract scrolls are legally enforceable under city law"}
+      ],
+      "parks": [
+        {"name": "The Forum Garden", "description": "A formal garden of cultivated underground fungi and dome-lit flower beds at the plaza's east edge. Diplomatic meetings often happen on its stone benches.", "features": ["dome-lit cultivated flowers", "phosphorescent hedge maze", "stone fountain with purified canal water"]},
+        {"name": "The Petitioner's Grove", "description": "A small bioluminescent garden where those awaiting audience sit. Maintained by Tower Authority as a gesture of civility.", "features": ["soft-glowing amber moss", "carved stone benches", "gentle thermal vent heating"]}
+      ],
+      "malls": [
+        {"name": "The Forum Arcade", "description": "A covered colonnade of high-end shops lining the Forum's northern face. The most prestigious commercial address in the city.", "anchor_stores": ["Gilded Quill Trading Post", "Forum Cartographers", "The Notary's Stall"], "specialty": "Political services, legal instruments, and luxury information goods"}
+      ]
+    },
+    "Guild Spires": {
+      "ring": 1,
+      "description": "Towering faction headquarters. The Adventurers Guild, Merchant Guild, and Artificers make their homes here.",
+      "faction_presence": ["Adventurers Guild", "Argent Blades"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Adventurers Guild Hall", "description": "Mission board, registration, Mari Fen's desk"},
+        {"name": "Silver Spire", "description": "Aric Veyne's tower, SS-Rank adventurer residence"},
+        {"name": "Merchant Guild Tower", "description": "Trade licenses, tariff negotiations"},
+        {"name": "Artificers Collective", "description": "Magical item certification and sales"}
+      ],
+      "notable_establishments": [
+        {"name": "The Ranking Board", "type": "notice_board", "description": "Public adventurer rankings"},
+        {"name": "Prospect's Rest", "type": "inn", "description": "Budget lodging for new adventurers"},
+        {"name": "The Gilded Halls", "type": "guild_hall", "description": "Argent Blades showpiece headquarters"}
+      ],
+      "places_of_interest": [
+        {"name": "The Champion's Plinth", "type": "monument", "description": "A rotating magical display case at the Spires base showing the current top-ranked adventurers' likenesses in glowing illusion-craft.", "dnd_relevance": "Ranked adventurers can request one free identify per month at the Artificers Collective"},
+        {"name": "The Artificers Certification Wall", "type": "attraction", "description": "A floor-to-ceiling board displaying every certified magic item in the city registry. Updated daily by junior artificers.", "dnd_relevance": "Successful Investigation DC 14 locates any item in registry; items here can be legally purchased"},
+        {"name": "The Merchant Exchange Bell", "type": "landmark", "description": "An enormous bronze bell rung to open and close official trade sessions. Its tone carries to Ring 3.", "dnd_relevance": "Thieves who steal from within earshot during bell hours face doubled Warden response time penalties"}
+      ],
+      "small_shops": [
+        {"name": "Sigil & Seal", "type": "magic", "description": "Arcane focuses, spell component pouches, and certified wondrous items for Guild-registered adventurers.", "signature_item": "Spell component pouch (pre-stocked, 3-month supply)", "dnd_relevance": "arcane focus, spell components, ring of protection, cloak of elvenkind"},
+        {"name": "The Prospect's Outfitter", "type": "general", "description": "Budget adventuring gear for new Guild registrants. Everything a D-rank needs for their first mission.", "signature_item": "Dungeoneer's Pack (Guild spec)", "dnd_relevance": "dungeoneer's pack, healer's kit, 50ft rope"},
+        {"name": "The Ranking Notary", "type": "specialty", "description": "Official registration, rank appeals, and mission contract authentication.", "signature_item": "Mission contract scroll (official)", "dnd_relevance": "contracts are required for any mission above E-rank pay grade"}
+      ],
+      "parks": [
+        {"name": "The Spires Terrace", "description": "An elevated plaza between the Spire towers with imported stone benches and dome-filtered pale light. Used for off-duty Guild socializing.", "features": ["pale dome-light filtering", "carved stonework benches", "bioluminescent vine trellises"]}
+      ],
+      "malls": [
+        {"name": "The Spires Concourse", "description": "A multi-level commercial gallery at the base of the Guild Spires, catering exclusively to registered Guild members and faction representatives.", "anchor_stores": ["Sigil & Seal", "The Prospect's Outfitter", "The Ranking Notary"], "specialty": "Adventuring equipment, magical certification, and Guild-only services"}
+      ]
+    },
+    "Archive Row": {
+      "ring": 1,
+      "description": "Glass Sigil territory. Libraries, scriptoriums, and the accumulated knowledge of ages.",
+      "faction_presence": ["Glass Sigil", "Guild of Ashen Scrolls"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Grand Archive Dome", "description": "Main Glass Sigil repository under the great glass dome"},
+        {"name": "Scroll Vault", "description": "Temperature-controlled rare manuscript storage"},
+        {"name": "The Cataloguing Halls", "description": "Where junior archivists sort incoming materials"},
+        {"name": "Archive Catacombs", "locations": ["Forbidden Stacks", "The Memory Vault", "Residue Storage"]}
+      ],
+      "notable_establishments": [
+        {"name": "Senior Archivist Pell's Office", "type": "office", "description": "Glass Sigil leadership"},
+        {"name": "The Inkwell", "type": "tavern", "description": "Where archivists drink and gossip"},
+        {"name": "Scribe's Supply", "type": "shop", "description": "Writing materials, preservation supplies"}
+      ],
+      "places_of_interest": [
+        {"name": "The Grand Archive Dome", "type": "landmark", "description": "The great glass dome itself — the largest single structure in Ring 1 aside from the Tower. The dome is Sigil-made and partially transparent, casting archival light within.", "dnd_relevance": "Any Arcana or History check made inside the Dome gains a +2 bonus from ambient reference access"},
+        {"name": "The Index Fountain", "type": "attraction", "description": "A shimmering liquid-crystal fountain in the Archive courtyard that displays the day's new acquisitions as floating text. Archivists check it every morning.", "dnd_relevance": "Successful Arcana DC 12 can query the index for a specific topic; one free query per day per visitor"},
+        {"name": "The First Record Stone", "type": "monument", "description": "The oldest surviving written record in the city — a slab of inscribed basalt behind glass in the Archive lobby.", "dnd_relevance": "comprehend languages required to read the archaic dialect; reveals pre-Tower city history"}
+      ],
+      "small_shops": [
+        {"name": "The Cataloguing Hand", "type": "scroll", "description": "Scrolls of Identify, detect magic, comprehend languages, and remove curse. All Glass Sigil certified.", "signature_item": "Scroll of Identify (verified)", "dnd_relevance": "identify scroll, detect magic, comprehend languages, remove curse"},
+        {"name": "Scribe's Supply", "type": "general", "description": "Writing materials, preservation wax, blank scroll stock, and enchanted inks for scribing.", "signature_item": "Enchanted ink set (50 spell inscriptions)", "dnd_relevance": "required for scribing any spell scroll"},
+        {"name": "The Pressed Page", "type": "specialty", "description": "Rare book dealer operating under Glass Sigil charter. Spell theory, dungeon survey records, and faction histories.", "signature_item": "Dungeon survey record (any known dungeon, DC 15 to find specific)", "dnd_relevance": "grants advantage on Intelligence checks related to surveyed dungeon"}
+      ],
+      "parks": [
+        {"name": "The Archive Courtyard", "description": "A serene enclosed garden between the archive wings. Quiet reading alcoves, stone tables, and a preservation-ward that keeps insects and moisture out.", "features": ["preservation ward aura", "reading alcoves with pale dome light", "bioluminescent fern beds"]},
+        {"name": "The Memory Walk", "description": "A long covered colonnade planted with crystalline memory-flowers that glow faintly when walked past. Archivists believe the flowers absorb and hold emotional impressions.", "features": ["crystalline memory-flowers", "emotional impression resonance", "Glass Sigil ward markers"]}
+      ],
+      "malls": [
+        {"name": "The Row Arcade", "description": "A scholarly shopping hall along Archive Row's main street. Frequented by researchers, scribes, and serious collectors.", "anchor_stores": ["The Cataloguing Hand", "Scribe's Supply", "The Pressed Page"], "specialty": "Scrolls, books, magical research materials, and scribe supplies"}
+      ]
+    },
+    "Diplomats Row": {
+      "ring": 1,
+      "description": "Embassy buildings and neutral meeting grounds for inter-faction negotiations.",
+      "faction_presence": ["Tower Authority", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Neutral Hall", "description": "Where factions meet under truce"},
+        {"name": "Embassy Row", "description": "Foreign dignitary residences"},
+        {"name": "The Garden of Accord", "description": "Formal gardens for diplomatic functions"}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Accord Statue", "type": "monument", "description": "A bronze statue of the seven founding faction signatories standing in a circle, hands extended toward the center. The plaque beneath reads: 'We agreed, once.'", "dnd_relevance": "A successful Insight DC 13 check reveals the statue was repaired after being vandalized — one figure's hand was removed and reattached"},
+        {"name": "The Neutral Hall Crystal", "type": "landmark", "description": "A floating truth-crystal above the Neutral Hall table that glows red if a speaker is knowingly lying. All major negotiations happen beneath it.", "dnd_relevance": "Functions as a permanent zone of truth (DC 16 Will save to resist) during active negotiations"},
+        {"name": "The Condolence Board", "type": "curiosity", "description": "A velvet-lined message board in the embassy corridor where factions post formal condolences after inter-faction deaths. Etiquette dictates specific mourning language.", "dnd_relevance": "Studying the board with History DC 14 reveals a pattern — some factions post condolences before deaths are publicly announced"}
+      ],
+      "small_shops": [
+        {"name": "The Neutral Ground Armourers", "type": "armor", "description": "Ceremonial arms and formal armour for diplomatic functions. Looks dangerous, designed for display.", "signature_item": "+1 longsword (ceremonial scabbard, never drawn)", "dnd_relevance": "+1 longsword, formal armor sets"},
+        {"name": "The Courier's Table", "type": "specialty", "description": "Diplomatic message delivery service with guaranteed discretion. Neutral faction affiliation.", "signature_item": "Sealed diplomatic pouch (tamper-evident warding)", "dnd_relevance": "tamper-evident wax seal uses a 2nd-level alarm effect"}
+      ],
+      "parks": [
+        {"name": "The Garden of Accord", "description": "Formal diplomatic gardens maintained under strict neutrality treaty. All factions contribute one groundskeeper each. The only place in the city where faction members are forbidden from faction insignia.", "features": ["neutral-territory ward posts", "rare deep-soil cultivated flowers", "crystal-clear ornamental pool", "dome-arc framing the central fountain"]}
+      ],
+      "malls": []
+    },
+    "Sanctum Quarter": {
+      "ring": 2,
+      "description": "Major temples and religious administration. Serpent Choir's seat of power.",
+      "faction_presence": ["Serpent Choir"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Pantheon Walk", "description": "Street of major deity temples"},
+        {"name": "Choir Hall", "description": "Serpent Choir headquarters, High Apostle Yzura's seat"},
+        {"name": "Contract Archives", "description": "Divine contract storage, heavily warded"},
+        {"name": "Sanctum Catacombs", "locations": ["Burial Vaults", "Penitent's Walk", "The Sealed Crypts", "Choir Undercroft"]}
+      ],
+      "notable_establishments": [
+        {"name": "Vesper's Consultation Office", "type": "office", "description": "Contract Mediator Vesper sees petitioners here"},
+        {"name": "The Pilgrim's Rest", "type": "inn", "description": "Lodging for religious travelers"},
+        {"name": "Tithe House", "type": "administrative", "description": "Where divine contracts are finalized and payments rendered"}
+      ],
+      "places_of_interest": [
+        {"name": "The Contract Obelisk", "type": "monument", "description": "A 30-foot obelisk in the Sanctum plaza engraved with the terms of the Founding Divine Compact — the agreement that allows the Choir to operate in the Undercity. The Choir polishes it weekly.", "dnd_relevance": "Any cleric who meditates here for 10 minutes gains one additional use of Channel Divinity that day"},
+        {"name": "The Penitent's Gate", "type": "landmark", "description": "A golden archway at the Choir Hall entrance. Those who pass through who have broken a Choir contract feel a burning sensation; those who have honored all contracts feel warmth.", "dnd_relevance": "Functions as detect evil and good for Choir contract status when characters pass through"},
+        {"name": "The Tithe Pool", "type": "attraction", "description": "A circular pool of still water in the plaza where citizens drop coins when making informal prayers. The Choir skims it daily and claims it funds good works.", "dnd_relevance": "Coins left for 24h become mildly blessed; function as holy water when used in rituals (half strength)"}
+      ],
+      "small_shops": [
+        {"name": "The Root & Residue", "type": "potion", "description": "Holy water, sacred incense, diamond dust for revivify, and genuine spell components sourced under Choir contract.", "signature_item": "Diamond dust (revivify component, 300 EC)", "dnd_relevance": "holy water, revivify components, spell components, cure wounds"},
+        {"name": "The Pilgrim's Rest Infirmary", "type": "specialty", "description": "Short-rest healing services: lay on hands surrogates, lesser restoration, and cure wounds at tiered Guild rates.", "signature_item": "Lesser Restoration (service, 50 EC)", "dnd_relevance": "cure wounds, lesser restoration, healing services"},
+        {"name": "The Contract Scribe's Table", "type": "scroll", "description": "Divine contract scribing for personal oaths and binding agreements. Witnessed and warded by Choir scribes.", "signature_item": "Binding oath scroll (witnessed, magical)", "dnd_relevance": "binding contracts enforceable by zone of truth effect"}
+      ],
+      "parks": [
+        {"name": "The Pantheon Gardens", "description": "A formal garden lining Pantheon Walk between the temples. Each deity's section is planted with symbolically appropriate flora — death's domain grows nightshade, healing's domain grows silverleaf.", "features": ["deity-themed planted sections", "meditative stone walkways", "soft dome-light filtered to amber", "ritual cleansing fountain"]},
+        {"name": "The Quiet Terrace", "description": "A rooftop garden above the Pilgrim's Rest for convalescent patients. Guarded against noise by a permanent silence ward on the perimeter.", "features": ["silence ward perimeter", "bioluminescent healing herbs", "padded stone benches"]}
+      ],
+      "malls": [
+        {"name": "The Sanctum Colonnade", "description": "A covered shopping gallery along the Sanctum's eastern face where religious goods, healing supplies, and ritual materials are sold. All vendors are Choir-approved.", "anchor_stores": ["The Root & Residue", "The Contract Scribe's Table", "The Pilgrim's Rest Infirmary"], "specialty": "Divine spell components, healing services, and ritual goods"}
+      ]
+    },
+    "Temple Row": {
+      "ring": 2,
+      "description": "Cathedral of the Eternal Flame, Temple of the Silent Watch, Shrine of Forgotten Names.",
+      "faction_presence": ["Serpent Choir", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Cathedral of the Eternal Flame", "description": "Tallest religious structure, sacred fire never extinguished"},
+        {"name": "Temple of the Silent Watch", "description": "Monastery of contemplative monks"},
+        {"name": "Shrine of Forgotten Names", "description": "Memorial to those lost to Rifts"},
+        {"name": "Temple Crypts", "locations": ["Flame Keeper Tombs", "Silent Watch Ossuary", "The Nameless Vault"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Eternal Flame", "type": "landmark", "description": "The sacred fire in the Cathedral that has not been extinguished in recorded history. A fire elemental of great age is said to be bound within it.", "dnd_relevance": "Fire damage dealt within 30ft of the flame is maximized once per short rest for fire-domain clerics"},
+        {"name": "Shrine of Forgotten Names", "type": "monument", "description": "A wall of stone tiles, each bearing the name of a citizen lost to Rift events. Families pay the Cathedral to add tiles. Tens of thousands of names.", "dnd_relevance": "speak with dead cast adjacent to a tile may reach the named individual if no prior contact was attempted"},
+        {"name": "The Bell of Passage", "type": "attraction", "description": "A massive bronze bell rung only for confirmed deaths of faction rank Senior or above. Its tone is heard across Ring 2 and parts of Ring 3.", "dnd_relevance": "The bell's sound functions as a mild antimagic field for 10 minutes after ringing — no concentration spells"}
+      ],
+      "small_shops": [
+        {"name": "Cathedral of the Eternal Flame — Alms Office", "type": "specialty", "description": "Free lesser restoration for the genuinely destitute. Greater restoration by appointment. Brings your contract record.", "signature_item": "Greater Restoration (by appointment, 500 EC donation)", "dnd_relevance": "lesser restoration, greater restoration, remove curse"},
+        {"name": "The Flame Keeper's Candle Shop", "type": "general", "description": "Blessed candles, sacred oils, and holy water in small quantities. Run by junior clerics. Practical and unpretentious.", "signature_item": "Holy water (flask, 25 EC), blessed candle (ritual use)", "dnd_relevance": "holy water, sacred flame cantrip-infused candles, ceremony spell components"}
+      ],
+      "parks": [
+        {"name": "The Flame Garden", "description": "A firelit garden directly behind the Cathedral maintained with perpetual torch-bushes — plants that grow small flames instead of flowers due to proximity to the Eternal Flame's aura.", "features": ["perpetual torch-bush flowers", "heated stone paths", "warm amber light year-round"]},
+        {"name": "The Silent Watch Cloister", "description": "A meditative courtyard maintained by the monks of the Silent Watch. Open to all but enforced silence within. The stonework mutes sound naturally.", "features": ["sound-muffling stonework", "dry stone garden", "central meditation plinth"]}
+      ],
+      "malls": []
+    },
+    "Academy Heights": {
+      "ring": 2,
+      "description": "Wizards Tower, magical education, and arcane research facilities.",
+      "faction_presence": ["Wizards Tower"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Wizards Tower", "description": "Archmage Yaulderna Silverstreak's domain"},
+        {"name": "Student Quarters", "description": "Dormitories for apprentices and journeymen"},
+        {"name": "The Laboratories", "description": "Experimental magic research"},
+        {"name": "Academy Underhalls", "locations": ["Experiment Vaults", "The Binding Chambers", "Golem Storage", "Planar Research Wing"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Smoking Wand", "type": "tavern", "description": "Where students and faculty relax"},
+        {"name": "Reagent Row", "type": "market", "description": "Magical component shops"},
+        {"name": "The Licensing Office", "type": "administrative", "description": "Arcane practice permits issued here"}
+      ],
+      "places_of_interest": [
+        {"name": "The Arcane Manifold", "type": "landmark", "description": "A permanent magical phenomenon at the Academy's center — a slow-rotating sphere of layered arcane energies hovering 40 feet above the courtyard. It has been there since the Academy's founding.", "dnd_relevance": "Within 30ft, spell save DC is increased by 1; detect magic reveals an incomprehensible web of conjuration, divination, and abjuration"},
+        {"name": "The Walk of Graduates", "type": "monument", "description": "A stone-flagged path lined with plaques naming every Archmage-certified graduate since founding. Gaps in the sequence mark those whose plaques were removed.", "dnd_relevance": "History DC 14 identifies removed graduates and the reason for removal — mostly involving catastrophic experiments"},
+        {"name": "The Golem Yard", "type": "curiosity", "description": "An outdoor area where student-built golems are tested. Failures are left as warnings. There are seventeen failed golems in various states of arrested motion.", "dnd_relevance": "At least two appear functional but remain motionless — Arcana DC 16 to determine why"}
+      ],
+      "small_shops": [
+        {"name": "Reagent Row Collective", "type": "magic", "description": "Full spell component inventory operated by licensed suppliers. Bat guano, diamond dust, rare inks, powdered iron. Pre-order for unusual materials.", "signature_item": "Rare spell component (custom order, 48h)", "dnd_relevance": "spell components, arcane focus, ritual casting supplies"},
+        {"name": "The Resonant Mark", "type": "magic", "description": "Weapon and armour enchantments by licensed Wizards Tower artificers. +1 to +3 upgrades, elemental damage infusions.", "signature_item": "+1 weapon enchantment (service)", "dnd_relevance": "+1 weapons, +2 weapons, flaming/frost/lightning weapon infusion"},
+        {"name": "Academy Bookbindery", "type": "scroll", "description": "Spell scribing services, blank spell books, and pre-written spell scrolls. Student pricing available.", "signature_item": "Blank spell book (100 pages, hardbound)", "dnd_relevance": "spellbook, spell scroll scribing"}
+      ],
+      "parks": [
+        {"name": "The Academy Courtyard", "description": "A broad stone courtyard around the Arcane Manifold. Students eat, argue, and practice cantrips here. The ambient magic means plants grow unusually — twisted but lush.", "features": ["arcane-influenced plant growth", "floating mage-light lamps", "the Arcane Manifold overhead", "debate circles chalked on stone"]},
+        {"name": "The Research Gardens", "description": "A rooftop garden used for outdoor spellwork experiments. Some sections are roped off permanently following incidents.", "features": ["experimental plant specimens", "ward markers for test zones", "restricted sections with visible burn marks"]}
+      ],
+      "malls": [
+        {"name": "Reagent Row", "description": "The main commercial strip of Academy Heights. Every shop services the magical trade — components, equipment, books, and enchantments. Busiest before exam periods.", "anchor_stores": ["Reagent Row Collective", "The Resonant Mark", "Academy Bookbindery"], "specialty": "Arcane components, magical equipment, and enchantment services"}
+      ]
+    },
+    "The Reliquary": {
+      "ring": 2,
+      "description": "Sacred items studied and stored under heavy guard and wards.",
+      "faction_presence": ["Glass Sigil", "Serpent Choir"],
+      "danger_level": "restricted",
+      "sub_areas": [
+        {"name": "Display Halls", "description": "Public exhibition of approved artifacts"},
+        {"name": "Study Chambers", "description": "Where scholars examine relics"},
+        {"name": "Deep Vaults", "locations": ["Cursed Item Storage", "Divine Fragment Repository", "The Forbidden Collection"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Display Halls", "type": "attraction", "description": "The public exhibition wing. Twenty approved artifacts behind glass and ward-walls. Most powerful items are represented only by replicas; the originals are elsewhere.", "dnd_relevance": "Arcana DC 16 distinguishes replicas from originals; one item in the current exhibition is authentic"},
+        {"name": "The Ward Lattice", "type": "landmark", "description": "The Reliquary's outer security system — a visible lattice of blue-gold magical wards woven over the building's surface. Any theft attempt within 100ft triggers a silent alarm to Choir and Sigil guard posts.", "dnd_relevance": "antimagic field, alarm, and glyph of warding effects layer the exterior"},
+        {"name": "The Study Antechamber", "type": "curiosity", "description": "A waiting room where approved researchers register before entering the Study Chambers. Decorated with framed letters of rejection from famous scholars denied access.", "dnd_relevance": "Persuasion DC 20 or formal Sigil sponsorship required for Study Chamber access"}
+      ],
+      "small_shops": [
+        {"name": "Ashen Relics & Curios", "type": "magic", "description": "Sanctioned artifact appraisal and limited sale under Glass Sigil charter. Rings of mind shielding, necklaces of adaptation, and cleared wondrous items.", "signature_item": "Ring of Mind Shielding (certified)", "dnd_relevance": "ring of mind shielding, necklace of adaptation, wondrous items"},
+        {"name": "The Relic Appraiser", "type": "specialty", "description": "Official Glass Sigil appraisal service. Identifies and values recovered magic items for a fee. All results are logged in the Sigil registry.", "signature_item": "Official appraisal certificate (binding, 75 EC)", "dnd_relevance": "identify, magic item appraisal, curse detection"}
+      ],
+      "parks": [
+        {"name": "The Reliquary Forecourt", "description": "A small formal garden at the Reliquary entrance with ward-marker sculptures and a shallow reflecting pool. The ward markers are functional, not decorative.", "features": ["functional ward markers", "reflecting pool (alarm-triggered)", "formal sculptured hedges"]}
+      ],
+      "malls": []
+    },
+    "Cult Corners": {
+      "ring": 2,
+      "description": "Brother Thane's Meeting Hall and other smaller faiths operate here.",
+      "faction_presence": ["Brother Thane's Cult", "Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Brother Thane's Meeting Hall", "description": "Public gathering space for the Returned"},
+        {"name": "Minor Shrine Row", "description": "Small temples to obscure deities"},
+        {"name": "The Vigil House", "description": "Where cult members keep watch"},
+        {"name": "Cult Warrens", "locations": ["Initiation Chambers", "The Speaking Room", "Hidden Sanctum"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Returned Board", "type": "curiosity", "description": "A public noticeboard outside Thane's Meeting Hall with testimonials from the Returned — those who claim to have died and come back. Updated weekly with new entries.", "dnd_relevance": "Investigation DC 11 finds inconsistencies in the death descriptions that suggest not all 'Returned' actually died"},
+        {"name": "Minor Shrine Row", "type": "attraction", "description": "A street of small shrines to twelve obscure or suppressed deities. Most are under a foot tall, shoved into wall niches. A few have fresh offerings.", "dnd_relevance": "Religion DC 15 to identify any specific deity; three of the shrines are to gods the Serpent Choir officially banned"},
+        {"name": "The Vigil Fire", "type": "landmark", "description": "A low perpetual flame in a clay bowl at the entrance to the Vigil House. Cult members who pass it touch it briefly. The fire has never gone out — cult members claim it is divine. Investigation suggests an enchanted ceramic.", "dnd_relevance": "Arcana DC 12 identifies a permanent prestidigitation effect; it is not divine"}
+      ],
+      "small_shops": [
+        {"name": "The Offering Table", "type": "specialty", "description": "Religious supplies for minor cults and personal shrine practice. Ritual candles, offering bowls, bone fragments, and burial herbs.", "signature_item": "Ritual preparation kit (bone, herbs, wax)", "dnd_relevance": "ceremony spell components, funeral rites, speak with dead preparations"},
+        {"name": "The Returned's Closet", "type": "general", "description": "Second-hand clothing and equipment from cult members who donated worldly possessions. Cheap but unpredictable inventory.", "signature_item": "Random common magic item (donated, 50 EC, no guarantee)", "dnd_relevance": "common magic items, random gear"}
+      ],
+      "parks": [
+        {"name": "The Quiet Corner Garden", "description": "A small unmaintained garden between two shrine buildings. Volunteers from the Patchwork Saints occasionally clear it. The cult uses it for outdoor vigils.", "features": ["tangled natural growth", "candle stubs on flat stones", "simple stone meditation circles"]}
+      ],
+      "malls": []
+    },
+    "Cobbleway Market": {
+      "ring": 3,
+      "description": "Traditional open-air bazaar. Spice Alley, Cloth Row, street food stalls.",
+      "faction_presence": ["Iron Fang Consortium", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Spice Alley", "description": "Aromatic corridor of spice merchants"},
+        {"name": "Cloth Row", "description": "Textile traders and tailors"},
+        {"name": "Food Court", "description": "Street food from a hundred cultures"},
+        {"name": "Market Undercroft", "locations": ["Smuggler's Cache", "Cold Storage", "The Black Stalls"]}
+      ],
+      "notable_establishments": [
+        {"name": "Elune's Apothecary", "type": "shop", "description": "Potions, herbs, remedies"},
+        {"name": "The Honest Scale", "type": "tavern", "description": "Merchant's drinking hole"}
+      ],
+      "places_of_interest": [
+        {"name": "The Old Market Bell Tower", "type": "landmark", "description": "A weathered stone tower above the market entrance whose bell marks the opening and closing of trade each day. The clock face shows only three hours because the fourth was damaged in a Rift event and never repaired.", "dnd_relevance": "The tower's base has a concealed access hatch (Perception DC 14) used by smugglers to reach the Market Undercroft"},
+        {"name": "Spice Alley Mural", "type": "attraction", "description": "A long mosaic mural on the Spice Alley wall depicting the founding of the market. Notable: one section was repainted and the original image — showing a now-banned faction — is visible under certain light angles.", "dnd_relevance": "Perception DC 13 in low light or with darkvision reveals the original banned faction sigil"},
+        {"name": "The Living Scale", "type": "curiosity", "description": "A massive enchanted scale at the market entrance, seven feet tall. Designed to detect tampering with goods sold in the market. Merchants avoid it; customers love it.", "dnd_relevance": "Functions as a truth-detector for trade goods — detects poison, magical alteration, or significant misrepresentation of weight"}
+      ],
+      "small_shops": [
+        {"name": "Elune's Apothecary", "type": "potion", "description": "Potions of healing in bulk, herbal remedies, herbalism kit supplies, and poisons for professional use.", "signature_item": "Potion of Healing (bulk rate: 45 EC each, min 4)", "dnd_relevance": "potions of healing, herbalism kit, antitoxin, healer's kit"},
+        {"name": "The Cloth Row Tailor", "type": "specialty", "description": "Custom-fitted adventuring clothes and disguise kits. Faction insignia removal and reapplication service. No questions on the insignia work.", "signature_item": "Custom disguise kit (crafted to order)", "dnd_relevance": "disguise kit, custom clothing with hidden pockets"},
+        {"name": "The Spice Merchant's Guild Stall", "type": "general", "description": "Aromatic spices with legitimate uses — and some that serve double duty as ritual components or alchemical reagents.", "signature_item": "Exotic spell component (disguised as spice, Perception DC 13 to identify)", "dnd_relevance": "spell components, alchemist's supplies ingredients"}
+      ],
+      "parks": [
+        {"name": "The Market Square Garden", "description": "A chaotic burst of street-garden in the market's center — vendors sell cut flowers here and someone long ago planted a mushroom grove that now takes up a third of the space. Everyone works around it.", "features": ["wild mushroom grove (edible varieties)", "cut flower stalls on the perimeter", "bioluminescent ground moss between cobbles"]}
+      ],
+      "malls": [
+        {"name": "The Cobbleway Grand Market Hall", "description": "The main covered section of the market — a vaulted stone hall with stalls on three levels, accessed through the market gate. Oldest commercial structure in Ring 3.", "anchor_stores": ["Elune's Apothecary", "The Cloth Row Tailor", "The Spice Merchant's Guild Stall"], "specialty": "Daily goods, food, clothing, and consumable supplies for the whole city"}
+      ]
+    },
+    "Markets Infinite": {
+      "ring": 3,
+      "description": "The sprawling commercial heart of the city. Iron Fang Consortium territory.",
+      "faction_presence": ["Iron Fang Consortium"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Crimson Alley", "description": "Iron Fang's back-channel dealings"},
+        {"name": "Relic Row", "description": "Adventuring gear and recovered artifacts"},
+        {"name": "The Counting Houses", "description": "Banks and money changers"},
+        {"name": "Consortium Underhalls", "locations": ["Guildmaster Dhal's Vault", "Acquisition Storage", "The Silent Auction"]}
+      ],
+      "notable_establishments": [
+        {"name": "Sera Voss's Storage Room", "type": "office", "description": "Behind a spice merchant, where Sera conducts business"},
+        {"name": "The Iron Coin", "type": "tavern", "description": "Consortium-friendly establishment"},
+        {"name": "TowerBay Depot", "type": "market", "description": "Auction house for rare goods"}
+      ],
+      "places_of_interest": [
+        {"name": "The Consortium Weigh Station", "type": "landmark", "description": "An enormous public weigh station at Markets Infinite's entrance where all bulk goods are officially weighed and taxed. Iron Fang officers collect the tariff. Avoiding this station is technically smuggling.", "dnd_relevance": "Sleight of Hand DC 17 to pass significant contraband; failure triggers Iron Fang detention"},
+        {"name": "The TowerBay Depot Sign", "type": "attraction", "description": "The largest illuminated commercial sign in the city — a 30-foot neon glyph visible from Ring 4 on a clear day. The Iron Fang Consortium commissioned it as a territorial marker as much as advertising.", "dnd_relevance": "Navigation within 5 miles of Markets Infinite is at advantage when the sign is visible"},
+        {"name": "The Crimson Alley Mural", "type": "curiosity", "description": "An unofficial mural at Crimson Alley's entrance showing the Iron Fang's version of their own history. Suspiciously heroic. Notable for what it omits.", "dnd_relevance": "History DC 12 identifies four major Iron Fang crimes omitted from the mural"}
+      ],
+      "small_shops": [
+        {"name": "Relic Row Outfitters", "type": "general", "description": "Full adventuring kits, explorer's packs, and consignment magic items. Everything identified by a licensed scribe.", "signature_item": "Explorer's Pack (Guild spec, 10 EC)", "dnd_relevance": "explorer's pack, dungeoneer's pack, identify scroll, consignment magic items"},
+        {"name": "The Iron Coin Exchange", "type": "specialty", "description": "Money changing, currency conversion, and EC-to-Kharma exchange at rates controlled by the Consortium. Not the best rates, but the safest.", "signature_item": "Currency exchange (no limit)", "dnd_relevance": "EC/Kharma exchange at posted rates"},
+        {"name": "Acquisition Solutions", "type": "specialty", "description": "Iron Fang front for 'procurement services'. If you need something sourced without questions, this is the stall. High prices, reliable delivery.", "signature_item": "Procurement contract (varies by item, 20% markup)", "dnd_relevance": "magic items, rare gear, restricted goods available with Gold or above faction standing"}
+      ],
+      "parks": [],
+      "malls": [
+        {"name": "Markets Infinite Central Hall", "description": "The largest single commercial structure in the Undercity — a vaulted iron-and-stone hall nearly half a mile long. Six hundred registered vendor stalls. The Iron Fang controls all lease agreements.", "anchor_stores": ["Relic Row Outfitters", "The Iron Coin Exchange", "TowerBay Depot"], "specialty": "Everything. If it exists in the Undercity, it has been sold here."},
+        {"name": "The Crimson Arcade", "description": "A premium annexe attached to the main hall with higher-end Iron Fang sanctioned goods. Velvet ropes at the entrance and Consortium guards inside.", "anchor_stores": ["Acquisition Solutions", "Sera Voss's front operation"], "specialty": "High-value goods, rare acquisitions, and consortium-brokered specialty sales"}
+      ]
+    },
+    "Floating Bazaar": {
+      "ring": 3,
+      "description": "Elevated neon-lit platforms. Luxury goods, tourist attractions, sky restaurants.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Sky Platforms", "description": "Floating commercial platforms lit with neon"},
+        {"name": "The Promenade", "description": "Upscale shopping walkway"},
+        {"name": "Vista Dining", "description": "Restaurants with views of the Tower"},
+        {"name": "Platform Maintenance", "locations": ["Service Tunnels", "Generator Rooms", "The Drop"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Tower View Platform", "type": "attraction", "description": "The highest publicly accessible point in the Bazaar. A reinforced observation deck facing the Tower. Citizens come here to watch the Great Beam's nightly pulse.", "dnd_relevance": "Concentration spells cast here during the Beam's pulse have their duration doubled once per long rest"},
+        {"name": "The Suspension Walk", "type": "landmark", "description": "A glass-floored bridge between two sky platforms with nothing but city below. A hundred feet long. Popular for dares and one confirmed murder.", "dnd_relevance": "Creatures with Acrophobia or fear of heights must succeed DC 12 Wisdom save to cross without hesitation"},
+        {"name": "The Tether & Claw", "type": "attraction", "description": "The Bazaar's famous exotic animal handler — the only place in the city where familiars and exotic companions are sold openly and legally.", "dnd_relevance": "find familiar spell component purchase, pseudodragon (with paperwork), exotic mounts"}
+      ],
+      "small_shops": [
+        {"name": "The Tether & Claw", "type": "specialty", "description": "Familiars, bonded mounts, and arcane companions. Current stock: ravens, owls, weasels, and a pseudodragon with incomplete paperwork.", "signature_item": "Pseudodragon (with provisional ownership certificate)", "dnd_relevance": "find familiar, pseudodragon, animal companion, exotic mounts"},
+        {"name": "Skylight Luxuries", "type": "specialty", "description": "High-end fashion, exotic textiles, and luxury goods for Ring 1-2 buyers slumming in Ring 3.", "signature_item": "Cloak of Billowing (cosmetic magic item, popular)", "dnd_relevance": "cosmetic magic items, disguise materials, luxury clothing"},
+        {"name": "The Vista Provisions", "type": "general", "description": "Expensive food and drink for the sky restaurants. Also sells bottled dome-rain water and platform-grown mushroom delicacies.", "signature_item": "Bottled dome rain (novelty, blessed by Cathedral of Flame, 5 EC)", "dnd_relevance": "holy water equivalent (very weak), gourmet spell component substitutes"}
+      ],
+      "parks": [
+        {"name": "The Sky Garden", "description": "A floating platform converted entirely to a garden. Maintained by a consortium of wealthy independent merchants as a status symbol. Free public access on the last day of each month.", "features": ["rare above-ground imported plants", "magelights simulating sunlight", "wind chimes of Elvish crystal", "the only outdoor café in Ring 3"]}
+      ],
+      "malls": [
+        {"name": "The Promenade", "description": "The main elevated shopping walkway of the Floating Bazaar. Glass-and-neon aesthetic, upscale vendors, and a dress code that is technically not enforced but practically is.", "anchor_stores": ["The Tether & Claw", "Skylight Luxuries", "The Vista Provisions"], "specialty": "Luxury goods, exotic companions, and upscale dining experiences"}
+      ]
+    },
+    "Neon Row": {
+      "ring": 3,
+      "description": "Entertainment district. Taverns, theaters, pleasure houses. Never sleeps.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "The Neon Strip", "description": "Main entertainment drag"},
+        {"name": "Theater Row", "description": "Playhouses and performance venues"},
+        {"name": "The Vice Quarter", "description": "Less reputable establishments"},
+        {"name": "Neon Underbelly", "locations": ["Lotus Back Rooms", "The Memory Den", "Pleasure Tunnels"]}
+      ],
+      "notable_establishments": [
+        {"name": "The Velvet Curtain", "type": "theater", "description": "Most prestigious playhouse"},
+        {"name": "The Laughing Skull", "type": "tavern", "description": "Adventurer dive bar"}
+      ],
+      "places_of_interest": [
+        {"name": "The Neon Strip", "type": "landmark", "description": "The main drag of Neon Row — half a mile of neon-glyph lit establishments, never dark, never quiet. The Obsidian Lotus controls the eastern end; independents control the western.", "dnd_relevance": "Bright light condition along the entire Strip; darkvision provides no advantage here even at night"},
+        {"name": "The Velvet Curtain Stage", "type": "attraction", "description": "The city's premier playhouse. Current production has been running for seven months — a fictionalized account of a famous adventurer's death that the real adventurer's family contests legally.", "dnd_relevance": "Performance checks made on this stage have DC reduced by 3 due to quality acoustics and lighting"},
+        {"name": "The Vice Quarter's Corner", "type": "curiosity", "description": "The edge of the Vice Quarter where Lotus control begins. An invisible line in the pavement that everyone in Neon Row can point to exactly. Crossing it means Lotus rules apply.", "dnd_relevance": "Obsidian Lotus agents have advantage on Perception checks to notice newcomers entering their territory"}
+      ],
+      "small_shops": [
+        {"name": "The Laughing Skull Supply", "type": "general", "description": "Adventurer supplies attached to the bar. Rope, torches, rations, and questionable healing potions sold cheap. The bartender knows their limitations.", "signature_item": "Potion of Healing (no guarantee, 30 EC)", "dnd_relevance": "potions of healing, torches, adventuring basics"},
+        {"name": "Blight & Brew", "type": "potion", "description": "Antitoxins, potions of resistance, and elixirs of health. Open all night because poison doesn't keep business hours.", "signature_item": "Antitoxin (vial, 50 EC)", "dnd_relevance": "antitoxin, potion of resistance, elixir of health"},
+        {"name": "The Memory Den Supply", "type": "specialty", "description": "Obsidian Lotus-adjacent shop selling memory-altering services and related supplies. Also offers dust of disappearance and smokepowder for professionals.", "signature_item": "Dust of Disappearance (pouch, 300 EC)", "dnd_relevance": "dust of disappearance, smokepowder, stealth aids"}
+      ],
+      "parks": [
+        {"name": "The Strip Atrium", "description": "A narrow neon-lit park-like space between two theater buildings — benches, artificial vines grown with prestidigitation, and the permanent smell of entertainment-district food. Used by performers between acts.", "features": ["prestidigitation-maintained artificial vines", "neon glyph ambient lighting", "performance warm-up space"]}
+      ],
+      "malls": [
+        {"name": "The Entertainment Quarter Complex", "description": "A covered multi-level entertainment hub at Neon Row's center. Theaters, bars, shops, and back-room services on four levels. The Lotus controls the basement and sub-basement.", "anchor_stores": ["The Velvet Curtain", "The Laughing Skull", "Blight & Brew"], "specialty": "Entertainment, consumables, vice, and night-market goods"}
+      ]
+    },
+    "Night Pits": {
+      "ring": 3,
+      "description": "Blood sport arenas. Gambling, gladiator culture, Sable's territory.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "high",
+      "sub_areas": [
+        {"name": "The Grand Pit", "description": "Main arena, seats thousands"},
+        {"name": "Fighter's Row", "description": "Gladiator barracks and training"},
+        {"name": "The Betting Halls", "description": "Where fortunes change hands"},
+        {"name": "Pit Warrens", "locations": ["Beast Pens", "The Bone Rooms", "Sable's Private Arena", "Corpse Disposal Tunnels"]}
+      ],
+      "notable_establishments": [
+        {"name": "Sable's Office", "type": "office", "description": "Night Pits boss operates from here"},
+        {"name": "The Last Round", "type": "tavern", "description": "Fighter's bar"},
+        {"name": "Champion's Obelisk", "type": "landmark", "description": "Names of arena champions carved in stone"}
+      ],
+      "places_of_interest": [
+        {"name": "The Grand Pit", "type": "landmark", "description": "The main arena — a deep stone pit that seats four thousand, with tiered standing room for another two. Fights happen every day except the new moon. The crowd noise is audible from Ring 4.", "dnd_relevance": "Gladiators who fight here successfully three times gain a reputation bonus — Persuasion and Intimidation +2 in Rings 3-4"},
+        {"name": "Champion's Obelisk", "type": "monument", "description": "A twelve-foot obelisk outside the Grand Pit entrance with every champion's name carved in the stone in order of win count. Current champion is listed twice under two different names.", "dnd_relevance": "Investigation DC 11 confirms the double listing — same person fought under two identities"},
+        {"name": "The Betting Board", "type": "curiosity", "description": "A magically updated odds board at the Betting Halls entrance showing live fight odds. Obsidian Lotus manages the board. Nobody publicly questions the odds.", "dnd_relevance": "Insight DC 16 to detect manipulation; caught cheating the board means instant Lotus attention"}
+      ],
+      "small_shops": [
+        {"name": "Fighter's Row Armament", "type": "weapon", "description": "Arena-grade weapons sold and maintained. Nets, tridents, gladiuses, and fighting shields. Also does field repairs between matches.", "signature_item": "Gladiatorial net (modified, counts as net weapon)", "dnd_relevance": "net, trident, shield, shortsword arena spec"},
+        {"name": "The Bone Doctor's Stall", "type": "specialty", "description": "Unlicensed medic operating between the barracks. Healer's kits, bone setting, and emergency potions. No records kept.", "signature_item": "Healer's Kit (no receipt, 4 EC)", "dnd_relevance": "healer's kit, potions of healing, stabilization"},
+        {"name": "Razorthorn Blades", "type": "weapon", "description": "Combat daggers, rapiers, and paired short blades. Silver coating available. All balanced for arena use.", "signature_item": "Silver-coated dagger (25 EC premium)", "dnd_relevance": "silvered weapons, dagger, rapier, short swords"}
+      ],
+      "parks": [],
+      "malls": []
+    },
+    "Scrapworks": {
+      "ring": 3,
+      "description": "Industrial salvage district. Mara the Scrapper's territory.",
+      "faction_presence": ["Patchwork Saints", "Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Mara's Yard", "description": "Main salvage operation"},
+        {"name": "The Sorting Floors", "description": "Where scrap is categorized"},
+        {"name": "Recycler's Row", "description": "Workshops converting scrap to goods"},
+        {"name": "Scrap Tunnels", "locations": ["Material Cache", "The Rust Maze", "Salvage Vaults"]}
+      ],
+      "notable_establishments": [
+        {"name": "Mara's Office", "type": "office", "description": "The Scrapper runs her operation from here"},
+        {"name": "The Oily Rag", "type": "tavern", "description": "Worker's drinking hole"}
+      ],
+      "places_of_interest": [
+        {"name": "The Scrap Tower", "type": "landmark", "description": "A sixty-foot tower of salvaged materials — metal, stone, glass — that serves as Mara's observation post and unofficial territory marker. It should not be structurally sound. It is.", "dnd_relevance": "Climbing (Athletics DC 12) provides a view across Rings 3-4; acts as a Warden signal relay during emergencies"},
+        {"name": "The Rust Maze Entrance", "type": "curiosity", "description": "The above-ground entry to the Rust Maze below — a marked hole in the floor of the main yard covered with a salvaged iron grate. Mara charges 5 EC admission for explorers.", "dnd_relevance": "Dungeon entrance — DC 14 Survival to navigate; the maze contains salvage worth 2d6 x 10 EC with a full exploration"},
+        {"name": "The Golem Yard", "type": "attraction", "description": "A separate section of Scrapworks where golem parts and construct components are sorted. Several partial golems stand inert. One of them moved last winter. Nobody investigated.", "dnd_relevance": "Arcana DC 14 to identify usable golem components; golem parts worth 50-200 EC each to the right buyer"}
+      ],
+      "small_shops": [
+        {"name": "Grapple & Grind", "type": "tool", "description": "Salvage-quality thieves' tools, climbing gear, grappling hooks, and rope. Everything tested before it leaves the yard.", "signature_item": "Grappling Hook and 50ft rope (salvage quality, 8 EC)", "dnd_relevance": "thieves' tools, climbing gear, grappling hook, rope"},
+        {"name": "Recycler's Workshop", "type": "general", "description": "Repaired and reconditioned mundane gear — swords straightened, armour re-riveted, tools sharpened. No magic work. Honest prices.", "signature_item": "Armour repair service (any non-magic armour, 5-15 EC)", "dnd_relevance": "equipment maintenance, tool repair"},
+        {"name": "The Parts Pile", "type": "specialty", "description": "Golem components, construct materials, and mechanical curiosities sold by Mara's crew. No questions on intended use.", "signature_item": "Partial golem core (salvaged, 100 EC, Arcana DC 12 to use)", "dnd_relevance": "construct components, arcane materials, golem repair"}
+      ],
+      "parks": [
+        {"name": "The Sorting Floor Garden", "description": "A small corner of the sorting floors where workers installed a mushroom garden — partly for food, partly because someone said it was good for morale. It has spread significantly.", "features": ["worker-tended mushroom garden", "salvaged planter containers", "bioluminescent oyster mushrooms"]}
+      ],
+      "malls": []
+    },
+    "Artisan Quarter": {
+      "ring": 3,
+      "description": "Craftspeople, artists, and the Guild of Ashen Scrolls scriptorium.",
+      "faction_presence": ["Guild of Ashen Scrolls", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Scriptorium Quarter", "description": "Where Ashen Scrolls scribes work"},
+        {"name": "Potter's Lane", "description": "Ceramics and glasswork"},
+        {"name": "Jeweler's Row", "description": "Fine metalwork and gems"},
+        {"name": "Artisan Cellars", "locations": ["Kiln Vaults", "Dye Works", "Secret Studios"]}
+      ],
+      "notable_establishments": [
+        {"name": "Archivist Eir Velan's Study", "type": "office", "description": "Guild of Ashen Scrolls leadership"}
+      ],
+      "places_of_interest": [
+        {"name": "The Ashen Scriptorium", "type": "landmark", "description": "The main Guild of Ashen Scrolls scribing facility. Forty scribes work here daily producing scroll copies, illuminated manuscripts, and official records. The smell of ink and preservation wax is permanent.", "dnd_relevance": "Scroll scribing services available here at Guild rates; copying spells into spellbooks 20% cheaper than standard"},
+        {"name": "Jeweler's Row Display Windows", "type": "attraction", "description": "The shop-front windows of Jeweler's Row are the most beautiful street-view in Ring 3. Gem-cutters display their best work under magelights. Several items in the windows have been there for years, too expensive to sell.", "dnd_relevance": "Gems required for identify, revivify, and raise dead purchased here at standard prices"},
+        {"name": "The Potter's Hall Kiln", "type": "curiosity", "description": "The communal kiln serving the entire Potter's Lane collective. Large enough to stand in. Several notable forgeries have been traced to objects that passed through this kiln.", "dnd_relevance": "Investigation DC 14 of fired pottery can detect if it was used to conceal or transport contraband"}
+      ],
+      "small_shops": [
+        {"name": "Inkwright's Scriptorium", "type": "scroll", "description": "Custom scroll scribing — any spell up to 5th level with 3-day lead. Pre-made combat utility scrolls in stock: haste, hold person, counterspell.", "signature_item": "Scroll of Haste (standard price + 10% scribing fee)", "dnd_relevance": "spell scroll scribing, haste, hold person, counterspell, identify"},
+        {"name": "Ferric & Sons Armaments", "type": "weapon", "description": "Three generations of blades. Shortswords, longswords, and hand crossbows to Guild spec. +1 enchantment upgrade service available.", "signature_item": "+1 Shortsword (upgrade service, 3 days, 300 EC)", "dnd_relevance": "+1 weapons, shortsword, longsword, hand crossbow"},
+        {"name": "The Gem Cutter's Standard", "type": "specialty", "description": "Cut and mounted gemstones for magical use, jewelry, and spell component requirements. Guild of Ashen Scrolls certified.", "signature_item": "Diamond (300 GP equivalent, revivify grade)", "dnd_relevance": "diamond dust, spell component gems, identify requirements"}
+      ],
+      "parks": [
+        {"name": "The Artisan's Courtyard", "description": "A communal outdoor workspace in the Quarter's center where artisans set up for weather-permitting work. Bioluminescent moss covers the walls, providing soft working light that the artisans claim is better for color judgment.", "features": ["bioluminescent wall-moss", "communal worktables", "chalk-marked guild territory sections"]}
+      ],
+      "malls": [
+        {"name": "The Quarter Arcade", "description": "A covered craftsperson's market in the Artisan Quarter running daily from mid-morning to late evening. More curated than Cobbleway — everything here is made, not traded.", "anchor_stores": ["Inkwright's Scriptorium", "Ferric & Sons Armaments", "The Gem Cutter's Standard"], "specialty": "Handcrafted goods, weapons, scrolls, and fine materials"}
+      ]
+    },
+    "Hearthstone District": {
+      "ring": 4,
+      "description": "Middle-class families. Stable, respectable neighborhoods.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Family Row", "description": "Modest but comfortable homes"},
+        {"name": "Market Square", "description": "Local shops and services"},
+        {"name": "Community Hall", "description": "Local governance and gatherings"},
+        {"name": "Hearthstone Basements", "locations": ["Root Cellars", "Storm Shelters", "Community Bunker"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Hearthstone Memorial", "type": "monument", "description": "A bronze relief panel on the Community Hall exterior depicting the district's founding — thirty-two families who built the first houses here. Most residents claim to be descended from at least one family.", "dnd_relevance": "History DC 10 to identify a specific founding family; one lineage has an unresolved inheritance case worth 2,000 EC"},
+        {"name": "The Community Well", "type": "landmark", "description": "The central shared well of Hearthstone, pre-dating the canal system. Still functional. Families bring disputes to be resolved 'at the Well' as a tradition.", "dnd_relevance": "The well feeds from an underground source; Zone of Truth effect lingers near the well (DC 12 Wisdom save) from generations of dispute resolution rituals"}
+      ],
+      "small_shops": [
+        {"name": "The Amber Flask", "type": "potion", "description": "Standard, Greater, and Superior Healing Potions. No Guild markup, no questions. Behind the Copper Market, third stall past the lantern post.", "signature_item": "Potion of Greater Healing (120 EC)", "dnd_relevance": "potion of healing, potion of greater healing"},
+        {"name": "Hearthstone Hardware", "type": "tool", "description": "Mundane tools, repair supplies, and household equipment. Also stocks climbing gear and rope as 'household supplies'.", "signature_item": "50ft hemp rope (2 EC)", "dnd_relevance": "rope, climbing gear, mundane tools"},
+        {"name": "The Corner Chirurgeon", "type": "specialty", "description": "A licensed healer serving Hearthstone families. Mundane medicine, healer's kits, and basic remedy supplies. Affordable rates.", "signature_item": "Healer's Kit (5 uses, 5 EC)", "dnd_relevance": "healer's kit, medicine check assistance, stabilization"}
+      ],
+      "parks": [
+        {"name": "Hearthstone Common", "description": "The central green of the district — a rare underground space with dome-light panels providing diffuse daylight-equivalent illumination. Children play here. Families picnic. It is aggressively normal.", "features": ["dome-light panels (daylight equivalent)", "maintained grass and soil garden beds", "community notice board", "children's play structures"]},
+        {"name": "The Fernway", "description": "A covered walkway between two residential blocks planted with potted ferns and dim bioluminescent lanterns. Used for morning walks and quiet evenings.", "features": ["potted fern walls", "bioluminescent lanterns", "stone benches"]}
+      ],
+      "malls": [
+        {"name": "Hearthstone Market Square", "description": "The district's main commercial area — a compact, practical shopping square with general goods, food, and services. Nothing extravagant. Reliably open and reliably stocked.", "anchor_stores": ["The Amber Flask", "Hearthstone Hardware", "The Corner Chirurgeon"], "specialty": "Daily goods, household supplies, and basic adventuring consumables"}
+      ]
+    },
+    "Ember Ward": {
+      "ring": 4,
+      "description": "Working class district. Union halls, mutual aid networks.",
+      "faction_presence": ["Patchwork Saints", "Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Union Hall", "description": "Worker organization headquarters"},
+        {"name": "Shift Housing", "description": "Dormitories for factory workers"},
+        {"name": "The Commons", "description": "Shared green space"},
+        {"name": "Ember Undercroft", "locations": ["Union Vault", "Strike Bunker", "Aid Cache"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Strike Pillar", "type": "monument", "description": "A salvaged factory pillar at the Union Hall entrance etched with the dates and outcomes of every major labor action in the Ward's history. Wins are carved deep. Losses are carved shallow.", "dnd_relevance": "History DC 10 to count the losses — there are more than the wins; the pillar tells a different story than the Hall's official history"},
+        {"name": "The Aid Cache Wall", "type": "attraction", "description": "A public wall where citizens post anonymous requests for assistance and Patchwork Saints volunteers post anonymous offers. The system is informal and largely functional.", "dnd_relevance": "Successful Insight DC 12 identifies which posts are legitimate and which are planted by faction recruiters"}
+      ],
+      "small_shops": [
+        {"name": "Patchwork Pharmacy", "type": "potion", "description": "Saints-run, community-priced. Healer's kits, bandages, herbalism kit supplies, and unlabelled potions of healing. Sliding scale pricing.", "signature_item": "Potion of Healing (sliding scale, 20-50 EC based on means)", "dnd_relevance": "healer's kit, herbalism kit, potions of healing"},
+        {"name": "The Worker's Tool Shed", "type": "tool", "description": "Tools, work supplies, and practical equipment. Also stocks thieves' tools under the counter for union members handling 'labor disputes'.", "signature_item": "Thieves' Tools (under counter, 15 EC, union member only)", "dnd_relevance": "thieves' tools, artisan's tools, work equipment"}
+      ],
+      "parks": [
+        {"name": "The Commons", "description": "The Ward's central shared space — an underground park maintained by volunteer labor. Thermal vents from the Ironworks run beneath it, keeping the ground warm year-round. Used for community meetings, informal markets, and rest.", "features": ["thermal vent heating", "volunteer-maintained garden beds", "communal cooking fire pits", "union meeting circle"]}
+      ],
+      "malls": []
+    },
+    "Coppergate": {
+      "ring": 4,
+      "description": "Lower middle class. Aspiring merchants and small business owners.",
+      "faction_presence": ["Independent"],
+      "danger_level": "low",
+      "sub_areas": [
+        {"name": "Shop Row", "description": "Small storefronts"},
+        {"name": "Copper Market", "description": "Budget goods and secondhand sales"},
+        {"name": "Tenement Blocks", "description": "Dense housing"},
+        {"name": "Coppergate Cellars", "locations": ["Storage Vaults", "Hidden Markets", "Escape Routes"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Copper Arch", "type": "landmark", "description": "A corroded copper archway marking the main entrance to Coppergate from Ring 3. Originally built as a prestige project. The copper was never polished and the green corrosion became the district symbol.", "dnd_relevance": "Widely recognized navigation landmark; investigation of the arch reveals several carved initials — some belonging to known criminals"},
+        {"name": "The Hidden Market Signs", "type": "curiosity", "description": "Coppergate's unofficial hidden market is signposted by chalk marks and scraped symbols on building corners. Different symbols indicate different goods. The code changes monthly.", "dnd_relevance": "Thieves' Tools / Thieves' Cant DC 13 to decode; grants access to the Coppergate Cellars hidden market"}
+      ],
+      "small_shops": [
+        {"name": "Vault & Rivet", "type": "armor", "description": "Studded leather to half-plate fitted same-day. The most practical armour shop in Ring 4.", "signature_item": "Studded Leather Armour (45 EC, same-day fit)", "dnd_relevance": "studded leather, chain shirt, half-plate, shield"},
+        {"name": "The Careful Hand", "type": "tool", "description": "Lockpicks, trap-finding kits, disguise supplies, and forgery components. Sold as 'novelty items' under Coppergate ordinance 7-C.", "signature_item": "Thieves' Tools (quality set, 25 EC)", "dnd_relevance": "thieves' tools, disguise kit, forgery kit"},
+        {"name": "The Budget Blade", "type": "weapon", "description": "Secondhand weapons at honest prices. Some of them work. Most of them work. All of them have been used.", "signature_item": "Used shortsword (8 EC, functional)", "dnd_relevance": "shortsword, dagger, light crossbow (budget quality)"}
+      ],
+      "parks": [
+        {"name": "The Tenement Yard", "description": "A shared courtyard between the tenement blocks with a small bioluminescent mushroom patch and a community water pump. Children play here. Laundry hangs overhead.", "features": ["bioluminescent mushroom patch", "communal water pump", "washing lines overhead", "chalk-drawn play areas"]}
+      ],
+      "malls": [
+        {"name": "The Copper Market Hall", "description": "A secondhand and budget goods market covering most of Shop Row — repurposed warehouse with vendor stalls. Everything is either used, surplus, or slightly irregular. Prices are honest.", "anchor_stores": ["Vault & Rivet", "The Careful Hand", "The Budget Blade"], "specialty": "Budget equipment, secondhand goods, and practical supplies for working-class residents"}
+      ]
+    },
+    "Ashfall Terraces": {
+      "ring": 4,
+      "description": "Vertical housing built into volcanic slopes. Warm, smoky.",
+      "faction_presence": ["Independent"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Upper Terraces", "description": "Better housing with views"},
+        {"name": "Mid-Slopes", "description": "Average residential"},
+        {"name": "Lower Vents", "description": "Near volcanic activity, cheap but dangerous"},
+        {"name": "Lava Tubes", "locations": ["Forge Caverns", "Vent Communities", "Thermal Baths", "Magma Shrine"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Magma Shrine", "type": "monument", "description": "A carved stone shrine to the volcanic god Ashara built at a lava tube observation point. Open-flame offerings left here are said to receive volcanic blessings.", "dnd_relevance": "Fire domain clerics who make an offering here can cast fire-related spells without spell slots once per long rest (1st-2nd level only)"},
+        {"name": "The Thermal Baths", "type": "attraction", "description": "Natural hot springs in the lava tubes expanded and maintained as public baths. Cheapest hot water in the city. Popular with off-duty Wardens and Ironworks workers.", "dnd_relevance": "Long rests taken in the Thermal Baths reduce exhaustion by 2 levels instead of 1 (heat therapy)"},
+        {"name": "The Vent Community", "type": "curiosity", "description": "The lowest-rent housing in Ashfall — hovels literally built against volcanic vent openings. Warm, cheap, and occasionally subjected to ash bursts. The residents consider this acceptable.", "dnd_relevance": "Constitution DC 10 per hour in the Lower Vents to avoid being subjected to 1 level of exhaustion from heat"}
+      ],
+      "small_shops": [
+        {"name": "The Ashfall Forge", "type": "weapon", "description": "Weapons forged at volcanic vent heat — exceptionally tempered. Heat-treating service also available for existing blades.", "signature_item": "Heat-tempered longsword (+1 damage vs cold creatures, 180 EC)", "dnd_relevance": "weapons with fire-adjacent properties, armor heat-treatment"},
+        {"name": "The Vent Remedies", "type": "potion", "description": "Vent-community healer specializing in smoke inhalation, ash burns, and heat exhaustion. Also makes fire resistance salves.", "signature_item": "Fire Resistance Salve (1 hour resistance to fire damage, 80 EC)", "dnd_relevance": "resistance to fire, healer's kit, burn treatment"}
+      ],
+      "parks": [
+        {"name": "The Upper Terrace Garden", "description": "A cultivated garden on the upper terraces using volcanic soil — highly fertile. Residents grow unusual heat-adapted plants here. The view of the lower terraces and dome from here is considered the best in Ring 4.", "features": ["volcanic soil plant beds", "heat-adapted exotic plants", "viewing platform toward the dome", "community maintained paths"]}
+      ],
+      "malls": []
+    },
+    "Duskhollow": {
+      "ring": 4,
+      "description": "Perpetual shadow zone. Home to night workers, those who avoid light.",
+      "faction_presence": ["Independent", "Obsidian Lotus"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Shadow Row", "description": "Main residential street, always dark"},
+        {"name": "Night Market", "description": "Commerce that operates after dark"},
+        {"name": "The Blind Quarter", "description": "Where those without sight live comfortably"},
+        {"name": "Duskhollow Depths", "locations": ["Shadow Sanctum", "Blind Council Hall", "The Lightless Library"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Lightless Library", "type": "landmark", "description": "A repository of forbidden texts maintained by an unknown curator — located in Duskhollow Depths. All books are written in Braille or encoded for tactile reading. The curator has never been identified.", "dnd_relevance": "Contains texts unavailable anywhere else; finding and reading requires DC 15 Investigation + ability to read without sight (or blindsight)"},
+        {"name": "The Shadow Arch", "type": "monument", "description": "An archway of dark stone at Duskhollow's entrance where no light penetrates. Not magical — the stone absorbs light. A natural phenomenon the community treats as sacred.", "dnd_relevance": "Magical darkness passes through this archway unimpeded; light spells fail to illuminate it"},
+        {"name": "The Night Market Square", "type": "attraction", "description": "The Night Market's central plaza where vendors sell after dark exclusively. Bioluminescent markers on the ground guide navigation. Non-darkvision visitors frequently lose their footing.", "dnd_relevance": "Disadvantage on Perception checks without darkvision; Night Market items rotate but always include contraband at 10% off standard black market rates"}
+      ],
+      "small_shops": [
+        {"name": "Under the Counter", "type": "specialty", "description": "Everything the Guild doesn't officially sell. Poisons, smoke bombs, caltrops, and dust of disappearance. Night Market hours only. No Warden tokens. No credit.", "signature_item": "Basic Poison (vial, 100 EC)", "dnd_relevance": "basic poison, smoke bomb, caltrops, dust of disappearance"},
+        {"name": "Duskweave Tailors", "type": "armor", "description": "Arcane-threaded robes and spell-resistant leathers. Silence-treated soles, mage-stitched pockets, and a lining that won't betray you under detect magic.", "signature_item": "Silence-treated leather boots (Stealth check advantage, 120 EC)", "dnd_relevance": "stealth-enhanced armor, mage armor equivalent, detect magic resistant clothing"},
+        {"name": "The Lightless Market", "type": "general", "description": "Night Market general goods — practical supplies sold in the dark. Everything pre-packaged for tactile identification. Surprisingly well-organized.", "signature_item": "Darkvision goggles (non-magical, mechanical, 50 EC)", "dnd_relevance": "low-light tools, non-magical darkvision aids, adventuring supplies"}
+      ],
+      "parks": [
+        {"name": "The Blind Quarter Garden", "description": "A garden maintained by Blind Quarter residents that is navigable entirely by touch and scent — textured paths, strongly fragrant plants, and wind chimes at key junctions. No lighting at all.", "features": ["textured navigation paths", "scent-garden plantings", "wind chime navigation markers", "total darkness (intentional)"]}
+      ],
+      "malls": []
+    },
+    "Outer Wall": {
+      "ring": 5,
+      "description": "Warden military installations. Four Great Gates, 12 bastions.",
+      "faction_presence": ["Wardens of Ash"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "North Gate (The Frost Gate)", "description": "Faces the cold wastes"},
+        {"name": "South Gate (The Ash Gate)", "description": "Faces volcanic regions"},
+        {"name": "East Gate (The Dawn Gate)", "description": "First to see light"},
+        {"name": "West Gate (The Dusk Gate)", "description": "Last light of day"},
+        {"name": "Wall Tunnels", "locations": ["Patrol Routes", "Armories", "Emergency Bunkers", "The Wall Crypts"]}
+      ],
+      "notable_establishments": [
+        {"name": "Captain Korin's Command", "type": "military", "description": "Warden headquarters"},
+        {"name": "Lieutenant Varen's Post", "type": "military", "description": "Secondary command"},
+        {"name": "The Shield & Ash", "type": "tavern", "description": "Warden drinking establishment"}
+      ],
+      "places_of_interest": [
+        {"name": "The Warden Tombs", "type": "monument", "description": "The honored dead of the Wardens interred in the Wall Crypts beneath the Outer Wall. An honor guard of three Wardens rotates through at all times, even during Rift events.", "dnd_relevance": "Speak with dead cast here requires DC 14 Religion check — the dead Wardens actively resist questioning about classified operations"},
+        {"name": "The Great Gates", "type": "landmark", "description": "The four massive gates of the Outer Wall — the only official exits from the city. Each is 40 feet tall, enchanted iron and stone. Warden-controlled. Closed since the last major Rift breach.", "dnd_relevance": "knock and arcane lock spells are ineffective; the locks are mechanical with additional ward against magic"},
+        {"name": "The Wall's Edge Observation Posts", "type": "attraction", "description": "Twelve bastions along the Wall with Warden observation posts. Civilians can apply for observation access during daylight — the view of beyond the city is disquieting.", "dnd_relevance": "Perception DC 12 from any post reveals Rift scarring on the terrain outside — unusual density near the Dawn Gate"}
+      ],
+      "small_shops": [
+        {"name": "The Warden's Forge", "type": "armor", "description": "Warden-surplus chain mail and splint armour — inspected, repaired, re-fitted. Shield repairs while you wait.", "signature_item": "Warden-surplus Chain Mail (60 EC, Warden-inspected)", "dnd_relevance": "chain mail, splint armor, shield, armor repair"},
+        {"name": "The Armory Overflow", "type": "weapon", "description": "Surplus Warden weapons sold off when inventory rotates. Spears, hand axes, and shortswords in good condition.", "signature_item": "Warden-issue Spear (6 EC)", "dnd_relevance": "spear, handaxe, shortsword (surplus military spec)"}
+      ],
+      "parks": [
+        {"name": "The Warden Memorial Garden", "description": "A small maintained garden between two Wall bastions dedicated to fallen Wardens. Austere and functional. Flowers from every recruit's home district are planted here — a tradition.", "features": ["district-representative plantings", "stone memorial markers", "bioluminescent moss border"]}
+      ],
+      "malls": []
+    },
+    "Ironworks": {
+      "ring": 5,
+      "description": "Iron Fang heavy industry. Factories, foundries, worker housing.",
+      "faction_presence": ["Iron Fang Consortium"],
+      "danger_level": "moderate",
+      "sub_areas": [
+        {"name": "Foundry Row", "description": "Main production facilities"},
+        {"name": "Worker Barracks", "description": "Company housing"},
+        {"name": "Shipping Yards", "description": "Where goods leave for distribution"},
+        {"name": "Industrial Underworks", "locations": ["Cooling Tunnels", "Slag Pits", "The Furnace Heart", "Smuggler's Loading"]}
+      ],
+      "notable_establishments": [
+        {"name": "Iron Fang Smokestacks", "type": "landmark", "description": "Always producing smoke"}
+      ],
+      "places_of_interest": [
+        {"name": "The Iron Fang Smokestacks", "type": "landmark", "description": "The four massive smokestacks of the main Ironworks foundry. Visible from Ring 3 on a clear day. Workers claim the smoke patterns predict the next Rift event. They are sometimes correct.", "dnd_relevance": "Perception DC 14 on a given day to interpret smoke patterns; on a successful check, DM rolls twice for next Rift event timing and chooses the worse result"},
+        {"name": "The Furnace Heart", "type": "curiosity", "description": "The oldest and largest furnace in the Ironworks — buried in the Industrial Underworks. Workers say it hasn't been fully extinguished since the Consortium's founding. Iron Fang leadership keeps it as a symbol.", "dnd_relevance": "Fire elementals have been spotted near the Furnace Heart three times in the last year; Constitution DC 13 per hour in the Underworks near it"}
+      ],
+      "small_shops": [
+        {"name": "The Iron Covenant", "type": "weapon", "description": "Weapons forged in Ironworks furnaces. War hammers, battleaxes, and greataxes. No filigree. Consortium workers get 10% off.", "signature_item": "War Hammer (15 EC, Ironworks-forged)", "dnd_relevance": "war hammer, battleaxe, greataxe, maul"},
+        {"name": "The Worker's Store", "type": "general", "description": "Company-run general store for Ironworks workers. Overpriced basics available only to Consortium employees. Also sells industrial safety gear that doubles as light armor.", "signature_item": "Industrial Work Apron (improvised light armor, AC 11)", "dnd_relevance": "improvised armor, industrial tools, basic supplies"}
+      ],
+      "parks": [],
+      "malls": []
+    },
+    "Shantytown Heights": {
+      "ring": 5,
+      "description": "Vertical slums. Patchwork Saints territory. Poverty but community.",
+      "faction_presence": ["Patchwork Saints"],
+      "danger_level": "high",
+      "sub_areas": [
+        {"name": "Stack Housing", "description": "Vertical slums built atop each other"},
+        {"name": "Saints' Refuge", "description": "Patchwork Saints aid station"},
+        {"name": "The Bridges", "description": "Precarious walkways between stacks"},
+        {"name": "Shanty Warrens", "locations": ["Community Caches", "Hidden Clinics", "Escape Routes", "The Deepstack"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Bridges", "type": "curiosity", "description": "Precarious rope and plank walkways between the stack housing towers. Marked with knotted rope signals by Saints members indicating safe/unsafe bridge status.", "dnd_relevance": "Athletics DC 12 to cross safely; DC 16 in adverse conditions; failure results in a fall with distance determined by bridge height"},
+        {"name": "Saints' Wall", "type": "monument", "description": "A plastered wall at the Saints' Refuge entrance covered in hand-painted murals of community members — births, deaths, acts of courage. New panels are added constantly.", "dnd_relevance": "Investigation DC 12 identifies a specific person from description; three current missing persons have faces in the mural"}
+      ],
+      "small_shops": [
+        {"name": "The Dead Weight Supply Co.", "type": "general", "description": "Rope, pitons, torches, iron rations, and ten-foot poles. Delivers to Warrens access points. Keeping the bottom of the city alive.", "signature_item": "Ten-Foot Pole (1 EC, free with purchase of climbing kit)", "dnd_relevance": "rope, pitons, torches, iron rations, ten-foot pole, climbing gear"},
+        {"name": "The Hidden Clinic", "type": "specialty", "description": "Unlicensed Saints-run medical care. Healer's kits, basic surgery, and cure wounds potions. No Warden reporting. Ever.", "signature_item": "Healer's Kit (emergency, 3 EC)", "dnd_relevance": "healer's kit, stabilization, cure wounds (potion)"}
+      ],
+      "parks": [
+        {"name": "The Deepstack Commons", "description": "A ground-level open space at the base of the stack housing towers. Technically a park — more of an outdoor community room. Shared cooking, childcare, and Saints organization meetings all happen here simultaneously.", "features": ["communal cooking fires", "salvaged seating", "bioluminescent mushroom lights on stakes"]}
+      ],
+      "malls": []
+    },
+    "Collapsed Plaza": {
+      "ring": 5,
+      "description": "Ruined district from a past Rift disaster. Scavenger territory. Dangerous.",
+      "faction_presence": ["Brother Thane's Cult", "Independent"],
+      "danger_level": "extreme",
+      "sub_areas": [
+        {"name": "The Rubble Fields", "description": "Collapsed buildings, unstable footing"},
+        {"name": "Scavenger Camps", "description": "Temporary settlements of the desperate"},
+        {"name": "Brother Thane's Cult House", "description": "Where the Returned gather"},
+        {"name": "Plaza Depths", "locations": ["Rift Scar Caves", "The Broken Sanctum", "Rubble Tunnels", "Cult Catacombs"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Rift Scar", "type": "landmark", "description": "The original Rift breach point that destroyed the district — a 30-foot crack in the stone ground that still occasionally bleeds spatial distortion. Warden tape marks a 20-foot exclusion zone that nobody respects.", "dnd_relevance": "Wild magic surge check (DC 12 Arcana) for any spell cast within 10ft; wild magic surge table applies on failure"},
+        {"name": "The Broken Sanctum", "type": "curiosity", "description": "A partially collapsed temple to an unknown deity that predates the current religious establishment. The Cult of Thane uses the intact sections for initiations. The collapsed sections have not been excavated.", "dnd_relevance": "Religion DC 16 to identify the deity; History DC 14 confirms the temple predates all current faction records"},
+        {"name": "The Scavenger's Wall", "type": "attraction", "description": "A section of intact wall in the Rubble Fields where scavengers post trade offers, warnings about specific rubble areas, and maps of cleared zones. Updated nightly.", "dnd_relevance": "Investigation DC 11 to find specific relevant information; one posting per visit can be acted on without a Deception check to determine authenticity"}
+      ],
+      "small_shops": [
+        {"name": "Shadowthread Outfitters", "type": "specialty", "description": "Cloaks of the Manta Ray, darkvision aids, and black-dyed leathers. Location is not advertised. You know how to find them or you don't.", "signature_item": "Cloak of the Manta Ray (permanent enchant, 500 EC)", "dnd_relevance": "cloak of the manta ray, darkvision tools, stealth equipment"},
+        {"name": "The Rubble Finder's Post", "type": "general", "description": "Scavenger-run gear depot. Sells salvage tools, mapping equipment, and supplies for exploring the Collapsed Plaza's depths.", "signature_item": "Cartographer's tools (modified for rubble mapping, 12 EC)", "dnd_relevance": "cartographer's tools, climbing gear, rope, rubble-specific exploration gear"}
+      ],
+      "parks": [],
+      "malls": []
+    },
+    "The Fringe": {
+      "ring": 5,
+      "description": "Edge of mapped territory. Last permanent habitation before the unknown.",
+      "faction_presence": ["Independent", "Glass Sigil"],
+      "danger_level": "extreme",
+      "sub_areas": [
+        {"name": "Last Light Settlement", "description": "Final outpost of civilization"},
+        {"name": "Monitoring Stations", "description": "Rift observation posts"},
+        {"name": "The Edge", "description": "Where the city simply ends"},
+        {"name": "Fringe Tunnels", "locations": ["Observation Bunkers", "Emergency Caches", "The Void Watch"]}
+      ],
+      "notable_establishments": [],
+      "places_of_interest": [
+        {"name": "The Last Light", "type": "landmark", "description": "The final permanent magelight at the edge of the Last Light Settlement. Beyond it, there is nothing but darkness and Rift territory. Residents treat it as both a monument and a warning.", "dnd_relevance": "light spells cast beyond the Last Light are immediately suppressed by an antimagic effect of unknown origin"},
+        {"name": "The Void Watch Post", "type": "curiosity", "description": "A Glass Sigil monitoring station at the absolute edge of mapped territory. Three archivists rotate through on 48-hour shifts. None of them discuss what they have seen. Two previous archivists did not return.", "dnd_relevance": "Arcana DC 18 to successfully calibrate monitoring equipment; successful calibration predicts a Rift event within 24h (60% accuracy)"},
+        {"name": "The Edge Marker", "type": "monument", "description": "A stone post driven into the ground at the furthest mapped point of the city. It has been replaced six times. The current post leans slightly toward the dark.", "dnd_relevance": "Detect magic reveals a faint evocation aura from beyond the marker — consistent across all observations, origin unknown"}
+      ],
+      "small_shops": [
+        {"name": "The Emergency Cache Post", "type": "general", "description": "Glass Sigil-maintained emergency supply post in the Last Light Settlement. Basic survival gear, emergency rations, and Rift-response supplies. Access requires Sigil authorization or genuine emergency.", "signature_item": "Emergency survival kit (Rift-rated, 25 EC)", "dnd_relevance": "Rift exposure countermeasures, emergency rations, climbing gear"}
+      ],
+      "parks": [],
+      "malls": []
+    }
+  },
+  "warrens_distribution": [
+    {
+      "name": "Eastern Warrens",
+      "description": "Oldest warren network. Smugglers, cults, Patchwork Saints stronghold.",
+      "danger_level": "high",
+      "locations": ["Smuggler's Run", "Cult Hollow", "Saints' Haven", "The Old Tunnels", "Echo Alley"]
+    },
+    {
+      "name": "Northern Warrens (The Depths)",
+      "description": "Deepest underground. Mushroom farms, blind communities, forgotten things.",
+      "danger_level": "extreme",
+      "locations": ["Mushroom Caverns", "Blind Town", "The Deep Markets", "Forgotten Vaults", "The Lightless Lake"]
+    },
+    {
+      "name": "Western Warrens (Rustside)",
+      "description": "Former industrial. Toxic salvage, dangerous chemicals, desperate communities.",
+      "danger_level": "high",
+      "locations": ["Rust Tunnels", "Chemical Dumps", "Salvage Town", "The Corroded Halls", "Poison Lake"]
+    },
+    {
+      "name": "Southern Warrens (Ashfall)",
+      "description": "Near volcanic vents. Forge communities, heat-adapted peoples.",
+      "danger_level": "high",
+      "locations": ["Vent Town", "Forge Caverns", "The Hot Springs", "Magma Shrine", "Ember Depths"]
+    },
+    {
+      "name": "Underbelly Warrens",
+      "description": "Vertical slums in the city's foundations. No natural light ever reaches here.",
+      "danger_level": "high",
+      "locations": ["Foundation Slums", "The Drip", "Pillar Town", "The Forgotten Layer", "Root Cellars"]
+    }
+  ],
+  "underground_network": {
+    "sewers": {
+      "description": "The vast sewer network that serves the entire city. Multiple levels, some areas unmapped.",
+      "danger_level": "varies",
+      "major_sections": [
+        {
+          "name": "Forum Sewers",
+          "ring": 1,
+          "description": "Well-maintained, Warden-patrolled. Clean by sewer standards.",
+          "danger_level": "low",
+          "locations": ["Main Junction", "Maintenance Hub Alpha", "The Clean Run"]
+        },
+        {
+          "name": "Sanctum Drains",
+          "ring": 2,
+          "description": "Holy water runoff creates strange effects. Some areas warded.",
+          "danger_level": "moderate",
+          "locations": ["Blessed Confluence", "Temple Runoff", "The Purified Pools", "Choir Drainage"]
+        },
+        {
+          "name": "Market Underdrain",
+          "ring": 3,
+          "description": "Heavy traffic from commerce. Smuggler routes. Rat problems.",
+          "danger_level": "moderate",
+          "locations": ["Merchant's Secret", "Smuggler's Junction", "The Rat King's Domain", "Consortium Bypass"]
+        },
+        {
+          "name": "Residential Collectors",
+          "ring": 4,
+          "description": "Standard residential waste. Occasionally used by criminals.",
+          "danger_level": "low",
+          "locations": ["Hearthstone Drain", "Ember Collector", "The Common Flow"]
+        },
+        {
+          "name": "Industrial Outflow",
+          "ring": 5,
+          "description": "Toxic, dangerous, largely unmonitored. Strange mutations.",
+          "danger_level": "high",
+          "locations": ["Ironworks Discharge", "Chemical Flow", "The Poison Current", "Mutant Pools"]
+        },
+        {
+          "name": "Sewer Grid 7",
+          "ring": 5,
+          "description": "Rift-affected section. Reality unstable. Glass Sigil monitors.",
+          "danger_level": "extreme",
+          "locations": ["Monitoring Station 7", "The Warp Zone", "Rift Breach Point", "Quarantine Section"]
+        },
+        {
+          "name": "The Deep Sewers",
+          "ring": "varies",
+          "description": "Ancient levels beneath the modern system. No maps exist.",
+          "danger_level": "extreme",
+          "locations": ["The Forgotten Flow", "Ancient Cisterns", "The Drowned City", "Primordial Pools"]
+        }
+      ]
+    },
+    "lairs": {
+      "description": "Known creature lairs and monster dens throughout the underground.",
+      "locations": [
+        {
+          "name": "The Rat King's Warren",
+          "district": "Market Underdrain",
+          "description": "Massive intelligent rat colony. Trade information for food.",
+          "inhabitants": "Giant rats, rat-folk, the Rat King himself",
+          "danger_level": "moderate"
+        },
+        {
+          "name": "Slime Pits",
+          "district": "Industrial Outflow",
+          "description": "Toxic pools breeding oozes and slimes of various types.",
+          "inhabitants": "Oozes, slimes, corrupted elementals",
+          "danger_level": "high"
+        },
+        {
+          "name": "The Spider Galleries",
+          "district": "Eastern Warrens",
+          "description": "Web-choked tunnels home to giant spider colonies.",
+          "inhabitants": "Giant spiders, ettercaps, phase spiders",
+          "danger_level": "high"
+        },
+        {
+          "name": "Goblin Warrens",
+          "district": "Northern Warrens",
+          "description": "Extensive goblin settlement in the deep tunnels.",
+          "inhabitants": "Goblins, hobgoblins, bugbears",
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Carrion Caves",
+          "district": "Collapsed Plaza Depths",
+          "description": "Where ghouls and worse feed on the dead.",
+          "inhabitants": "Ghouls, ghasts, carrion crawlers",
+          "danger_level": "high"
+        },
+        {
+          "name": "Troll Depths",
+          "district": "Rustside Warrens",
+          "description": "Where trolls regenerate in the dark and hunt.",
+          "inhabitants": "Trolls, cave trolls",
+          "danger_level": "extreme"
+        },
+        {
+          "name": "The Wyvern Roost",
+          "district": "Ashfall Terraces Lava Tubes",
+          "description": "Volcanic caves where fire-resistant wyverns nest.",
+          "inhabitants": "Fire wyverns, salamanders",
+          "danger_level": "extreme"
+        },
+        {
+          "name": "Mimic Alley",
+          "district": "Abandoned Commerce Tunnels",
+          "description": "An entire section where mimics have established dominance.",
+          "inhabitants": "Mimics of all sizes",
+          "danger_level": "high"
+        }
+      ]
+    },
+    "dungeons": {
+      "description": "Ancient structures, abandoned facilities, and dangerous complexes beneath the city.",
+      "locations": [
+        {
+          "name": "The Old Prison",
+          "district": "Forum Undercroft",
+          "description": "Pre-Tower era prison complex. Cells still intact. Something still screams at night.",
+          "history": "Built before the Tower arrived. Used for political prisoners. Sealed after an incident.",
+          "danger_level": "high",
+          "levels": 3
+        },
+        {
+          "name": "The Sunken Temple",
+          "district": "Sanctum Catacombs",
+          "description": "Temple to a forgotten god, collapsed into the underground. Still holy... to something.",
+          "history": "Predates current pantheon. Collapsed during the Third Rift Crisis.",
+          "danger_level": "high",
+          "levels": 5
+        },
+        {
+          "name": "Artificer's Folly",
+          "district": "Academy Underhalls",
+          "description": "Abandoned research complex. Failed golem experiments still patrol.",
+          "history": "Sealed after a catastrophic experiment 200 years ago.",
+          "danger_level": "extreme",
+          "levels": 4
+        },
+        {
+          "name": "The Merchant Vaults",
+          "district": "Consortium Underhalls",
+          "description": "Legendary treasure vaults from the first Merchant Princes. Trapped extensively.",
+          "history": "Built during the founding era. Keys lost to time.",
+          "danger_level": "extreme",
+          "levels": 6
+        },
+        {
+          "name": "The Warden Tombs",
+          "district": "Wall Tunnels",
+          "description": "Where fallen Wardens are interred. Honor guard still patrols.",
+          "history": "Sacred burial ground for defenders of the Wall.",
+          "danger_level": "moderate",
+          "levels": 2
+        },
+        {
+          "name": "The Rift Laboratories",
+          "district": "Sewer Grid 7",
+          "description": "Research facility built to study Rifts. Abandoned after researchers changed.",
+          "history": "Tower Authority project, terminated. Records sealed.",
+          "danger_level": "extreme",
+          "levels": 3
+        },
+        {
+          "name": "The Drowned Coliseum",
+          "district": "Deep Sewers",
+          "description": "Ancient arena from a civilization before the Tower. Partially flooded.",
+          "history": "Unknown origin. Predates all records.",
+          "danger_level": "high",
+          "levels": 2
+        },
+        {
+          "name": "Thane's Labyrinth",
+          "district": "Collapsed Plaza Depths",
+          "description": "Tunnel complex being excavated by Brother Thane's Cult. Purpose unknown.",
+          "history": "Currently under construction. The Cult guards it jealously.",
+          "danger_level": "high",
+          "levels": "unknown"
+        }
+      ]
+    },
+    "sanctums": {
+      "description": "Hidden holy places, cult strongholds, and secret gathering places.",
+      "locations": [
+        {
+          "name": "The Choir Undercroft",
+          "district": "Sanctum Catacombs",
+          "description": "Secret Serpent Choir meeting hall. Divine contracts too sensitive for surface.",
+          "faction": "Serpent Choir",
+          "access": "High-ranking Choir members only"
+        },
+        {
+          "name": "Thane's Inner Sanctum",
+          "district": "Collapsed Plaza Depths",
+          "description": "Brother Thane's true seat of power. Where the Returned truly gather.",
+          "faction": "Brother Thane's Cult",
+          "access": "Trusted cult members, Speakers and above"
+        },
+        {
+          "name": "The Widow's Web",
+          "district": "Eastern Warrens",
+          "description": "Obsidian Lotus true headquarters. The Widow rules from here.",
+          "faction": "Obsidian Lotus",
+          "access": "Lotus leadership, Ghosts and above"
+        },
+        {
+          "name": "The Memory Vault",
+          "district": "Archive Catacombs",
+          "description": "Glass Sigil's most sensitive storage. Memories deemed too dangerous to exist.",
+          "faction": "Glass Sigil",
+          "access": "Senior Archivists only"
+        },
+        {
+          "name": "Saints' Refuge",
+          "district": "Shantytown Heights Warren",
+          "description": "Secret Patchwork Saints headquarters and emergency shelter.",
+          "faction": "Patchwork Saints",
+          "access": "Saints members, those in need"
+        },
+        {
+          "name": "The Forge Shrine",
+          "district": "Southern Warrens",
+          "description": "Secret shrine to Ashara the Phoenix Marshal. Wardens' hidden faith.",
+          "faction": "Wardens of Ash",
+          "access": "Wardens who know the old ways"
+        },
+        {
+          "name": "The Counting House",
+          "district": "Consortium Underhalls",
+          "description": "Iron Fang's true vault and meeting room. Where real deals happen.",
+          "faction": "Iron Fang Consortium",
+          "access": "Senior agents and Guildmaster Dhal"
+        },
+        {
+          "name": "The Arena Crypts",
+          "district": "Night Pits Warrens",
+          "description": "Where Argent Blades initiate new members through blood trials.",
+          "faction": "Argent Blades",
+          "access": "Blades undergoing initiation"
+        },
+        {
+          "name": "The Silent Library",
+          "district": "Duskhollow Depths",
+          "description": "Repository of forbidden texts maintained by an unknown curator.",
+          "faction": "Unknown",
+          "access": "Those who find the way"
+        },
+        {
+          "name": "The Tower's Roots",
+          "district": "Deep Sewers",
+          "description": "Ancient chambers at the Tower's foundation. The Oracle's dreams echo here.",
+          "faction": "None/Tower itself",
+          "access": "Unknown - no confirmed visitors"
+        }
+      ]
+    },
+    "transit_tunnels": {
+      "description": "The underground transit network connecting districts.",
+      "locations": [
+        {
+          "name": "Deep Line Stations",
+          "description": "Unofficial underground train connecting warren clusters. No Warden patrols.",
+          "stations": ["Eastern Junction", "Depths Station", "Rustside Platform", "Ashfall Terminal", "Underbelly Stop"]
+        },
+        {
+          "name": "Maintenance Tunnels",
+          "description": "Service tunnels for the legitimate train lines. Worker access only.",
+          "danger_level": "low"
+        },
+        {
+          "name": "Abandoned Stations",
+          "description": "Old stations from routes no longer in service.",
+          "locations": ["Old Forum East", "Sanctum Crossing", "The Sealed Platform", "Ghost Station 9"]
+        }
+      ]
+    },
+    "special_underground": {
+      "description": "Unique underground locations that don't fit other categories.",
+      "locations": [
+        {
+          "name": "Echo Alley",
+          "district": "Eastern Warrens",
+          "description": "Acoustically haunted smuggler tunnels. Sound behaves wrong. Obsidian Lotus territory.",
+          "features": ["Dead drops", "Echoing chambers", "Sound traps", "The Whisper Node"],
+          "danger_level": "high"
+        },
+        {
+          "name": "The Fungal Forest",
+          "district": "Northern Warrens",
+          "description": "Massive underground mushroom forest. Food source for deep communities.",
+          "features": ["Luminescent fungi", "Spore clouds", "Myconid settlements"],
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Crystalline Caves",
+          "district": "Southern Warrens",
+          "description": "Natural crystal formations with magical resonance.",
+          "features": ["Crystal growths", "Magic amplification zones", "Resonance chambers"],
+          "danger_level": "moderate"
+        },
+        {
+          "name": "The Bone Market",
+          "district": "Underbelly Warrens",
+          "description": "Underground black market dealing in remains, relics, and forbidden goods.",
+          "features": ["Necromantic supplies", "Relic trading", "Information sales"],
+          "danger_level": "high"
+        },
+        {
+          "name": "The Drowning Pools",
+          "district": "Deep Sewers",
+          "description": "Flooded chambers with air pockets. Aquatic creatures and worse.",
+          "features": ["Submerged passages", "Air chambers", "Underwater ruins"],
+          "danger_level": "extreme"
+        },
+        {
+          "name": "Rift Scar Zone",
+          "district": "Multiple",
+          "description": "Areas permanently damaged by Rift activity. Reality is thin.",
+          "features": ["Spatial distortions", "Temporal echoes", "Wild magic zones"],
+          "danger_level": "extreme"
+        }
+      ]
+    }
+  },
+  "transportation": {
+    "train_tubes": {
+      "description": "Seven major tube lines connecting the city.",
+      "major_lines": [
+        {"name": "Spine Line (Silver)", "route": "Tower → Forum → Sanctum → Markets → North Wall", "stations": ["Tower Station", "Forum Central", "Sanctum Gate", "Market Hub", "North Wall Terminal"]},
+        {"name": "Ring Express (Gold)", "route": "Circular around Commerce Ring", "stations": ["Markets North", "Floating Bazaar", "Neon Row", "Night Pits", "Scrapworks", "Artisan Quarter"]},
+        {"name": "Eastern Radial (Blue)", "route": "Forum → Sanctum East → Markets East → Hearthstone → Eastern Warrens", "stations": ["Forum East", "Temple Row", "Cobbleway", "Hearthstone Central", "Eastern Warren Access"]},
+        {"name": "Western Radial (Red)", "route": "Forum → Academy → Artisan → Duskhollow → Rustside", "stations": ["Forum West", "Academy Heights", "Artisan Gate", "Duskhollow", "Rustside Terminal"]},
+        {"name": "Northern Radial (White)", "route": "Forum → Temple Row → Floating Bazaar → Ashfall → Fringe", "stations": ["Forum North", "Cathedral Station", "Sky Platform", "Ashfall Terraces", "Fringe Station"]},
+        {"name": "Southern Radial (Green)", "route": "Forum → Guild Spires → Scrapworks → Collapsed Plaza → Southern Warrens", "stations": ["Forum South", "Guild Spires", "Scrapworks Gate", "Plaza Edge", "Southern Warren Access"]},
+        {"name": "Deep Line (Black)", "route": "Unofficial underground connecting warren clusters", "stations": ["Eastern Junction", "Depths Station", "Rustside Platform", "Ashfall Terminal", "Underbelly Stop"]}
+      ]
+    },
+    "canal_rings": [
+      {"name": "First Ring Canal (The Moat)", "description": "Surrounds Tower. Ceremonial only."},
+      {"name": "Forum Canal", "description": "Separates Forum from Sanctum. Diplomatic vessels."},
+      {"name": "Sanctum Canal", "description": "Temple procession barges, pilgrims."},
+      {"name": "Commerce Canal (The Flow)", "description": "Heaviest traffic. Cargo, merchants."},
+      {"name": "Residential Canal", "description": "Commuter ferries, local fishing."},
+      {"name": "Outer Canal (The Trench)", "description": "Industrial shipping, military patrols, smugglers at night."}
+    ]
+  }
+}

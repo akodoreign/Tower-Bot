@@ -1,0 +1,23 @@
+﻿# Runtime and local-only files
+.env
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/
+*.pyc
+logs/
+generated_modules/
+.chrome_ddb_profile/
+character_memory/
+nudge_state/
+*.log
+stop_tower.zip
+
+# Local secrets / tool state
+.mcp.json
+.claude/
+
+# Legacy/runtime campaign data should live in MySQL, not source control.
+campaign_docs/*.json
+campaign_docs/*.txt
+!campaign_docs/city_gazetteer.json

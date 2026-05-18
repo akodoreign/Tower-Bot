@@ -1,0 +1,9 @@
+{
+  "name": "tower-module-builder",
+  "version": "1.0.0",
+  "description": "D&D mission module docx builder for Tower of Last Chance",
+  "private": true,
+  "dependencies": {
+    "docx": "^9.0.0"
+  }
+}

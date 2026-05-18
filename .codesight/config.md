@@ -1,0 +1,151 @@
+# Config
+
+## Environment Variables
+
+- `A1111_ANIME_MODEL` (has default) — .env
+- `A1111_EXPERIMENT_BASE_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_BASE_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_FLUX_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_FLUX_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_SDXL_CFG` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_SDXL_STEPS` **required** — scripts\experiment_map_lanes.py
+- `A1111_EXPERIMENT_TIMEOUT` **required** — scripts\experiment_map_lanes.py
+- `A1111_FLUX_CHECKPOINT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_CHECKPOINT` (has default) — .env
+- `A1111_MAP_COOLDOWN_SECONDS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_DUNGEON_TRIGGERS` (has default) — .env
+- `A1111_MAP_IDLE_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_INTERIOR_TRIGGERS` (has default) — .env
+- `A1111_MAP_LORA` **required** — src\mission_builder\image_generator.py
+- `A1111_MAP_LORA_DUNGEON` (has default) — .env
+- `A1111_MAP_LORA_INTERIOR` (has default) — .env
+- `A1111_MAP_LORA_TOWN` (has default) — .env
+- `A1111_MAP_LORA_WEIGHT` (has default) — .env
+- `A1111_MAP_MAX_ROUNDS` **required** — archive\backups_old\backups\codex_20260508_bug2_map_contract\src\mission_builder\maps.py
+- `A1111_MAP_MODEL_SWAP_COOLDOWN` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_POLL_SECONDS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAP_TIMEOUT` **required** — src\mission_builder\image_generator.py
+- `A1111_MAP_TOWN_TRIGGERS` (has default) — .env
+- `A1111_MAP_VAE` (has default) — .env
+- `A1111_MAPCRAFT_ENABLED` (has default) — .env.example
+- `A1111_MAPCRAFT_FLUX_CHECKPOINT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_FLUX_LORA` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_FLUX_VAE` (has default) — .env
+- `A1111_MAPCRAFT_SDXL_CHECKPOINT` (has default) — .env
+- `A1111_MAPCRAFT_SDXL_LORA` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_SDXL_VAE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MAPCRAFT_TRIGGER` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `A1111_MODEL` (has default) — .env
+- `A1111_MODEL_SWITCH_TIMEOUT` **required** — src\a1111_runtime.py
+- `A1111_NICE_MAP_CHECKPOINT` **required** — scripts\experiment_map_lanes.py
+- `A1111_NICE_MAP_SAMPLER` **required** — scripts\experiment_map_lanes.py
+- `A1111_OPTIONS_GET_TIMEOUT` **required** — src\a1111_runtime.py
+- `A1111_SCENE_MODEL_2` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_MODEL_3` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_175520\src\city_scene.py
+- `A1111_SCENE_VAE` (has default) — .env
+- `A1111_TILE_TIMEOUT` **required** — src\mission_builder\dungeon_delve\tile_generator.py
+- `A1111_URL` (has default) — .env
+- `ADMIN_USER_IDS` (has default) — .env.example
+- `CHAR_MONITOR_CHANNEL_ID` (has default) — .env
+- `CHROME_PATH` **required** — archive\scripts_oneoff\extract_ddb_session.py
+- `CLAUDE_KEY` (has default) — .env.example
+- `CONVERSATION_TRIM_SIZE` (has default) — .env.example
+- `DASHBOARD_EXTERNAL_PIN` **required** — Webpage\app.py
+- `DASHBOARD_PORT` (has default) — .env
+- `DDB_CDP_PORT` **required** — src\ddb_homebrew.py
+- `DDB_COBALT_SESSION` (has default) — .env
+- `DDB_COBALT_TOKEN` **required** — src\character_monitor.py
+- `DDB_HOMEBREW_ENABLED` **required** — src\ddb_homebrew.py
+- `DEFAULT_MODEL` (has default) — .env.example
+- `DEFAULT_PROVIDER` (has default) — .env.example
+- `DISCORD_BOT_TOKEN` **required** — .env.example
+- `DISCORD_CHANNEL_ID` **required** — .env.example
+- `DISCORD_GUILD_ID` (has default) — .env
+- `DM_USER_ID` (has default) — .env
+- `FLASK_DEBUG` **required** — archive\backups_old\backups\codex_20260507_172046\app.py
+- `GAZETTEER_CACHE_TTL` **required** — src\mission_builder\locations.py
+- `GEMINI_KEY` (has default) — .env.example
+- `GROK_KEY` (has default) — .env.example
+- `IMAGE_STYLE` (has default) — .env
+- `INFESTATION_ROOM_MAP_ATTEMPTS` **required** — src\mission_builder\infestation_pipeline.py
+- `INFESTATION_ROOM_MAP_RETRY_DELAY` **required** — src\mission_builder\infestation_pipeline.py
+- `INFESTATION_ROOM_MAP_WAIT_SECONDS` **required** — src\mission_builder\infestation_pipeline.py
+- `KIMI_ENABLE_SUBAGENTS` (has default) — .env.example
+- `KIMI_MODEL` (has default) — .env.example
+- `LEARN_HOUR_END` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\self_learning.py
+- `LEARN_HOUR_START` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\self_learning.py
+- `LOGGING` (has default) — .env.example
+- `MAPS_CHANNEL_ID` **required** — archive\backups_old\backups\codex_20260507_174150\src\mission_builder\maps.py
+- `MAX_CONVERSATION_LENGTH` (has default) — .env.example
+- `MIMIR_CAMPAIGN_ID` (has default) — .env
+- `MIMIR_CAMPAIGN_NAME` **required** — src\mimir_client.py
+- `MIMIR_DATABASE_PATH` (has default) — .env
+- `MIMIR_LOG_LEVEL` **required** — src\mimir_client.py
+- `MIMIR_MCP_PATH` (has default) — .env
+- `MIMIR_PULL_NPC_SLEEP` **required** — src\mimir_sync.py
+- `MIMIR_PULL_PROGRESS_EVERY` **required** — src\mimir_sync.py
+- `MIMIR_SYNC_INTERVAL` **required** — archive\backups_old\backups\codex_20260507_175030\src\mimir_sync.py
+- `MISSION_BOARD_CHANNEL_ID` (has default) — .env.example
+- `MISSION_RESULTS_CHANNEL_ID` (has default) — .env
+- `MODULE_BLUEPRINT_TIMEOUT` **required** — src\mission_builder\published_pipeline.py
+- `MODULE_BLUEPRINT_TOKENS` **required** — src\mission_builder\published_pipeline.py
+- `MODULE_GENERATE_MAPS` (has default) — .env.example
+- `MODULE_OUTPUT_CHANNEL_ID` (has default) — .env
+- `MODULE_PIPELINE` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\mission_builder\__init__.py
+- `MODULE_USE_COUNCIL` (has default) — .env.example
+- `MODULE_USE_LLM_BLUEPRINT` (has default) — .env
+- `MYSQL_DB` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_HOST` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_PASSWORD` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQL_PORT` **required** — src\db_backup.py
+- `MYSQL_USER` **required** — archive\backups_old\backups\codex_20260508_bug6_db_authoritative\src\db_api.py
+- `MYSQLDUMP_PATH` **required** — src\db_backup.py
+- `NPC_LIFECYCLE_BUSY_RETRY_SECONDS` **required** — src\aclient.py
+- `OLLAMA_AGENT_CTX` (has default) — .env
+- `OLLAMA_AGENT_THINK` **required** — src\agents\base.py
+- `OLLAMA_FAST_MODEL` (has default) — .env.example
+- `OLLAMA_FLASH_ATTENTION` (has default) — .env
+- `OLLAMA_KEEP_ALIVE` (has default) — .env
+- `OLLAMA_MODEL` (has default) — .env.example
+- `OLLAMA_NUM_CTX` (has default) — .env
+- `OLLAMA_NUM_GPU` (has default) — .env
+- `OLLAMA_QUICK_TIMEOUT` **required** — src\ollama_queue.py
+- `OLLAMA_URL` (has default) — .env.example
+- `OLLAMA_VISION_MODEL` (has default) — .env
+- `OPENAI_ENABLED` **required** — src\art.py
+- `OPENAI_KEY` (has default) — .env.example
+- `QWEN_MODEL` (has default) — .env.example
+- `REAL_WEATHER_LOCATION` (has default) — .env.example
+- `REPLYING_ALL` (has default) — .env.example
+- `REPLYING_ALL_DISCORD_CHANNEL_ID` **required** — .env.example
+- `RESOURCE_COP_A1111_MAX_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_A1111_TIMEOUT` **required** — src\resource_cop.py
+- `RESOURCE_COP_A1111_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_BUSY_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_MAX_WAIT` **required** — src\resource_cop.py
+- `RESOURCE_COP_OLLAMA_TIMEOUT` **required** — src\resource_cop.py
+- `RUST_LOG` **required** — src\mimir_client.py
+- `VTT_MAP_ALLOW_AI_TEXTURE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_GRID_CELLS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY` (has default) — .env.example
+- `VTT_MAP_PRETTY_CFG` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_DENOISE` (has default) — .env.example
+- `VTT_MAP_PRETTY_INCLUDE_FLUX` (has default) — .env.example
+- `VTT_MAP_PRETTY_MAPCRAFT_TEXT2IMG` (has default) — .env.example
+- `VTT_MAP_PRETTY_SAMPLER` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_SIZE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_STEPS` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_PRETTY_TIMEOUT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_SIZE` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+- `VTT_MAP_STRICT` **required** — archive\backups_old\backups\codex_20260507_155641\vtt_renderer.py
+
+## Config Files
+
+- `.env.example`
+- `Dockerfile`
+- `docker-compose.yml`
+
+## Key Dependencies
+
+- openai: ^6.32.0
