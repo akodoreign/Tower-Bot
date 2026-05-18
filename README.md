@@ -1,170 +1,124 @@
-# ChatGPT Discord Bot
+# Tower Bot
 
-> ### Build your own Discord bot with multiple AI providers
+A campaign-aware Discord bot and web dashboard for tabletop RPG servers. It supports mission boards, generated adventure modules, NPC lifecycle tools, campaign RAG, local LLM routing through Ollama, optional A1111 image generation, MySQL-backed state, and a Flask dashboard.
 
----
-> [!IMPORTANT]
->
-> **Major Refactor (2025/07):**
-> - **5 AI Providers**: Free (g4f), OpenAI, Claude, Gemini, Grok
-> - **No Cookie Authentication**: Removed unreliable cookie-based auth for free providers
+This repository is a clean source snapshot intended for other tables to adapt. Private campaign notes, generated modules, logs, `.env`, local model state, and runtime output are intentionally excluded.
 
-### Chat
+## Credits
 
-![image](https://user-images.githubusercontent.com/89479282/206497774-47d960cd-1aeb-4fba-9af5-1f9d6ff41f00.gif)
+This project began as a fork of the open-source ChatGPT Discord Bot project and has since been heavily extended for tabletop campaign operations, mission generation, local model routing, RAG, dashboard tooling, and D&D workflow integrations.
 
-# Setup
+Credit and thanks to the original ChatGPT Discord Bot authors and contributors for the base Discord bot foundation. All campaign-specific extensions, Tower Bot workflows, mission generation systems, dashboard work, and operational tooling in this snapshot are maintained by akodoreign.
+
+## What It Does
+
+- Discord bot for campaign chat, commands, mission interaction, and admin workflows
+- Mission board and module generation across multiple mission types
+- Tactical map generation support through A1111/Stable Diffusion WebUI
+- Campaign RAG from MySQL training documents and local `campaign_docs/*.txt` files
+- NPC lifecycle, portraits, scenes, calendar hooks, faction state, and campaign utilities
+- Flask dashboard in `Webpage/`
+- MySQL-backed persistent state
+- Local-first LLM support through Ollama, with optional provider integrations
+
+## Quick Setup
+
+Windows users can run the guided setup script:
+
+```powershell
+.\setup_new_campaign.ps1
+```
+
+The script walks through campaign preferences, RAG/persona setup, Discord IDs, MySQL settings, Ollama, A1111, and optional dependency installation. It writes local-only files such as `.env` and `campaign_docs\rag_profile.txt`.
+
+For the full walkthrough, read:
+
+```text
+docs/setup_walkthrough.md
+```
+
 ## Prerequisites
-* **Python 3.9 or later**
-* **Rename the file `.env.example` to `.env`**
-* Running `pip3 install -r requirements.txt` to install the required dependencies
-* Optional: API keys for premium providers (OpenAI, Claude, Gemini, Grok)
----
-## Step 1: Create a Discord bot
 
-1. Go to https://discord.com/developers/applications create an application
-2. Build a Discord bot under the application
-3. Get the token from bot setting
+- Python 3.11
+- MySQL 8 or compatible MySQL server
+- Discord bot token and channel IDs
+- Ollama, if using local language models
+- Stable Diffusion WebUI/A1111, if using image generation
+- Node.js, if using JavaScript document builder utilities
 
-   ![image](https://user-images.githubusercontent.com/89479282/205949161-4b508c6d-19a7-49b6-b8ed-7525ddbef430.png)
-4. Store the token to `.env` under the `DISCORD_BOT_TOKEN`
+## Manual Install
 
-   <img height="190" width="390" alt="image" src="https://user-images.githubusercontent.com/89479282/222661803-a7537ca7-88ae-4e66-9bec-384f3e83e6bd.png">
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+npm install
+Copy-Item .env.example .env
+```
 
-5. Turn MESSAGE CONTENT INTENT `ON`
+Then edit `.env` with local secrets, database values, Discord IDs, and model settings.
 
-   ![image](https://user-images.githubusercontent.com/89479282/205949323-4354bd7d-9bb9-4f4b-a87e-deb9933a89b5.png)
+## Database
 
-6. Invite your bot to your server via OAuth2 URL Generator
+MySQL is the source of truth for live bot state. Use these files as references:
 
-   ![image](https://user-images.githubusercontent.com/89479282/205949600-0c7ddb40-7e82-47a0-b59a-b089f929d177.png)
+```text
+database_schema.sql
+docs/mysql_schema_reference.md
+.codesight/schema.md
+```
 
+A minimal local database setup looks like:
 
+```powershell
+mysql -u root -p -e "CREATE DATABASE towerbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p towerbot < database_schema.sql
+```
 
-## Step 2: Run the bot on the desktop
+Match the database name and credentials in `.env`.
 
-1. Open a terminal or command prompt
+## RAG and Campaign Notes
 
-2. Navigate to the directory where you installed the ChatGPT Discord bot
+The clean repository keeps `campaign_docs/` blank except for a placeholder. Each table should add its own local `.txt` files there, or import training documents into MySQL.
 
-3. Run `python3 main.py` or `python main.py` to run the bot
----
-## Step 2: Run the bot with Docker
+The setup script creates:
 
-1. Build the Docker image & run the Docker container with `docker compose up -d`
+```text
+campaign_docs\rag_profile.txt
+```
 
-2. Inspect whether the bot works well `docker logs -t chatgpt-discord-bot`
+That file records campaign name, assistant persona, tone, house rules, and source preferences. It is ignored by git so private lore stays private.
 
-   ### Stop the bot:
+## Running
 
-   * `docker ps` to see the list of running services
-   * `docker stop <BOT CONTAINER ID>` to stop the running bot
+```powershell
+.\.venv\Scripts\Activate.ps1
+python main.py
+```
 
-### Have a good chat!
----
+If you run the dashboard separately, use the `Webpage/` app entry point and configure the desired port for your deployment.
 
-## Provider Configuration
+## Tests
 
-### Free Provider (unstable)
-Outdated model, close to GPT-3.5 or GPT-4 capabilities
+```powershell
+python -m pytest
+```
 
-No configuration required
+Some tests and smoke paths expect local services such as MySQL, Ollama, A1111, or Discord mocks. Prefer focused tests for the subsystem you changed.
 
-### Premium Providers (Optional)
+## Repository Hygiene
 
-#### OpenAI
-1. Obtain your API key from https://platform.openai.com/api-keys
-2. Add to `.env`: `OPENAI_KEY=your_api_key_here`
+Do not commit:
 
-#### Claude (Anthropic)
-1. Get API key from https://console.anthropic.com/
-2. Add to `.env`: `CLAUDE_KEY=your_api_key_here`
+- `.env`
+- `.venv/`
+- `node_modules/`
+- logs
+- generated modules
+- local browser profiles
+- private campaign notes in `campaign_docs/`
 
-#### Gemini (Google)
-1. Get API key from https://ai.google.dev/
-2. Add to `.env`: `GEMINI_KEY=your_api_key_here`
+## Notes
 
-#### Grok (xAI)
-1. Get API key from https://x.ai/api
-2. Add to `.env`: `GROK_KEY=your_api_key_here`
-
-Use `/provider` command in Discord to switch between available providers
-
-## Image Generation
-
-<img src="https://i.imgur.com/Eo1ZzKk.png" width="300" alt="image">
-
-Image generation is now integrated with the provider system:
-
-### OpenAI DALL-E 3
-- Requires OpenAI API key
-- High-quality image generation
-- Use `/draw [prompt] openai`
-
-### Google Gemini
-- Requires Gemini API key  
-- Free tier available
-- Use `/draw [prompt] gemini`
-
-### Fallback Options
-- If premium providers are unavailable, the bot will attempt to use free alternatives
-- Image generation capabilities vary by provider availability
-
-## Optional: Setup system prompt
-
-* A system prompt would be invoked when the bot is first started or reset
-* You can set it up by modifying the content in `system_prompt.txt`
-* All the text in the file will be fired as a prompt to the bot
-* Get the first message from ChatGPT in your discord channel!
-* Go Discord setting turn `developer mode` on
-
-   1. Right-click the channel you want to recieve the message, `Copy  ID`
-
-        ![channel-id](https://user-images.githubusercontent.com/89479282/207697217-e03357b3-3b3d-44d0-b880-163217ed4a49.PNG)
-
-   2. paste it into `.env` under `DISCORD_CHANNEL_ID`
-
-## Optional: Disable logging
-
-* Set the value of `LOGGING` in the `.env` to False
-
-## Commands
-
-### Core Commands
-* `/chat [message]` - Chat with the current AI provider
-* `/provider` - Switch between AI providers (Free, OpenAI, Claude, Gemini, Grok)
-* `/draw [prompt] [model]` - Generate images with specified provider
-* `/reset` - Clear conversation history
-* `/help` - Display all available commands
-
-### Persona Commands
-* `/switchpersona [persona]` - Switch AI personality (admin-only for jailbreaks)
-   * `standard` - Standard helpful assistant
-   * `creative` - More creative and imaginative responses  
-   * `technical` - Technical and precise responses
-   * `casual` - Casual and friendly tone
-   * `jailbreak-v1` - BYPASS mode (admin only)
-   * `jailbreak-v2` - SAM mode (admin only)
-   * `jailbreak-v3` - Developer Mode Plus (admin only)
-
-### Bot Behavior
-* `/private` - Bot replies only visible to command user
-* `/public` - Bot replies visible to everyone (default)
-* `/replyall` - Bot responds to all messages in channel (toggle)
-## Security Features
-
-### Admin-Only Jailbreak Access
-Jailbreak personas require admin privileges for enhanced security:
-
-1. Set `ADMIN_USER_IDS` in `.env` with comma-separated Discord user IDs
-2. Only admin users can access jailbreak personas
-3. Regular users see only safe personas in `/switchpersona`
-
-> **Warning**
-> Jailbreak personas may generate content that bypasses normal AI safety measures. Admin access required.
-
-### Environment Security
-- No cookie-based authentication (removed for reliability)
-- Secure API key management via environment variables
-- Docker security hardening with non-root user
-- Read-only filesystem for container security
+VAE override variables should be left blank unless deliberately diagnosing A1111. VAE overrides have broken image generation on the original rig before.
