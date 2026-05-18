@@ -4,6 +4,23 @@ A campaign-aware Discord bot and web dashboard for tabletop RPG servers. It supp
 
 This repository is a clean source snapshot intended for other tables to adapt. Private campaign notes, generated modules, logs, `.env`, local model state, and runtime output are intentionally excluded.
 
+## Tags
+
+`#dnd` `#dnd5e` `#dnd5-5e` `#dnd2024` `#dungeons-and-dragons` `#ttrpg` `#tabletop-rpg` `#discord-bot` `#campaign-management` `#dungeon-master-tools` `#vtt` `#ollama` `#stable-diffusion` `#a1111`
+
+## Minimum Requirements
+
+- Windows 10/11 or a comparable Linux host for self-hosting
+- Python 3.11
+- MySQL 8 or compatible MySQL server
+- 16 GB system RAM minimum, 32 GB recommended for smoother local model work
+- NVIDIA GPU with at least 8 GB VRAM for practical local image generation
+- 20 GB free disk space minimum, more if storing generated modules, models, or campaign media
+- Ollama for local LLM workflows
+- Stable Diffusion WebUI/A1111 for local image and tactical map generation
+- Node.js for JavaScript document builder utilities
+- Discord bot token and channel IDs
+
 ## Credits
 
 This project began as a fork of the open-source ChatGPT Discord Bot project and has since been heavily extended for tabletop campaign operations, mission generation, local model routing, RAG, dashboard tooling, and D&D workflow integrations.
