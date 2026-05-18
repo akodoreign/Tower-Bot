@@ -9,7 +9,7 @@ This is a clean source snapshot of the current Tower of Last Chance bot code. Th
 - utility scripts in `scripts/`
 - tests in `tests/`
 - project skills, docs, schema references, and CodeSight navigation docs
-- `campaign_docs/city_gazetteer.json` and `campaign_docs/TrainingPDFS/` reference material
+- blank `campaign_docs/` placeholder only; live campaign data and training material are local-only
 - a fresh `.env.example` with placeholders only
 
 ## Prerequisites
@@ -70,3 +70,4 @@ Some tests and smoke paths may require live Ollama, A1111, MySQL, Discord mocks,
 - Keep `.env`, logs, generated modules, `.venv`, `node_modules`, browser profiles, and live runtime data out of git.
 - Coordinate bug work through `buglog.md` when multiple agents are working.
 - Read `CLAUDE.md`, `buglog.md`, and `MAP.md` before changing code.
+

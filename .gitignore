@@ -18,6 +18,7 @@ stop_tower.zip
 .claude/
 
 # Legacy/runtime campaign data should live in MySQL, not source control.
-campaign_docs/*.json
-campaign_docs/*.txt
-!campaign_docs/city_gazetteer.json
+campaign_docs/**
+!campaign_docs/
+!campaign_docs/.gitkeep.md
+
