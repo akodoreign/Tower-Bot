@@ -45,6 +45,7 @@ from src.mission_builder.infestation_layout import (
 )
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import get_monsters_by_cr_sources, monster_summary
 
 OUTPUT_BASE     = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 ROOM_MAP_CACHE  = OUTPUT_BASE / "_room_map_cache"
@@ -207,7 +208,85 @@ def _infer_creature_type(name: str, primary_type: str = "") -> str:
     return "beast"
 
 
+def _attacks_from_db(monster: dict, limit: int = 3) -> List[str]:
+    actions = monster.get("actions") or ""
+    if not actions:
+        return [f"Attack. Uses its listed CR {monster.get('cr')} combat routine."]
+    return [p.strip() for p in str(actions).split("\n\n") if p.strip()][:limit]
+
+
+def _variant_from_db(monster: dict, density_note: str) -> dict:
+    return {
+        "name": monster.get("name"),
+        "cr": str(monster.get("cr") or "1"),
+        "hp": int(monster.get("hp") or 10),
+        "ac": int(monster.get("ac") or 12),
+        "speed": monster.get("speed") or "30 ft.",
+        "attacks": _attacks_from_db(monster, 2),
+        "special": (str(monster.get("traits") or "").split("\n\n")[0] or None),
+        "density_note": density_note,
+        "db_summary": monster_summary(monster),
+    }
+
+
+def _boss_from_db(monster: dict) -> dict:
+    traits = str(monster.get("traits") or "")
+    return {
+        "name": monster.get("name"),
+        "cr": str(monster.get("cr") or "1"),
+        "hp": int(monster.get("hp") or 30),
+        "ac": int(monster.get("ac") or 14),
+        "speed": monster.get("speed") or "30 ft.",
+        "attacks": _attacks_from_db(monster, 4),
+        "legendary_actions": monster.get("legendary_actions") or None,
+        "lair_action": monster.get("lair_actions") or "At initiative count 20, the lair shifts and one room feature becomes difficult terrain.",
+        "tactics": (traits.split("\n\n")[0] if traits else "Uses terrain and minions to isolate the weakest target."),
+        "db_summary": monster_summary(monster),
+    }
+
+
+def _db_infestation_roster(subtype: str, cr: int, faction: str) -> dict:
+    prefer_void = any(w in f"{subtype} {faction}".lower() for w in ("void", "rift", "corrupt"))
+    variants = get_monsters_by_cr_sources(
+        max(1, cr - 2),
+        cr + 1,
+        count=3,
+        include_void=not prefer_void,
+        only_void=prefer_void,
+        sources=("undercity", "undercity_high_cr"),
+    )
+    boss_rows = get_monsters_by_cr_sources(
+        cr + 1,
+        cr + 3,
+        count=1,
+        include_void=True,
+        only_void=prefer_void,
+        sources=("undercity", "undercity_high_cr"),
+    )
+    if len(variants) < 2 or not boss_rows:
+        return {}
+    primary = variants[0]
+    secondary = variants[1] if len(variants) > 1 else variants[0]
+    notes = [
+        "light rooms",
+        "normal/heavy rooms",
+        "heavy rooms and boss-room minions",
+    ]
+    return {
+        "primary_type": primary.get("name"),
+        "secondary_type": secondary.get("name"),
+        "variants": [_variant_from_db(m, notes[i] if i < len(notes) else "normal rooms") for i, m in enumerate(variants)],
+        "boss": _boss_from_db(boss_rows[0]),
+        "infestation_note": f"{primary.get('name')} and related threats have claimed this {subtype}; their pressure now intersects {faction}.",
+        "source": "monsters_db",
+    }
+
+
 async def generate_monster_roster(subtype: str, cr: int, faction: str) -> dict:
+    db_roster = _db_infestation_roster(subtype, cr, faction)
+    if db_roster:
+        return db_roster
+
     pool = _MONSTER_POOLS.get(subtype, _MONSTER_POOLS["lair"])
     chosen = random.sample(pool, min(2, len(pool)))
     main_type = chosen[0]
@@ -632,9 +711,9 @@ async def generate_room_map(
     if cache_path.exists():
         shutil.copy2(cache_path, out_path)
         try:
-            from src.mission_builder.vtt_renderer import stylize_pretty_battlemap, write_grid_sidecar
+            from src.mission_builder.vtt_renderer import stylize_pretty_battlemap_safe, write_grid_sidecar
             write_grid_sidecar(out_path, map_context)
-            stylize_pretty_battlemap(out_path, map_context)
+            stylize_pretty_battlemap_safe(out_path, map_context)
         except Exception as _pe:
             logger.warning(f"[INFEST] Cached map pretty pass failed: {_pe}")
         logger.info(f"[INFEST] Room map cache hit: {cache_path.name} → {out_path.name}")
@@ -997,6 +1076,25 @@ def render_infestation_module(
         if rc.get("hazard"):
             hazard_html = f'<div class="inf-hazard">⚠️ Hazard: {_esc(rc["hazard"])}</div>'
 
+        # Boss enhancement
+        boss_enhancement_html = ""
+        if room.is_boss and rc.get("boss_read_aloud"):
+            triggers_html = "".join(f"<li>{_esc(t)}</li>" for t in (rc.get("boss_triggers") or []))
+            phases_html = "".join(f"<li>{_esc(p)}</li>" for p in (rc.get("boss_phase_changes") or []))
+            boss_enhancement_html = (
+                f'<div class="inf-section"><div class="inf-section-label" style="color:#8a1a1a;">Boss Encounter Read Aloud</div>'
+                f'<div class="inf-section-body read-aloud" style="background:#1a0808;color:#fcc;border-left:5px solid #8a1a1a;padding:10px 14px;border-radius:0 5px 5px 0;font-style:italic;">'
+                f'{_esc(rc.get("boss_read_aloud",""))}</div></div>'
+                + (f'<div class="inf-section"><div class="inf-section-label">Boss Triggers</div><ul class="inf-feature-list">{triggers_html}</ul></div>' if triggers_html else "")
+                + (f'<div class="inf-section"><div class="inf-section-label">Phase Changes (≤50% HP)</div><ul class="inf-feature-list">{phases_html}</ul></div>' if phases_html else "")
+                + (f'<div class="inf-section"><div class="inf-section-label">Death Effect</div><div class="inf-section-body">{_esc(rc.get("boss_death_effect",""))}</div></div>' if rc.get("boss_death_effect") else "")
+            )
+
+        # Plot anchor badge
+        plot_anchor_html = ""
+        if rc.get("plot_anchor"):
+            plot_anchor_html = f'<div style="background:#2a1a5a;color:#c8b8ff;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:bold;margin-bottom:8px;display:inline-block;">📌 Canon anchor: {_esc(rc["plot_anchor"])}</div>'
+
         room_cards.append(f"""
 <div class="inf-room" id="room-{room.room_id}">
   <div class="inf-room-header">
@@ -1029,8 +1127,10 @@ def render_infestation_module(
     <div class="inf-section-label">Connections</div>
     <div class="inf-section-body" style="font-family:monospace;font-size:12px;">{_esc(conns)}</div>
   </div>
+  {plot_anchor_html}
   {(f'<div class="inf-section"><div class="inf-section-label">Treasure</div><div class="inf-section-body">{_esc(rc.get("treasure","Nothing of value."))}</div></div>') if rc.get('treasure') else ''}
   {hazard_html}
+  {boss_enhancement_html}
 </div>""")
 
     content = overview_html + "\n".join(room_cards)
@@ -1058,6 +1158,122 @@ def render_infestation_module(
 
 def _safe_filename(text: str, maxlen: int = 50) -> str:
     return re.sub(r"[^\w\s-]", "", text or "mission").strip().replace(" ", "_")[:maxlen]
+
+
+def _mission_context(mission: dict) -> Dict[str, Any]:
+    """Extract named entities and stakes from the mission body for canon injection."""
+    parts: List[str] = []
+    for key in ("title", "faction", "npc_giver", "body", "description"):
+        val = mission.get(key)
+        if val:
+            parts.append(str(val))
+    text = " ".join(parts)
+    terms = []
+    for m in re.finditer(r"\b[A-Z][A-Za-z0-9''.-]*(?:\s+[A-Z][A-Za-z0-9''.-]*){0,3}\b", text):
+        t = m.group(0).strip()
+        if t.lower() not in {"infestation", "dungeon", "standard", "mission", "posted"} and t not in terms:
+            terms.append(t)
+    stakes = re.findall(r"[^.!?\n]*(?:clear|infest|exterminate|contain|retrieve|evidence|culprit|contract|nest)[^.!?\n]*", text, flags=re.I)
+    return {
+        "canon_terms": terms[:12],
+        "stakes": [s.strip() for s in stakes[:4] if s.strip()],
+    }
+
+
+def _pick_plot_room_id(layout: InfestationLayout) -> Optional[int]:
+    """Find the room immediately before the boss in sequence; must not be entry."""
+    seq = layout.room_sequence
+    by_id = {r.room_id: r for r in layout.rooms}
+    boss_idx = next((i for i, rid in enumerate(seq) if by_id.get(rid) and by_id[rid].is_boss), None)
+    if boss_idx is None or boss_idx == 0:
+        return None
+    for i in range(boss_idx - 1, -1, -1):
+        rid = seq[i]
+        room = by_id.get(rid)
+        if room and not room.is_entry and not room.is_boss:
+            return rid
+    return None
+
+
+async def _generate_plot_room_content(
+    room: "InfestationRoom",
+    layout: "InfestationLayout",
+    monsters: dict,
+    mission: dict,
+    canon_terms: List[str],
+) -> dict:
+    """Generate a single plot-room with mission canon baked into the prompt."""
+    primary   = monsters.get("primary_type", "creatures")
+    boss_name = (monsters.get("boss") or {}).get("name", "the boss")
+    canon_str = ", ".join(canon_terms[:8]) or mission.get("title", "this mission")
+    conns     = ", ".join(f"R{c[0]:02d} via {c[1]}" for c in room.connections) or "one onward passage"
+    prompt = f"""D&D 5e dungeon room for "{mission.get('title','Infestation')}".
+This is the PLOT ROOM — one room before the boss. It must contain a visible reference to the mission's canon terms: {canon_str}.
+
+Room type: {room.room_type} | Density: {room.monster_density} | Connections: {conns}
+Infestation: {primary} and {monsters.get('secondary_type', primary)}. Boss: {boss_name}.
+
+Write content that:
+- Makes the mission canon visible (a symbol, name, object, or sign tied to {canon_terms[0] if canon_terms else mission.get('faction','the faction')})
+- Hints at what the boss room holds
+- Gives players a clue about what created the infestation
+
+Return JSON only:
+{{
+  "id": {room.room_id},
+  "name": "evocative room name",
+  "read_aloud": "2-3 sentences — mention one detail from the mission's canon context",
+  "dm_notes": "DM secret: what the canon detail means; what this reveals about the infestation's true cause",
+  "monsters": "monster placement and count",
+  "features": ["feature 1", "feature 2", "feature 3"],
+  "exits": "exit description",
+  "treasure": "specific loot or nothing",
+  "hazard": "environmental hazard or null",
+  "plot_anchor": "the specific canon term or object visible in this room"
+}}"""
+    raw = await _ask(prompt, system=_SYSTEM_ROOMS, timeout=90, tokens=700)
+    data = _parse_json(raw)
+    if not data or not data.get("read_aloud"):
+        return {}
+    return data
+
+
+async def _generate_boss_enhancement(
+    boss_room_content: dict,
+    monsters: dict,
+    mission: dict,
+    canon_terms: List[str],
+) -> dict:
+    """Generate rich boss encounter additions for the boss room."""
+    boss = monsters.get("boss") or {}
+    boss_name = boss.get("name", "the boss")
+    canon_str = ", ".join(canon_terms[:6]) or mission.get("title", "this mission")
+    existing_read_aloud = boss_room_content.get("read_aloud", "")
+    prompt = f"""Enhance the boss room for a D&D 5e infestation mission.
+
+Mission: "{mission.get('title','Infestation')}"
+Canon context: {canon_str}
+Boss creature: {boss_name} (CR {boss.get('cr','?')}, HP {boss.get('hp','?')})
+Boss tactics: {boss.get('tactics','')}
+Existing read-aloud: {existing_read_aloud}
+
+Return JSON only:
+{{
+  "boss_read_aloud": "3 sentences — read aloud when players enter and see the boss for the first time. Make it specific to the mission canon.",
+  "boss_triggers": ["3 environmental events or reactions the boss causes during the fight"],
+  "boss_phase_changes": ["2 visible changes when the boss drops below 50% HP"],
+  "boss_death_effect": "What happens to the room/environment when the boss is defeated — collapse, silence, release, revelation, etc."
+}}"""
+    raw = await _ask(prompt, system=_SYSTEM_ROOMS, timeout=90, tokens=500)
+    data = _parse_json(raw)
+    if not isinstance(data, dict) or not data.get("boss_read_aloud"):
+        return {
+            "boss_read_aloud": f"{boss_name} is already aware of you. It turns — not in surprise, but in the way a predator turns when it has decided the waiting is over.",
+            "boss_triggers": ["The nest walls flex and seal one exit at initiative 20.", "Boss screech stuns anyone within 10 ft (DC 13 CON or stunned 1 turn, once per fight).", "At 50% HP, 1d4 minions surge from the walls."],
+            "boss_phase_changes": [f"{boss_name} drops to all four limbs and its speed doubles.", "The lair action changes to a targeted area slam instead of difficult terrain."],
+            "boss_death_effect": f"When {boss_name} falls, the infestation sounds cease instantly — the colony's link to its alpha severed. The nest material begins to dry and crumble. One previously sealed passage is now open.",
+        }
+    return data
 
 
 def _party_strength() -> Dict[str, Any]:
@@ -1234,6 +1450,28 @@ async def build_infestation_module(mission: dict, out_dir: Optional[Path] = None
     # 3. Room content
     logger.info("[INFEST] Generating room descriptions...")
     room_contents = await generate_all_rooms(layout, monsters, mission)
+
+    # 3b. Plot room — inject mission canon into the pre-boss room
+    mission_ctx = _mission_context(mission)
+    canon_terms = mission_ctx.get("canon_terms", [])
+    plot_room_id = _pick_plot_room_id(layout)
+    if plot_room_id is not None and canon_terms:
+        logger.info(f"[INFEST] Plot-room targeted generation for R{plot_room_id} with canon: {canon_terms[:4]}")
+        by_id_tmp = {r.room_id: r for r in layout.rooms}
+        plot_room_obj = by_id_tmp.get(plot_room_id)
+        if plot_room_obj:
+            plot_content = await _generate_plot_room_content(plot_room_obj, layout, monsters, mission, canon_terms)
+            if plot_content and plot_content.get("read_aloud"):
+                room_contents[plot_room_id] = plot_content
+                logger.info(f"[INFEST] Plot room R{plot_room_id} content injected with anchor: {plot_content.get('plot_anchor','?')}")
+
+    # 3c. Boss room enhancement pass
+    boss_room_id = next((r.room_id for r in layout.rooms if r.is_boss), None)
+    if boss_room_id is not None:
+        logger.info(f"[INFEST] Boss enhancement pass for R{boss_room_id}")
+        boss_enhancement = await _generate_boss_enhancement(room_contents.get(boss_room_id, {}), monsters, mission, canon_terms)
+        if boss_enhancement:
+            room_contents[boss_room_id] = {**room_contents.get(boss_room_id, {}), **boss_enhancement}
 
     # Mimir: push boss room and entrance read-aloud docs
     if mimir_module_id:

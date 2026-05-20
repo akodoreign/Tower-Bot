@@ -456,7 +456,7 @@ Return JSON object only with:
 - location_readaloud
 - trail: 6 investigation/retrieval trail beats, each with clue, skill, dc, success, fail_forward
 - complications: 6 target/faction-specific complications
-- retrieval_scene: location, current_holder, approach_options, hazards, handling_rules
+- retrieval_scene: location, read_aloud (2 sentences DM reads when party reaches the retrieval site), current_holder, approach_options, hazards, handling_rules
 - rival_pressure: how rival faction/party may interfere without stealing the whole mission
 - moral_note: only if target type deserves one; otherwise say "none"
 - map_plan: none/one_map/two_maps plus why
@@ -503,6 +503,7 @@ def _fallback_plan(
         "complications": random.sample(COMPLICATIONS, 6),
         "retrieval_scene": {
             "location": context.get("name"),
+            "read_aloud": f"{context.get('name', 'The place')} in {context.get('district', 'the district')} is quieter than it should be for somewhere that has what you need. You count the exits before you start looking for {object_text}.",
             "current_holder": "someone who can be negotiated with, bypassed, or exposed",
             "approach_options": RETRIEVAL_SHAPES[:4],
             "hazards": ["fragility", "bad paperwork", "watching rivals", "limited time"],
@@ -614,8 +615,14 @@ def _outcome_table(plan: Dict[str, Any]) -> str:
 def _retrieval_html(scene: Dict[str, Any]) -> str:
     if not isinstance(scene, dict):
         return f"<p>{_e(scene)}</p>"
+    read_aloud = scene.get("read_aloud", "")
+    read_aloud_html = (
+        f'<div style="font-style:italic;color:#333;border-left:3px solid #8a5a1f;padding:6px 12px;margin-bottom:10px;">'
+        f'{_e(read_aloud)}</div>'
+    ) if read_aloud else ""
     return (
-        f"<p><strong>Location:</strong> {_e(scene.get('location'))}</p>"
+        read_aloud_html
+        + f"<p><strong>Location:</strong> {_e(scene.get('location'))}</p>"
         f"<p><strong>Current Holder:</strong> {_e(scene.get('current_holder'))}</p>"
         f"<h3>Approach Options</h3>{_ul(scene.get('approach_options', []))}"
         f"<h3>Hazards</h3>{_ul(scene.get('hazards', []))}"

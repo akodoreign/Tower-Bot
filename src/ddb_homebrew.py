@@ -205,7 +205,8 @@ _SUBMIT_JS = """
 
 _CR_OPTIONS = {
     "0": "1", "1/8": "2", "1/4": "3", "1/2": "4",
-    **{str(i): str(i + 4) for i in range(1, 31)},
+    **{str(i): str(i + 4) for i in range(1, 24)},   # CR 1-23: option = CR + 4
+    **{str(i): str(i + 5) for i in range(24, 31)},  # CR 24-30: DDB skips option 28
 }
 _TYPE_OPTIONS = {
     "aberration":"1","beast":"2","celestial":"3","construct":"4",
@@ -487,12 +488,18 @@ async def push_monster_http(
             logger.info(f"[DDB_HB_HTTP] Created: {url}")
             return url
 
-        # Extract DDB validation errors from the response HTML
+        # Extract DDB validation errors — strip nested tags to get plain text
         import re as _re
-        err_hits = _re.findall(r'(?:class="[^"]*error[^"]*"|error[^<]{0,60})<[^>]*>([^<]{1,120})', resp.text, _re.IGNORECASE)
-        if not err_hits:
-            # Fallback: grab any visible error-class text
-            err_hits = _re.findall(r'alert[^>]*>([^<]{1,120})', resp.text, _re.IGNORECASE)
+        err_blocks = _re.findall(
+            r'class="[^"]*(?:error|alert|invalid|validation)[^"]*"[^>]*>(.*?)</(?:div|span|li|p|ul)\b',
+            resp.text, _re.IGNORECASE | _re.DOTALL,
+        )
+        err_hits = []
+        for blk in err_blocks:
+            txt = _re.sub(r'<[^>]+>', ' ', blk)
+            txt = _re.sub(r'\s+', ' ', txt).strip()
+            if txt and len(txt) > 3:
+                err_hits.append(txt[:200])
         logger.warning(f"[DDB_HB_HTTP] POST {resp.status_code} for {name!r} — no redirect. Errors: {err_hits[:5]}")
         return None
 

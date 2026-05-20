@@ -43,6 +43,7 @@ import httpx
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import faction_role_monsters, mission_enemy_entry
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -597,9 +598,9 @@ Defender commander: {commander['label']} — {commander['lead_style']}
 Mission notes: {body[:300]}
 
 Write a briefing as if the faction contact is speaking to the party. Include:
-- What the target position is and why it needs to be taken
+- What the target position is and why taking it matters for this faction right now
 - What force the party is being given to lead
-- The three win conditions: reach the objective, break defender morale, or take down the commander
+- Three specific win conditions for THIS mission (not generic — tied to what success means here)
 - One specific warning about the defender commander and how they operate
 - The party's role — they lead, the troops follow
 
@@ -608,8 +609,10 @@ Return JSON only:
   "contact_speech": "2-3 paragraphs of the contact briefing the party",
   "objective_desc": "1 sentence on what the specific objective is inside the position",
   "commander_warning": "1 sentence warning about the defender commander",
-  "win_conditions": ["reach and hold the objective", "break defender morale", "neutralise the commander"],
-  "position_desc": "2 sentences describing the target position from the outside"
+  "win_conditions": ["mission-specific win condition 1", "mission-specific win condition 2", "mission-specific win condition 3"],
+  "position_desc": "2 sentences describing the target position from the outside",
+  "position_approach_read_aloud": "3 sentences, present tense, sensory — what the party sees and hears as they first sight the position",
+  "commander_dialogue": ["line spoken when battle starts", "line spoken when morale breaks", "line spoken when cornered or surrendering"]
 }}"""
 
     raw = await _ollama(prompt)
@@ -619,8 +622,18 @@ Return JSON only:
             "contact_speech":    f"We need that position taken. Lead the {attacker_force['force_label']} in — they'll follow if you show them it can be done.",
             "objective_desc":    f"Reach and hold the inner chamber of {position}.",
             "commander_warning": f"Their {commander['label']} is the linchpin — take them out and the defense collapses.",
-            "win_conditions":    ["Reach and hold the objective", "Break defender morale through losses", "Neutralise the commander"],
+            "win_conditions":    [
+                f"Reach and hold the objective inside {position}",
+                f"Break {defending_faction} morale — reduce their morale pool to 0",
+                f"Neutralise {commander['label']} — the defense collapses without them",
+            ],
             "position_desc":     f"A fortified {position}. Defenders have had time to prepare.",
+            "position_approach_read_aloud": f"The {position} rises ahead of you, {defending_faction} banners visible above the outer wall. The sounds of preparation carry across the open ground — orders barked, equipment checked, the creak of a gate mechanism. Nothing moves yet, but nothing is still.",
+            "commander_dialogue": [
+                f"Hold the line. They bleed the same as anyone.",
+                f"Fall back to the inner position — this is not over.",
+                f"I yield. But know that {defending_faction} does not forget.",
+            ],
         }
     return data
 
@@ -867,6 +880,29 @@ def _e(s: Any) -> str:
     return html.escape(str(s or ""))
 
 
+def _approach_read_aloud_html(briefing: Dict, fc: str) -> str:
+    text = briefing.get("position_approach_read_aloud", "")
+    if not text:
+        return ""
+    return (
+        f'<div style="background:#f0f4ff;border-left:3px solid {fc};padding:10px 14px;'
+        f'margin:10px 0;font-style:italic;font-size:13px;border-radius:0 6px 6px 0;">'
+        f'<strong>Read aloud — approach:</strong><br>{_e(text)}</div>'
+    )
+
+
+def _commander_dialogue_html(briefing: Dict) -> str:
+    lines = briefing.get("commander_dialogue", [])
+    if not lines:
+        return ""
+    items = "".join(f"<li>{_e(line)}</li>" for line in lines)
+    return (
+        f'<div style="margin-top:10px;font-size:13px;">'
+        f'<strong>Commander dialogue:</strong>'
+        f'<ul style="margin:4px 0;padding-left:18px;">{items}</ul></div>'
+    )
+
+
 def _morale_track(pool: int, label: str) -> str:
     """Color-coded checkbox track with state thresholds marked."""
     boxes = ""
@@ -1000,6 +1036,8 @@ def render_assault_module(
     <strong>Position:</strong> {_e(briefing.get("position_desc",""))}<br>
     <strong>Commander warning:</strong> {_e(briefing.get("commander_warning",""))}
   </div>
+  {_approach_read_aloud_html(briefing, fc)}
+  {_commander_dialogue_html(briefing)}
   <h3 style="margin:12px 0 4px;">Win Conditions — any one</h3>
   <ul style="margin:0;padding-left:20px;">{win_conditions_html}</ul>
 </div>
@@ -1268,8 +1306,15 @@ async def build_assault_module(mission: dict, out_dir: Optional[Path] = None) ->
     # Mimir: commander + defender catalog lookup
     from src.mission_builder.mimir_module import create_module as _mc, enrich_monsters as _me, upload_map as _mu, render_mimir_section as _ms, push_documents as _mpd
     _mimir_id = await _mc(mission, mission_type="assault")
+    target_cr = mission_cr(mission)
+    db_guards = faction_role_monsters(["enforcer", "shieldbearer", "zealot"], count=1, cr_max=target_cr)
+    db_commanders = faction_role_monsters(["captain", "champion", "lieutenant"], count=1, cr_max=max(target_cr, int(commander["cr"])))
     _a_enemies = [
+        mission_enemy_entry(db_guards[0], count=4, notes=f"{defending_faction} defenders")
+        if db_guards else
         {"name": f"{defending_faction} Guard", "cr": str(max(1, int(strength.get("avg_level", 3)) - 1)), "count": 4, "notes": "Defenders"},
+        mission_enemy_entry(db_commanders[0], count=1, notes=f"Commander: {commander['label']}")
+        if db_commanders else
         {"name": commander["label"], "cr": str(commander["cr"]), "count": 1, "notes": "Commander"},
     ]
     _enriched = await _me(_mimir_id or "", _a_enemies)

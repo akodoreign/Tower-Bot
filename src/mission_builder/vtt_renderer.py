@@ -18,6 +18,7 @@ import logging
 import os
 import random
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Optional
 
@@ -48,6 +49,7 @@ MAPCRAFT_FLUX_CHECKPOINT = os.getenv("A1111_MAPCRAFT_FLUX_CHECKPOINT", os.getenv
 MAPCRAFT_SDXL_CHECKPOINT = os.getenv("A1111_MAPCRAFT_SDXL_CHECKPOINT", os.getenv("A1111_MAP_CHECKPOINT", "")).strip()
 
 logger = logging.getLogger(__name__)
+_PRETTY_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pretty-map")
 
 
 def wait_for_a1111_idle(timeout: float | None = None, cooldown: float | None = None) -> bool:
@@ -651,6 +653,41 @@ def stylize_pretty_battlemap(path: Path, context: Optional[dict] = None, force: 
         return None
 
 
+def stylize_pretty_battlemap_safe(path: Path, context: Optional[dict] = None, force: bool = False) -> Optional[Path]:
+    """
+    Run the pretty pass without blocking a live asyncio event loop.
+
+    Mission pipelines are async Discord tasks. The pretty pass polls A1111 and
+    sleeps between attempts, so calling it directly from the event loop can
+    starve Discord heartbeats. In async contexts we queue it on a single worker;
+    in normal sync contexts we keep the old blocking behavior.
+    """
+    try:
+        import asyncio
+
+        asyncio.get_running_loop()
+        in_event_loop = True
+    except RuntimeError:
+        in_event_loop = False
+
+    if not in_event_loop:
+        return stylize_pretty_battlemap(path, context, force)
+
+    path = Path(path)
+    context_copy = dict(context or {})
+
+    def _done(future) -> None:
+        try:
+            future.result()
+        except Exception as exc:
+            logger.warning("Background pretty map pass failed for %s: %s", path, exc)
+
+    future = _PRETTY_EXECUTOR.submit(stylize_pretty_battlemap, path, context_copy, force)
+    future.add_done_callback(_done)
+    logger.info("Pretty map pass queued in background for %s", path)
+    return pretty_map_path(path) if pretty_map_path(path).exists() else None
+
+
 def save_vtt_battlemap(path: Path, ai_b64: str | None = None, context: Optional[dict] = None) -> Path:
     ai_bytes = None
     if ai_b64:
@@ -660,7 +697,7 @@ def save_vtt_battlemap(path: Path, ai_b64: str | None = None, context: Optional[
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(render_vtt_battlemap(context=context, ai_png=ai_bytes))
     write_grid_sidecar(path, context)
-    stylize_pretty_battlemap(path, context)
+    stylize_pretty_battlemap_safe(path, context)
     return path
 
 
@@ -678,5 +715,5 @@ def save_vtt_battlemap_bytes(path: Path, ai_bytes: bytes | None = None, context:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(render_vtt_battlemap(context=context, ai_png=ai_bytes))
     write_grid_sidecar(path, context)
-    stylize_pretty_battlemap(path, context)
+    stylize_pretty_battlemap_safe(path, context)
     return path

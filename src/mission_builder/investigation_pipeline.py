@@ -200,6 +200,46 @@ GENERIC_INVESTIGATION_MARKERS = [
 ]
 
 
+def _default_clue_check(item: Any, idx: int) -> Dict[str, Any]:
+    text = json.dumps(item, ensure_ascii=False).lower() if isinstance(item, dict) else str(item).lower()
+    source = str(item.get("source", "")).lower() if isinstance(item, dict) else ""
+    if any(term in text or term in source for term in ("record", "ledger", "paper", "archive", "seal", "permit")):
+        skill = "Investigation"
+    elif any(term in text or term in source for term in ("witness", "interview", "alibi", "testimony", "social")):
+        skill = "Insight"
+    elif any(term in text or term in source for term in ("scene", "footprint", "physical", "blood", "residue")):
+        skill = "Perception"
+    elif any(term in text or term in source for term in ("ritual", "rift", "magic", "curse", "omen")):
+        skill = "Arcana"
+    else:
+        skill = "Investigation"
+    return {"skill": skill, "dc": 13 + (idx % 3)}
+
+
+def _normalize_clue_web(items: List[Any], fallback: List[Any]) -> List[Dict[str, Any]]:
+    source_items = items if isinstance(items, list) and items else fallback
+    normalized = []
+    for idx, item in enumerate(source_items):
+        defaults = _default_clue_check(item, idx)
+        if isinstance(item, dict):
+            entry = dict(item)
+            entry.setdefault("clue", "")
+            entry.setdefault("source", "")
+            entry.setdefault("proves", "")
+            entry.setdefault("unlocks", "")
+        else:
+            entry = {"clue": str(item), "source": "", "proves": "", "unlocks": ""}
+        entry["skill"] = entry.get("skill") or entry.get("check_skill") or defaults["skill"]
+        raw_dc = entry.get("dc") or entry.get("DC") or entry.get("check_dc") or defaults["dc"]
+        try:
+            entry["dc"] = int(raw_dc)
+        except (TypeError, ValueError):
+            entry["dc"] = defaults["dc"]
+        entry["dc"] = max(10, min(22, entry["dc"]))
+        normalized.append(entry)
+    return normalized
+
+
 def _mission_text(mission: dict) -> str:
     parts = []
     for key in ("title", "body", "description", "private_notes", "public_text", "story_text", "contact", "personal_for", "opposing_faction"):
@@ -641,9 +681,9 @@ def _fallback_plan(mission: dict, case_type: str, roles: Dict[str, str], tones: 
         "long_rest_revelation": random.choice(LONG_REST_REVELATIONS) if random.random() < 0.25 else "None expected; the case can still move through ordinary deduction.",
         "resolution": random.sample(RESOLUTIONS, 5),
         "clue_web": [
-            {"clue": f"A witness uses the wrong name for {anchor}.", "source": "first interview", "proves": "They learned the story secondhand or were coached.", "unlocks": "records lead"},
-            {"clue": f"A record connected to {anchor} has one altered date or seal.", "source": "paper trail", "proves": "The official timeline is engineered.", "unlocks": "pressure faction lead"},
-            {"clue": f"A physical detail at the scene contradicts the public story.", "source": "scene work", "proves": "The case cannot be solved from testimony alone.", "unlocks": "final theory"},
+            {"clue": f"A witness uses the wrong name for {anchor}.", "source": "first interview", "skill": "Insight", "dc": 13, "proves": "They learned the story secondhand or were coached.", "unlocks": "records lead"},
+            {"clue": f"A record connected to {anchor} has one altered date or seal.", "source": "paper trail", "skill": "Investigation", "dc": 14, "proves": "The official timeline is engineered.", "unlocks": "pressure faction lead"},
+            {"clue": f"A physical detail at the scene contradicts the public story.", "source": "scene work", "skill": "Perception", "dc": 15, "proves": "The case cannot be solved from testimony alone.", "unlocks": "final theory"},
         ],
         "scene_secrets": [
             f"The first scene contains one detail that only matters after the party hears {culprit['name']}'s alibi.",
@@ -651,6 +691,22 @@ def _fallback_plan(mission: dict, case_type: str, roles: Dict[str, str], tones: 
             f"{roles['pressure']} benefits from the rumor but may not be the true culprit.",
         ],
         "accusation_standard": "The party should be able to name the culprit/cause, prove motive, explain the false public story, and cite at least three independent clues before the final reveal.",
+        "witness_list": [
+            {
+                "name": culprit["name"],
+                "what_they_say_publicly": f"Nothing unusual happened around {anchor}.",
+                "what_they_know": f"They were present when the incident occurred and saw something that contradicts the public story.",
+                "dc_to_get_truth": 14,
+                "how_to_break": "Catch them in a contradiction or appeal to their conscience.",
+            },
+            {
+                "name": suspects[1]["name"] if len(suspects) > 1 else "A second witness",
+                "what_they_say_publicly": "I only heard about it afterward.",
+                "what_they_know": "They were actually present but covered for a faction contact.",
+                "dc_to_get_truth": 15,
+                "how_to_break": "Present the physical evidence that contradicts their alibi.",
+            },
+        ],
     }
 
 
@@ -675,6 +731,7 @@ def _normalize_plan(
             plan[key] = items or fallback[key]
         elif not isinstance(value, list) or not value:
             plan[key] = fallback[key]
+    plan["clue_web"] = _normalize_clue_web(plan.get("clue_web", []), fallback["clue_web"])
     plan.setdefault("long_rest_revelation", "None expected.")
     plan.setdefault("accusation_standard", fallback["accusation_standard"])
     if _is_generic_plan(plan, _mission_context(mission)):
@@ -733,9 +790,12 @@ Return JSON only:
   "twist": "reveal, false mask, or complication",
   "long_rest_revelation": "rare dream/memory/revelation during long rest or None expected",
   "clue_web": [
-    {{"clue": "specific clue", "source": "where/who gives it", "proves": "what it proves", "unlocks": "next lead"}}
+    {{"clue": "specific clue", "source": "where/who gives it", "skill": "Investigation", "dc": 14, "proves": "what it proves", "unlocks": "next lead"}}
   ],
   "scene_secrets": ["3-6 secrets attached to specific rooms/witnesses/records"],
+  "witness_list": [
+    {{"name": "witness name", "what_they_say_publicly": "what they tell anyone who asks", "what_they_know": "what they actually know and are hiding", "dc_to_get_truth": 14, "how_to_break": "what pressure or approach makes them talk"}}
+  ],
   "accusation_standard": "what proof the party needs before the final reveal",
   "resolution": ["5-7 valid resolution paths"]
 }}"""
@@ -879,9 +939,12 @@ def _clue_web(items: List[Any]) -> str:
     rows = []
     for item in items:
         if isinstance(item, dict):
+            check = ""
+            if item.get("skill") or item.get("dc"):
+                check = f"Check: {item.get('skill', 'Investigation')} DC {item.get('dc', '')} | "
             rows.append((
                 item.get("clue", ""),
-                f"Source: {item.get('source', '')} | Proves: {item.get('proves', '')} | Unlocks: {item.get('unlocks', '')}",
+                f"{check}Source: {item.get('source', '')} | Proves: {item.get('proves', '')} | Unlocks: {item.get('unlocks', '')}",
             ))
         else:
             rows.append(("Clue", str(item)))
@@ -902,6 +965,9 @@ def render_investigation_module(
     title = mission.get("title") or plan.get("case_title") or "Investigation"
     fc = _faction_color(roles["sponsor"])
     body = ""
+    context = _mission_context(mission)
+    if len(context.get("canon_terms", [])) < 3:
+        body += _card("DM WARNING — Thin Mission Body", "<p style='color:#ffcc00;'><strong>This mission body contained fewer than 3 named entities or canon terms. Clue anchors, suspect names, and scene details may be generic. Enrich before running cold.</strong></p>", "#7b1e1e")
     body += _card("Briefing", f'<div style="white-space:pre-line;font-style:italic;">{_e(plan["briefing"])}</div>', fc)
     body += _card("Case Frame", _table([
         ("Type", case_type),
@@ -918,6 +984,14 @@ def render_investigation_module(
     body += _card("Multi-Day Timeline", _list(plan.get("timeline", []), ordered=True), "#555")
     body += _card("Core Clue Web", _clue_web(plan.get("clue_web", [])), "#2a6a2a")
     body += _card("Scene Secrets", _list(plan.get("scene_secrets", []), ordered=False), "#8a5a1f")
+    if plan.get("witness_list"):
+        witness_rows = []
+        for w in plan["witness_list"]:
+            witness_rows.append((
+                w.get("name", "?"),
+                f"Public: {w.get('what_they_say_publicly', '')} | Knows: {w.get('what_they_know', '')} | DC {w.get('dc_to_get_truth', 14)} to truth | Break: {w.get('how_to_break', '')}",
+            ))
+        body += _card("Witness List", _table(witness_rows), "#8a5a1f")
     body += _card("Long-Rest Revelation", f"<p>{_e(plan.get('long_rest_revelation', 'None expected.'))}</p><p><strong>Use rarely:</strong> only when the table needs a late-night connection, omen, remembered detail, or witness message.</p>", "#3a6898")
     body += _card("No Tactical Map", "<p>No map generated. Run this through area and room descriptions: who is present, what feels off, what changes after the party leaves, what gets missed if they rush, and sensory details that can become evidence.</p>", "#7b1e1e")
     body += _card("Suspect Board", _suspect_board(suspects), "#555")

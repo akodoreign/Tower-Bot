@@ -437,6 +437,7 @@ Return JSON only:
 {{
   "briefing": "2-3 paragraphs from the hiring contact",
   "site_description": "2 sentences about the social space",
+  "opening_read_aloud": "2-3 sentences, present tense, sensory — what the party sees, hears, and smells the first moment they enter the venue or social space",
   "win_condition": "what success means",
   "failure_note": "what failure looks like before lockdown",
   "debrief": "where/how the debrief happens"
@@ -447,6 +448,7 @@ Return JSON only:
     return {
         "briefing": f"{roles['hiring']} needs the party inside {location.get('name')} under a believable cover. Get friendly, get access, complete the objective, and leave before {roles['site']} realizes the story does not add up.",
         "site_description": location.get("description") or "A public-facing site with private rooms behind a polite social mask.",
+        "opening_read_aloud": f"The entrance to {location.get('name')} opens onto a space that is louder and busier than you expected. {roles['site']} faces are everywhere — and none of them know you yet.",
         "win_condition": f"Complete: {objectives['primary']}; bonus: {objectives['secondary']}.",
         "failure_note": "Failure starts as social suspicion before it becomes lockdown.",
         "debrief": "Debrief depends on alert level and whether the party kept the cover intact.",

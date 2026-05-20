@@ -120,6 +120,27 @@ def test_puzzle_normalize_plan_fills_partial_llm_json():
     assert plan["solve_path"]  # may come from LLM data or mission-specific fallback
 
 
+def test_puzzle_fallback_templates_vary_by_puzzle_type():
+    mission = {
+        "title": "Neon Mural Cipher",
+        "body": "Decode the Neon Row mural sequence before the Glass Sigil paints over it.",
+    }
+
+    art = pp._fallback_plan(mission, "Guild of Ashen Scrolls", "art_puzzle", "decode a mural")
+    cipher = pp._fallback_plan(mission, "Guild of Ashen Scrolls", "language_cipher", "decode a mural")
+    mechanism = pp._fallback_plan(mission, "Guild of Ashen Scrolls", "physical_mechanism", "decode a mural")
+    trial = pp._fallback_plan(mission, "Guild of Ashen Scrolls", "divine_trial", "decode a mural")
+
+    names = {art["puzzle_name"], cipher["puzzle_name"], mechanism["puzzle_name"], trial["puzzle_name"]}
+    assert len(names) == 4
+    assert "Mural Sequence" in art["puzzle_name"]
+    assert "Cipher Bell" in cipher["puzzle_name"]
+    assert "Counterweight Engine" in mechanism["puzzle_name"]
+    assert "Witness Trial" in trial["puzzle_name"]
+    assert "Oath-Circuit" not in art["puzzle_name"]
+    assert "Oath-Circuit" not in cipher["puzzle_name"]
+
+
 def test_recovery_normalize_plan_fills_structured_fields():
     mission = {"title": "Find the Ledger"}
     context = {"name": "Dust Market", "district": "Low Market"}

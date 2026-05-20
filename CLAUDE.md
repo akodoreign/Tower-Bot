@@ -60,6 +60,20 @@ NPCs / characters / parties:
 - `missing_persons`
 - `resurrection_queue`
 
+Creatures / monsters / statblocks:
+- `monsters`
+- Live as of 2026-05-18: `scripts/seed_monster_db.py` creates and seeds `monsters` with 60 Undercity creatures: 10 regular CR 5, 10 regular CR 6, 10 regular CR 7, 10 regular CR 8, plus 5 void variants each at CR 7, CR 8, CR 9, and CR 10.
+- Live as of 2026-05-18: `scripts/seed_high_cr_monster_db.py` adds 270 more source=`undercity_high_cr` monsters, CR 8 through CR 25, with 10 regular and 5 void-corrupted variants at each CR tier.
+- Live as of 2026-05-18: `scripts/seed_faction_monster_db.py` adds 18 reusable source=`faction_generic` humanoid roles: thug, scout, archer, bruiser, enforcer, priest, shieldbearer, handler, alchemist, saboteur, zealot, mage, duelist, lieutenant, assassin, quartermaster, captain, and champion.
+- DDB import/enrichment: `scripts/enrich_creatures_ddb.py` now runs DB monster import/enrichment by default for sources `undercity`, `undercity_high_cr`, and `faction_generic`. Use `--dry-run --monster-limit N` to smoke-test without touching DDB/art generation; use `--monster-sources`, `--cr-min`, `--cr-max`, `--void-only`, and `--regular-only` for chunked imports. Legacy module creature/NPC staging-log passes are opt-in with `--include-legacy`.
+- Prefer `monsters` over generated module JSON, DDB staging JSON, LLM monster-name generation, or hardcoded monster tables when selecting campaign monsters.
+- Important columns: `name`, `cr`, `creature_type`, `size`, `ac`, `hp`, `hp_die`, `hp_die_count`, `stat_str`, `stat_dex`, `stat_con`, `stat_int`, `stat_wis`, `stat_cha`, `passive_perc`, `languages`, `speed`, `actions`, `traits`, `reactions`, `bonus_actions`, `legendary_actions`, `mythic_actions`, `lair_actions`, `saves_json`, `notes`, `sd_appearance`, `source`, `is_void`, `base_name`, `ddb_url`, `ddb_edit_url`, `portrait_path`, `enriched_at`, `created_at`, `updated_at`.
+- Current indexes/constraints: unique monster `name`; indexes on `cr`, `creature_type`, `is_void`, `source`, and `enriched_at`.
+- `saves_json` currently stores save modifiers. Skills/senses/resistances/immunities are mostly encoded in `traits`/`notes` text unless Claude adds more JSON columns later.
+- DB helper module: `src/mission_builder/monster_roster.py`. Mission pipelines should call DB-backed roster helpers for CR/type/void-appropriate monsters instead of asking the LLM for random monster names.
+- Combat CR rule as of 2026-05-18: `src/mission_builder/cr_scaling.py:mission_cr()` targets party average level + 4 for standard difficulty. Numeric `difficulty` uses 5 as standard; each point below 5 subtracts 1 CR, each point above 5 adds 1 CR. Pipelines that need critters should use `mission_cr(mission)` before querying `monster_roster`.
+- DB-backed monster/fodder wiring as of 2026-05-18: infestation, battle, defense, assault, ambush fallback guards, rescue fallback captor, dungeon delve room encounters, and published fallback stat blocks now query `monsters`/`faction_generic` where appropriate instead of inventing all critters from scratch.
+
 Factions / reputation / events:
 - `faction_reputation`
 - `faction_events`

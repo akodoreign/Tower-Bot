@@ -337,7 +337,8 @@ Return JSON only:
   "pickup_desc": "1 sentence",
   "delivery_desc": "1 sentence on delivery location and who receives",
   "threat_note": "1 sentence on the threat",
-  "special_instructions": "handling or behaviour requirements"
+  "special_instructions": "handling or behaviour requirements",
+  "opening_read_aloud": "2 sentences, present tense, sensory — what the party sees and hears when they arrive at the pickup location for the first time"
 }}"""
 
     raw = await _ollama(prompt)
@@ -349,6 +350,7 @@ Return JSON only:
             "delivery_desc":        f"Deliver to the contact at {delivery_location}.",
             "threat_note":          f"{opposing} are moving on this. Expect an ambush.",
             "special_instructions": target.get("handling", "Keep them safe."),
+            "opening_read_aloud":   f"{pickup_location} looks ordinary enough. The target is not hard to spot — they are the one trying not to look like they are waiting.",
         }
     return data
 
@@ -834,16 +836,31 @@ async def build_escort_module(mission: dict, out_dir: Optional[Path] = None) -> 
 
     logger.info(f"[ESCORT] Building: {title!r} | faction={faction} | tier={tier}")
 
+    body        = mission.get("body") or mission.get("description") or ""
     strength    = _party_strength()
     vet         = _get_vet(faction)
     ambush_goal = _ambush_goal(opposing)
-    is_item     = random.random() < 0.35
 
+    # Extract named persons and locations from mission body before falling back to random selection
+    _named_persons = re.findall(r"\b([A-Z][a-z]{1,20}(?:\s+[A-Z][a-z]{1,20}){1,2})\b", body)
+    _known_districts = [
+        "Scrapworks", "Neon Row", "Grand Forum", "Cobbleway Market", "Floating Bazaar",
+        "Hearthstone", "Artisan Quarter", "Night Pits", "Pantheon Walk", "Collapsed Plaza",
+        "Crimson Alley", "Silver Spire", "Shantytown Heights", "Iron Quarter", "Obsidian Quarter",
+        "Diplomats Row", "Tower staging area",
+    ]
+    _body_locations = [loc for loc in _known_districts if loc.lower() in body.lower()]
+
+    is_item = random.random() < 0.35
     if is_item:
         base = random.choice(ITEM_ARCHETYPES)
         target = {**base, "is_item": True, "hp": None, "ac": None, "useful": False}
     else:
         base = random.choice(PERSON_ARCHETYPES)
+        # Use a mission-named person as the target label if one was found in the body
+        if _named_persons:
+            base = {**base, "label": _named_persons[0]}
+            logger.info(f"[ESCORT] Using mission-named target: {_named_persons[0]}")
         target = {**base, "is_item": False}
 
     trap_count = min(6, max(2, (strength["party_size"] // 2) + max(0, strength["max_level"] - 4) // 2))
@@ -859,8 +876,12 @@ async def build_escort_module(mission: dict, out_dir: Optional[Path] = None) -> 
         "the Artisan Quarter scriptorium",    "a Patchwork Saints community hall",
         "the Scrapworks loading bay",         "a vessel at the Ironworks shipping yards",
     ]
-    pickup_location   = random.choice(pickup_options)
-    delivery_location = random.choice(delivery_options)
+    # Prefer locations named in the mission body over random selection
+    pickup_location   = _body_locations[0] if _body_locations else random.choice(pickup_options)
+    delivery_location = (
+        _body_locations[1] if len(_body_locations) > 1
+        else random.choice(delivery_options)
+    )
 
     logger.info(f"[ESCORT] Target={target['label']} | ambush_goal={ambush_goal} | traps={len(traps)}")
 

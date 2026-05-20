@@ -584,12 +584,13 @@ Return JSON only:
   "surface_description": "what the party sees at first, without solution",
   "puzzle_name": "short name",
   "mission_specific_stakes": "named PC/NPC/object/site/consequence summary",
+  "time_pressure": "1 sentence — the clock: what happens to the world if the puzzle is not solved, and how fast",
   "objective": "specific objective",
   "core_puzzle": "what the puzzle is",
   "answer_key": "full answer for DM",
   "exact_solution_steps": ["specific input/action 1", "specific input/action 2", "specific final action"],
   "clue_ladder": [
-    {{"clue": "concrete clue", "where": "where found", "means": "what it proves", "failure_cost": "what happens on failure"}}
+    {{"clue": "concrete clue", "where": "specific named place the party must go to retrieve this clue", "means": "what it proves", "failure_cost": "what happens on failure"}}
   ],
   "clue_meanings": ["5-8 clue meanings"],
   "solve_path": ["phase 1", "phase 2", "phase 3", "final unlock"],
@@ -611,62 +612,180 @@ def _fallback_plan(mission: dict, sponsor: str, puzzle_type: str, objective: str
     personal = context["personal_for"] or "the party"
     terms = context["canon_terms"]
     stakes = context["stakes"]
-    object_name = next((t for t in terms if "oath" in t.lower() or "relic" in t.lower()), title)
-    engine = "rogue arcane engine" if "rogue arcane engine" in stakes else "unstable arcane engine"
+    object_name = next((t for t in terms if any(word in t.lower() for word in ("oath", "relic", "cipher", "mural", "bell", "shrine", "engine", "vault"))), title)
+    engine = "rogue arcane engine" if "rogue arcane engine" in stakes else "unstable pressure in the puzzle system"
     site = "The Warrens' Undercroft" if "Warrens" in " ".join(terms) else "the sponsor's sealed worksite"
     consequence = "a breach in the Dome" if "dome" in stakes or "breach" in stakes else "a public magical disaster"
-    return {
-        "briefing": f"{contact} hires {personal} and the crew because {sponsor} cannot solve the lock around {object_name} without exposing its own cover-up. The job is not to smash a door; it is to restore the failed control sequence before {engine} turns a stolen relic into {consequence}.\n\nThe sponsor wants the truth contained, the relic recovered, and any former ally involved in the trap identified quietly. Every hour spent guessing gives rival handlers more time to weaponize the system.",
-        "surface_description": f"At {site}, {object_name} sits behind a fractured oath-circuit: Iron Fang tally marks, a warforged-compatible command socket, and a missing oath phrase burned out of the sequence. The ward hums in pulses that match an engine cycle rather than a door lock.",
+    base_briefing = (
+        f"{contact} hires {personal} and the crew because {sponsor} cannot solve {object_name} without exposing a failure of its own experts. "
+        f"The job is not to smash through the obstacle; it is to understand the rules, prove the correct answer, and finish the solve before {consequence} becomes public.\n\n"
+        f"The sponsor wants the site preserved, the answer documented, and the embarrassing false starts kept quiet. Every hour spent guessing gives rivals, reporters, or unstable magic more time to turn {title} into a scandal."
+    )
+
+    templates: Dict[str, Dict[str, Any]] = {
+        "language_cipher": {
+            "surface_description": f"At {site}, {object_name} appears as a ring of mismatched scripts, bell marks, clipped names, and repeated punctuation that looks decorative until read aloud. Three lines are visibly newer than the rest.",
+            "puzzle_name": f"{title} Cipher Bell",
+            "core_puzzle": f"A layered language cipher around {object_name}; the repeated marks are separators, the missing vowels define the reading order, and the final phrase must be spoken in the old civic pronunciation.",
+            "answer_key": f"The party must identify the separator mark, group the names by month-bell order, restore the missing vowels from the sponsor archive, then read the final phrase aloud while touching the newest line last. Reading it alphabetically produces a false confession and resets the cipher.",
+            "exact_solution_steps": [
+                "Identify the repeated mark as a separator rather than a letter.",
+                "Group the fragments by bell/month order instead of written order.",
+                "Restore the missing vowels from an archive, temple, or witness source.",
+                "Read the final phrase aloud in the old pronunciation while touching the newest line last.",
+            ],
+            "clue_ladder": [
+                {"clue": "The same mark appears after names of different lengths.", "where": site, "means": "It is punctuation or a separator, not a letter.", "failure_cost": "A false translation wastes half a day."},
+                {"clue": "One old bell-name appears in three fragments.", "where": "archive or public monument", "means": "Bell/month order is the sequence key.", "failure_cost": "A rival solver publishes a wrong reading."},
+                {"clue": "The newer line uses modern spelling only where the old sound vanished.", "where": "close inspection", "means": "Pronunciation matters more than spelling.", "failure_cost": "The cipher resets one outer ring."},
+            ],
+            "clue_meanings": ["Separator marks divide words.", "Bell/month order replaces alphabetical order.", "Modern spelling is bait.", "The newest line is touched last.", "The answer must be spoken, not only written."],
+            "solve_path": ["Inspect the script ring.", "Research old bell/month names.", "Restore missing vowels.", "Test pronunciation on a harmless fragment.", "Speak the final phrase and touch the newest line last."],
+            "alternate_solutions": ["Comprehend languages helps with sounds but not order.", "A bardic or historian approach can reconstruct pronunciation.", "A careful rubbing lets the party solve away from the unstable site."],
+            "unstick_notes": ["Have a scholar recognize one bell-name.", "Let a wrong spoken phrase light the correct separators.", "Let the contact mispronounce a word and reveal why sound matters.", "A partial success translates the warning even if the lock stays closed."],
+        },
+        "art_puzzle": {
+            "surface_description": f"{object_name} is spread across paint, tile, or stained glass at {site}. The image changes when viewed from different heights, and the obvious central figure has been overpainted by a later hand.",
+            "puzzle_name": f"{title} Mural Sequence",
+            "core_puzzle": f"A visual sequence puzzle around {object_name}; color layers reveal three different time periods, and the answer is the path of the unpainted negative space rather than the painted figures.",
+            "answer_key": "The party must view the artwork from child-height, lantern-height, and balcony-height, trace the negative space shared by all three layers, then place or name the missing color in the only panel that never casts a shadow.",
+            "exact_solution_steps": [
+                "Separate the oldest pigment layer from later overpaint.",
+                "View the work from three heights or angles.",
+                "Trace the shared negative-space path.",
+                "Name or place the missing color in the panel that never casts a shadow.",
+            ],
+            "clue_ladder": [
+                {"clue": "Old pigment reflects differently under lantern light.", "where": site, "means": "There are multiple time layers.", "failure_cost": "The party follows the newest layer first and loses time."},
+                {"clue": "The central figure's shadow points nowhere.", "where": "balcony or upper landing", "means": "The obvious subject is bait.", "failure_cost": "A wrong color choice stains one panel for a day."},
+                {"clue": "A child's-eye sketch matches the lowest layer.", "where": "local witness or archive", "means": "Height changes the answer.", "failure_cost": "A rival guesses the first viewing angle."},
+            ],
+            "clue_meanings": ["Pigment age matters.", "Negative space is the true path.", "The obvious subject is bait.", "The missing color is an answer token.", "Perspective changes the sequence."],
+            "solve_path": ["Inspect pigment layers.", "Find the three viewing angles.", "Trace shared negative space.", "Identify the no-shadow panel.", "Place or name the missing color."],
+            "alternate_solutions": ["Artisan tools can reveal pigment age.", "Illusion magic can isolate layers.", "A player drawing the mural can solve the negative-space path manually."],
+            "unstick_notes": ["Let a failed check reveal one false layer.", "Have light from a passing lantern expose pigment age.", "Let an NPC child see the first correct angle.", "A partial color match opens a harmless preview panel."],
+        },
+        "physical_mechanism": {
+            "surface_description": f"At {site}, {object_name} is a locked assembly of counterweights, cracked pressure plates, and tool-scarred access panels. The mechanism answers weight and timing, not passwords.",
+            "puzzle_name": f"{title} Counterweight Engine",
+            "core_puzzle": f"A physical timing and weight puzzle around {object_name}; the safe route balances old counterweights before releasing the final catch, while brute force shifts the load into a dangerous reset.",
+            "answer_key": "The party must lock the cracked plate, balance three weights in ascending load order, release the decoy catch first, then pull the real release while the pressure needle is inside the marked safe band.",
+            "exact_solution_steps": [
+                "Brace or lock the cracked pressure plate.",
+                "Measure or infer the three counterweight loads.",
+                "Set weights in ascending load order.",
+                "Release the decoy catch first.",
+                "Pull the real release while the pressure needle is in the safe band.",
+            ],
+            "clue_ladder": [
+                {"clue": "Tool scars cluster around the wrong catch.", "where": "access panel", "means": "Previous solvers attacked the decoy.", "failure_cost": "The mechanism shifts and adds a reset timer."},
+                {"clue": "Dust under the lightest weight is undisturbed.", "where": "counterweight bay", "means": "The order starts light, not heavy.", "failure_cost": "One plate locks until manually reset."},
+                {"clue": "The pressure needle pauses twice before the true safe band.", "where": "gauge face", "means": "Timing matters after balance.", "failure_cost": "Steam or force backlash deals minor damage and noise."},
+            ],
+            "clue_meanings": ["The obvious catch is a decoy.", "Weights ascend by load.", "The cracked plate must be braced.", "The gauge safe band is the final timing window.", "Brute force creates a reset, not a solve."],
+            "solve_path": ["Survey the panels.", "Secure the damaged plate.", "Find counterweight order.", "Trigger the decoy safely.", "Use the pressure gauge to time the true release."],
+            "alternate_solutions": ["Thieves' tools can bypass the decoy after identifying it.", "Athletics can hold a plate steady while others solve.", "Mending or similar magic can stabilize but not solve the order."],
+            "unstick_notes": ["Let a failed attempt move only one weight and reveal its load.", "Have the pressure gauge twitch toward the safe band.", "Let tool marks identify the decoy catch.", "A rival brute-force attempt demonstrates the reset."],
+        },
+        "divine_trial": {
+            "surface_description": f"{object_name} rests in a quiet trial space at {site}: offerings are intact, old prayers are crossed out, and the air warms whenever someone speaks a half-truth.",
+            "puzzle_name": f"{title} Witness Trial",
+            "core_puzzle": f"A shrine trial around {object_name}; the answer is not piety by performance, but naming the truthful witness, the broken vow, and the mercy owed afterward.",
+            "answer_key": "The party must reject the flattering offering, identify which prayer is a witness statement, admit the broken vow aloud, then choose the merciful consequence rather than the punitive one.",
+            "exact_solution_steps": [
+                "Identify the crossed-out prayer as witness testimony.",
+                "Reject the offering that praises the sponsor too neatly.",
+                "Name the broken vow aloud.",
+                "Choose the merciful consequence that protects the harmed party without hiding the truth.",
+            ],
+            "clue_ladder": [
+                {"clue": "The crossed-out prayer remains warm to the touch.", "where": "shrine wall", "means": "It is the living witness statement.", "failure_cost": "The shrine repeats a warning and withholds one symbol."},
+                {"clue": "The richest offering casts no shadow.", "where": "altar", "means": "Flattery is false piety.", "failure_cost": "The trial shifts toward punishment."},
+                {"clue": "A humble offering names the harmed party, not the sponsor.", "where": "offering bowl", "means": "Mercy is owed to the harmed, not the powerful.", "failure_cost": "A faction observer objects and adds pressure."},
+            ],
+            "clue_meanings": ["Witness truth outranks sponsor pride.", "The rich offering is bait.", "The broken vow must be named.", "Mercy is part of the solution.", "Concealing the truth fails the trial."],
+            "solve_path": ["Read prayers as testimony.", "Separate true offerings from flattering ones.", "Name the broken vow.", "Choose mercy with accountability.", "Accept the shrine's reveal or opening."],
+            "alternate_solutions": ["Religion identifies trial logic.", "Insight spots the flattering falsehood.", "A sincere confession can replace one missing clue."],
+            "unstick_notes": ["Let the shrine warm at true statements.", "Have a false offering go cold.", "Let a PC's honest admission reveal the next symbol.", "A failed punitive choice causes warning, not immediate failure."],
+        },
+        "rift_memory": {
+            "surface_description": f"{site} repeats the same moment around {object_name}: dust falls upward, a voice answers before questions are asked, and one memory appears slightly different each loop.",
+            "puzzle_name": f"{title} Memory Loop",
+            "core_puzzle": f"A rift-memory sequence around {object_name}; the party must identify which remembered detail changes, anchor the true event, and break the loop without erasing the witness memory.",
+            "answer_key": "The party must observe three loops, mark the one detail that changes each time, speak the unchanged witness phrase, then move the anchor object to the location it occupied before the false memory formed.",
+            "exact_solution_steps": [
+                "Observe or provoke three loops without forcing an ending.",
+                "Identify the changing detail.",
+                "Find the unchanged witness phrase.",
+                "Move the anchor object to its original location.",
+                "Speak the unchanged phrase to close the loop without erasing the memory.",
+            ],
+            "clue_ladder": [
+                {"clue": "One object changes position in each loop.", "where": site, "means": "That object is the anchor.", "failure_cost": "The next loop starts with one PC briefly displaced."},
+                {"clue": "One phrase is identical in every memory replay.", "where": "loop dialogue", "means": "The unchanged phrase is the key.", "failure_cost": "The loop repeats with a new sensory distortion."},
+                {"clue": "The false memory protects someone from guilt, not harm.", "where": "witness account", "means": "Do not erase the witness; restore the event.", "failure_cost": "The witness panics and becomes harder to question."},
+            ],
+            "clue_meanings": ["Changing detail marks the anchor.", "Unchanged phrase is the closure key.", "Restoration beats erasure.", "Three loops are enough evidence.", "Forcing the end creates displacement."],
+            "solve_path": ["Watch loops.", "Track differences.", "Identify anchor and unchanged phrase.", "Move anchor back.", "Speak the phrase and let the true memory settle."],
+            "alternate_solutions": ["Arcana tracks the anchor.", "Insight or Medicine helps protect the witness.", "A careful written log can replace perfect player memory."],
+            "unstick_notes": ["Make the changing detail visually obvious on the third loop.", "Let a failed force attempt reveal why erasure is wrong.", "Have the unchanged phrase echo quietly when the anchor is touched.", "A partial solve stabilizes the site for another try."],
+        },
+    }
+
+    if puzzle_type in {"symbol_pattern", "logic_sequence", "moral_choice", "lore_history"}:
+        templates[puzzle_type] = {
+            "surface_description": f"{object_name} presents a grid of symbols, statements, and missing placements at {site}. Each row obeys one rule and one tempting false rule.",
+            "puzzle_name": f"{title} Rule Grid",
+            "core_puzzle": f"A rule-deduction puzzle around {object_name}; the answer comes from proving which rule survives every row, then placing the exception in the only slot that explains the history.",
+            "answer_key": "The party must reject the rule that works only on the first row, identify the survivor rule across all rows, place the exception token in the historical gap, then state why the exception exists.",
+            "exact_solution_steps": ["List visible row rules.", "Disprove the attractive first-row rule.", "Find the rule that survives every row.", "Place the exception token in the historical gap.", "State why the exception exists."],
+            "clue_ladder": [
+                {"clue": "The first row has an extra mark no other row has.", "where": site, "means": "The obvious first-row rule is bait.", "failure_cost": "The grid locks one row until a new example is found."},
+                {"clue": "One historical name appears where a symbol should be.", "where": "archive or witness memory", "means": "The exception is historical, not mathematical.", "failure_cost": "The sponsor argues for a cleaner but wrong answer."},
+                {"clue": "Every correct row preserves one empty space.", "where": "grid inspection", "means": "The gap must be explained, not filled blindly.", "failure_cost": "A wrong token causes a harmless but time-consuming reset."},
+            ],
+            "clue_meanings": ["First-row rule is bait.", "Survivor rule appears in every row.", "The exception is historical.", "The gap needs explanation.", "The answer is stated and placed."],
+            "solve_path": ["Write candidate rules.", "Disprove bad rules.", "Research the historical exception.", "Place the exception token.", "State the exception's reason."],
+            "alternate_solutions": ["Logic notes can solve without rolls.", "History can identify the exception early.", "A player-built table or diagram is valid evidence."],
+            "unstick_notes": ["Reveal a counterexample after a wrong placement.", "Let research name the exception.", "Have one row glow when its rule is correctly stated.", "A partial solve opens one clue compartment."],
+        }
+
+    template = templates.get(puzzle_type) or {
+        "surface_description": f"At {site}, {object_name} sits behind a fractured oath-circuit: tally marks, a command socket, and a missing oath phrase burned out of the sequence. The ward hums in pulses that match a civic engine cycle rather than a door lock.",
         "puzzle_name": f"{title} Oath-Circuit",
-        "mission_specific_stakes": f"{personal} is tied to {object_name}; {contact} wants {sponsor}'s breach buried; the wrong solve feeds {engine} toward {consequence}.",
-        "objective": objective,
-        "core_puzzle": f"A broken arcane oath-circuit around {object_name}; the visible Iron Fang order is bait, while the true sequence is betrayal -> custody -> restoration -> release.",
-        "answer_key": f"The party must restore the missing oath phrase, route the engine pulse through the warforged-compatible socket, then speak or inscribe the original custody oath in reverse witness order. The final action is to ground {object_name} before the engine reaches its fourth pulse; doing it in the visible Iron Fang order arms the trap.",
-        "exact_solution_steps": [
-            f"Identify the burned-out oath phrase connected to {object_name}.",
-            "Separate the visible Iron Fang tally order from the true witness order.",
-            "Route or mimic the warforged-compatible socket so the circuit accepts a living/construct witness.",
-            "Input the custody oath in reverse witness order: betrayal, custody, restoration, release.",
-            f"Ground {object_name} before the fourth engine pulse to prevent {consequence}.",
-        ],
+        "core_puzzle": f"A broken arcane oath-circuit around {object_name}; the visible order is bait, while the true sequence is betrayal -> custody -> restoration -> release.",
+        "answer_key": f"The party must restore the missing oath phrase, route the pulse through the compatible socket, then speak or inscribe the original custody oath in reverse witness order. The final action is to ground {object_name} before the fourth pulse.",
+        "exact_solution_steps": [f"Identify the burned-out oath phrase connected to {object_name}.", "Separate the visible order from the true witness order.", "Bridge the compatible socket safely.", "Input the custody oath in reverse witness order.", f"Ground {object_name} before the fourth pulse."],
         "clue_ladder": [
-            {"clue": "Soot around the missing phrase curls inward, not outward.", "where": site, "means": "The phrase was removed by the circuit itself after a betrayal, not chiseled out later.", "failure_cost": "The next engine pulse advances while the party chases a vandal theory."},
-            {"clue": "The warforged socket is polished by use and sized for a palm, not a key.", "where": "control plinth", "means": f"{personal} or another construct-linked witness can safely bridge the circuit.", "failure_cost": "A metal tool works briefly, then heats and marks the user."},
-            {"clue": "An old failed attempt used the visible Iron Fang tally order and scorched the release rune.", "where": "records or old map collection", "means": "The visible order is a false reading.", "failure_cost": "A rival repeats the same wrong attempt and locks one research route for a day."},
-            {"clue": "Veyra's briefing avoids naming who first broke the custody oath.", "where": "interview with the contact", "means": "The cover-up is part of the solution sequence.", "failure_cost": "The sponsor grows defensive and adds a watcher."},
+            {"clue": "Soot around the missing phrase curls inward, not outward.", "where": site, "means": "The phrase was removed by the circuit itself.", "failure_cost": "The next pulse advances while the party chases a vandal theory."},
+            {"clue": "The socket is polished by use and sized for a palm, not a key.", "where": "control plinth", "means": "Witness identity matters.", "failure_cost": "A metal tool works briefly, then heats and marks the user."},
+            {"clue": "An old failed attempt used the visible order.", "where": "records or old map collection", "means": "The visible order is a false reading.", "failure_cost": "A rival repeats the wrong attempt and locks one route for a day."},
         ],
-        "clue_meanings": [
-            "The missing oath phrase marks the start, not the end.",
-            "Iron Fang tally order is bait left by the trap-maker.",
-            "The warforged socket means witness identity matters.",
-            "Engine pulses are a countdown and a metronome.",
-            "The former ally's failed order proves what not to do.",
-        ],
-        "solve_path": [
-            f"Inspect {site} and identify the oath-circuit as a custody ward around {object_name}.",
-            "Research the failed Iron Fang attempt and prove the visible order is false.",
-            "Interview the contact or rival witness to recover the missing oath phrase.",
-            "Test the warforged/construct-compatible bridge with safeguards.",
-            f"Input the reverse witness order and ground {object_name} before the fourth pulse.",
-        ],
-        "alternate_solutions": [
-            "Research-first solve through records and failed attempt notes.",
-            "Arcana plus tool proficiency to simulate the warforged socket safely.",
-            "Social solve: pressure the contact into revealing the missing oath phrase.",
-            "Divination or object reading to confirm the witness order, still requiring the physical grounding step.",
-        ],
-        "unstick_notes": [
-            "Let a failed visible-order attempt prove the bait without destroying the relic.",
-            "Have the engine pulse visibly advance when the party stalls.",
-            "Let the contact accidentally say one word of the missing oath phrase.",
-            "A rival makes a useful wrong attempt that reveals the false order.",
-            "Any careful theory can be tested on a harmless side rune first.",
-        ],
+        "clue_meanings": ["The missing phrase marks the start.", "Visible order is bait.", "The socket means witness identity matters.", "Pulses are a countdown.", "Grounding is the final action."],
+        "solve_path": [f"Inspect {site}.", "Research the failed attempt.", "Recover the missing oath phrase.", "Test the socket safely.", f"Input the reverse witness order and ground {object_name}."],
+        "alternate_solutions": ["Research-first solve.", "Arcana plus tools to simulate the socket.", "Social solve through a witness or contact.", "Divination confirms order but not the physical grounding step."],
+        "unstick_notes": ["Let a failed visible-order attempt prove the bait.", "Have the pulse visibly advance when the party stalls.", "Let the contact accidentally say one word of the phrase.", "A careful theory can be tested on a harmless side rune first."],
+    }
+
+    return {
+        "briefing": base_briefing,
+        "surface_description": template["surface_description"],
+        "puzzle_name": template["puzzle_name"],
+        "mission_specific_stakes": f"{personal} is tied to {object_name}; {contact} wants {sponsor}'s breach buried; the wrong solve feeds {engine} toward {consequence}.",
+        "time_pressure": f"Each failed attempt or long rest advances {engine} by one stage; at stage 4, {consequence} becomes public and the sponsor's window closes.",
+        "objective": objective,
+        "core_puzzle": template["core_puzzle"],
+        "answer_key": template["answer_key"],
+        "exact_solution_steps": template["exact_solution_steps"],
+        "clue_ladder": template["clue_ladder"],
+        "clue_meanings": template["clue_meanings"],
+        "solve_path": template["solve_path"],
+        "alternate_solutions": template["alternate_solutions"],
+        "unstick_notes": template["unstick_notes"],
         "wrong_attempts": random.sample(WRONG_OUTCOMES, 5),
         "world_moves": random.sample(WORLD_MOVES, 5),
-        "debrief": f"{sponsor} reviews whether the party recovered {object_name}, kept the breach quiet, and exposed the former ally trap without public scandal.",
-        "news_angle": f"A quiet technical item unless {consequence} becomes visible or {sponsor}'s cover-up leaks.",
+        "debrief": f"{sponsor} reviews whether the party solved {object_name}, documented the fair answer, and contained the fallout around {consequence}.",
+        "news_angle": f"A quiet technical or culture item unless {consequence} becomes visible or {sponsor}'s failed solve leaks.",
     }
 
 

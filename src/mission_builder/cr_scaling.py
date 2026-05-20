@@ -4,6 +4,9 @@ cr_scaling.py — Central party-level and challenge-rating helpers.
 All mission builder pipelines import from here. Single source of truth
 for dynamic CR calculation so every pipeline scales consistently.
 
+Current CR rule: standard missions target party average level + 4.
+Each numeric difficulty step below 5 subtracts 1 CR; each step above 5 adds 1 CR.
+
 CR formula: max(1, min(30, avg_party_level + TIER_CR_OFFSET[tier]))
 
 Tier offsets range from -8 (easy tutorial) to +10 (Tower-level epic),
@@ -20,33 +23,32 @@ from typing import Any, Dict, List
 # ---------------------------------------------------------------------------
 
 TIER_CR_OFFSET: Dict[str, int] = {
-    # Easy / learning
-    "tutorial":       -8,
-    "trivial":        -6,
-    "easy":           -4,
-    # Neighbourhood / low-stakes
-    "local":          -2,
-    "patrol":         -1,
-    # Standard adventuring (baseline)
-    "standard":        0,
-    "escort":         +1,
-    "investigation":  +1,
-    "courier":        +1,
-    "negotiation":    +1,
-    # Elevated danger
-    "rift":           +3,
-    "dungeon":        +3,
-    "dungeon-delve":  +4,
-    "major":          +5,
-    "inter-guild":    +5,
-    # Deadly / legendary
-    "high-stakes":    +7,
-    "epic":           +8,
-    "divine":         +9,
-    "tower":         +10,
+    "tutorial":      -4,
+    "trivial":       -3,
+    "easy":          -2,
+    "local":         -1,
+    "patrol":        -1,
+    "standard":       0,
+    "escort":         0,
+    "investigation":  0,
+    "courier":        0,
+    "negotiation":    0,
+    "seasoned":      +1,
+    "rift":          +1,
+    "dungeon":       +1,
+    "dungeon-delve": +2,
+    "major":         +2,
+    "inter-guild":   +2,
+    "elite":         +3,
+    "high-stakes":   +3,
+    "legend":        +4,
+    "epic":          +4,
+    "divine":        +5,
+    "tower":         +6,
 }
 
 _DEFAULT_OFFSET = 0  # fallback for unknown tiers
+_BASE_PARTY_CR_BONUS = 4
 
 
 # ---------------------------------------------------------------------------
@@ -117,6 +119,10 @@ def mission_cr(mission: dict) -> int:
     """
     Return the target encounter CR for this mission.
 
+    Baseline: party average level + 4. A numeric difficulty of 5 is standard;
+    each point below 5 subtracts 1 CR, and each point above 5 adds 1 CR.
+    Named tiers map to the same easier/harder offsets.
+
     Priority:
       1. Explicit mission["cr"] if set (DM override — always respected).
       2. avg_party_level + TIER_CR_OFFSET[tier], clamped 1–30.
@@ -138,7 +144,13 @@ def mission_cr(mission: dict) -> int:
 
     strength = party_strength()
     avg      = int(strength["avg_level"])
-    tier     = (mission.get("tier") or "standard").lower().strip()
+    tier     = (mission.get("tier") or mission.get("difficulty_label") or "standard").lower().strip()
     offset   = TIER_CR_OFFSET.get(tier, _DEFAULT_OFFSET)
+    numeric_difficulty = mission.get("difficulty") or mission.get("diff")
+    try:
+        if numeric_difficulty not in (None, ""):
+            offset = int(numeric_difficulty) - 5
+    except (TypeError, ValueError):
+        pass
 
-    return max(1, min(30, avg + offset))
+    return max(1, min(30, avg + _BASE_PARTY_CR_BONUS + offset))

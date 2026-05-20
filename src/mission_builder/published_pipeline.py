@@ -19,7 +19,9 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from src.log import logger
-from src.mission_builder.encounters import get_cr, get_encounter_budget, get_party_size
+from src.mission_builder.encounters import get_encounter_budget, get_party_size
+from src.mission_builder.cr_scaling import mission_cr
+from src.mission_builder.monster_roster import faction_role_monsters, monster_summary
 from src.mission_builder.html_renderer import render_component, render_index, render_maps_page
 
 OUTPUT_BASE = Path(__file__).resolve().parent.parent.parent / "generated_modules"
@@ -707,6 +709,20 @@ def _module_markdown(ctx: dict, scenes: list[dict]) -> str:
 
 
 def _stat_block(ctx: dict, role: str) -> str:
+    wanted = ["scout"] if role == "Scout" else ["captain", "lieutenant", "champion"]
+    rows = faction_role_monsters(wanted, count=1, cr_max=max(1, int(ctx.get("cr") or 1) + 1))
+    if rows:
+        m = rows[0]
+        actions = str(m.get("actions") or "Attack. Uses faction weapons.").replace("\n", "\n>> ")
+        traits = str(m.get("traits") or "").replace("\n", "\n>> ")
+        return (
+            f">> {m.get('name')}\n"
+            f">> Medium humanoid, faction-aligned\n"
+            f">> Armor Class {m.get('ac')}; Hit Points {m.get('hp')}; Speed {m.get('speed') or '30 ft.'}\n"
+            f">> Challenge {m.get('cr')}; {monster_summary(m)}\n"
+            + (f">> Traits. {traits}\n" if traits else "")
+            + f">> {actions}\n\n"
+        )
     cr = ctx["cr"]
     prof = max(2, min(6, 2 + cr // 5))
     hp = 18 + cr * (6 if role == "Scout" else 10)
@@ -915,7 +931,7 @@ async def generate_published_module(mission: dict, player_name: str = "") -> Opt
     ctx = gather_context(mission)
     ctx.update(seed)
     ctx["primary_location"] = _infer_primary_location(seed, ctx.get("primary_location", ""))
-    ctx["cr"] = get_cr(seed["tier"])
+    ctx["cr"] = mission_cr(seed)
     ctx["dc"] = _dc(ctx["cr"])
     ctx["goal"] = _goal_from_title(seed["title"], seed["mission_type"])
     ctx["enemy"] = _enemy_name(seed["mission_type"], seed["opposing_faction"] if seed["opposing_faction"] != "None" else seed["faction"])

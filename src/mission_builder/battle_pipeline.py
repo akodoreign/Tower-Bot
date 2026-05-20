@@ -51,6 +51,12 @@ import httpx
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import (
+    faction_role_monsters,
+    get_monsters_by_cr_sources,
+    mission_enemy_entry,
+    monster_summary,
+)
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -290,6 +296,10 @@ def _scale_cr(party_level: int, difficulty_bonus: int = 4) -> int:
     return max(1, party_level + difficulty_bonus)
 
 
+def _target_cr(mission: dict, strength: Dict[str, Any]) -> int:
+    return mission_cr(mission or {"tier": "standard"})
+
+
 def _grunt_count(party_size: int, fight_index: int, conflict_type: str) -> int:
     """
     Grunt count scales with party size and increases across fights.
@@ -342,7 +352,7 @@ def _party_strength() -> Dict[str, Any]:
 def _party_scaling_note(strength: Dict) -> str:
     return (
         f"Live party: {strength['party_size']} PCs, avg level {strength['avg_level']}, "
-        f"max level {strength['max_level']}. Enemy CR target: {_scale_cr(int(strength['avg_level']))}."
+        f"max level {strength['max_level']}. Enemy CR target uses mission_cr(): party average +4, shifted by mission difficulty."
     )
 
 
@@ -412,8 +422,19 @@ def _determine_conflict_type(mission: dict) -> str:
     return "faction_vs_faction"
 
 
-def _pick_void_creatures(party_level: int, count: int) -> List[Dict]:
-    target_cr = _scale_cr(party_level)
+def _pick_void_creatures(target_cr: int, count: int) -> List[Dict]:
+    rows = get_monsters_by_cr_sources(
+        max(1, target_cr - 2),
+        target_cr + 2,
+        count=count,
+        only_void=True,
+        sources=("undercity", "undercity_high_cr"),
+    )
+    if rows:
+        return [
+            {"name": m["name"], "cr": str(m.get("cr") or target_cr), "desc": monster_summary(m), "db_monster": m, "bulk": False}
+            for m in rows
+        ]
     pool = sorted(VOID_CREATURES, key=lambda c: abs(int(c["cr"].split("/")[0]) - target_cr))
     chosen = pool[:max(3, count)]
     random.shuffle(chosen)
@@ -457,6 +478,16 @@ def _battle_mimir_enemies(
             f"Fight {fight.get('index', len(enemies) + 1)}: {fight.get('name', 'Pocket Fight')}. "
             f"{fight.get('enemy_desc', '')} {fight.get('enemy_tactic', '')}"
         ).strip()
+        if fight.get("db_enemy"):
+            entry = mission_enemy_entry(fight["db_enemy"], count=count, notes=note)
+            key = (str(entry.get("name", "")).lower(), str(entry.get("cr", cr)))
+            if key in seen:
+                seen[key]["count"] += count
+                seen[key]["notes"] = f"{seen[key].get('notes', '')}\n{note}".strip()
+                continue
+            seen[key] = entry
+            enemies.append(entry)
+            continue
         if key in seen:
             seen[key]["count"] += count
             seen[key]["notes"] = f"{seen[key].get('notes', '')}\n{note}".strip()
@@ -561,11 +592,14 @@ async def _generate_briefing(
     elif conflict_type == "monster_breakout":
         void_note = f"\nBreakout source: {source['name']} — {source['creature_type']}. The creatures have broken containment. The source location is sealed but breached.\n"
 
+    body = mission.get("body") or mission.get("description") or ""
+
     prompt = f"""Write a battle mission briefing for a D&D Undercity campaign.
 
 MISSION: {mission.get('title', 'Battle')}
+MISSION NOTES: {body[:400]}
 CONFLICT TYPE: {conflict_cfg['label']}
-HIRING FACTION: {hiring_faction} ({force['tactics']})
+HIRING FACTION: {hiring_faction} — what they LOSE if this battle fails: {conflict_cfg.get('faction_loss', 'ground in the district and reputation')}
 OPPOSING SIDE: {opposing_side}
 CONTACT NPC: {contact['name']} — {contact['role']}
 LOCATION: {location['name']}, {location['district']}
@@ -576,16 +610,17 @@ BULLETIN TONE: {conflict_cfg['bulletin_tone']}
 
 Write ONLY a JSON object with these keys, no markdown:
 {{
-  "contact_speech": "2-3 sentences the contact says when hiring the party — specific, urgent, with a real personal stake",
-  "situation": "1-2 sentences describing the public situation and where the battle will be",
-  "timer_reason": "one sentence explaining why the 5-day clock is fixed",
-  "opposing_desc": "one sentence describing the opposing side",
-  "win_conditions": ["3 bullet strings — specific things the party can do to turn the tide"],
-  "lose_condition": "one sentence — what happens if the battle is lost",
+  "contact_speech": "2-3 sentences the contact says — specific, urgent, naming what {hiring_faction} specifically loses if they fail",
+  "situation": "2-3 sentences describing the public situation, why this location, and what's already happened",
+  "timer_reason": "one sentence explaining why the {timer}-day clock is fixed and cannot be moved",
+  "opposing_desc": "one sentence on the opposing side's goal and why they won't back down",
+  "win_conditions": ["specific thing 1 the party can do to turn this battle", "specific thing 2", "specific thing 3"],
+  "lose_condition": "one sentence — the specific consequence for {hiring_faction} and the district if the battle is lost",
+  "desertion_consequence": "one sentence — what happens to the party's reputation/faction standing if they retreat mid-battle",
   "debrief_location": "{conflict_cfg['debrief_location']}"
 }}"""
 
-    text = await _ollama(prompt, 1000)
+    text = await _ollama(prompt, 1200)
     m = re.search(r"\{[\s\S]*\}", text)
     if m:
         try:
@@ -595,19 +630,25 @@ Write ONLY a JSON object with these keys, no markdown:
         except Exception:
             pass
     return {
-        "contact_speech":   f"{contact['name']} needs fighters for what's coming. {hiring_faction} has {timer} days.",
-        "situation":        f"A battle is coming to {location['name']}.",
-        "timer_reason":     "The opposing side has already committed. There is no postponing this.",
-        "opposing_desc":    f"The {opposing_side} are not standing down.",
-        "win_conditions":   ["Hold the line through all pocket fights", "Complete the glory fight if attempted", "Keep morale from collapsing"],
-        "lose_condition":   "The battle is lost and the faction loses ground in the district.",
-        "debrief_location": conflict_cfg["debrief_location"],
-        "timer_days":       timer,
+        "contact_speech":        f"{contact['name']} needs fighters for what's coming. {hiring_faction} has {timer} days to hold {location['name']}.",
+        "situation":             f"A battle is coming to {location['name']}. {opposing_side} has committed forces — {hiring_faction} cannot afford to cede this ground.",
+        "timer_reason":          "The opposing side has already moved. There is no postponing this.",
+        "opposing_desc":         f"The {opposing_side} are not standing down. They have numbers and a reason.",
+        "win_conditions":        [
+            f"Hold {location['name']} through all pocket fights",
+            "Complete the glory fight if attempted",
+            f"Prevent {opposing_side} morale from recovering after a loss",
+        ],
+        "lose_condition":        f"{hiring_faction} loses ground in {location['district']} and faction reputation takes a hit.",
+        "desertion_consequence": f"Leaving the battle marks the party as unreliable — {hiring_faction} will not pay and may assign blame publicly.",
+        "debrief_location":      conflict_cfg["debrief_location"],
+        "timer_days":            timer,
     }
 
 
 async def _generate_pocket_fight(
     fight_index: int,
+    mission: dict,
     conflict_type: str,
     opposing_side: str,
     location: Dict,
@@ -616,20 +657,33 @@ async def _generate_pocket_fight(
     source: Optional[Dict],
 ) -> Dict[str, Any]:
     conflict_cfg = CONFLICT_TYPES[conflict_type]
-    cr_target = _scale_cr(int(strength["avg_level"]))
+    cr_target = _target_cr(mission, strength)
     grunt_count = _grunt_count(strength["party_size"], fight_index, conflict_type)
     reinforce_chance = 40 + fight_index * 10  # later fights more likely to have reinforcement
+    db_enemy = None
 
     if conflict_type == "faction_vs_void" and void_creatures:
         creature = void_creatures[fight_index % len(void_creatures)]
         enemy_desc = f"{creature['name']} (CR {creature['cr']}) — {creature['desc']}"
         enemy_name = creature["name"]
+        db_enemy = creature.get("db_monster")
     elif conflict_type == "monster_breakout" and source:
-        enemy_name = f"Escaped {source['creature_type'].split(',')[0].strip()}"
-        enemy_desc = f"Escaped from {source['name']} — {source['creature_type']}"
+        rows = get_monsters_by_cr_sources(max(1, cr_target - 2), cr_target + 2, count=1, include_void=False, sources=("undercity", "undercity_high_cr"))
+        if rows:
+            db_enemy = rows[0]
+            enemy_name = db_enemy["name"]
+        else:
+            enemy_name = f"Escaped {source['creature_type'].split(',')[0].strip()}"
+        enemy_desc = monster_summary(db_enemy) if db_enemy else f"Escaped from {source['name']} - {source['creature_type']}"
     else:
-        enemy_name = f"{opposing_side} Infantry"
-        enemy_desc = f"Standard {opposing_side} fighters in formation"
+        roles = faction_role_monsters(["enforcer", "lieutenant", "priest", "scout"], count=1, cr_max=cr_target + 1)
+        if roles:
+            db_enemy = roles[0]
+            enemy_name = f"{opposing_side} {db_enemy['name'].replace('Faction ', '')}"
+            enemy_desc = monster_summary(db_enemy)
+        else:
+            enemy_name = f"{opposing_side} Infantry"
+            enemy_desc = f"Standard {opposing_side} fighters in formation"
 
     prompt = f"""Write a pocket fight card for a D&D Undercity battle mission.
 
@@ -643,6 +697,7 @@ REINFORCEMENT CHANCE: {reinforce_chance}% — {conflict_cfg['reinforcement']}
 Write ONLY a JSON object, no markdown:
 {{
   "name": "short evocative fight name (3-5 words)",
+  "read_aloud": "2 sentences, present tense — what the party sees and hears as they enter this zone of the battle",
   "setting": "one sentence — where exactly in the battle this pocket fight takes place",
   "enemy_tactic": "one sentence — how the enemy fights in this pocket fight",
   "environmental_hazard": "one sentence — one terrain or situation hazard in this specific area (or null)",
@@ -663,6 +718,7 @@ Write ONLY a JSON object, no markdown:
     return {
         "index":                fight_index + 1,
         "name":                 data.get("name", f"Pocket Fight {fight_index + 1}"),
+        "read_aloud":           data.get("read_aloud", f"The fight spills into {location['name']}. {enemy_name} hold the ground ahead — there are more of them than you'd like."),
         "setting":              data.get("setting", f"A clash near {location['name']}."),
         "enemy_name":           enemy_name,
         "enemy_desc":           enemy_desc,
@@ -674,6 +730,7 @@ Write ONLY a JSON object, no markdown:
         "hazard":               data.get("environmental_hazard"),
         "outcome_won":          data.get("outcome_if_won", "The tide shifts slightly in the party's favour."),
         "outcome_lost":         data.get("outcome_if_lost", "The enemy presses the advantage."),
+        "db_enemy":             db_enemy,
     }
 
 
@@ -924,9 +981,19 @@ def _pocket_fight_card(fight: Dict, glory_slot: Optional[int], glory: Dict, fc: 
     reinforce_pct = fight.get("reinforce_chance", 40)
     reinforce_color = "#c8531f" if reinforce_pct >= 60 else "#8a7a5c"
 
+    read_aloud_html = ""
+    if fight.get("read_aloud"):
+        read_aloud_html = (
+            f'<div style="background:#0d1a2a;border-left:3px solid #3a6898;padding:8px 12px;'
+            f'margin-bottom:10px;font-style:italic;font-size:13px;color:#a8c4e0;border-radius:0 4px 4px 0;">'
+            f'<span style="font-size:10px;color:#3a6898;font-style:normal;font-weight:700;">READ ALOUD</span><br>'
+            f'{_e(fight["read_aloud"])}</div>'
+        )
+
     return _card(
         f'Pocket Fight {fight["index"]} — {_e(fight["name"])}',
-        f'<div style="color:#c8a96e;margin-bottom:8px;">{_e(fight["setting"])}</div>'
+        read_aloud_html
+        + f'<div style="color:#c8a96e;margin-bottom:8px;">{_e(fight["setting"])}</div>'
         f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
         f'<div><div style="font-size:11px;color:#8a7a5c;">ENEMY</div>'
         f'<div style="color:#c8a96e;">{_e(fight["enemy_name"])}</div>'
@@ -1007,9 +1074,13 @@ def render_battle_module(
     ), fc)
 
     # Win/Lose conditions
+    desertion_note = ""
+    if briefing.get("desertion_consequence"):
+        desertion_note = f'<div style="color:#8a5c1a;font-size:12px;margin-top:6px;font-style:italic;">Desertion: {_e(briefing["desertion_consequence"])}</div>'
     body += _card("Objectives",
         _ul(briefing.get("win_conditions", []), fc)
-        + f'<div style="color:#c8531f;font-size:12px;margin-top:8px;">Fail: {_e(briefing.get("lose_condition",""))}</div>',
+        + f'<div style="color:#c8531f;font-size:12px;margin-top:8px;">Fail: {_e(briefing.get("lose_condition",""))}</div>'
+        + desertion_note,
         fc,
     )
 
@@ -1172,7 +1243,8 @@ async def build_battle_module(mission: dict, out_dir: Optional[Path] = None) -> 
     contact  = _pick_contact(hiring_faction)
 
     # Conflict-specific data
-    void_creatures  = _pick_void_creatures(int(strength["avg_level"]), fight_count) if conflict_type == "faction_vs_void" else None
+    target_cr       = mission_cr(mission)
+    void_creatures  = _pick_void_creatures(target_cr, fight_count) if conflict_type == "faction_vs_void" else None
     source          = _pick_breakout_source() if conflict_type == "monster_breakout" else None
 
     # Glory fight — slot between fight 1-2 or 2-3 (or after last fight)
@@ -1194,7 +1266,7 @@ async def build_battle_module(mission: dict, out_dir: Optional[Path] = None) -> 
 
     pocket_tasks = [
         asyncio.create_task(
-            _generate_pocket_fight(i, conflict_type, opposing_side, location, strength, void_creatures, source)
+            _generate_pocket_fight(i, mission, conflict_type, opposing_side, location, strength, void_creatures, source)
         )
         for i in range(fight_count)
     ]

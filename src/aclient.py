@@ -187,6 +187,41 @@ class DiscordClient(discord.Client):
             logger.debug(f"📅 Calendar tick found no due bulletins (source={source_label})")
         return count
 
+    async def _dispatch_towerbay_tick(self, channel, source_label: str) -> bool:
+        """Run TowerBay's cadence tick and post the board when due."""
+        try:
+            towerbay_bulletin = await check_towerbay_tick(channel=channel)
+        except Exception as e:
+            logger.exception(f"🏗️ TowerBay tick error (source={source_label}): {e}")
+            return False
+
+        if not towerbay_bulletin:
+            logger.debug(f"🏗️ TowerBay tick found no due board (source={source_label})")
+            return False
+
+        try:
+            embeds = format_towerbay_embeds()
+            for batch_start in range(0, len(embeds), 10):
+                batch = embeds[batch_start:batch_start + 10]
+                await channel.send(embeds=batch)
+            logger.info(f"🏗️ TowerBay board posted to #{channel.name} ({len(embeds)} embeds)")
+            return True
+        except Exception as embed_err:
+            logger.warning(f"🏗️ TowerBay embed posting failed ({embed_err}) — falling back to text")
+            chunks, current = [], []
+            for line in towerbay_bulletin.splitlines(keepends=True):
+                if sum(len(l) for l in current) + len(line) > 1900:
+                    chunks.append("".join(current))
+                    current = []
+                current.append(line)
+            if current:
+                chunks.append("".join(current))
+            for chunk in chunks:
+                if chunk.strip():
+                    await channel.send(chunk)
+            logger.info(f"🏗️ TowerBay board posted (text fallback, {len(chunks)} chunk(s))")
+            return True
+
     async def news_feed_loop(self):
         """Post hourly mission board bulletins to the default Discord channel."""
         discord_channel_id = os.getenv("DISCORD_CHANNEL_ID")
@@ -204,6 +239,14 @@ class DiscordClient(discord.Client):
             await refresh_news_types_if_needed()
         except Exception as e:
             logger.exception(f"📰 News type refresh error: {e}")
+
+        # Economy sidecars may be overdue after restarts; do one immediate cadence pass.
+        try:
+            channel = self.get_channel(int(discord_channel_id))
+            if channel:
+                await self._dispatch_towerbay_tick(channel, "startup")
+        except Exception as e:
+            logger.exception(f"🏗️ Startup TowerBay dispatch error: {e}")
 
         # Fire 3 quick bulletins on startup to seed the channel, 4 minutes apart
         # (longer gap so Ollama has breathing room between each one)
@@ -330,30 +373,7 @@ class DiscordClient(discord.Client):
                         logger.info(f"📊 TIA flash (rift) posted to #{channel.name}")
 
                 # TowerBay tick — updates bids, posts board once per 24h, posts sold notifications
-                towerbay_bulletin = await check_towerbay_tick(channel=channel)
-                if towerbay_bulletin:
-                    # Post as color-coded embeds (Discord allows up to 10 embeds per message)
-                    try:
-                        embeds = format_towerbay_embeds()
-                        # Discord max 10 embeds per message — batch if needed
-                        for batch_start in range(0, len(embeds), 10):
-                            batch = embeds[batch_start:batch_start + 10]
-                            await channel.send(embeds=batch)
-                        logger.info(f"🏗️ TowerBay board posted to #{channel.name} ({len(embeds)} embeds)")
-                    except Exception as embed_err:
-                        logger.warning(f"🏗️ TowerBay embed posting failed ({embed_err}) — falling back to text")
-                        chunks, current = [], []
-                        for line in towerbay_bulletin.splitlines(keepends=True):
-                            if sum(len(l) for l in current) + len(line) > 1900:
-                                chunks.append("".join(current))
-                                current = []
-                            current.append(line)
-                        if current:
-                            chunks.append("".join(current))
-                        for chunk in chunks:
-                            if chunk.strip():
-                                await channel.send(chunk)
-                        logger.info(f"🏗️ TowerBay board posted (text fallback, {len(chunks)} chunk(s))")
+                await self._dispatch_towerbay_tick(channel, "news_feed_loop")
 
                 # TIA ticker — drifts values, posts every 4h
                 tia_bulletin = check_tia_tick()

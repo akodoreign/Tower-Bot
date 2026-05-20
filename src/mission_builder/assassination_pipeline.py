@@ -145,6 +145,37 @@ def _get_client_style(faction: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Canon extraction from mission body
+# ---------------------------------------------------------------------------
+
+_KILL_KEYWORDS = re.compile(
+    r"\b(?:eliminate|kill|neutralize|remove|assassinate|execute|silence|take out)\b\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)",
+    re.IGNORECASE,
+)
+_TARGET_LABEL = re.compile(r"\b(?:target|mark|contract)\s*[:\-–]\s*([A-Z][a-z]+(?: [A-Z][a-z]+)*)", re.IGNORECASE)
+_CAPITALIZED = re.compile(r"\b([A-Z][a-z]{2,}(?: [A-Z][a-z]{2,}){0,2})\b")
+_COMMON_WORDS = {"The", "This", "They", "Their", "These", "That", "When", "Where", "After", "Before"}
+
+
+def _extract_target_name(body: str) -> str:
+    """Return the most likely target name from mission body text, or '' if nothing found."""
+    if not body:
+        return ""
+    for pattern in (_KILL_KEYWORDS, _TARGET_LABEL):
+        m = pattern.search(body)
+        if m:
+            name = m.group(1).strip()
+            if name not in _COMMON_WORDS:
+                return name
+    # Fall back to first prominent capitalized name (not a common word)
+    for m in _CAPITALIZED.finditer(body[:600]):
+        name = m.group(1)
+        if name not in _COMMON_WORDS and len(name) > 4:
+            return name
+    return ""
+
+
+# ---------------------------------------------------------------------------
 # Location vocabulary for the hit site
 # ---------------------------------------------------------------------------
 
@@ -292,24 +323,27 @@ Return JSON only:
     return data
 
 
-async def _generate_target(mission: dict, security: Dict, hit_site: str) -> Dict:
-    faction  = mission.get("faction", "Independent")
-    tier     = mission.get("tier", "standard")
-    body     = mission.get("body") or ""
+async def _generate_target(mission: dict, security: Dict, hit_site: str, target_name_hint: str = "") -> Dict:
+    faction   = mission.get("faction", "Independent")
+    body      = mission.get("body") or ""
+    site_desc = HIT_SITE_TYPES.get(hit_site, hit_site)
+    name_line = f"Use this name if it fits: {target_name_hint}" if target_name_hint else "Generate an original name."
 
     prompt = f"""You are building the target profile for a D&D assassination mission.
 
 Client faction: {faction}
 Security level: {security['label']} — {security['guards']}
-Hit location type: {hit_site}
-Mission notes: {body[:200]}
+Hit location type: {site_desc}
+Mission notes: {body[:300]}
+Target name guidance: {name_line}
 
 Generate:
-1. A target name and role (generic — not a canon NPC)
+1. A target name and role (use the name hint if provided)
 2. The target's actual guilt or innocence (the DM secret)
 3. Their daily routine — 3 time windows the party could observe or strike
 4. Security arrangement (use the profile provided)
-5. One piece of information that might change the party's mind about the contract
+5. One detail that might change the party's mind about the contract
+6. A hit site read-aloud: 2 sentences the DM reads when the party first sees the hit site
 
 Return JSON only:
 {{
@@ -322,23 +356,26 @@ Return JSON only:
     {{"time": "evening", "location": "...", "activity": "...", "guards_present": 0}}
   ],
   "security_note": "specific guard arrangement at the hit site",
-  "conscience_trigger": "the detail that might give the party pause"
+  "conscience_trigger": "the detail that might give the party pause",
+  "hit_site_read_aloud": "2 sentences — what the party sees when they first lay eyes on the hit site"
 }}"""
 
     raw = await _ollama(prompt)
     data = _parse_json(raw)
+    fallback_name = target_name_hint or "Veran Solt (District Liaison)"
     if not data:
         data = {
-            "target_name":       "Veran Solt (District Liaison)",
+            "target_name":       fallback_name,
             "target_role":       "Mid-level faction functionary with access to sealed records",
-            "dm_secret":         "Solt has been feeding information to a third party but does not know the extent of the damage caused",
+            "dm_secret":         f"{fallback_name.split('(')[0].strip()} has been feeding information to a third party but does not know the extent of the damage caused.",
             "routine": [
                 {"time": "morning",   "location": "personal office, 3rd floor",    "activity": "reviews correspondence alone",   "guards_present": 1},
                 {"time": "afternoon", "location": "private dining room, guild hall", "activity": "lunches with two known associates", "guards_present": 2},
                 {"time": "evening",   "location": "residence, upper district",       "activity": "retires early, one guard at door",  "guards_present": 1},
             ],
-            "security_note":     "Two personal bodyguards rotate in 6-hour shifts. No magic detection. Single patrol past the residence at midnight.",
-            "conscience_trigger": "The target has a young apprentice who clearly adores them — and the target treats them with genuine care.",
+            "security_note":       "Two personal bodyguards rotate in 6-hour shifts. No magic detection. Single patrol past the residence at midnight.",
+            "conscience_trigger":  "The target has a young apprentice who clearly adores them — and the target treats them with genuine care.",
+            "hit_site_read_aloud": f"The {site_desc} is quiet when you arrive — too quiet for a place that's supposed to be ordinary. You count two exits and note that the nearest guard post faces the wrong direction.",
         }
     return data
 
@@ -770,6 +807,11 @@ def render_assassination_module(
 
 <hr>
 
+<div style="background:#f5f0e8;border-left:4px solid {fc};border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;">
+  <strong style="font-size:13px;color:#555;text-transform:uppercase;letter-spacing:0.5px;">Read Aloud — Arriving at the Hit Site</strong>
+  <div style="font-style:italic;color:#333;margin-top:6px;">{_e(target.get("hit_site_read_aloud","The site looks quiet from the outside. You study the approach and note where the guards are not."))}</div>
+</div>
+
 <h2>Surveillance Leads</h2>
 <div style="font-size:12px;color:#666;margin-bottom:8px;">Each completed lead gives the party actionable intel on the target.</div>
 {surveillance_html}
@@ -937,9 +979,14 @@ async def build_assassination_module(mission: dict, out_dir: Optional[Path] = No
 
     logger.info(f"[ASSASSIN] Security={security['label']} | site={hit_site}")
 
+    body = mission.get("body") or mission.get("description") or ""
+    target_name_hint = _extract_target_name(body)
+    if target_name_hint:
+        logger.info(f"[ASSASSIN] Extracted target name hint: {target_name_hint!r}")
+
     # Generate content concurrently where safe
     briefing_task = asyncio.create_task(_generate_briefing(mission, security, client_style))
-    target_task   = asyncio.create_task(_generate_target(mission, security, hit_site))
+    target_task   = asyncio.create_task(_generate_target(mission, security, hit_site, target_name_hint))
 
     briefing, target = await asyncio.gather(briefing_task, target_task)
 

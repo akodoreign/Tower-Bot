@@ -220,6 +220,7 @@ DCs: {dcs}
 
 Include:
 - briefing
+- opening_read_aloud: 2-3 sentences the DM reads when the party first sees the contact group — specific, sensory, alive
 - contact_identity: the exact people/community/entity being contacted, using mission canon
 - contact_protocol: 5 ordered steps for safe first contact
 - misunderstanding_ladder: 5 ways the first meeting can go wrong without becoming murder mode
@@ -250,6 +251,7 @@ def _fallback_plan(mission: dict, ctype: str) -> Dict[str, Any]:
     stake = _stakes[0]
     return {
         "briefing": f"{canon} has reached a first-contact moment. The job is to keep the meeting safe, protect consent, and stop the first public story from becoming exploitation.",
+        "opening_read_aloud": f"You see them before they see you: {CONTACT_TYPES[ctype]}. The air between you carries the smell of a place that is not here. One of them notices you first and the crowd goes very still.",
         "contact_identity": f"The contact subject is mission-specific: {canon}.",
         "contact_protocol": ["hands visible and weapons low", "ask permission before approaching vulnerable people", "exchange names before offers", "explain the Tower in plain words", "secure a quiet shelter before faction claims begin"],
         "misunderstanding_ladder": ["gesture is read as a threat", "translation invents a false promise", "a camera turns fear into public panic", "a faction agent speaks over the contact subject", f"the core stake escalates: {stake}"],
@@ -328,6 +330,8 @@ def render_module(mission: dict, ctype: str, location: Dict[str, Any], plan: Dic
     fc = _faction_color(faction)
     body = ""
     body += _card("Briefing", f"<p>{_e(plan.get('briefing'))}</p><p>{_e(_party_note(strength))}</p>", fc)
+    if plan.get("opening_read_aloud"):
+        body += _card("Read Aloud — First Sight", f'<div style="font-style:italic;color:#333;">{_e(plan["opening_read_aloud"])}</div>', "#8a5a1f")
     body += _card("Where Contact Happens", f"<p><strong>{_e(location.get('name'))}</strong> - {_e(location.get('district'))}</p><p>{_e(location.get('description'))}</p>", "#8a5a1f")
     body += _card("Contact Protocol", f"<p><strong>{_e(plan.get('contact_identity'))}</strong></p><h3>Protocol</h3>{_ul(plan.get('contact_protocol', []))}<h3>Misunderstanding Ladder</h3>{_ul(plan.get('misunderstanding_ladder', []))}", "#2a6a2a")
     body += _card("First Sight Imagery", _ul(plan.get("first_sight", [])), "#555")

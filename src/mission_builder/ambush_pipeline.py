@@ -42,6 +42,7 @@ import httpx
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import faction_role_monsters, monster_summary
 
 OUTPUT_BASE = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -450,13 +451,20 @@ async def _ollama(prompt: str, tokens: int = 1000) -> str:
             logger.warning(f"[AMBUSH] Ollama deferred by resource cop: {decision.reason}")
             return ""
 
-        async with httpx.AsyncClient(timeout=180.0) as c:
-            r = await c.post(OLLAMA_URL, json=payload)
-            r.raise_for_status()
-            return r.json()["message"]["content"].strip()
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(timeout=180.0) as c:
+                    r = await c.post(OLLAMA_URL, json=payload)
+                    r.raise_for_status()
+                    return r.json()["message"]["content"].strip()
+            except Exception as e:
+                if attempt < 2:
+                    logger.warning(f"[AMBUSH] Ollama attempt {attempt + 1}/3 failed: {e} — retrying")
+                else:
+                    logger.error(f"[AMBUSH] Ollama failed after 3 attempts: {e}")
     except Exception as e:
         logger.error(f"[AMBUSH] Ollama error: {e}")
-        return ""
+    return ""
 
 
 def _clean_json(raw: str) -> str:
@@ -590,12 +598,28 @@ def _guard_roster(roles: Dict[str, str], strength: Dict[str, Any]) -> Dict:
                 "note": npc.get("location") or "",
             })
     else:
-        roster = [
-            {"name": "Lead Guard", "role": "commander / handler", "note": "calls the first response"},
-            {"name": "Escort Pair", "role": "2-4 escorts", "note": "body-block and move with the target"},
-            {"name": "Specialist", "role": "caster, scout, or heavy", "note": "faction-specific trick"},
-            {"name": "Lookout", "role": "reserve / signaler", "note": "calls reinforcements or spots traps"},
-        ]
+        cr_max = max(3, int(strength.get("avg_level", 5)) + 4)
+        db_guards = faction_role_monsters(
+            ["captain", "enforcer", "mage", "scout", "shieldbearer"],
+            count=4,
+            cr_max=cr_max,
+        )
+        if db_guards:
+            roster = [
+                {
+                    "name": m.get("name"),
+                    "role": f"CR {m.get('cr')} {m.get('creature_type', 'humanoid')}",
+                    "note": monster_summary(m),
+                }
+                for m in db_guards
+            ]
+        else:
+            roster = [
+                {"name": "Lead Guard", "role": "commander / handler", "note": "calls the first response"},
+                {"name": "Escort Pair", "role": "2-4 escorts", "note": "body-block and move with the target"},
+                {"name": "Specialist", "role": "caster, scout, or heavy", "note": "faction-specific trick"},
+                {"name": "Lookout", "role": "reserve / signaler", "note": "calls reinforcements or spots traps"},
+            ]
     return {"style": f"{faction} guard roster", "behavior": behavior, "members": roster, "note": "Faction-appropriate roster from DB when possible."}
 
 
@@ -635,7 +659,8 @@ Return JSON only:
   "contact_speech": "2-3 paragraphs from the hiring contact",
   "known_intel": "what the party knows before choosing setup",
   "unknowns": "what they do not know",
-  "debrief_style": "where/how the hiring faction wants the debrief"
+  "debrief_style": "where/how the hiring faction wants the debrief",
+  "target_spotted_read_aloud": "2 sentences, present tense — the exact words the DM reads the moment the target (or their convoy) enters the ambush zone. Sensory and specific."
 }}"""
     data = _parse_json(await _ollama(prompt, tokens=900))
     if data:
@@ -645,6 +670,7 @@ Return JSON only:
         "known_intel": f"The target crosses {location['district']} under {roles['guarding']} protection.",
         "unknowns": "The exact entry route is unknown until the target appears.",
         "debrief_style": "Varies by heat; clean work gets a quiet handoff, messy work gets a colder meeting.",
+        "target_spotted_read_aloud": f"There — {target['name']}, moving through {location['name']} with {roles['guarding']} flanking. This is the moment. Everyone holds until the signal.",
     }
 
 

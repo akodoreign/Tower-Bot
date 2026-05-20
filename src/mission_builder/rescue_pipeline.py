@@ -29,6 +29,7 @@ import httpx
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import logical_enemy_roster_for_mission
 
 OUTPUT_BASE = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -337,6 +338,31 @@ def _parse_json(raw: str) -> Optional[dict]:
         return None
 
 
+def _db_captor_stat_block(mission: dict, fallback_name: str) -> Optional[Dict[str, Any]]:
+    rows = logical_enemy_roster_for_mission(
+        mission,
+        count=1,
+        prefer_faction_roles=True,
+        prefer_void=any(w in str(mission).lower() for w in ("void", "rift", "corrupt")),
+    )
+    if not rows:
+        return None
+    m = rows[0]
+    abilities = []
+    if m.get("actions"):
+        abilities.extend([p.strip() for p in str(m["actions"]).split("\n\n") if p.strip()][:2])
+    if m.get("traits"):
+        abilities.append(str(m["traits"]).split("\n\n")[0])
+    return {
+        "name": m.get("name") or fallback_name,
+        "cr": str(m.get("cr") or "2"),
+        "hp": int(m.get("hp") or 45),
+        "ac": int(m.get("ac") or 14),
+        "abilities": abilities or ["Multiattack", "Alert - can't be surprised"],
+        "special": m.get("notes") or "DB-backed captor; re-skin faction markings to the active obstacle.",
+    }
+
+
 def _fallback_plan(mode: str, roles: Dict[str, str], target: Dict[str, str], location: Dict[str, Any], mission: Optional[dict] = None) -> Dict[str, Any]:
     mission_context = _mission_context(mission or {})
     canon = ", ".join(mission_context.get("canon_terms", [])[:6]) or target["name"]
@@ -358,7 +384,21 @@ def _fallback_plan(mode: str, roles: Dict[str, str], target: Dict[str, str], loc
             "tnn_question": "Did the city fail these people before you ever arrived?",
             "news_memory_seed": f"Rescue crews and adventurers searched {location.get('name')} for {target['name']}, while families and TNN demanded answers.",
             "debrief": "Payment depends on dignity, answers, and who the party protected from the cameras.",
+            "scene_skill_checks": [
+                {"scene": "locate missing", "skill": "Investigation or Survival (DC 13)", "consequence": "lose a day — public story hardens"},
+                {"scene": "comfort families", "skill": "Persuasion or Insight (DC 12)", "consequence": "family goes to TNN instead"},
+                {"scene": "clear officials", "skill": "Persuasion or Intimidation (DC 14)", "consequence": "access denied — slower route needed"},
+            ],
+            "captor_stat_block": {
+                "name": "None (aftermath mode)",
+                "cr": "—",
+                "hp": 0,
+                "ac": 0,
+                "abilities": [],
+                "special": "No active combatant. Conflict in aftermath mode is social and bureaucratic.",
+            },
         }
+    db_captor = _db_captor_stat_block(mission or {}, roles["obstacle"])
     return {
         "briefing": f"{target['name']} needs extraction from {location.get('name')}. Preserve mission-specific stakes around {canon}; move now, get them out, and do not let the situation degrade.",
         "timer": random.choice(ACTIVE_TIMERS),
@@ -374,6 +414,21 @@ def _fallback_plan(mode: str, roles: Dict[str, str], target: Dict[str, str], loc
         "tnn_question": "Are you rescuers, or are you cleaning up someone else's negligence?",
         "news_memory_seed": f"{target['name']} was pulled from danger at {location.get('name')} under {roles['sponsor']} sponsorship.",
         "debrief": "Pay and reputation depend on condition, speed, and how public the rescue became.",
+        "scene_skill_checks": [
+            {"scene": "approach",        "skill": "Stealth (DC 14)",         "consequence": "guards alerted, timer reduced by 1 stage"},
+            {"scene": "locate target",   "skill": "Perception or Investigation (DC 13)", "consequence": "lose 2 rounds — target condition worsens"},
+            {"scene": "clear obstacle",  "skill": "Athletics or Persuasion (DC 15)", "consequence": "obstacle blocks extraction route"},
+            {"scene": "stabilize",       "skill": "Medicine (DC 12)",         "consequence": "target degrades one condition step"},
+            {"scene": "extract",         "skill": "Athletics or Deception (DC 14)", "consequence": "pursuit triggered or route closes"},
+        ],
+        "captor_stat_block": db_captor or {
+            "name": roles["obstacle"],
+            "cr": "2",
+            "hp": 45,
+            "ac": 14,
+            "abilities": ["Multiattack (2 strikes)", "Alert — can't be surprised"],
+            "special": "Falls back to guard the target if the party disables or flanks the patrol.",
+        },
     }
 
 
@@ -438,7 +493,18 @@ Return JSON only:
   "official_quote": "short quote",
   "tnn_question": "intrusive or useful TNN question",
   "news_memory_seed": "1-2 sentence news-cycle memory candidate",
-  "debrief": "how debrief changes by result"
+  "debrief": "how debrief changes by result",
+  "scene_skill_checks": [
+    {{"scene": "scene name", "skill": "Skill (DC XX)", "consequence": "what happens on failure"}}
+  ],
+  "captor_stat_block": {{
+    "name": "captor/threat name",
+    "cr": "challenge rating",
+    "hp": 0,
+    "ac": 0,
+    "abilities": ["key combat ability 1", "key combat ability 2"],
+    "special": "what makes this threat unique in a rescue context"
+  }}
 }}"""
     data = _parse_json(await _ollama(prompt))
     return _normalize_plan(data, mode, roles, target, location, mission)
@@ -577,6 +643,17 @@ def render_rescue_module(mission: dict, subtype: str, roles: Dict[str, str], tar
     body += _card("Rescue Standard", _table([("Target State", plan.get("target_state", "")), ("Captor / Pressure", plan.get("captor_or_pressure", "")), ("Complete When", plan.get("extraction_standard", ""))]) + "<h3>Rescue Clock</h3><ul>" + "".join(f"<li>{_e(x)}</li>" for x in plan.get("rescue_clock", [])) + "</ul>", "#2a6a2a")
     body += _card("Condition Track", _table(CONDITION_TRACK), "#7b1e1e")
     body += _card("Scenes", f"<ol>{scenes}</ol><h3>Hazards / Pressures</h3><ul>{pressures}</ul>", "#555")
+    if plan.get("scene_skill_checks"):
+        sc_rows = [(c.get("scene", ""), f"{c.get('skill', '')} | Fail: {c.get('consequence', '')}") for c in plan["scene_skill_checks"]]
+        body += _card("Scene Skill Checks", _table(sc_rows), "#3a6898")
+    cstat = plan.get("captor_stat_block") or {}
+    if cstat and cstat.get("name") and cstat.get("cr") != "—":
+        abilities_html = "<ul>" + "".join(f"<li>{_e(a)}</li>" for a in (cstat.get("abilities") or [])) + "</ul>"
+        body += _card(
+            f"Captor / Threat Stat Block — {_e(cstat.get('name', ''))}",
+            _table([("CR", cstat.get("cr", "")), ("HP", str(cstat.get("hp", ""))), ("AC", str(cstat.get("ac", "")))]) + "<h4>Abilities</h4>" + abilities_html + f"<p><strong>Special:</strong> {_e(cstat.get('special', ''))}</p>",
+            "#7b1e1e",
+        )
     body += map_section
     body += _card("Reporter / TNN Pressure", _table(REPORTER_TRACK) + f'<p><strong>TNN question:</strong> {_e(plan["tnn_question"])}</p>', "#3a6898")
     body += _card("Interviews", _table([("Survivor", plan["survivor_quote"]), ("Family", plan["family_quote"]), ("Official / faction", plan["official_quote"]), ("Party response", '<textarea rows="2" style="width:100%;font-family:inherit;"></textarea>')]), "#555")

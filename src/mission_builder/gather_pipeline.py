@@ -451,14 +451,15 @@ Meeting location: {meet_location}
 What they want gathered: {item}
 Quantity needed (quota): {quota}
 Handling notes: {gather_profile['handling']}
-Mission background: {body[:300]}
+Mission background: {body[:500]}
 
 Write:
 1. A brief scene-setting description of the meeting location (2 sentences)
 2. The contact's opening — their personality, how they greet the party (warm/cold/nervous/businesslike based on faction culture)
-3. The negotiation beats — what the party can push for and what the contact will reveal under pressure
-4. A Persuasion or Insight hook (DC 13) — what the party learns if they roll well (a second location, a rival also gathering, a handling hazard, a shortcut)
-5. The send-off — where they're told to go and what to look for
+3. The contact's motivation — WHY does this specific contact personally need the party for this specific item right now? (1-2 sentences, personal stakes or urgency, not just "faction needs it")
+4. The negotiation beats — what the party can push for and what the contact will reveal under pressure
+5. A Persuasion or Insight hook (DC 13) — what the party learns if they roll well (a second location, a rival also gathering, a handling hazard, a shortcut)
+6. The send-off — where they're told to go and what to look for
 
 The gather_location must be a SPECIFIC named place — a real district, street, landmark, park, garden,
 plaza, or point of interest. Choose from places like: Grand Forum, The Garden of Accord, Cobbleway
@@ -472,10 +473,12 @@ Return JSON only:
 {{
   "scene_desc": "...",
   "contact_intro": "...",
+  "contact_motivation": "1-2 sentences on why this contact specifically needs the party for this right now",
   "negotiation_beats": ["beat 1", "beat 2", "beat 3"],
   "insight_hook": "what a good roll reveals",
   "sendoff": "...",
-  "gather_location": "specific named place in the city"
+  "gather_location": "specific named place in the city",
+  "world_consequence": "1-2 sentences: what changes in the city or for the faction because this gather was completed — the real-world outcome beyond just the reward"
 }}"""
 
     raw = await _ollama(prompt)
@@ -484,10 +487,12 @@ Return JSON only:
         data = {
             "scene_desc":         f"{contact.get('name','The contact')} meets you at {meet_location}.",
             "contact_intro":      f"They get straight to it. {quota} units of {item}. You know where to look.",
+            "contact_motivation": f"{contact.get('name','The contact')} needs this before their window closes — a rival order arrives tomorrow and {faction} gets nothing.",
             "negotiation_beats":  ["Standard pay up front", "Bonus for surplus", "Don't damage them"],
             "insight_hook":       "A good Insight roll reveals they know of a backup location if the first is dry.",
             "sendoff":            f"Head to the {gather_profile['examples'][0]} district. You'll know them when you see them.",
             "gather_location":    "the market district",
+            "world_consequence":  f"{faction} secures its supply line. Without this, a planned operation stalls for a week.",
         }
     return data
 

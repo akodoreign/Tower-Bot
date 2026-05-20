@@ -236,6 +236,7 @@ DCs: {dcs}
 
 Include:
 - briefing
+- opening_read_aloud: 2-3 sentences the DM reads aloud when the party first encounters the discovery — sensory, immediate, specific to the mission
 - actual_discovery: the exact mission-specific thing/truth found
 - proof_standard: what proves it is real and not rumor
 - changed_world_state: what changes after the party reports it
@@ -265,6 +266,7 @@ def _fallback_plan(mission: dict, dtype: str, context: Dict[str, Any], dcs: Dict
     stake = _stakes[0]
     return {
         "briefing": f"Identify what {title} really revealed, preserve evidence tied to {canon}, and contain the consequences before rumor or misuse spreads.",
+        "opening_read_aloud": f"Something is wrong with the air near {context.get('name', 'the site')} — the wrong kind of quiet, the wrong kind of light. You push forward and see it: {object_hint or DISCOVERY_TYPES[dtype]}, sitting in the open as if it has been waiting.",
         "actual_discovery": f"The party finds mission-specific proof involving {object_hint}; it is tied to {canon}.",
         "proof_standard": f"Success requires two independent signs: physical handling proof from {context.get('name')} and testimony or records tying the find to {canon}.",
         "changed_world_state": f"Once reported, {stake}",
@@ -334,6 +336,8 @@ def render_module(mission: dict, dtype: str, context: Dict[str, Any], plan: Dict
     fc = _faction_color(faction)
     body = ""
     body += _card("Briefing", f"<p>{_e(plan.get('briefing'))}</p><p>{_e(_party_note(strength))}</p>", fc)
+    if plan.get("opening_read_aloud"):
+        body += _card("Read Aloud — First Encounter", f'<div style="font-style:italic;color:#333;">{_e(plan["opening_read_aloud"])}</div>', "#8a5a1f")
     body += _card("Actual Discovery", f"<p><strong>Discovery:</strong> {_e(plan.get('actual_discovery'))}</p><p><strong>Proof:</strong> {_e(plan.get('proof_standard'))}</p><p><strong>Changed World-State:</strong> {_e(plan.get('changed_world_state'))}</p>", "#2a6a2a")
     body += _card("Surface Description", f"<p>{_e(plan.get('surface_description'))}</p><p><strong>Context:</strong> {_e(context.get('name'))} - {_e(context.get('district'))}</p>", "#8a5a1f")
     body += _card("Imagery", _ul(plan.get("first_imagery", [])), "#555")

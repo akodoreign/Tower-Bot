@@ -27,6 +27,7 @@ from typing import Dict, List, Optional, Any
 import httpx
 
 from .layouts import DungeonLayout, RoomPosition
+from src.mission_builder.monster_roster import get_monsters_by_cr_sources, monster_summary
 
 logger = logging.getLogger(__name__)
 
@@ -176,6 +177,14 @@ def _get_encounter(room: RoomPosition, context: DungeonContext) -> Optional[Dict
     
     tier = context.get_cr_tier()
     monsters = MONSTER_TABLES.get(tier, MONSTER_TABLES["low"])
+    db_rows = get_monsters_by_cr_sources(
+        max(1, context.cr_target - (1 if room.room_type == "boss" else 2)),
+        context.cr_target + (3 if room.room_type == "boss" else 1),
+        count=1,
+        include_void="void" in f"{context.aesthetic} {context.objective}".lower(),
+        only_void="void" in f"{context.aesthetic} {context.objective}".lower(),
+        sources=("undercity", "undercity_high_cr"),
+    )
     
     # Boss rooms get stronger single monsters
     if room.room_type == "boss":
@@ -183,11 +192,11 @@ def _get_encounter(room: RoomPosition, context: DungeonContext) -> Optional[Dict
         higher_tiers = {"low": "medium", "medium": "high", "high": "extreme", "extreme": "extreme"}
         boss_tier = higher_tiers.get(tier, tier)
         boss_monsters = MONSTER_TABLES.get(boss_tier, monsters)
-        monster = random.choice(boss_monsters)
+        monster = db_rows[0] if db_rows else random.choice(boss_monsters)
         count = 1
         description = f"The dungeon's master: a fearsome {monster['name']}"
     else:
-        monster = random.choice(monsters)
+        monster = db_rows[0] if db_rows else random.choice(monsters)
         # Scale count by room type
         if room.room_type in ("lair", "chamber"):
             count = random.randint(2, 4)
@@ -206,7 +215,7 @@ def _get_encounter(room: RoomPosition, context: DungeonContext) -> Optional[Dict
                 "count": count,
                 "cr": monster["cr"],
                 "hp": monster["hp"],
-                "notes": "Boss" if room.room_type == "boss" else "",
+                "notes": ("Boss. " if room.room_type == "boss" else "") + (monster_summary(monster) if db_rows else ""),
             }
         ],
     }

@@ -299,6 +299,38 @@ def _marker_reason(marker: int, side_a: str, side_b: str) -> str:
     return f"{side_b} begins with overwhelming leverage; {side_a} feels cornered."
 
 
+def _extract_canon_terms(mission: dict) -> tuple[list[str], list[str]]:
+    """Extract named NPCs/places and stakes phrases from mission body for prompt injection."""
+    body = mission.get("body") or mission.get("description") or ""
+    title = mission.get("title", "")
+    combined = f"{title} {body}"
+    names = list(dict.fromkeys(re.findall(r"\b([A-Z][a-z]{1,20}(?:\s+[A-Z][a-z]{1,20}){1,2})\b", combined)))[:8]
+    stake_keywords = ("purge", "expos", "silence", "ruin", "destroy", "collapse", "seize", "arrest", "execute")
+    stakes = [s.strip() for s in re.split(r"[.!;]", body) if any(kw in s.lower() for kw in stake_keywords)][:4]
+    return names, stakes
+
+
+GENERIC_NEGOTIATION_MARKERS = [
+    "wants a fair deal",
+    "seeks reasonable terms",
+    "mutual benefit",
+    "both sides agree",
+    "come to an understanding",
+    "general settlement",
+    "compromise is possible",
+]
+
+
+def _is_generic_negotiation_plan(plan: Optional[Dict[str, Any]]) -> bool:
+    if not isinstance(plan, dict):
+        return True
+    check_text = " ".join(
+        str(v) for k in ("what_happened", "current_state", "side_a_wants", "side_b_wants") for v in [plan.get(k, "")]
+    ).lower()
+    hits = sum(1 for m in GENERIC_NEGOTIATION_MARKERS if m in check_text)
+    return hits >= 2
+
+
 def _pick_situation(mission: dict) -> Dict[str, str]:
     text = " ".join(str(mission.get(k, "")) for k in ("title", "type", "mission_type", "body", "description")).lower()
     for sit in SITUATIONS:
@@ -390,6 +422,10 @@ async def _generate_plan(
     strength: Dict[str, Any],
     seeds: Dict[str, Any],
 ) -> Dict[str, Any]:
+    canon_names, stakes = _extract_canon_terms(mission)
+    canon_note = (f"Mission canon — use these names in delegate names and dialogue: {', '.join(canon_names)}" if canon_names else "")
+    stakes_note = (f"Mission stakes — reference these in red lines and success/failure terms: {'; '.join(stakes)}" if stakes else "")
+
     npc_names = ", ".join(f"{n.get('name')} ({n.get('faction')}, {n.get('role')})" for n in seeds.get("npcs", [])[:8])
     outcome_bits = []
     for outcome in seeds.get("outcomes", [])[:4]:
@@ -412,22 +448,25 @@ Live party: {_party_scaling_note(strength)}
 DB NPCs: {npc_names}
 Recent outcomes: {outcome_notes}
 Recent news: {news_notes}
-Mission notes: {(mission.get('body') or mission.get('description') or '')[:500]}
+Mission notes: {(mission.get('body') or mission.get('description') or '')[:600]}
+{canon_note}
+{stakes_note}
 
 Generate:
-- what_happened: brief public history
+- what_happened: brief public history (reference mission canon if present)
 - current_state: where negotiation stands now
-- side_a_delegate and side_b_delegate with names/titles if possible
-- side_a_wants and side_b_wants: lists of concessions each side wants
-- side_a_red_lines and side_b_red_lines: hidden DM-only red lines
+- side_a_delegate and side_b_delegate with specific names and titles (use mission canon names if provided)
+- side_a_wants and side_b_wants: specific concessions tied to THIS dispute, not generic phrases
+- side_a_red_lines and side_b_red_lines: DM-only, each with format "if [specific topic is raised] → [specific reaction/consequence]"
 - marker_start_reason
+- scene_anchor: 2-3 sentences — the physical room, who else is present, ambient tension when party enters
 - research: 8 items, each with lane, place, check, dc, result, marker_effect, risk
-- dialogue: at least 20 DM dialogue options/prompts/counter-lines across opening, pressure, concession, apology, threat, compromise, outside favor, and failure
+- dialogue: at least 20 DM lines referencing the actual dispute and names (not generic filler)
 - outside_favors: 6 possible favors with source, ask, cost, marker_effect
 - escalations: 4 possible escalation scenes
 - apology_mode: one normal or over-the-top apology option
 - debrief: how sponsor reacts
-- success_terms: what a -2..+2 deal looks like
+- success_terms: what a -2..+2 deal looks like for THIS dispute
 - rough_terms_a and rough_terms_b
 - failure_spawn: one of assault, defense, rescue, investigation, sabotage, heist, ambush, battle, political
 
@@ -435,6 +474,9 @@ Keep player-facing material surface-level. Dialogue can include secrets because 
 Return JSON object only."""
     raw = await _ollama(prompt)
     data = _parse_json(raw)
+    if _is_generic_negotiation_plan(data):
+        logger.info("[NEGOTIATION] Plan too generic — using fallback")
+        return _normalize_plan(None, mission, roles, situation, marker, dcs)
     return _normalize_plan(data, mission, roles, situation, marker, dcs)
 
 
@@ -473,6 +515,7 @@ def _fallback_plan(mission: dict, roles: Dict[str, str], situation: Dict[str, st
     return {
         "what_happened": f"{situation['frame'].capitalize()} pulled {a} and {b} into the same room.",
         "current_state": "Both sides are still seated, but neither trusts the first offer.",
+        "scene_anchor": "A neutral room cleared for the occasion. Both delegations sit across a long table, faction colours visible but not ostentatious. A clerk near the door holds an unsealed summary of proceedings. The air smells of cold tea and held grudges.",
         "side_a_delegate": f"{a} delegate",
         "side_b_delegate": f"{b} delegate",
         "side_a_wants": ["public face-saving", "material compensation", "enforceable limits"],

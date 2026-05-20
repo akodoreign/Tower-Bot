@@ -38,6 +38,7 @@ import httpx
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
 from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.monster_roster import faction_role_monsters, mission_enemy_entry
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -435,17 +436,19 @@ Return JSON only:
   "contact_speech": "2-3 paragraphs of the contact briefing the party",
   "location_desc": "1 sentence describing the defensive position",
   "threat_summary": "1 sentence on the expected attackers",
-  "prep_window": "how long they likely have (vague — hours to days)"
+  "prep_window": "how long they likely have (vague — hours to days)",
+  "arrival_read_aloud": "2-3 sentences, present tense, sensory — what the party sees when they first arrive at the position to defend (the people already there, the sounds of preparation, the sense of what is at stake)"
 }}"""
 
     raw = await _ollama(prompt)
     data = _parse_json(raw)
     if not data:
         data = {
-            "contact_speech": f"We need you to hold {location}. The {opposing} are moving on us — could be tonight, could be three days from now. Use the time.",
-            "location_desc":  f"A defensible position at {location}.",
-            "threat_summary": f"The {opposing} are coming in force.",
-            "prep_window":    "Hours to days — unknown.",
+            "contact_speech":     f"We need you to hold {location}. The {opposing} are moving on us — could be tonight, could be three days from now. Use the time.",
+            "location_desc":      f"A defensible position at {location}.",
+            "threat_summary":     f"The {opposing} are coming in force.",
+            "prep_window":        "Hours to days — unknown.",
+            "arrival_read_aloud": f"{location} is already in motion when the party arrives. Defenders move with the purposeful speed of people who know they are running out of time. Someone points to the weakest wall and says nothing else.",
         }
     return data
 
@@ -653,19 +656,28 @@ def _defense_mimir_enemies(waves: List[Dict], army: Dict, profile: Dict) -> List
     """Build defense-specific Mimir enemy entries from generated wave data."""
     creature_type = _defense_enemy_type(army, profile)
     enemies: dict[tuple[str, str], Dict] = {}
+    db_grunt = (faction_role_monsters(["enforcer", "thug", "zealot", "scout"], count=1, cr_max=3) or [None])[0]
+    db_lt = (faction_role_monsters(["lieutenant", "priest", "mage", "duelist"], count=1, cr_max=6) or [None])[0]
+    db_commander = (faction_role_monsters(["captain", "champion", "quartermaster"], count=1, cr_max=8) or [None])[0]
 
-    def add_enemy(name: str, cr: str, count: int, note: str) -> None:
+    def add_enemy(name: str, cr: str, count: int, note: str, db_monster: Dict | None = None) -> None:
         if count <= 0:
             return
+        if db_monster:
+            name = str(db_monster.get("name") or name)
+            cr = str(db_monster.get("cr") or cr)
         key = (name.lower(), str(cr))
         if key not in enemies:
-            enemies[key] = {
-                "name": name,
-                "cr": str(cr),
-                "count": 0,
-                "notes": "",
-                "creature_type": creature_type,
-            }
+            if db_monster:
+                enemies[key] = mission_enemy_entry(db_monster, count=0, notes="")
+            else:
+                enemies[key] = {
+                    "name": name,
+                    "cr": str(cr),
+                    "count": 0,
+                    "notes": "",
+                    "creature_type": creature_type,
+                }
         enemies[key]["count"] += count
         enemies[key]["notes"] = f"{enemies[key]['notes']}\n{note}".strip()
 
@@ -675,14 +687,15 @@ def _defense_mimir_enemies(waves: List[Dict], army: Dict, profile: Dict) -> List
             f"Wave {wave.get('number', '?')}: {wave_label}. "
             f"{wave.get('tactics', '')} {wave.get('repelled_result', '')}"
         ).strip()
-        add_enemy(str(army.get("grunt_label") or "attack grunts"), str(army.get("grunt_cr") or "1/4"), int(wave.get("grunts") or 0), note)
-        add_enemy(str(army.get("lt_label") or "attack lieutenants"), str(army.get("lt_cr") or "1"), int(wave.get("lieutenants") or 0), note)
+        add_enemy(str(army.get("grunt_label") or "attack grunts"), str(army.get("grunt_cr") or "1/4"), int(wave.get("grunts") or 0), note, db_grunt)
+        add_enemy(str(army.get("lt_label") or "attack lieutenants"), str(army.get("lt_cr") or "1"), int(wave.get("lieutenants") or 0), note, db_lt)
         if wave.get("commander_present"):
             add_enemy(
                 str(profile.get("commander") or "enemy commander"),
                 str(army.get("commander_cr") or army.get("lt_cr") or "2"),
                 1,
                 f"Commander present in {wave_label}. {profile.get('tactics', '')}",
+                db_commander,
             )
 
     return list(enemies.values())
