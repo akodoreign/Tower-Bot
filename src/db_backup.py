@@ -32,7 +32,7 @@ def _get_db_config() -> dict:
         "host":     os.getenv("MYSQL_HOST",     "localhost"),
         "port":     os.getenv("MYSQL_PORT",     "3306"),
         "user":     os.getenv("MYSQL_USER",     "Claude"),
-        "password": os.getenv("MYSQL_PASSWORD", "WXdCPJmeDfaQALaktzF6!"),
+        "password": os.getenv("MYSQL_PASSWORD", ""),
         "database": os.getenv("MYSQL_DB",       "tower_bot"),
     }
 

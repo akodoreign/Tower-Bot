@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 MYSQL_CONFIG = {
     "host": os.getenv("MYSQL_HOST", "localhost"),
     "user": os.getenv("MYSQL_USER", "Claude"),
-    "password": os.getenv("MYSQL_PASSWORD", "WXdCPJmeDfaQALaktzF6!"),
+    "password": os.getenv("MYSQL_PASSWORD", ""),
     "database": os.getenv("MYSQL_DB", "tower_bot"),
     "charset": "utf8mb4",
     "collation": "utf8mb4_unicode_ci",
