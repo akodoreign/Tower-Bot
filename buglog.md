@@ -1497,3 +1497,49 @@ MEASURED: 1086 KB portrait -> 25 KB webp (43x smaller); area map -> 15 KB; condi
 304; ?w=300 snaps to the 320 bucket and reuses the cached file. SECURITY verified: thumbnails
 go through the same allowlist/dotfile/extension checks (.env and traversal both rejected).
 Dashboard restart picks this up (bot restart not required separately -- same process).
+
+---
+
+## 2026-07-12 - DONE: dashboard security (fail-closed PIN) + pytest regression suite
+
+### SECURITY: dashboard external-action PIN was a public default
+The dashboard is internet-exposed via a running Cloudflare tunnel
+(dashboard.tower-bot.com -> localhost:5001). Design is sound overall: local network =
+full control, external (CF-Ray header present) = read-only + PIN-gated actions, and
+generate-mission is hard-blocked externally. BUT `_pin_ok` fell back to a hardcoded default
+PIN "86753" (now visible in the public repo after this month's push) and treated an empty PIN
+as "allow all external". Fixed FAIL-CLOSED: no DASHBOARD_EXTERNAL_PIN configured -> external
+actions DENIED; constant-time hmac.compare_digest; the old default no longer works. Generated a
+fresh PIN into .env (git-ignored), documented the var in .env.example. Committed+pushed e26bc08
+(security fix shipped ahead of the test suite). Local-network access unchanged.
+NOTE: user should confirm/rotate DASHBOARD_EXTERNAL_PIN and restart the dashboard so the fix
+loads; until then external claim/complete/buy actions are denied (safe default).
+
+### Pytest regression suite (was: same fake-world harness re-mocked ad hoc every session)
+- tests/conftest.py: shared fixtures fake_db (canned rows + captured writes),
+  fake_ollama (records payloads, controllable reply; also fakes resource_cop),
+  fake_mimir (available toggle + catalog item matching), no_sleep. This is the reusable
+  version of the harness whose throwaway ancestor once leaked rows into the live DB.
+- tests/test_july2026_regressions.py: 27 tests pinning this month's fixes -- _fit_ctx
+  floor/cap across 5 pipelines, first_contact canon-anchor gate + sentence-boundary regex,
+  the 5 de-poisoned gates carry the score>=3 override, scene_dialogs None-foe sanitize (7
+  variants) + real-foe preserved, loot_card package caching, enrich_mission_loot catalog match
+  + no-op paths, party casualty gates/wound/wipeout, NPC-completion storm cap, and the
+  dashboard PIN fail-closed + local-not-gated security behavior.
+- Fixed the pytest_asyncio loop-scope deprecation warning (pytest.ini).
+- Result: 27/27 new pass; full suite re-run to confirm no regressions to the existing 137.
+
+FULL-SUITE RESULT (38m background run): 160 passed, 2 skipped, 2 failed -> both fixed:
+(1) test_enrich_mission_loot_matches_catalog flaked on import order (consumers bind get_mimir
+    at import; fake_mimir fixture now also patches already-imported consumer modules);
+    verified passing in the exact failing order (28/28).
+(2) PRE-EXISTING: test_e2e test_mission_with_images_mock is named "mock" but only mocks the
+    IMAGE side -- mission content still calls REAL Ollama (ReadTimeout after 3+ min; most of
+    the suite's 38-minute runtime). Marked @pytest.mark.integration with an honest docstring;
+    verified deselected from default runs; run with `-m integration` when Ollama is idle.
+    NOTE: other test_e2e tests also reach live services -- candidates for the same marker.
+Also: CLAUDE.md gained "Operational Rules (added 2026-07-12)" (testing fixtures + live-DB
+lesson, num_ctx fitting, gate self-poisoning, Mimir-not-memory rules source, peak power
+window, dashboard security model, outage caps, git hygiene, BOM note) and the Butterfly
+section now documents the outcomes-feed-generation, crew-blood-price, and party-lifecycle
+chains.

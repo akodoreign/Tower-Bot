@@ -205,8 +205,15 @@ class TestImageGenerationWorkflow:
         logger.info(f"✓ Generated {len(tiles)} dungeon tiles")
 
     @pytest.mark.asyncio
+    @pytest.mark.integration
     async def test_mission_with_images_mock(self):
-        """Test complete mission generation with images (using mocks)."""
+        """Test complete mission generation with images.
+
+        Only the IMAGE side is mocked -- mission content generation still calls
+        the real Ollama server, so this needs the model up and idle (it timed
+        out after 3+ minutes in the 2026-07-12 suite run). Marked integration
+        so default runs skip it; run with `-m integration` when Ollama is free.
+        """
         mission_title = "The Sunken Temple"
 
         # Mock the image generation entirely since A1111 may not be available
