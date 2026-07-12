@@ -1465,3 +1465,35 @@ fake the whole db_api module.
 - Restart-readiness picture is now COMPLETE: bot process, all cogs, all loops, and the
   dashboard thread are verified importable/serving; every queue and backlog measured and
   either clean or capped.
+
+---
+
+## 2026-07-12 - DONE: repo pushed clean + dashboard photo caching
+
+### Git updated (user request: nothing personal or generated)
+Local main was 8 commits behind origin with 186 dirty files; working tree is the truth (past
+sessions deliberately deleted backups/PHB/archives). Fast-forwarded the pointer
+(reset --soft origin/main), tightened .gitignore (logs/, .chrome_ddb_profile/ browser cookies,
+src/character_appearance/ player-personal llava JSONs, campaign_docs archives/appearances/
+snapshots/battle_maps/TrainingPDFS, Webpage/area_maps+scraps PNGs, archive/ backups, DDB
+staging JSONs, COPYRIGHTED Original Adventures Reincarnated texts, thumb_cache). Audited the
+staged set three times (no images, no secrets, no .env, no copyrighted text), committed 452
+files as "July 2026 overhaul..." (f027d7a) and pushed clean onto origin/main -- no force.
+
+### Dashboard photo slowness -- three root causes, all fixed
+1. SINGLE-THREADED Flask: app.run defaults threaded=False, so a gallery of 30 PNGs was served
+   strictly one-at-a-time. -> threaded=True in main.py._start_dashboard and app.py __main__.
+2. NO CACHE HEADERS: every visit refetched every image. -> /media/project/* now
+   max_age=7d + conditional ETag 304s (ref images have timestamped filenames, safe);
+   /area-maps/* max_age=1h + 304s (same-name regeneration possible).
+3. FULL-SIZE PNGS AT AVATAR SIZE: 22px avatars and 120-140px cards were loading ~1MB PNGs.
+   -> NEW ?w= server-side thumbnails: Pillow -> WEBP, width snapped to buckets
+   (64/160/320/640), disk-cached in Webpage/thumb_cache (30d browser cache, explicit
+   image/webp mimetype -- Windows mimetypes lacks .webp). Frontend thumbUrl() helper applied at
+   the 5 gallery sites (mission avatars w=64; image-refs cards, gazetteer district+place maps,
+   worldshop w=320); lightboxes keep full resolution; external URLs pass through untouched.
+
+MEASURED: 1086 KB portrait -> 25 KB webp (43x smaller); area map -> 15 KB; conditional revisit
+304; ?w=300 snaps to the 320 bucket and reuses the cached file. SECURITY verified: thumbnails
+go through the same allowlist/dotfile/extension checks (.env and traversal both rejected).
+Dashboard restart picks this up (bot restart not required separately -- same process).

@@ -1981,6 +1981,40 @@ _MEDIA_ALLOWED_ROOTS = [
 _MEDIA_ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".pdf", ".html", ".css", ".js", ".json"}
 
 
+# Thumbnail cache: generated images are large PNGs but the dashboard renders
+# most of them at avatar/card size. ?w=<px> serves a disk-cached WEBP thumbnail
+# (snapped to a bucket so the cache stays small). Originals get long browser
+# cache lifetimes because ref images are written with timestamped filenames.
+_THUMB_CACHE_DIR = Path(__file__).resolve().parent / "thumb_cache"
+_THUMB_WIDTHS = (64, 160, 320, 640)
+
+
+def _serve_image_cached(full: Path, max_age: int):
+    """Serve an image with browser caching; optional ?w= thumbnail."""
+    w = request.args.get("w", type=int)
+    if w:
+        w = min(_THUMB_WIDTHS, key=lambda c: abs(c - w))
+        try:
+            import hashlib
+            from PIL import Image
+            st = full.stat()
+            key = hashlib.sha1(f"{full}|{st.st_mtime_ns}|{w}".encode("utf-8")).hexdigest()
+            _THUMB_CACHE_DIR.mkdir(exist_ok=True)
+            thumb = _THUMB_CACHE_DIR / f"{key}.webp"
+            if not thumb.exists():
+                img = Image.open(full)
+                img.thumbnail((w, w * 4))
+                img.save(thumb, "WEBP", quality=80, method=4)
+            # mimetype set explicitly: Windows' mimetypes registry often lacks .webp
+            return send_from_directory(str(_THUMB_CACHE_DIR), thumb.name,
+                                       max_age=30 * 86400, conditional=True,
+                                       mimetype="image/webp")
+        except Exception:
+            pass  # any thumbnail failure falls back to the original
+    return send_from_directory(str(full.parent), full.name,
+                               max_age=max_age, conditional=True)
+
+
 @app.route("/media/project/<path:filename>")
 def serve_project_media(filename: str):
     """Serve generated project media from approved media directories only."""
@@ -1995,7 +2029,8 @@ def serve_project_media(filename: str):
         return "Access denied", 403
     if not full.exists() or not full.is_file():
         return "Media not found", 404
-    return send_from_directory(str(full.parent), full.name)
+    # Ref images have timestamped filenames -> content-addressed, cache long.
+    return _serve_image_cached(full, max_age=7 * 86400)
 
 
 # ---------------------------------------------------------------------------
@@ -2307,7 +2342,9 @@ def serve_area_map(filename: str):
         return "Access denied", 403
     if not full.exists():
         return "Map not found", 404
-    return send_from_directory(str(full.parent), full.name)
+    # Area maps can regenerate under the SAME filename -> short max_age, but
+    # conditional requests still return 304 when unchanged.
+    return _serve_image_cached(full, max_age=3600)
 
 
 # ---------------------------------------------------------------------------
@@ -2538,4 +2575,4 @@ if __name__ == "__main__":
     port = int(os.getenv("DASHBOARD_PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
     print(f"TowerBot Dashboard -> http://localhost:{port}")
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    app.run(host="0.0.0.0", port=port, debug=debug, threaded=True)

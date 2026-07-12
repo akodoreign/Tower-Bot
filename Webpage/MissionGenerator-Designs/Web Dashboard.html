@@ -2063,12 +2063,20 @@ function formatTitle(title) {
   return title;
 }
 
+/* ── Thumbnail helper: local generated media supports ?w= server-side
+      WEBP thumbnails (Webpage/app.py). Full-size stays for lightboxes. ── */
+function thumbUrl(url, w) {
+  if (!url || typeof url !== "string") return url;
+  if (!(url.startsWith("/media/project/") || url.startsWith("/area-maps/"))) return url;
+  return url + (url.includes("?") ? "&" : "?") + "w=" + (w || 320);
+}
+
 /* ── Mission row renderer ────────────────────────────────────────── */
 function _personalTag(m) {
   if (!m.personal_for) return "";
   const url = m._portrait_url;
   const avatar = url
-    ? `<img src="${url}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid rgba(244,234,213,.25);flex-shrink:0;vertical-align:middle;" loading="lazy">`
+    ? `<img src="${thumbUrl(url, 64)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid rgba(244,234,213,.25);flex-shrink:0;vertical-align:middle;" loading="lazy">`
     : `<span style="width:22px;height:22px;border-radius:50%;background:var(--parchment-2);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--sigil);flex-shrink:0;vertical-align:middle;" title="Portrait pending">?</span>`;
   return `<span style="display:inline-flex;align-items:center;gap:4px;margin-left:4px;">${avatar}<span style="color:var(--ember);font-size:11px;">for ${h(m.personal_for)}</span></span>`;
 }
@@ -3584,7 +3592,7 @@ async function loadViewImages() {
     body.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">${
       d.image_refs.map(img => `<div style="background:var(--bone);border:1px solid var(--line);border-radius:8px;overflow:hidden;">
         ${img.image_url
-          ? `<img src="${img.image_url}" alt="${img.entity_name}" style="width:100%;height:140px;object-fit:cover;" onerror="this.style.display='none'">`
+          ? `<img src="${thumbUrl(img.image_url, 320)}" alt="${img.entity_name}" style="width:100%;height:140px;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">`
           : `<div style="height:140px;background:var(--parchment-2);display:grid;place-items:center;color:var(--sigil);font-size:12px;">No image</div>`}
         <div style="padding:8px;">
           <div style="font-weight:600;font-size:13px;">${img.entity_name}</div>
@@ -3695,7 +3703,7 @@ function _renderDistrictCard(dist) {
       <span>${dist.place_count||0} places</span>
     </div>
     ${desc ? `<div class="gaz-card-desc">${_esc(desc.slice(0,180))}${desc.length>180?"…":""}</div>` : ""}
-    ${imgUrl ? `<img class="gaz-area-map-thumb" src="${_esc(imgUrl)}"${_rotateAttrs(imgUrls, `district:${dist.name}`)} alt="${_esc(dist.name)} map" style="margin-top:8px;max-height:120px;">` : ""}
+    ${imgUrl ? `<img class="gaz-area-map-thumb" src="${_esc(thumbUrl(imgUrl, 320))}"${_rotateAttrs(imgUrls, `district:${dist.name}`)} alt="${_esc(dist.name)} map" style="margin-top:8px;max-height:120px;" loading="lazy">` : ""}
     ${dist.image_missing ? `<div class="gaz-place-soon">Image ref missing</div>` : ""}
     ${fpHtml}
   </div>`;
@@ -3814,7 +3822,7 @@ function _gazPlaceImage(p, cls) {
   const urls = p.image_urls?.length ? p.image_urls : (p.image_url ? [p.image_url] : []);
   const url = _rotatingImageUrl(urls, `gaz:${p.district || _gazCurrentDistrict}:${p.name}`);
   return url
-    ? `<img src="${_esc(url)}"${_rotateAttrs(urls, `gaz:${p.district || _gazCurrentDistrict}:${p.name}`)} class="${cls||""}" alt="${_esc(p.name)} map" loading="lazy">`
+    ? `<img src="${_esc(thumbUrl(url, 320))}"${_rotateAttrs(urls, `gaz:${p.district || _gazCurrentDistrict}:${p.name}`)} class="${cls||""}" alt="${_esc(p.name)} map" loading="lazy">`
     : `<div class="gaz-place-soon">Coming soon</div>`;
 }
 
@@ -4338,7 +4346,7 @@ async function loadViewWorldShop() {
     }
     body.innerHTML = `<div class="worldshop-grid">${items.map(item => {
       const image = item.image_url
-        ? `<img class="worldshop-img" src="${h(item.image_url)}" alt="${h(item.item_name)}" loading="lazy">`
+        ? `<img class="worldshop-img" src="${h(thumbUrl(item.image_url, 320))}" alt="${h(item.item_name)}" loading="lazy">`
         : `<div class="worldshop-img-missing">No image</div>`;
       const rarity = (item.rarity || "").replace(/_/g, " ");
       return `<article class="worldshop-card" data-id="${h(item.id)}">

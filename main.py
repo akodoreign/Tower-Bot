@@ -15,7 +15,9 @@ def _start_dashboard():
     try:
         from Webpage.app import app
         port = int(os.getenv("DASHBOARD_PORT", 5000))
-        app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+        # threaded=True: image-heavy dashboard pages request dozens of PNGs in
+        # parallel; the single-threaded default serialized every request.
+        app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False, threaded=True)
     except Exception as e:
         logger.warning(f"Dashboard failed to start: {e}")
 
