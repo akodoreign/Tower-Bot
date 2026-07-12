@@ -27,6 +27,11 @@ import discord
 
 logger = logging.getLogger(__name__)
 
+DISCORD_CONTENT_LIMIT = 2000
+DISCORD_EMBED_TITLE_LIMIT = 256
+DISCORD_EMBED_DESCRIPTION_LIMIT = 4096
+DISCORD_EMBED_FOOTER_LIMIT = 2048
+
 
 class EditorType(Enum):
     """Types of editorial content."""
@@ -229,7 +234,39 @@ def get_timestamp_line() -> str:
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
     real_str = now.strftime("%Y-%m-%d %H:%M")
     tower_str = tower.strftime("%d %b %Y, %H:%M")
-    return f"-# 🕰️ {real_str} │ Tower: {tower_str}"
+    return f"-# 🕰️ {real_str} | Tower: {tower_str}"
+
+
+def _clamp_text(value: str, limit: int) -> str:
+    value = value or ""
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 1)].rstrip() + "…"
+
+
+def _prepare_embed_for_discord(embed: discord.Embed) -> discord.Embed:
+    """Clamp mutable embed fields to Discord's per-field limits before send."""
+    if embed.title:
+        embed.title = _clamp_text(embed.title, DISCORD_EMBED_TITLE_LIMIT)
+    if embed.description:
+        embed.description = _clamp_text(embed.description, DISCORD_EMBED_DESCRIPTION_LIMIT)
+    footer_text = getattr(embed.footer, "text", None)
+    if footer_text:
+        embed.set_footer(text=_clamp_text(footer_text, DISCORD_EMBED_FOOTER_LIMIT))
+    return embed
+
+
+def _fallback_editorial_text(result: EditorialResult) -> str:
+    text = result.preview or result.raw_content or result.headline or "Editorial bulletin unavailable."
+    return _clamp_text(text, DISCORD_CONTENT_LIMIT)
+
+
+def _is_invalid_form_body(exc: Exception) -> bool:
+    return (
+        isinstance(exc, discord.HTTPException)
+        and getattr(exc, "status", None) == 400
+        and getattr(exc, "code", None) == 50035
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -269,16 +306,29 @@ async def post_editorial_bulletin(
         return None
     
     try:
-        # Add timestamp to embed description
+        # Add timestamp and clamp mutable fields to Discord's embed limits.
         if result.embed:
             timestamp_line = get_timestamp_line()
-            result.embed.description = f"{timestamp_line}\n\n{result.embed.description or ''}"
+            body = result.embed.description or ""
+            combined = f"{timestamp_line}\n\n{body}"
+            result.embed.description = combined
+            _prepare_embed_for_discord(result.embed)
         
         # Post with embed and Read More button
-        message = await channel.send(
-            embed=result.embed,
-            view=result.view,
-        )
+        try:
+            message = await channel.send(
+                embed=result.embed,
+                view=result.view,
+            )
+        except Exception as e:
+            if not _is_invalid_form_body(e):
+                raise
+            logger.error(
+                "ðŸ“° Editorial embed rejected by Discord 50035; retrying text-only fallback "
+                f"(preview={len(result.preview)}, full={len(result.raw_content)}, "
+                f"headline={len(result.headline)})"
+            )
+            message = await channel.send(content=_fallback_editorial_text(result))
         
         # Save to memory (if not gossip)
         if result.save_to_memory and write_memory_func:

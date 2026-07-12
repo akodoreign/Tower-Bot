@@ -6,12 +6,12 @@ difficulty-to-tier mappings. Integrates with creative writing skills for
 dynamic title and description generation.
 
 Exported:
-    MISSION_TYPES — All 18+ mission type definitions
+    MISSION_TYPES — All 19+ mission type definitions
     get_mission_type() — Get a mission type by name
     map_difficulty_to_tier() — Convert ease rating (1-10) to tier/CR
     generate_dynamic_title() — Generate title with mission type + creative skills
     get_difficulty_description() — Human-readable difficulty description
-    
+
 Mission Types:
     - Escort: Protect and transport target
     - Recovery: Find and retrieve something
@@ -31,6 +31,7 @@ Mission Types:
     - Puzzle: Solve complex mystery/trap
     - Gathering: Collect resources or information
     - Political: Navigate faction/social dynamics
+    - Strange Occurrence: Dead seen walking — undead return or doppelganger
 """
 
 from __future__ import annotations
@@ -595,6 +596,50 @@ MISSION_TYPES: Dict[str, MissionType] = {
         skill_checks=["Persuasion", "Deception", "Insight", "Investigation"],
         suggested_skills=["mission-gen", "prose-writing"],
     ),
+
+    "strange_occurrence": MissionType(
+        name="strange_occurrence",
+        display_name="Strange Occurrence",
+        description=(
+            "A dead person has been seen walking. Investigate what returned, "
+            "what it wants, and whether it can be stopped — or saved."
+        ),
+        dm_guidance=(
+            "This mission is about identity, grief, and danger. The entity was someone — "
+            "a faction member, a loved one, a known face — and that history is the hook. "
+            "Focus entirely on what it is DOING: is it hunting someone? Hiding and trying "
+            "to live normally? Completing unfinished business? Seeking vengeance? The party "
+            "builds a picture through witnesses, physical evidence, and careful confrontation. "
+            "Do NOT reveal the entity's nature immediately — let it unfold through clues. "
+            "The final act may be combat (banish/destroy), a ritual, or a haunting conversation "
+            "where violence isn't the answer. For undead: lean into what kind of undead it is "
+            "and what that type's behavior and weakness means narratively. For doppelgangers: "
+            "the mystery is WHO sent it and what it was after — the impersonation is a means, "
+            "not the end. There is no single right resolution; moral weight is the point."
+        ),
+        typical_act_structure=[
+            "Act 1: Witness reports — sightings, anomalies, behavior that doesn't fit a living person; "
+            "the party learns who (or what) has supposedly been seen",
+            "Act 2: Track the entity's movements — where it has been, who it has contacted or avoided, "
+            "what it has taken or left behind; multiple witnesses with conflicting accounts",
+            "Act 3: Direct confrontation or dramatic reveal — what the entity truly is, what it wants, "
+            "and whether it is aware of what it has become",
+            "Act 4: Resolution — banishment, destruction, containment, rescue, or uncovering the "
+            "deeper truth behind who sent or created it",
+        ],
+        resolution_keywords=[
+            "laid to rest", "banished", "destroyed", "confronted", "exposed",
+            "contained", "truth uncovered", "identity revealed", "returned to death",
+            "impersonator unmasked", "entity defeated", "spirit released"
+        ],
+        combat_intensity="medium",
+        roleplay_intensity="high",
+        skill_checks=[
+            "Investigation", "Insight", "Religion (identify undead nature)",
+            "Arcana (magical origins)", "Persuasion (witnesses)", "Perception (tracks/clues)"
+        ],
+        suggested_skills=["mission-gen", "prose-writing"],
+    ),
 }
 
 
@@ -756,5 +801,12 @@ GENERIC_TITLES_BY_TYPE: Dict[str, List[str]] = {
         "Face the {subject}",
         "Battle Against {subject}",
         "The {subject} Conflict",
+    ],
+    "strange_occurrence": [
+        "The {subject} Sightings",
+        "Something Wearing {subject}'s Face",
+        "The Return of {subject}",
+        "What Walks as {subject}",
+        "{subject} Was Supposed to Be Dead",
     ],
 }

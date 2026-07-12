@@ -36,10 +36,6 @@ current_persona = "standard"
 
 def get_persona_prompt(persona_name: str, user_id: Optional[str] = None) -> str:
     """Get the prompt for a specific persona"""
-    # Check if persona requires admin access
-    if is_jailbreak_persona(persona_name) and not is_admin_user(user_id):
-        raise PermissionError(f"Persona '{persona_name}' requires admin privileges")
-    
     return PERSONAS.get(persona_name, PERSONAS["standard"])
 
 

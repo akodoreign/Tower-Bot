@@ -35,17 +35,9 @@ class TestExtractDungeonRooms:
         ]
 
         mission: MissionModule = {
-            "title": "Test",
-            "acts": [
-                {
-                    "encounters": [
-                        {
-                            "name": "Dungeon",
-                            "dungeon_delve": {"rooms": rooms},
-                        }
-                    ]
-                }
-            ],
+            "metadata": {"title": "Test"},
+            "content": {"overview": "Test"},
+            "dungeon_delve": {"rooms": rooms},
             "images": [],
         }
 
@@ -55,7 +47,11 @@ class TestExtractDungeonRooms:
 
     def test_extract_rooms_empty_mission(self):
         """Test extracting from mission with no dungeon content."""
-        mission: MissionModule = {"title": "Test", "acts": [], "images": []}
+        mission: MissionModule = {
+            "metadata": {"title": "Test"},
+            "content": {"overview": "Test"},
+            "images": [],
+        }
 
         extracted = extract_dungeon_rooms_from_mission(mission)
         assert len(extracted) == 0
@@ -63,21 +59,14 @@ class TestExtractDungeonRooms:
     def test_extract_multiple_dungeons(self):
         """Test extracting from mission with multiple dungeon encounters."""
         mission: MissionModule = {
-            "title": "Multi-Dungeon",
-            "acts": [
-                {
-                    "encounters": [
-                        {
-                            "name": "First",
-                            "dungeon_delve": {"rooms": [{"name": "room1", "description": ""}]},
-                        },
-                        {
-                            "name": "Second",
-                            "dungeon_delve": {"rooms": [{"name": "room2", "description": ""}]},
-                        },
-                    ]
-                }
-            ],
+            "metadata": {"title": "Multi-Dungeon"},
+            "content": {"overview": "Test"},
+            "dungeon_delve": {
+                "rooms": [
+                    {"name": "room1", "description": ""},
+                    {"name": "room2", "description": ""},
+                ]
+            },
             "images": [],
         }
 
@@ -95,8 +84,8 @@ class TestGenerateMissionWithImages:
             "src.mission_builder.image_integration.generate_mission_async"
         ) as mock_gen:
             mock_mission: MissionModule = {
-                "title": "Test Mission",
-                "acts": [],
+                "metadata": {"title": "Test Mission"},
+                "content": {"overview": "Test"},
                 "images": [],
             }
             mock_gen.return_value = mock_mission
@@ -119,7 +108,7 @@ class TestGenerateMissionWithImages:
                     )
 
                     assert mission is not None
-                    assert mission["title"] == "Test Mission"
+                    assert mission["metadata"]["title"] == "Test Mission"
 
     @pytest.mark.asyncio
     async def test_generate_mission_with_dungeon_images(self):
@@ -129,14 +118,9 @@ class TestGenerateMissionWithImages:
         ]
 
         mock_mission: MissionModule = {
-            "title": "Dungeon Adventure",
-            "acts": [
-                {
-                    "encounters": [
-                        {"name": "Dungeon", "dungeon_delve": {"rooms": rooms}}
-                    ]
-                }
-            ],
+            "metadata": {"title": "Dungeon Adventure"},
+            "content": {"overview": "Test"},
+            "dungeon_delve": {"rooms": rooms},
             "images": [],
         }
 
@@ -185,8 +169,8 @@ class TestGenerateCompleteMission:
     async def test_generate_complete_mission_to_disk(self, tmp_path):
         """Test generating complete mission and saving to disk."""
         mock_mission: MissionModule = {
-            "title": "Complete Mission",
-            "acts": [],
+            "metadata": {"title": "Complete Mission"},
+            "content": {"overview": "Test"},
             "images": [],
         }
 
@@ -216,7 +200,7 @@ class TestGenerateCompleteMission:
                 # Verify content
                 with open(json_path) as f:
                     loaded = json.load(f)
-                    assert loaded["title"] == "Complete Mission"
+                    assert loaded["metadata"]["title"] == "Complete Mission"
 
 
 class TestUpdateMissionWithImages:
@@ -226,21 +210,13 @@ class TestUpdateMissionWithImages:
     async def test_update_existing_mission(self, tmp_path):
         """Test loading and updating an existing mission."""
         mission_data: MissionModule = {
-            "title": "Existing Mission",
-            "acts": [
-                {
-                    "encounters": [
-                        {
-                            "name": "Combat",
-                            "dungeon_delve": {
-                                "rooms": [
-                                    {"name": "arena", "description": "battle ground"}
-                                ]
-                            },
-                        }
-                    ]
-                }
-            ],
+            "metadata": {"title": "Existing Mission"},
+            "content": {"overview": "Test"},
+            "dungeon_delve": {
+                "rooms": [
+                    {"name": "arena", "description": "battle ground"}
+                ]
+            },
             "images": [],
         }
 
@@ -297,7 +273,11 @@ class TestSyncWrapper:
         with patch(
             "src.mission_builder.image_integration.generate_mission_with_images"
         ) as mock_gen:
-            mock_mission: MissionModule = {"title": "Test", "acts": [], "images": []}
+            mock_mission: MissionModule = {
+                "metadata": {"title": "Test"},
+                "content": {"overview": "Test"},
+                "images": [],
+            }
             mock_gen.return_value = (mock_mission, {})
 
             # Use sync wrapper
@@ -325,18 +305,9 @@ class TestIntegration:
         ]
 
         mission: MissionModule = {
-            "title": "Dragon's Lair",
-            "faction": "Dragon Slayers",
-            "acts": [
-                {
-                    "encounters": [
-                        {
-                            "name": "Dragon Battle",
-                            "dungeon_delve": {"rooms": rooms},
-                        }
-                    ]
-                }
-            ],
+            "metadata": {"title": "Dragon's Lair", "faction": "Dragon Slayers"},
+            "content": {"overview": "Test"},
+            "dungeon_delve": {"rooms": rooms},
             "images": [],
         }
 

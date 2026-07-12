@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 A1111_URL = os.getenv("A1111_URL", "http://127.0.0.1:7860")
-A1111_TIMEOUT = 300.0  # 5 minutes per tile
+A1111_TIMEOUT = float(os.getenv("A1111_TILE_TIMEOUT", "900"))  # seconds per tile
 
 # Tile dimensions — 512x512 for faster generation, will be stitched
 TILE_WIDTH = 512
@@ -176,9 +176,15 @@ async def generate_room_tile(
     
     try:
         # Import the A1111 lock from news_feed to respect queue
-        from src.news_feed import a1111_lock, _a1111_lock
-        
-        if _a1111_lock.locked():
+        from src.news_feed import a1111_lock
+        from src.resource_cop import wait_for_a1111_turn
+
+        decision = await wait_for_a1111_turn("dungeon_tile", max_wait_seconds=60)
+        if not decision.run_now:
+            logger.info(f"🗺️ A1111 busy, deferring tile {room.room_id}: {decision.reason}")
+            return None
+
+        if a1111_lock.locked():
             logger.info(f"🗺️ A1111 busy, waiting for lock...")
         
         async with a1111_lock:

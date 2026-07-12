@@ -27,10 +27,9 @@ from typing import List, Dict, Optional, Tuple
 from difflib import SequenceMatcher
 
 from src.log import logger
+from src.db_api import get_revealed_secrets
 
-DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-NPC_ROSTER_FILE = DOCS_DIR / "npc_roster.json"
-NPC_GRAVEYARD_FILE = DOCS_DIR / "npc_graveyard.json"
+DOCS_DIR    = Path(__file__).resolve().parent.parent / "campaign_docs"
 NPC_APP_DIR = DOCS_DIR / "npc_appearances"
 
 # Minimum similarity threshold for fuzzy matching (0.0 to 1.0)
@@ -41,7 +40,7 @@ def _load_all_npcs() -> List[Dict]:
     """Load all NPCs from MySQL npcs table (falls back to JSON files)."""
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT name, faction, role, status, location, data_json FROM npcs ORDER BY name") or []
+        rows = _rq("SELECT id, name, faction, role, status, location, data_json FROM npcs ORDER BY name") or []
         if rows:
             npcs = []
             for row in rows:
@@ -51,35 +50,14 @@ def _load_all_npcs() -> List[Dict]:
                         dj = json.loads(dj)
                     except Exception:
                         dj = {}
-                npc = {**dj, "name": row["name"], "faction": row["faction"],
+                npc = {**dj, "_db_id": row["id"], "name": row["name"], "faction": row["faction"],
                        "role": row["role"], "status": row["status"], "location": row["location"],
                        "_source": "graveyard" if row["status"] == "dead" else "roster"}
                 npcs.append(npc)
             return npcs
     except Exception as e:
         logger.warning(f"npc_lookup: DB load failed: {e}")
-
-    npcs = []
-    if NPC_ROSTER_FILE.exists():
-        try:
-            roster = json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8"))
-            for npc in roster:
-                npc["_source"] = "roster"
-            npcs.extend(roster)
-        except Exception as e:
-            logger.warning(f"npc_lookup: Could not load roster: {e}")
-
-    if NPC_GRAVEYARD_FILE.exists():
-        try:
-            graveyard = json.loads(NPC_GRAVEYARD_FILE.read_text(encoding="utf-8"))
-            for npc in graveyard:
-                npc["_source"] = "graveyard"
-                npc["status"] = "dead"
-            npcs.extend(graveyard)
-        except Exception as e:
-            logger.warning(f"npc_lookup: Could not load graveyard: {e}")
-
-    return npcs
+        return []
 
 
 def _get_npc_appearance(name: str) -> Optional[Dict]:
@@ -219,7 +197,10 @@ def extract_and_lookup_npcs(text: str) -> List[Dict]:
             
             # Get appearance data
             appearance = _get_npc_appearance(name)
-            sd_prompt = appearance.get("sd_prompt", "") if appearance else ""
+            sd_prompt = (
+                (appearance.get("sd_appearance") or appearance.get("sd_prompt", ""))
+                if appearance else ""
+            )
             
             results.append({
                 "name": name,
@@ -295,8 +276,10 @@ def get_npc_context_for_prompt(text: str, include_appearance: bool = True) -> st
             lines.append(f"  Motivation: {npc['motivation']}")
         
         # Secrets (if revealed or for DM context)
-        if npc.get("revealed_secrets"):
-            lines.append(f"  Known secrets: {'; '.join(npc['revealed_secrets'])}")
+        _nid = npc.get("_db_id") or npc.get("id")
+        _revealed = (get_revealed_secrets(int(_nid)) if _nid else npc.get("revealed_secrets")) or []
+        if _revealed:
+            lines.append(f"  Known secrets: {'; '.join(_revealed)}")
         
         # Appearance (if requested and available)
         if include_appearance and m.get("appearance"):
@@ -329,24 +312,39 @@ def get_npc_sd_prompt(text: str) -> str:
     prompt_parts = []
     
     for m in matches[:3]:  # Limit to 3 NPCs for prompt length
+        npc = m["data"]
+        species = npc.get("species", "")
+        species_prefix = ""
+        if species:
+            try:
+                from src.npc_appearance import (
+                    get_race_sd_traits,
+                    species_portrait_constraints,
+                    species_visual_guard,
+                )
+                positive, _negative = species_portrait_constraints(species)
+                bits = [species_visual_guard(species), positive, get_race_sd_traits(species)]
+                species_prefix = ", ".join(b for b in bits if b)
+            except Exception:
+                species_prefix = species
         if m.get("sd_prompt"):
-            # Use the pre-generated SD prompt
-            prompt_parts.append(m["sd_prompt"].split(".")[0].strip())
+            base = m["sd_prompt"].split(".")[0].strip()
+            prompt_parts.append(", ".join(p for p in (species_prefix, base) if p))
         elif m.get("appearance"):
-            # Build from appearance data
             app = m["appearance"]
-            if app.get("sd_prompt"):
-                prompt_parts.append(app["sd_prompt"].split(".")[0].strip())
-            elif app.get("physical"):
-                prompt_parts.append(app["physical"].split(".")[0].strip())
+            # sd_appearance is the key used by npc_appearance.py's _generate_npc_profile
+            sd = app.get("sd_appearance") or app.get("sd_prompt") or app.get("physical", "")
+            if sd:
+                base = sd.split(".")[0].strip()
+                prompt_parts.append(", ".join(p for p in (species_prefix, base) if p))
+            else:
+                basic = npc.get("appearance", npc.get("species", "human"))
+                base = basic.split(".")[0].strip()
+                prompt_parts.append(", ".join(p for p in (species_prefix, base) if p))
         else:
-            # Fallback to roster data
-            npc = m["data"]
-            species = npc.get("species", "human")
-            basic = f"{species}"
-            if npc.get("appearance"):
-                basic = npc["appearance"].split(".")[0].strip()
-            prompt_parts.append(basic)
+            basic = npc.get("appearance", "") or npc.get("species", "human")
+            base = basic.split(".")[0].strip()
+            prompt_parts.append(", ".join(p for p in (species_prefix, base) if p))
     
     return ", ".join(prompt_parts) if prompt_parts else ""
 

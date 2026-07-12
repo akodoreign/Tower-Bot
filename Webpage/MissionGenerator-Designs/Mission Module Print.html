@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>The Silent Vault — Mission Module</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --parchment: #f4ead5;
+    --parchment-2: #ece0c2;
+    --parchment-3: #e1d3ae;
+    --ink: #1a1612;
+    --ink-2: #2b2521;
+    --iron: #4a3f34;
+    --sigil: #7a6a4f;
+    --ember: #c8531f;
+    --ember-dim: #8a3a16;
+    --bone: #f9f2df;
+    --rust: #7d2e12;
+    --moss: #5b6b3a;
+    --sky: #3e5a6b;
+    --line: rgba(26, 22, 18, 0.22);
+    --line-2: rgba(26, 22, 18, 0.12);
+    --serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #2b2521;
+    background-image:
+      radial-gradient(1000px 500px at 50% 0%, rgba(200,83,31,.08), transparent 60%);
+  }
+  body { font-family: var(--serif); color: var(--ink); padding: 32px 0 60px; }
+
+  .shell { max-width: 850px; margin: 0 auto; }
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; margin-bottom: 16px;
+    background: rgba(26,22,18,.55); backdrop-filter: blur(8px);
+    border: 1px solid rgba(244,234,213,.15); border-radius: 8px;
+    color: var(--parchment); font-family: var(--sans); font-size: 12.5px;
+  }
+  .toolbar b { font-family: var(--serif); font-size: 16px; font-weight: 600; }
+  .toolbar b em { font-style: italic; color: #e27b44; }
+  .toolbar .sep { width: 1px; height: 18px; background: rgba(244,234,213,.15); margin: 0 6px; }
+  .toolbar .meta { color: rgba(244,234,213,.55); font-family: var(--mono); font-size: 11px; letter-spacing: .04em; }
+  .toolbar .spacer { flex: 1; }
+  .toolbar button {
+    background: transparent; color: var(--parchment);
+    border: 1px solid rgba(244,234,213,.2); border-radius: 6px;
+    padding: 6px 10px; font-family: var(--sans); font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .toolbar button:hover { background: rgba(244,234,213,.08); }
+  .toolbar button.primary { background: var(--ember); border-color: var(--ember-dim); }
+  .toolbar button.primary:hover { background: var(--ember-dim); }
+
+  /* ── page ─────────────────────────────────────────────────── */
+  .page {
+    width: 850px;
+    min-height: 1100px;
+    margin: 0 auto 18px;
+    background: var(--parchment);
+    background-image:
+      radial-gradient(900px 500px at 80% -10%, rgba(200,83,31,.05), transparent 60%),
+      radial-gradient(600px 400px at 10% 110%, rgba(58,50,41,.08), transparent 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .08 0 0 0 0 .06 0 0 0 0 .04 0 0 0 .05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,.7), 0 2px 0 rgba(255,255,255,.1) inset;
+    padding: 60px 72px 70px;
+    position: relative;
+    color: var(--ink);
+  }
+  .page::after {
+    content: ""; position: absolute; inset: 18px;
+    border: 1px solid rgba(122, 106, 79, .35);
+    border-radius: 2px; pointer-events: none;
+  }
+  .page .folio {
+    position: absolute; bottom: 20px; left: 0; right: 0;
+    display: flex; justify-content: space-between;
+    padding: 0 80px; font-family: var(--mono); font-size: 10px;
+    color: var(--sigil); letter-spacing: .14em; text-transform: uppercase;
+  }
+  .page .folio b { font-weight: 600; color: var(--iron); }
+
+  /* ── Cover ────────────────────────────────────────────────── */
+  .cover { padding: 8px 8px; }
+  .cover .kicker {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .36em;
+    text-transform: uppercase; color: var(--rust); text-align: center; margin-bottom: 18px;
+  }
+  .ornament {
+    width: 120px; height: 1px; background: var(--iron); margin: 0 auto 18px;
+    position: relative;
+  }
+  .ornament::before, .ornament::after {
+    content: ""; position: absolute; top: -3px;
+    width: 7px; height: 7px; background: var(--ember);
+    transform: rotate(45deg); border-radius: 1px;
+  }
+  .ornament::before { left: -12px; }
+  .ornament::after { right: -12px; }
+
+  .cover h1 {
+    font-family: var(--serif);
+    font-size: 78px; font-weight: 600;
+    text-align: center; line-height: .95;
+    margin: 0 0 2px; letter-spacing: -.015em;
+  }
+  .cover h1 em { font-style: italic; color: var(--ember); font-weight: 500; }
+  .cover .super {
+    text-align: center; font-family: var(--mono);
+    font-size: 11.5px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--iron); margin: 4px 0 4px;
+  }
+  .cover .faction-line {
+    text-align: center; font-style: italic; font-size: 20px;
+    color: var(--iron); margin-top: 14px; font-weight: 400;
+  }
+  .cover .faction-line b { font-style: normal; font-weight: 600; color: var(--ink); }
+
+  .cover-art {
+    margin: 26px -8px 24px;
+    height: 340px; border-radius: 2px;
+    border: 1px solid var(--iron);
+    background:
+      radial-gradient(circle at 50% 60%, rgba(200,83,31,.3), transparent 50%),
+      linear-gradient(180deg, #1a1612 0%, #2b2521 60%, #3a3229 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 80px rgba(0,0,0,.6);
+  }
+  .cover-art::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0 59px, rgba(244,234,213,.03) 59px 60px),
+      repeating-linear-gradient(0deg, transparent 0 59px, rgba(244,234,213,.03) 59px 60px);
+  }
+  .cover-art .door {
+    position: absolute; left: 50%; top: 40px; transform: translateX(-50%);
+    width: 180px; height: 240px;
+    background: linear-gradient(180deg, #3a3229, #1a1612);
+    border: 2px solid var(--ember-dim);
+    border-radius: 100px 100px 4px 4px;
+    box-shadow: 0 0 40px rgba(200,83,31,.5), inset 0 0 20px rgba(0,0,0,.8);
+  }
+  .cover-art .sigil {
+    position: absolute; left: 50%; top: 140px; transform: translateX(-50%);
+    width: 70px; height: 70px; border: 2px solid var(--ember);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(200,83,31,.6);
+  }
+  .cover-art .sigil::before, .cover-art .sigil::after {
+    content: ""; position: absolute; inset: 6px;
+    border: 1px solid var(--ember);
+    border-radius: 50%;
+  }
+  .cover-art .sigil::after { inset: 14px; border-color: var(--ember-dim); }
+  .cover-art .cap {
+    position: absolute; bottom: 10px; left: 12px; right: 12px;
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: rgba(244,234,213,.45); display: flex; justify-content: space-between;
+  }
+  .cover-art .cap b { color: #e27b44; }
+
+  .cover-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    border-top: 1px solid var(--iron);
+    border-bottom: 1px solid var(--iron);
+    margin: 10px 0;
+  }
+  .cover-stats > div { padding: 10px 4px; text-align: center; border-right: 1px dashed var(--sigil); }
+  .cover-stats > div:last-child { border-right: 0; }
+  .cover-stats b {
+    display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--sigil); font-weight: 600; margin-bottom: 4px;
+  }
+  .cover-stats span { font-family: var(--serif); font-size: 22px; font-weight: 600; }
+  .cover-stats span em { font-style: italic; color: var(--ember); font-size: 15px; }
+
+  .cover-toc { margin-top: 22px; font-family: var(--sans); font-size: 12px; }
+  .cover-toc h4 {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--sigil); font-weight: 600; margin: 0 0 8px;
+  }
+  .toc-row {
+    display: flex; align-items: baseline; padding: 3px 0;
+    font-family: var(--serif); font-size: 15px;
+  }
+  .toc-row b { font-weight: 600; width: 80px; color: var(--iron); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; }
+  .toc-row span { flex: 1; }
+  .toc-row .dots {
+    flex: 1;
+    border-bottom: 1px dotted var(--sigil);
+    margin: 0 6px;
+    height: 10px;
+  }
+  .toc-row i { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--iron); }
+
+  .brand-stamp {
+    margin-top: 24px; text-align: center; font-family: var(--mono);
+    font-size: 10px; letter-spacing: .32em; text-transform: uppercase;
+    color: var(--sigil);
+  }
+
+  /* ── Interior pages ───────────────────────────────────────── */
+  h2.section {
+    font-family: var(--serif); font-size: 40px; font-weight: 600;
+    line-height: 1; margin: 0 0 4px; letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  h2.section em { font-style: italic; color: var(--ember); }
+  .section-kicker {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .28em;
+    text-transform: uppercase; color: var(--rust); margin-bottom: 6px;
+  }
+  .rule {
+    height: 1px; background: var(--iron);
+    margin: 14px 0 18px; position: relative;
+  }
+  .rule::after {
+    content: ""; position: absolute; top: -3px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 7px; height: 7px; background: var(--ember); border-radius: 1px;
+  }
+
+  .cols { column-count: 2; column-gap: 26px; font-size: 12.5px; line-height: 1.5; column-rule: 1px solid rgba(122,106,79,.25); }
+  .cols p { margin: 0 0 8px; text-indent: 1.2em; }
+  .cols p:first-of-type { text-indent: 0; }
+  .cols p:first-of-type::first-letter {
+    float: left;
+    font-size: 46px; line-height: .85;
+    padding: 3px 6px 0 0; color: var(--ember); font-weight: 600;
+    font-family: var(--serif);
+  }
+
+  .callout {
+    break-inside: avoid;
+    background: #fdf8ea;
+    border-left: 3px solid var(--ember);
+    padding: 10px 12px;
+    margin: 10px 0;
+    font-size: 12px; line-height: 1.45;
+  }
+  .callout b { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--rust); display: block; margin-bottom: 3px; }
+  .callout.dm {
+    border-left-color: var(--sky); background: #eef2f5;
+  }
+  .callout.dm b { color: var(--sky); }
+
+  /* Acts */
+  .act {
+    break-inside: avoid;
+    margin: 16px 0;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, var(--parchment-2), transparent);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+  }
+  .act-head {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 6px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--sigil);
+  }
+  .act-num {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--sigil); font-weight: 600;
+  }
+  .act-name {
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+    flex: 1; line-height: 1.1;
+  }
+  .act-name em { font-style: italic; color: var(--ember); font-weight: 500; }
+  .act-time {
+    font-family: var(--mono); font-size: 10px; color: var(--iron);
+    letter-spacing: .06em;
+  }
+  .act p { margin: 6px 0; font-size: 12.5px; line-height: 1.5; }
+
+  .lead-list { list-style: none; padding: 0; margin: 6px 0 0; }
+  .lead-list li {
+    padding: 8px 10px; margin-bottom: 6px;
+    background: var(--bone); border: 1px solid var(--line-2);
+    border-left: 3px solid var(--moss);
+    border-radius: 2px; font-size: 12px; line-height: 1.45;
+  }
+  .lead-list li b {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--moss); font-weight: 600;
+    display: block; margin-bottom: 2px;
+  }
+  .lead-list li em { font-style: italic; color: var(--iron); }
+  .lead-list .why {
+    margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--line-2);
+    font-size: 11.5px; color: var(--iron);
+  }
+  .lead-list .why b { color: var(--rust); display: inline; margin: 0 6px 0 0; }
+
+  /* Encounter / statblock */
+  .statblock {
+    break-inside: avoid;
+    margin: 12px 0;
+    background: #fdf8ea;
+    border: 1px solid var(--iron);
+    border-top: 4px double var(--ember);
+    padding: 12px 14px;
+    font-size: 11.5px; line-height: 1.4;
+  }
+  .statblock h3 {
+    font-family: var(--serif); font-size: 24px; font-weight: 600;
+    margin: 0 0 2px; color: var(--rust); line-height: 1; font-variant: small-caps;
+    letter-spacing: .02em;
+  }
+  .statblock .type-line {
+    font-style: italic; font-size: 12px; color: var(--iron);
+    margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--ember);
+  }
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 10px;
+    margin: 6px 0; padding: 6px 0; border-bottom: 1px solid var(--ember);
+    font-family: var(--sans); font-size: 11px;
+  }
+  .stat-grid b { color: var(--rust); font-weight: 700; }
+  .abilities {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px;
+    text-align: center; margin: 6px 0; padding: 6px 0;
+    border-bottom: 1px solid var(--ember);
+    font-family: var(--sans);
+  }
+  .abilities div b {
+    display: block; font-size: 9.5px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--rust); font-weight: 700;
+  }
+  .abilities div span {
+    font-size: 13px; font-weight: 600;
+  }
+  .abilities div em { font-style: normal; font-size: 10px; color: var(--iron); }
+  .sb-line {
+    padding: 3px 0; font-family: var(--sans); font-size: 11px;
+    border-bottom: 1px solid rgba(200,83,31,.3);
+  }
+  .sb-line b { color: var(--rust); font-weight: 700; }
+  .sb-line:last-child { border-bottom: 0; }
+  .sb-actions {
+    margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--ember);
+  }
+  .sb-actions h5 {
+    font-family: var(--serif); font-size: 15px; font-weight: 600;
+    margin: 4px 0 2px; color: var(--rust); font-variant: small-caps;
+    letter-spacing: .04em; border-bottom: 1px solid var(--ember); padding-bottom: 2px;
+  }
+  .sb-actions p { margin: 3px 0; font-size: 11px; font-family: var(--sans); line-height: 1.4; }
+  .sb-actions p b { font-style: italic; font-weight: 700; }
+
+  /* NPC card */
+  .npc {
+    break-inside: avoid;
+    display: grid; grid-template-columns: 78px 1fr; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .npc:last-child { border-bottom: 0; }
+  .npc .portrait {
+    width: 78px; height: 100px; border-radius: 2px;
+    border: 1px solid var(--iron);
+    background:
+      repeating-linear-gradient(45deg, rgba(26,22,18,.08) 0 4px, transparent 4px 8px),
+      linear-gradient(180deg, var(--parchment-3), var(--parchment-2));
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--sigil);
+    text-transform: uppercase; text-align: center; padding: 6px;
+  }
+  .npc .portrait.vex { background:
+    radial-gradient(60% 45% at 50% 38%, #d4b98a 0 70%, transparent 70%),
+    linear-gradient(180deg, #1a1612 0%, #3a3229 60%, #5b4a36 100%);
+    color: transparent;
+  }
+  .npc .portrait.warden { background:
+    radial-gradient(60% 45% at 50% 38%, #a69474 0 70%, transparent 70%),
+    linear-gradient(180deg, #2b2521 0%, #4a3f34 100%);
+    color: transparent;
+  }
+  .npc .portrait.fence { background:
+    radial-gradient(60% 45% at 50% 38%, #c8a378 0 70%, transparent 70%),
+    linear-gradient(180deg, #3e5a6b 0%, #1a1612 100%);
+    color: transparent;
+  }
+  .npc h4 {
+    font-family: var(--serif); font-size: 20px; font-weight: 600;
+    margin: 0; line-height: 1.1;
+  }
+  .npc h4 em { font-style: italic; color: var(--ember); font-weight: 500; font-size: 14px; margin-left: 4px; }
+  .npc .role {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--sigil); font-weight: 600; margin: 2px 0 4px;
+  }
+  .npc p { margin: 3px 0; font-size: 12px; line-height: 1.45; }
+  .npc .quote {
+    font-style: italic; color: var(--iron);
+    padding-left: 10px; border-left: 2px solid var(--ember);
+    margin: 4px 0;
+  }
+  .npc .tags { margin-top: 4px; font-family: var(--mono); font-size: 10px; color: var(--iron); letter-spacing: .04em; }
+  .npc .tags b { background: var(--parchment-2); padding: 1px 5px; border-radius: 2px; margin-right: 4px; font-weight: 500; }
+
+  /* Dungeon map */
+  .dungeon-map {
+    border: 1px solid var(--iron);
+    background: #1a1612;
+    padding: 14px;
+    margin: 8px 0 12px;
+    position: relative;
+    break-inside: avoid;
+  }
+  .dungeon-map h4 {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .22em;
+    text-transform: uppercase; color: #e27b44; margin: 0 0 10px;
+    font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+  }
+  .dungeon-map h4 span { color: rgba(244,234,213,.45); font-weight: 400; letter-spacing: .08em; }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .tile {
+    aspect-ratio: 1;
+    background: #2b2521;
+    border: 1px solid #3a3229;
+    position: relative;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 10px;
+    color: rgba(244,234,213,.6);
+  }
+  .tile.entrance { background:
+    linear-gradient(45deg, #3a3229 25%, transparent 25%),
+    linear-gradient(-45deg, #3a3229 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #3a3229 75%),
+    linear-gradient(-45deg, transparent 75%, #3a3229 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+    background-color: #2b2521;
+  }
+  .tile.hall { background:
+    repeating-linear-gradient(0deg, #2b2521 0 8px, #3a3229 8px 9px);
+  }
+  .tile.chamber {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(200,83,31,.18) 0 20%, transparent 25%),
+      #2b2521;
+    border-color: var(--ember-dim);
+  }
+  .tile.trap { background:
+    linear-gradient(45deg, transparent 45%, var(--rust) 45% 55%, transparent 55%),
+    #2b2521; }
+  .tile.boss {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(200,83,31,.5) 0 30%, rgba(200,83,31,.1) 45%, transparent 60%),
+      #1a1612;
+    border: 2px solid var(--ember);
+    box-shadow: inset 0 0 20px rgba(200,83,31,.3);
+  }
+  .tile .num {
+    position: absolute; top: 3px; left: 5px;
+    font-weight: 700; color: var(--bone); font-size: 11px;
+  }
+  .tile .name {
+    position: absolute; bottom: 3px; left: 5px; right: 5px;
+    font-size: 8.5px; color: rgba(244,234,213,.85);
+    letter-spacing: .06em; text-transform: uppercase; font-weight: 600;
+  }
+  .tile.boss .name { color: var(--ember); }
+
+  .legend {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid rgba(244,234,213,.15);
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
+    color: rgba(244,234,213,.6); text-transform: uppercase;
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; display: inline-block; border: 1px solid #3a3229; }
+  .legend i.ent { background: repeating-linear-gradient(45deg, #3a3229 0 3px, #2b2521 3px 6px); }
+  .legend i.hall { background: repeating-linear-gradient(0deg, #2b2521 0 3px, #3a3229 3px 4px); }
+  .legend i.cham { background: var(--ember-dim); }
+  .legend i.trap { background: var(--rust); }
+  .legend i.boss { background: var(--ember); box-shadow: 0 0 6px var(--ember); }
+
+  /* Room cards */
+  .room {
+    break-inside: avoid;
+    margin: 10px 0;
+    padding: 10px 12px;
+    background: var(--bone);
+    border: 1px solid var(--line-2);
+    border-top: 2px solid var(--ember);
+    font-size: 11.5px; line-height: 1.45;
+  }
+  .room-head {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;
+    padding-bottom: 4px; border-bottom: 1px dashed var(--line-2);
+  }
+  .room-num {
+    font-family: var(--serif); font-size: 28px; font-weight: 600;
+    color: var(--ember); line-height: .8; font-style: italic;
+  }
+  .room-name {
+    font-family: var(--serif); font-size: 18px; font-weight: 600;
+    flex: 1;
+  }
+  .room-tags { font-family: var(--mono); font-size: 9.5px; color: var(--sigil); letter-spacing: .08em; text-transform: uppercase; }
+  .room p { margin: 3px 0; }
+  .room .features {
+    margin-top: 4px; font-family: var(--mono); font-size: 10px; color: var(--iron);
+    letter-spacing: .02em;
+  }
+  .room .features b { color: var(--rust); margin-right: 4px; font-weight: 700; }
+
+  /* Loot */
+  .loot-table {
+    break-inside: avoid;
+    border: 1px solid var(--iron);
+    background: #fdf8ea;
+    border-radius: 2px;
+    margin: 10px 0;
+    overflow: hidden;
+  }
+  .loot-table h4 {
+    margin: 0; padding: 8px 12px;
+    background: var(--ink); color: var(--parchment);
+    font-family: var(--serif); font-size: 15px; font-weight: 600;
+    font-variant: small-caps; letter-spacing: .06em;
+  }
+  .loot-table h4 em { color: #e27b44; font-style: italic; font-size: 12px; float: right; font-weight: 400; letter-spacing: 0; }
+  .loot-row {
+    display: grid; grid-template-columns: 28px 1fr 80px 60px;
+    gap: 10px; padding: 5px 12px;
+    border-top: 1px solid var(--line-2);
+    font-size: 11.5px; font-family: var(--sans); align-items: center;
+  }
+  .loot-row.head {
+    background: var(--parchment-2);
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--sigil); font-weight: 600;
+  }
+  .loot-row .roll { font-family: var(--mono); font-weight: 600; color: var(--iron); }
+  .loot-row b { font-weight: 600; font-family: var(--serif); font-size: 13px; }
+  .loot-row b em { font-style: italic; color: var(--ember); font-size: 11px; margin-left: 4px; }
+  .loot-row .rarity {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .loot-row .rarity.common { color: var(--iron); }
+  .loot-row .rarity.uncommon { color: var(--moss); }
+  .loot-row .rarity.rare { color: var(--sky); }
+  .loot-row .rarity.veryrare { color: var(--rust); }
+  .loot-row .price { font-family: var(--mono); font-size: 11px; text-align: right; }
+
+  /* JSON footnote */
+  .json-footer {
+    break-inside: avoid;
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: var(--ink); color: #c9bd9b;
+    font-family: var(--mono); font-size: 10px; line-height: 1.55;
+    border-radius: 2px;
+  }
+  .json-footer b { color: #e27b44; }
+  .json-footer .k { color: #8cb5c9; }
+  .json-footer .s { color: #c9bd9b; }
+
+  /* ── Print ─────────────────────────────────────────────────── */
+  @page { size: 8.5in 11in; margin: 0; }
+  @media print {
+    html, body { background: white !important; }
+    body { padding: 0; }
+    .toolbar, .brand-stamp { display: none; }
+    .page {
+      width: 8.5in; min-height: 11in;
+      margin: 0; padding: 0.6in 0.75in 0.7in;
+      box-shadow: none;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="toolbar">
+    <b>The Silent Vault<em> · Mission Module</em></b>
+    <span class="sep"></span>
+    <span class="meta">12 pp · 8.5×11 · auto-paginated from <code>module_data.json</code></span>
+    <span class="spacer"></span>
+    <button>Export JSON</button>
+    <button>Export DOCX</button>
+    <button class="primary" onclick="window.print()">Print / PDF</button>
+  </div>
+
+
+  <!-- ══════ PAGE 1 — COVER ══════════════════════════════════ -->
+  <article class="page" data-screen-label="01 Cover">
+    <div class="cover">
+      <div class="kicker">⚔ Tower of Last Chance · Mission Board</div>
+      <div class="ornament"></div>
+      <div class="super">A Theft Contract · Party Level 8</div>
+      <h1>The Silent <em>Vault</em></h1>
+      <div class="faction-line">Sponsored by <b>Glass Sigil</b> · Undercity Posting №&thinsp;0247</div>
+
+      <div class="cover-art" aria-label="cover illustration — placeholder">
+        <div class="door"></div>
+        <div class="sigil"></div>
+        <div class="cap">
+          <span>Cover · Cobbleway Vault Door</span>
+          <b>PLACEHOLDER — replace with A1111 render</b>
+        </div>
+      </div>
+
+      <div class="cover-stats">
+        <div><b>Difficulty</b><span>07<em> / 10</em></span></div>
+        <div><b>Challenge</b><span>CR&nbsp;9</span></div>
+        <div><b>Runtime</b><span>≈&nbsp;3<em> hrs</em></span></div>
+        <div><b>Reward</b><span>2,000<em> EC</em></span></div>
+      </div>
+
+      <div class="cover-toc">
+        <h4>Contents</h4>
+        <div class="toc-row"><b>§ I</b><span>Overview &amp; Briefing</span><span class="dots"></span><i>p. 2</i></div>
+        <div class="toc-row"><b>§ II</b><span>Five Acts · Planning to Escape</span><span class="dots"></span><i>p. 3</i></div>
+        <div class="toc-row"><b>§ III</b><span>Investigation Leads</span><span class="dots"></span><i>p. 5</i></div>
+        <div class="toc-row"><b>§ IV</b><span>Encounters &amp; Statblocks</span><span class="dots"></span><i>p. 6</i></div>
+        <div class="toc-row"><b>§ V</b><span>Dramatis Personae — NPCs</span><span class="dots"></span><i>p. 8</i></div>
+        <div class="toc-row"><b>§ VI</b><span>Vault Map &amp; Rooms</span><span class="dots"></span><i>p. 9</i></div>
+        <div class="toc-row"><b>§ VII</b><span>Rewards &amp; Consequences</span><span class="dots"></span><i>p. 11</i></div>
+      </div>
+
+      <div class="brand-stamp">Generated by TowerBot v1.2 · qwen3-8b-slim · A1111 · 2026-04-17</div>
+    </div>
+    <div class="folio"><b>⚔ TowerBot</b><span>I · Cover</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 2 — OVERVIEW ══════════════════════════════ -->
+  <article class="page" data-screen-label="02 Overview">
+    <div class="section-kicker">Section I · Overview</div>
+    <h2 class="section">The contract, in <em>brief</em>.</h2>
+    <div class="rule"></div>
+
+    <div class="cols">
+      <p>Glass Sigil has spent six months tracing a rumor down through the Cobbleway merchant quarter — a rumor that hardens, the deeper one digs, into something resembling a map. Beneath the old counting houses sleeps a vault, sealed in the last days of the Prior Compact and never reopened. What lies within is not listed in any ledger they will share.</p>
+
+      <p>The contract is quiet. The Sigil needs a discreet crew to bypass the vault's wardens, retrieve what sleeps inside, and return before the rival Obsidian Lotus — who have also begun sniffing at the masonry — catch the scent. Success buys the crew a standing favor with the Sigil and a purse that does not need to be explained. Failure is unlikely to leave witnesses.</p>
+
+      <div class="callout">
+        <b>Player Briefing</b>
+        Grandmaster Vex will meet the party in the upper solar of Glass Sigil's counting house at dusk. She provides: partial floorplans, the name of a reliable fence, and a hard deadline of three nights before the Lotus move.
+      </div>
+
+      <p>The party has three nights. The Sigil will pay for extraction, but not for rescue. If the job goes loud, there is no cavalry and the vault's guardians will not negotiate. The Cobbleway watch has been paid to look away — but only until dawn of the third night. After that, every badge in the quarter has orders to arrest anyone found near the door.</p>
+
+      <div class="callout dm">
+        <b>DM guidance · theft</b>
+        This is a heist. Give the party at least <i>three viable approaches</i>: social (seduce a ledger clerk), stealth (the servant's stair), direct (blow the east wall). Reward their plan. Success is getting the item <i>and escaping</i> — or paying the cost of staying too long.
+      </div>
+
+      <p>The item itself remains undescribed in Vex's briefing. She calls it only "the sleeper." Investigation leads in Section III will let clever parties learn more before committing — and discover that Glass Sigil has not been entirely honest about why they want it back.</p>
+
+      <p>A rival crew from Obsidian Lotus is active in the quarter. They may reach the door first. They may try to hire the party off. They may simply wait, and then rob the party on the way out. All three should be on the table.</p>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>II · Overview</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 3 — ACTS 1–3 ══════════════════════════════ -->
+  <article class="page" data-screen-label="03 Acts 1-3">
+    <div class="section-kicker">Section II · Five Acts</div>
+    <h2 class="section">Planning, <em>infiltration</em>, and the Vault.</h2>
+    <div class="rule"></div>
+
+    <div class="act">
+      <div class="act-head">
+        <div class="act-num">Act I</div>
+        <div class="act-name">The <em>Solar Meeting</em></div>
+        <div class="act-time">≈ 25 min · roleplay</div>
+      </div>
+      <p>Grandmaster Vex receives the party at dusk in the upper solar of Glass Sigil's counting house. The fire is lit but low. Three ledgers are open on the table; a fourth, in a glass box, is closed. She is direct. She wants the sleeper recovered. She will answer two questions honestly and one question evasively; the party must choose which to ask.</p>
+      <p>She provides: partial floorplans of the Cobbleway vault (Handout A), a writ of passage through the merchant quarter, and the name <em>Orrin Keel</em> — a fence who owes the Sigil a favor and keeps a stall at the night market.</p>
+      <div class="callout"><b>Skill · Insight DC 14</b> Vex is lying about the age of the vault. It is younger than she claims, and she knows whose seal is on the door.</div>
+    </div>
+
+    <div class="act">
+      <div class="act-head">
+        <div class="act-num">Act II</div>
+        <div class="act-name">Scouting the <em>Cobbleway</em></div>
+        <div class="act-time">≈ 40 min · mixed</div>
+      </div>
+      <p>The party has one night of reconnaissance before the watch rotation reliably changes. The Cobbleway district is a knot of counting houses, a covered market, a temple to the Clerk God, and the old grain cellars under which the vault sits.</p>
+      <p>Three investigation leads (see §III) become available. The party may pursue all three if they split up or move quickly; otherwise, two is realistic. Each lead reshapes the final heist in a concrete way.</p>
+      <div class="callout"><b>Complication · Lotus eyes</b> A Lotus scout tails the party after their second lead. Perception DC 16 to notice. If caught and questioned, she offers the party 1,500 EC to walk away. If killed, the Lotus will retaliate in Act V.</div>
+    </div>
+
+    <div class="act">
+      <div class="act-head">
+        <div class="act-num">Act III</div>
+        <div class="act-name">Through the <em>Vault Door</em></div>
+        <div class="act-time">≈ 45 min · skill + combat</div>
+      </div>
+      <p>The party enters the vault on the third night. Their chosen approach — social, stealth, or direct — determines the shape of this act but not its beats: first the outer corridor (traps and warding), then the antechamber (the vault guardians stir), then the door itself.</p>
+      <p>The door reads the party's intent. Anyone whose name appears in Glass Sigil's ledger of oaths passes untouched. Everyone else takes <b>2d10</b> radiant damage, Wisdom save DC 15 for half, on first contact. Clever parties may find the inscription (Investigation DC 18) and bluff past.</p>
+      <p>The guardians — three Iron Golems bound to the vault — wake as the door opens. See <b>Encounter 1</b> on page 6. They will not pursue beyond the antechamber.</p>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>III · Acts I–III</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 4 — ACTS 4–5 + LEADS ══════════════════════ -->
+  <article class="page" data-screen-label="04 Acts 4-5 + Leads">
+    <div class="section-kicker">Section II · continued</div>
+    <h2 class="section">The <em>sleeper</em>, and the long night after.</h2>
+    <div class="rule"></div>
+
+    <div class="act">
+      <div class="act-head">
+        <div class="act-num">Act IV</div>
+        <div class="act-name">The <em>Inner Sanctum</em></div>
+        <div class="act-time">≈ 25 min · roleplay</div>
+      </div>
+      <p>Past the vault door, a single round chamber. In its center, on a plinth of worn marble, rests a child's wooden figure — a soldier, one arm missing, its paint nearly gone. This is the sleeper. A held breath hangs in the air. Any character who touches the figure hears, faintly, a woman's voice ask: <i>"Are you kind?"</i></p>
+      <div class="callout dm"><b>DM · the twist</b> The sleeper is bound to the spirit of Vex's sister, lost in the Compact Wars and <i>not</i> dead — only stored. Vex wants the figure destroyed, not recovered. The briefing is a lie of omission. The party learns this only if they ask the figure directly (it answers honestly) or if they succeed at the Act I Insight check and follow the thread.</div>
+      <p>The choice belongs to the party. Return the figure to Vex, and the sister is consigned to silence. Destroy it, and the sister passes on — but the Sigil's payment is forfeit. Keep it, and the party now carries a relic that will find its own way into later sessions.</p>
+    </div>
+
+    <div class="act">
+      <div class="act-head">
+        <div class="act-num">Act V</div>
+        <div class="act-name">The <em>Long Walk Out</em></div>
+        <div class="act-time">≈ 30 min · combat or social</div>
+      </div>
+      <p>The party leaves the vault before dawn. Outside, the Lotus are waiting — unless the party bought them off in Act II, killed their scout, or bypassed the quarter entirely. What follows is either a running battle through the grain cellars (see <b>Encounter 2 · Cobbleway Ambush</b>) or a tense standoff resolved by the Deception or Persuasion of a Lotus offer (DC 17 · contested).</p>
+    </div>
+
+    <h3 style="font-family: var(--serif); font-size: 22px; font-weight: 600; margin: 18px 0 4px; color: var(--ink);">Investigation <em style="font-style: italic; color: var(--ember);">leads</em></h3>
+    <div style="font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--sigil); margin-bottom: 8px;">Section III · three threads to pull during Act II</div>
+
+    <ul class="lead-list">
+      <li>
+        <b>Lead · The Night Market</b>
+        <em>Orrin Keel · fence · Cobbleway night market, stall №14</em>
+        <div>Keel will sell the party the vault's interior layout for 200 EC or a story worth telling. He knows the antechamber is trapped but not the nature of the guardians.</div>
+        <div class="why"><b>WHY go here</b> Reveals the guardians' save DC and the existence of the inscription on the door. Makes Act III survivable.</div>
+      </li>
+      <li>
+        <b>Lead · The Clerk God's Priest</b>
+        <em>Brother Sennis · Temple of the Clerk God, morning mass</em>
+        <div>Sennis keeps the Cobbleway's older records. For a donation (100 EC) he will produce a ledger listing the vault's original sealing oath — and the seven names on it. One of the names is <i>Vex's sister.</i></div>
+        <div class="why"><b>WHY go here</b> Unlocks the Act IV twist. Without this lead, the figure's question lands cold. With it, the party has context.</div>
+      </li>
+      <li>
+        <b>Lead · The Retired Warden</b>
+        <em>Ferrun Ashe · former vault warden · Ember &amp; Ash boarding house</em>
+        <div>Ashe drinks heavily, speaks reluctantly, and will only open up after Persuasion DC 15 or a shared drink. He can describe the guardians' weakness — they freeze for one round when the vault's own sigil is shown to them.</div>
+        <div class="why"><b>WHY go here</b> Gives combat a non-damage-race angle. Reduces Encounter 1 difficulty from Deadly to Hard.</div>
+      </li>
+    </ul>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>IV · Acts IV–V &amp; Leads</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 5 — ENCOUNTER 1 + STATBLOCK ══════════════ -->
+  <article class="page" data-screen-label="05 Encounters">
+    <div class="section-kicker">Section IV · Encounters</div>
+    <h2 class="section">What <em>wakes</em> when the door opens.</h2>
+    <div class="rule"></div>
+
+    <div class="cols" style="column-count: 1;">
+      <p><b>Encounter 1 · Vault Guardians.</b> <i>Combat · Hard (CR 9 · 4,800 XP)</i>. Three Iron Golems stand at the four cardinal points of the antechamber. They ignite at the door's opening and move to intercept on initiative. Their orders: kill anything that is not listed on the ledger. They will not pursue beyond the antechamber and will return to position if disengaged for three rounds.</p>
+    </div>
+
+    <div class="statblock">
+      <h3>Iron Golem <em style="color: var(--iron); font-size: 14px; font-style: italic;">· bound</em></h3>
+      <div class="type-line">Large construct, lawful neutral · <b>3</b> in this encounter</div>
+
+      <div class="stat-grid">
+        <div><b>Armor Class</b> 20 (natural)</div>
+        <div><b>Hit Points</b> 210 (19d10+95)</div>
+        <div><b>Speed</b> 30 ft.</div>
+      </div>
+
+      <div class="abilities">
+        <div><b>Str</b><span>24</span><em>+7</em></div>
+        <div><b>Dex</b><span>9</span><em>−1</em></div>
+        <div><b>Con</b><span>20</span><em>+5</em></div>
+        <div><b>Int</b><span>3</span><em>−4</em></div>
+        <div><b>Wis</b><span>11</span><em>+0</em></div>
+        <div><b>Cha</b><span>1</span><em>−5</em></div>
+      </div>
+
+      <div class="sb-line"><b>Damage Immunities</b> fire, poison, psychic; bludgeoning, piercing, slashing from nonmagical attacks not made with adamantine</div>
+      <div class="sb-line"><b>Condition Immunities</b> charmed, exhaustion, frightened, paralyzed, petrified, poisoned</div>
+      <div class="sb-line"><b>Senses</b> darkvision 120 ft., passive Perception 10</div>
+      <div class="sb-line"><b>Languages</b> understands the creator's tongue but can't speak</div>
+      <div class="sb-line"><b>Challenge</b> 16 (15,000 XP) · reduced to encounter CR 9 by vault-binding</div>
+
+      <div class="sb-actions">
+        <h5>Actions</h5>
+        <p><b>Multiattack.</b> The golem makes two slam attacks.</p>
+        <p><b>Slam.</b> <i>Melee weapon attack:</i> +13 to hit, reach 5 ft., one target. <i>Hit:</i> 20 (3d8+7) bludgeoning damage.</p>
+        <p><b>Sword.</b> <i>Melee weapon attack:</i> +13 to hit, reach 10 ft., one target. <i>Hit:</i> 23 (3d10+7) slashing damage.</p>
+        <p><b>Poison Breath (Recharge 6).</b> The golem exhales poisonous gas in a 15-foot cone. Each creature in that area must make a DC 19 Constitution saving throw, taking 45 (10d8) poison damage on a failed save, or half as much on a successful one.</p>
+      </div>
+    </div>
+
+    <div class="callout dm">
+      <b>Tactics</b>
+      Golem 1 engages melee. Golems 2 and 3 flank and cut off retreat. If the party showed the vault sigil (from Ferrun Ashe, §III), all three freeze on round 1 — the party effectively gets a free round. On round 4 or when one golem drops, the remaining two combine into a breath-weapon formation: the surviving golem with breath ready moves to cone the party's back row.
+    </div>
+
+    <div class="callout">
+      <b>Encounter 2 · Cobbleway Ambush</b>
+      <span style="font-family: var(--sans); font-size: 11.5px;">Combat · Medium (CR 6 · 2,300 XP). 4× Lotus Duelists, 1× Lotus Mage. See <i>Monster Compendium p. 41</i> or stat as Assassin and Mage (MM) respectively. Occurs only if the party provoked the Lotus in Act II.</span>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>V · Encounters</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 6 — NPCs ══════════════════════════════════ -->
+  <article class="page" data-screen-label="06 NPCs">
+    <div class="section-kicker">Section V · Dramatis Personae</div>
+    <h2 class="section">Whom the party <em>will meet</em>.</h2>
+    <div class="rule"></div>
+
+    <div class="npc">
+      <div class="portrait vex">Grandmaster Vex</div>
+      <div>
+        <h4>Grandmaster Vex <em>· she/her</em></h4>
+        <div class="role">Quest Giver · Glass Sigil · Lawful Neutral</div>
+        <p>Silver-eyed, late fifties, dressed in the plain grey wool of a Sigil senior. Keeps her sister's portrait on a cord around her neck and never, ever mentions her aloud. Has not slept a full night in eight years.</p>
+        <p class="quote">"Return what sleeps. Don't ask me to explain it. The vault knows why I'm asking."</p>
+        <p class="tags"><b>pragmatic</b><b>haunted</b><b>unreliable narrator</b> — goal: <i>unmake her sister's binding quietly.</i></p>
+      </div>
+    </div>
+
+    <div class="npc">
+      <div class="portrait fence">Orrin Keel</div>
+      <div>
+        <h4>Orrin Keel <em>· he/him</em></h4>
+        <div class="role">Information Broker · Independent · Chaotic Neutral</div>
+        <p>Fence, bookseller, and occasional forger, operating from stall №14 of the Cobbleway night market. Owes Glass Sigil a favor he'd rather not repay. Knows everyone, trusts no one, laughs too loudly.</p>
+        <p class="quote">"Two hundred EC. Or a story worth telling — and friend, I charge more for the stories."</p>
+        <p class="tags"><b>mercantile</b><b>loose-tongued</b><b>cheerful</b> — goal: <i>survive the week in profit.</i></p>
+      </div>
+    </div>
+
+    <div class="npc">
+      <div class="portrait warden">Ferrun Ashe</div>
+      <div>
+        <h4>Ferrun Ashe <em>· he/him</em></h4>
+        <div class="role">Former Vault Warden · Retired · True Neutral</div>
+        <p>Grizzled, tired, drinks too much and sleeps too little. Wore the Sigil's black-and-iron for thirty-one years until something in the vault told him to leave. Has never said what.</p>
+        <p class="quote">"Show them the sigil before they show you theirs. That's the only trick worth knowing."</p>
+        <p class="tags"><b>withdrawn</b><b>honest when drunk</b><b>guilt-ridden</b> — goal: <i>be left alone. Mostly.</i></p>
+      </div>
+    </div>
+
+    <div class="npc">
+      <div class="portrait">NPC 04 · portrait placeholder</div>
+      <div>
+        <h4>Brother Sennis <em>· they/them</em></h4>
+        <div class="role">Clerk God Priest · Temple of Cobbleway · Lawful Good</div>
+        <p>Young for a keeper of records, nervous, devoted. Runs the temple's archive with a reverence that borders on panic. Donation-friendly; absolutely will not be threatened.</p>
+        <p class="quote">"The seal bears seven names. I can show you six. The seventh — the seventh is not for sale."</p>
+        <p class="tags"><b>devout</b><b>anxious</b><b>incorruptible</b> — goal: <i>keep the records safe. All of them.</i></p>
+      </div>
+    </div>
+
+    <div class="npc">
+      <div class="portrait">NPC 05 · portrait placeholder</div>
+      <div>
+        <h4>The Lotus Scout <em>· unnamed</em></h4>
+        <div class="role">Rival · Obsidian Lotus · Neutral Evil</div>
+        <p>Young, fast, excellent at being forgettable. Assigned to shadow the party through the quarter and report. Will bribe before she fights, fight before she dies, and not die stupidly.</p>
+        <p class="tags"><b>professional</b><b>expendable</b><b>observant</b> — goal: <i>know what the party knows.</i></p>
+      </div>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>VI · Dramatis Personae</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 7 — MAP + ROOMS ══════════════════════════ -->
+  <article class="page" data-screen-label="07 Vault Map">
+    <div class="section-kicker">Section VI · The Vault</div>
+    <h2 class="section">Cobbleway <em>vault</em> — five rooms.</h2>
+    <div class="rule"></div>
+
+    <div class="dungeon-map">
+      <h4>Composite Map <span>composite_map.png · 4×4 tiles · A1111 euler 20</span></h4>
+      <div class="map-grid">
+        <div class="tile entrance"><span class="num">1</span><span class="name">Entrance</span></div>
+        <div class="tile hall"></div>
+        <div class="tile hall"></div>
+        <div class="tile chamber"><span class="num">2</span><span class="name">Antechamber</span></div>
+
+        <div class="tile"></div>
+        <div class="tile trap"><span class="num">3</span><span class="name">Warded Hall</span></div>
+        <div class="tile hall"></div>
+        <div class="tile chamber"><span class="num">4</span><span class="name">Plinth Room</span></div>
+
+        <div class="tile"></div>
+        <div class="tile hall"></div>
+        <div class="tile hall"></div>
+        <div class="tile"></div>
+
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile boss"><span class="num">5</span><span class="name">Sanctum</span></div>
+        <div class="tile"></div>
+      </div>
+      <div class="legend">
+        <span><i class="ent"></i> Entry</span>
+        <span><i class="hall"></i> Corridor</span>
+        <span><i class="cham"></i> Chamber</span>
+        <span><i class="trap"></i> Warded</span>
+        <span><i class="boss"></i> Sanctum</span>
+      </div>
+    </div>
+
+    <div class="room">
+      <div class="room-head">
+        <div class="room-num">01</div>
+        <div class="room-name">The <em>Entrance Stairs</em></div>
+        <div class="room-tags">ent · 20 × 30 ft · lit</div>
+      </div>
+      <p>Worn stone stairs descend twenty feet from the cellar trapdoor. The temperature drops noticeably halfway down. At the base, a small landing with two guttering lanterns that were not lit when the party arrived.</p>
+      <p class="features"><b>Features</b> lanterns (magical · cannot be extinguished by mundane means) · dust unmarked by footprints for at least six months · faint smell of iron</p>
+    </div>
+
+    <div class="room">
+      <div class="room-head">
+        <div class="room-num">02</div>
+        <div class="room-name">The <em>Antechamber</em></div>
+        <div class="room-tags">chamber · 40 × 40 ft · dim</div>
+      </div>
+      <p>A broad square chamber with four alcoves at the cardinal points. In each alcove: an Iron Golem, inactive until the vault door opens. Between the alcoves, the floor bears a mosaic of the Glass Sigil's crest, overlaid with a second, older seal nearly worn away.</p>
+      <p class="features"><b>Features</b> 4 golem alcoves (one empty — Warden 4 was never replaced) · mosaic (History DC 15: the older seal is a Compact-era binding) · concealed exit behind the east alcove (Investigation DC 18)</p>
+    </div>
+
+    <div class="room">
+      <div class="room-head">
+        <div class="room-num">03</div>
+        <div class="room-name">The <em>Warded Hall</em></div>
+        <div class="room-tags">corridor · 10 × 60 ft · trapped</div>
+      </div>
+      <p>A long narrow corridor leading to the vault door. The walls are carved with seven names in Old Vosh; the fourth is struck through.</p>
+      <p class="features"><b>Traps</b> Radiant ward · trigger: stepping past the fifth name · DC 15 Wis save · 2d10 radiant (half on save) · <b>DC to disarm</b> 18 (Arcana or Religion) · <b>Secrets</b> the fourth name reads <i>Vex, Ilana</i> — the sister</p>
+    </div>
+
+    <div class="room">
+      <div class="room-head">
+        <div class="room-num">04</div>
+        <div class="room-name">The <em>Plinth Room</em></div>
+        <div class="room-tags">chamber · 30 × 30 ft · circular</div>
+      </div>
+      <p>A round chamber, domed, with a single marble plinth at its center. On the plinth: the sleeper. The air here is warmer than the rest of the vault. A single candle burns on a shelf in the wall, though no one has been here to light it for centuries.</p>
+      <p class="features"><b>Features</b> the sleeper (wooden soldier · minor relic) · candle (magical · burns without fuel) · the voice (audible only on touching the figure)</p>
+    </div>
+
+    <div class="room">
+      <div class="room-head">
+        <div class="room-num">05</div>
+        <div class="room-name">The <em>Sanctum</em></div>
+        <div class="room-tags">boss · 30 × 30 ft · sealed</div>
+      </div>
+      <p>A small sealed chamber past the plinth room, known only to those who pass the sleeper's question truthfully. Contains the Compact-era ledger and the true treasure of the vault — but only to those the vault judges kind.</p>
+      <p class="features"><b>Access</b> answer the sleeper's question truthfully · <b>Reward</b> see Loot Table B</p>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>VII · Vault</span></div>
+  </article>
+
+
+  <!-- ══════ PAGE 8 — LOOT + REWARDS + JSON ════════════════ -->
+  <article class="page" data-screen-label="08 Rewards">
+    <div class="section-kicker">Section VII · Rewards &amp; Consequences</div>
+    <h2 class="section">What the <em>party</em> walks away with.</h2>
+    <div class="rule"></div>
+
+    <div class="loot-table">
+      <h4>Loot Table A <em>· on delivering the sleeper to Vex</em></h4>
+      <div class="loot-row head"><div>D%</div><div>Item</div><div>Rarity</div><div>Price</div></div>
+      <div class="loot-row"><div class="roll">01–</div><div><b>Purse of Sigil Crowns</b> <em>cash</em></div><div class="rarity common">currency</div><div class="price">2,000 EC</div></div>
+      <div class="loot-row"><div class="roll">—</div><div><b>Writ of Sigil Favor</b> <em>redeemable once</em></div><div class="rarity uncommon">uncommon</div><div class="price">—</div></div>
+      <div class="loot-row"><div class="roll">—</div><div><b>Kharma</b> <em>spiritual</em></div><div class="rarity common">favor</div><div class="price">+100</div></div>
+      <div class="loot-row"><div class="roll">01–15</div><div><b>Cloak of the Counting House</b> <em>advantage on Deception (mercantile)</em></div><div class="rarity uncommon">uncommon</div><div class="price">750 EC</div></div>
+      <div class="loot-row"><div class="roll">16–40</div><div><b>Ledger Quill of Binding</b> <em>1× per day, rewrite a name</em></div><div class="rarity rare">rare</div><div class="price">2,400 EC</div></div>
+      <div class="loot-row"><div class="roll">41–80</div><div><b>Sigil of the Clerk God</b> <em>bonus to Religion + Investigation</em></div><div class="rarity rare">rare</div><div class="price">1,800 EC</div></div>
+      <div class="loot-row"><div class="roll">81–00</div><div><b>Grandmaster's Token</b> <em>one-time summon of Glass Sigil reinforcements</em></div><div class="rarity veryrare">very rare</div><div class="price">priceless</div></div>
+    </div>
+
+    <div class="loot-table">
+      <h4>Loot Table B <em>· sanctum access · sleeper's kindness</em></h4>
+      <div class="loot-row head"><div>D%</div><div>Item</div><div>Rarity</div><div>Price</div></div>
+      <div class="loot-row"><div class="roll">—</div><div><b>Ilana's Locket</b> <em>attunement · speak with sealed spirit 1×/long rest</em></div><div class="rarity veryrare">very rare</div><div class="price">priceless</div></div>
+      <div class="loot-row"><div class="roll">—</div><div><b>Compact-Era Ledger</b> <em>party-defining plot item</em></div><div class="rarity veryrare">quest</div><div class="price">—</div></div>
+      <div class="loot-row"><div class="roll">—</div><div><b>Sigil's Silent Debt</b> <em>the party now owes, or is owed — DM's call</em></div><div class="rarity rare">faction</div><div class="price">—</div></div>
+    </div>
+
+    <div class="callout dm">
+      <b>Consequences</b>
+      <span style="font-family: var(--sans); font-size: 11.5px;">
+      <b>Delivered to Vex:</b> Glass Sigil rep +2. Ilana's spirit is unmade. Vex sends a handwritten note of thanks; she will not meet the party again.<br/>
+      <b>Destroyed in place:</b> Sigil rep −1. Ilana passes. Vex refuses payment but sends the writ and token anyway. A rumor reaches the party six months later that she has begun sleeping through the night.<br/>
+      <b>Kept by party:</b> Sigil rep −3. Lotus rep +1 (they hear). The sleeper stays with the party; an Ilana-hook opens for a future session.
+      </span>
+    </div>
+
+    <div class="json-footer">
+<span class="dim">// module_data.json · excerpt · full file at generated_modules/the_silent_vault/</span>
+{
+  <span class="k">"metadata"</span>: { <span class="k">"title"</span>: <span class="s">"Deadly Theft: The Silent Vault"</span>, <span class="k">"faction"</span>: <span class="s">"Glass Sigil"</span>, <span class="k">"tier"</span>: <span class="s">"high-stakes"</span>,
+    <span class="k">"mission_type"</span>: <span class="s">"theft"</span>, <span class="k">"cr"</span>: 9, <span class="k">"party_level"</span>: 8, <span class="k">"difficulty_rating"</span>: 7, <span class="k">"runtime_minutes"</span>: 180 },
+  <span class="k">"content"</span>: { <span class="k">"overview"</span>: <span class="s">"Glass Sigil has traced rumors…"</span>, <span class="k">"act_1"</span>: <span class="s">"The Solar Meeting…"</span>, <span class="dim">…5 acts…</span> },
+  <span class="k">"encounters"</span>: [ <span class="dim">1 combat · 1 social · 1 trap</span> ],
+  <span class="k">"npcs"</span>: [ <span class="dim">5 entries</span> ],
+  <span class="k">"dungeon_delve"</span>: { <span class="k">"layout_name"</span>: <span class="s">"5-room Dungeon"</span>, <span class="k">"aesthetic"</span>: <span class="s">"gothic"</span>, <span class="k">"rooms"</span>: [ <span class="dim">5 entries</span> ] }
+}
+<span class="dim">// Generated by TowerBot v1.2 · qwen3-8b-slim · A1111 · 2026-04-17T17:42:44Z</span>
+    </div>
+
+    <div class="folio"><b>⚔ TowerBot</b><span>VIII · Rewards</span></div>
+  </article>
+
+</div>
+
+</body>
+</html>

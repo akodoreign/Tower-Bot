@@ -59,10 +59,10 @@ Modular mission document generation, refactored from monolithic `mission_module_
 | File | What It Does |
 |------|--------------|
 | `__init__.py` | Orchestrator. Exports `generate_mission_module()`, coordinates all sub-generators. |
-| `locations.py` | Gazetteer integration. Pulls location details from `city_gazetteer.json`. |
+| `locations.py` | Gazetteer integration. Reads from `gazetteer` DB table. |
 | `leads.py` | Investigation lead generation. Creates clues, red herrings, faction connections. |
 | `encounters.py` | Combat encounter generation. Stat blocks, environmental hazards, tactical notes. |
-| `npcs.py` | NPC dialogue and secrets. Pulls from `npc_roster.json`, generates conversation hooks. |
+| `npcs.py` | NPC dialogue and secrets. Reads from `npcs` DB table, generates conversation hooks. |
 | `rewards.py` | Loot tables and consequences. EC/Kharma rewards, faction rep changes, item drops. |
 | `docx_builder.py` | Document formatting. Converts generated content to formatted .docx output. |
 
@@ -107,31 +107,35 @@ Modular mission document generation, refactored from monolithic `mission_module_
 
 ---
 
-## Campaign Data (`campaign_docs/`)
+## Campaign Data — MySQL is Authoritative
 
-### Core Data Files
+All campaign state lives in MySQL `tower_bot`. Use `src/db_api.py`. campaign_docs JSON files are archived — do NOT read them.
 
-| File | Format | What It Stores |
-|------|--------|----------------|
-| `npc_roster.json` | JSON | All alive/injured NPCs with factions, roles, locations, secrets |
-| `npc_graveyard.json` | JSON | Dead NPCs (moved here from roster on death) |
-| `city_gazetteer.json` | JSON | All city districts, establishments, transport, ring structure |
-| `Updated_Pantheon_Ranks(import).csv` | CSV | All deities, faithlight scores, domains, alliances |
-| `character_memory.txt` | Text | Player character records (NAME/CLASS/SPECIES/PLAYER blocks) |
-| `faction_reputation.json` | JSON | Faction rep scores and event history |
+### Core DB Tables
 
-### State Files
+| Table | What It Stores |
+|-------|----------------|
+| `npcs` | All NPCs — faction, role, location, status, secrets, oracle_notes |
+| `npc_appearances` | NPC appearance profiles and SD prompts |
+| `player_characters` | Player chars with profile_json, oracle_notes, raw_block |
+| `character_snapshots` | DDB character snapshots |
+| `gazetteer` / `gazetteer_places` / `area_profiles` | City districts, establishments, transport |
+| `gods` (146 rows) | All deities, faithlight scores, domains |
+| `faction_reputation` | Faction rep scores, leader, motto, alignment |
 
-| File | Format | What It Tracks |
-|------|--------|----------------|
-| `news_memory.txt` | Text | Cleaned factual log of posted bulletins (max 40 entries) |
-| `mission_memory.json` | JSON | All missions (active + resolved) |
-| `rift_state.json` | JSON | Active Rift state machine data |
-| `arena_season.json` | JSON | Current arena season standings |
-| `dome_weather.json` | JSON | Current weather state |
-| `ec_exchange.json` | JSON | Current EC/Kharma exchange rate |
-| `tia.json` | JSON | TIA stock market sector values |
-| `faction_calendar.json` | JSON | Upcoming faction events |
+### State DB Tables
+
+| Table | What It Tracks |
+|-------|----------------|
+| `news_memory` / `bulletin_cache` | Factual bulletin log (1600+ entries) |
+| `missions` / `mission_outcomes` | All missions (active + resolved) |
+| `rift_state` | Active rift singleton |
+| `arena_seasons` | Current arena season |
+| `weather_state` | Current dome weather |
+| `economy_state` | EC/Kharma exchange rate |
+| `tia_market` | TIA stock market sector values |
+| `faction_events` | Upcoming faction events |
+| `global_state` | used_parties, council_rulings, generated types, arena_venues, rift_history |
 | `missing_persons.json` | JSON | Active missing persons cases |
 | `bounty_board.json` | JSON | Active bounties |
 | `player_listings.json` | JSON | Player TowerBay auction items |

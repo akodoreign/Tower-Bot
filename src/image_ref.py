@@ -32,6 +32,8 @@ from __future__ import annotations
 
 import base64
 import re
+import threading
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -40,17 +42,24 @@ from src.log import logger
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 REFS_DIR = DOCS_DIR / "image_refs"
 NPC_REFS = REFS_DIR / "npcs"
+NPC_ALT_REFS = REFS_DIR / "npcs_alt"
 LOC_REFS = REFS_DIR / "locations"
 
 # Ensure dirs exist at import time
-for _d in (REFS_DIR, NPC_REFS, LOC_REFS):
-    _d.mkdir(parents=True, exist_ok=True)
+for _d in (REFS_DIR, NPC_REFS, NPC_ALT_REFS, LOC_REFS):
+    try:
+        _d.mkdir(parents=True, exist_ok=True)
+    except PermissionError as _e:
+        import logging as _log
+        _log.getLogger(__name__).warning("image_ref: cannot create ref dir %s: %s", _d, _e)
 
-MAX_REFS = 2  # keep last 2 images per entity (plus optional pinned) — trimmed from 3 to save disk space
+MAX_REFS = 10  # keep up to 10 recent images per entity (plus optional pinned)
+_REF_LOCKS_GUARD = threading.Lock()
+_REF_LOCKS: dict[tuple[str, str], threading.RLock] = {}
 
 # Default denoising strength for img2img — 0.0 = exact copy, 1.0 = ignore reference
-# 0.45 preserves core composition/colors while allowing prompt to steer details
-NPC_DENOISE      = 0.45
+# NPC refs need enough denoise to vary new portraits instead of cloning the last face.
+NPC_DENOISE      = 0.68
 LOCATION_DENOISE = 0.50
 SCENE_DENOISE    = 0.55  # scenes need more freedom since composition varies
 
@@ -75,47 +84,98 @@ def _get_entity_dir(category_dir: Path, key: str) -> Path:
     return d
 
 
-def _save_ref(category_dir: Path, key: str, img_bytes: bytes) -> Path:
+def _entity_type(category_dir: Path) -> str:
+    """Map a category directory to a DB entity_type string."""
+    name = category_dir.name
+    if name == "npcs":
+        return "npc_portrait"
+    if name == "npcs_alt":
+        return "npc_portrait_alt"
+    if name == "locations":
+        return "location_map"
+    return name  # fallback: use dir name directly
+
+
+def _entity_lock(category_dir: Path, key: str) -> threading.RLock:
+    lock_key = (str(category_dir.resolve()), _slug(key))
+    with _REF_LOCKS_GUARD:
+        lock = _REF_LOCKS.get(lock_key)
+        if lock is None:
+            lock = threading.RLock()
+            _REF_LOCKS[lock_key] = lock
+        return lock
+
+
+def _save_ref(
+    category_dir: Path,
+    key: str,
+    img_bytes: bytes,
+    metadata: Optional[dict] = None,
+) -> Path:
     """
-    Save a new reference image, rotating older ones.
-    ref_001.png = newest, ref_002.png = second newest, etc.
+    Save a new reference image (rotating older ones) and register it in the DB.
+    ref_001.png = newest, ref_002.png = second newest.
     Returns the path of the saved file.
     """
-    d = _get_entity_dir(category_dir, key)
+    with _entity_lock(category_dir, key):
+        d = _get_entity_dir(category_dir, key)
 
-    # Rotate: delete oldest, shift others up
-    oldest = d / f"ref_{MAX_REFS:03d}.png"
-    if oldest.exists():
-        oldest.unlink()
+        oldest = d / f"ref_{MAX_REFS:03d}.png"
+        if oldest.exists():
+            oldest.unlink()
 
-    for i in range(MAX_REFS - 1, 0, -1):
-        src = d / f"ref_{i:03d}.png"
-        dst = d / f"ref_{i + 1:03d}.png"
-        if src.exists():
-            src.rename(dst)
+        for i in range(MAX_REFS - 1, 0, -1):
+            src = d / f"ref_{i:03d}.png"
+            dst = d / f"ref_{i + 1:03d}.png"
+            if src.exists():
+                src.replace(dst)
 
-    # Save new as ref_001
-    newest = d / "ref_001.png"
-    newest.write_bytes(img_bytes)
-    logger.info(f"🖼️ Saved ref image: {d.name}/ref_001.png ({len(img_bytes):,} bytes)")
-    return newest
+        newest = d / "ref_001.png"
+        tmp = d / f".ref_001.{uuid.uuid4().hex}.tmp"
+        tmp.write_bytes(img_bytes)
+        tmp.replace(newest)
+        logger.info(f"Saved ref image: {d.name}/ref_001.png ({len(img_bytes):,} bytes)")
 
+        try:
+            from src.db_api import save_image_ref as _db_save
+            entity_type = _entity_type(category_dir)
+            _db_save(entity_type, key, str(newest.resolve()), metadata=metadata)
+            logger.debug(f"DB ref registered: {entity_type}/{key}")
+        except Exception as e:
+            logger.warning(f"DB ref save failed (file saved OK): {e}")
+
+        return newest
 
 def _get_ref(category_dir: Path, key: str) -> Optional[bytes]:
     """
     Get the best reference image bytes.
-    Priority: pinned.png > ref_001.png (newest) > None
+    Priority: DB record → pinned.png → ref_001.png (newest) → None.
+    DB is checked first so references survive filesystem reorganisation.
     """
+    # 1. Try DB first — it stores the canonical path for the newest ref
+    try:
+        from src.db_api import get_image_ref as _db_get
+        entity_type = _entity_type(category_dir)
+        row = _db_get(entity_type, key)
+        if row and row.get("image_path"):
+            p = Path(row["image_path"])
+            if p.exists():
+                logger.debug(f"🖼️ Loaded ref from DB: {entity_type}/{key}")
+                return p.read_bytes()
+            # DB points to a missing file — fall through to filesystem
+            logger.debug(f"🖼️ DB ref path missing on disk, falling back: {p}")
+    except Exception as e:
+        logger.debug(f"🖼️ DB ref lookup failed, falling back to filesystem: {e}")
+
+    # 2. Filesystem fallback — check pinned then newest
     d = category_dir / _slug(key)
     if not d.exists():
         return None
 
-    # Check pinned first
     pinned = d / "pinned.png"
     if pinned.exists():
         return pinned.read_bytes()
 
-    # Fall back to newest ref
     newest = d / "ref_001.png"
     if newest.exists():
         return newest.read_bytes()
@@ -124,16 +184,28 @@ def _get_ref(category_dir: Path, key: str) -> Optional[bytes]:
 
 
 def _pin_ref(category_dir: Path, key: str, img_bytes: bytes) -> Path:
-    """Set a pinned canonical reference image."""
+    """Set a pinned canonical reference image and register it in the DB."""
     d = _get_entity_dir(category_dir, key)
     pinned = d / "pinned.png"
     pinned.write_bytes(img_bytes)
     logger.info(f"📌 Pinned ref image: {d.name}/pinned.png ({len(img_bytes):,} bytes)")
+    try:
+        from src.db_api import save_image_ref as _db_save
+        _db_save(_entity_type(category_dir), key, str(pinned.resolve()), metadata={"pinned": True})
+    except Exception as e:
+        logger.warning(f"📌 DB pin register failed: {e}")
     return pinned
 
 
 def _has_ref(category_dir: Path, key: str) -> bool:
-    """Check if any reference exists without loading the bytes."""
+    """Check if any reference exists — checks DB first, then filesystem."""
+    try:
+        from src.db_api import get_image_ref as _db_get
+        row = _db_get(_entity_type(category_dir), key)
+        if row and row.get("image_path") and Path(row["image_path"]).exists():
+            return True
+    except Exception:
+        pass
     d = category_dir / _slug(key)
     if not d.exists():
         return False
@@ -158,14 +230,55 @@ def _count_refs(category_dir: Path, key: str) -> int:
 # NPC-specific API
 # ---------------------------------------------------------------------------
 
-def save_npc_ref(name: str, img_bytes: bytes) -> Path:
-    """Save a new NPC portrait reference."""
-    return _save_ref(NPC_REFS, name, img_bytes)
+def save_npc_ref(name: str, img_bytes: bytes, metadata: Optional[dict] = None) -> Path:
+    """Save a new NPC portrait reference and register it in the DB."""
+    return _save_ref(NPC_REFS, name, img_bytes, metadata=metadata)
+
+
+def save_npc_alt_ref(name: str, img_bytes: bytes, metadata: Optional[dict] = None) -> Path:
+    """Save a new alt-universe NPC portrait reference and register it in the DB."""
+    return _save_ref(NPC_ALT_REFS, name, img_bytes, metadata=metadata)
+
+
+def save_npc_action_ref(name: str, img_bytes: bytes, metadata: Optional[dict] = None) -> Path:
+    """Save an NPC action reference without replacing the canonical ref_001 portrait."""
+    with _entity_lock(NPC_REFS, name):
+        d = _get_entity_dir(NPC_REFS, name)
+
+        oldest = d / f"ref_{MAX_REFS:03d}.png"
+        if oldest.exists():
+            oldest.unlink()
+
+        for i in range(MAX_REFS - 1, 1, -1):
+            src = d / f"ref_{i:03d}.png"
+            dst = d / f"ref_{i + 1:03d}.png"
+            if src.exists():
+                src.replace(dst)
+
+        action_ref = d / "ref_002.png"
+        tmp = d / f".ref_002.{uuid.uuid4().hex}.tmp"
+        tmp.write_bytes(img_bytes)
+        tmp.replace(action_ref)
+        logger.info(f"Saved NPC action ref: {d.name}/ref_002.png ({len(img_bytes):,} bytes)")
+
+        try:
+            from src.db_api import save_image_ref as _db_save
+            _db_save("npc_portrait_action", name, str(action_ref.resolve()), metadata=metadata)
+            logger.debug(f"DB action ref registered: npc_portrait_action/{name}")
+        except Exception as e:
+            logger.warning(f"DB action ref save failed (file saved OK): {e}")
+
+        return action_ref
 
 
 def get_npc_ref(name: str) -> Optional[bytes]:
-    """Get best NPC reference image bytes, or None."""
+    """Get best NPC reference image bytes (DB-primary, filesystem fallback)."""
     return _get_ref(NPC_REFS, name)
+
+
+def get_npc_alt_ref(name: str) -> Optional[bytes]:
+    """Get best alt-universe NPC reference image bytes."""
+    return _get_ref(NPC_ALT_REFS, name)
 
 
 def pin_npc_ref(name: str, img_bytes: bytes) -> Path:
@@ -174,21 +287,26 @@ def pin_npc_ref(name: str, img_bytes: bytes) -> Path:
 
 
 def has_npc_ref(name: str) -> bool:
-    """Check if an NPC has any reference image."""
+    """Check if an NPC has any reference image (DB-primary check)."""
     return _has_ref(NPC_REFS, name)
+
+
+def has_npc_alt_ref(name: str) -> bool:
+    """Check if an NPC has any alt-universe reference image."""
+    return _has_ref(NPC_ALT_REFS, name)
 
 
 # ---------------------------------------------------------------------------
 # Location-specific API
 # ---------------------------------------------------------------------------
 
-def save_location_ref(location: str, img_bytes: bytes) -> Path:
-    """Save a new location reference."""
-    return _save_ref(LOC_REFS, location, img_bytes)
+def save_location_ref(location: str, img_bytes: bytes, metadata: Optional[dict] = None) -> Path:
+    """Save a new location/map reference and register it in the DB."""
+    return _save_ref(LOC_REFS, location, img_bytes, metadata=metadata)
 
 
 def get_location_ref(location: str) -> Optional[bytes]:
-    """Get best location reference image bytes, or None."""
+    """Get best location reference image bytes (DB-primary, filesystem fallback)."""
     return _get_ref(LOC_REFS, location)
 
 
@@ -198,7 +316,7 @@ def pin_location_ref(location: str, img_bytes: bytes) -> Path:
 
 
 def has_location_ref(location: str) -> bool:
-    """Check if a location has any reference image."""
+    """Check if a location has any reference image (DB-primary check)."""
     return _has_ref(LOC_REFS, location)
 
 
@@ -209,7 +327,7 @@ def has_location_ref(location: str) -> bool:
 def to_img2img_payload(
     txt2img_payload: dict,
     ref_bytes: bytes,
-    denoising_strength: float = 0.45,
+    denoising_strength: float = 0.65,
 ) -> dict:
     """
     Convert a txt2img payload dict to an img2img payload by injecting
@@ -287,7 +405,7 @@ def detect_and_save_refs(text: str, img_bytes: bytes) -> dict:
     # Detect NPCs
     try:
         from src.npc_appearance import find_npc_in_text
-        found_npcs = find_npc_in_text(text)
+        found_npcs = find_npc_in_text(text, exact_only=True)
         for npc_name, _sd_prompt, _district in found_npcs[:3]:
             save_npc_ref(npc_name, img_bytes)
             saved_npcs.append(npc_name)
@@ -342,6 +460,50 @@ def get_best_ref_for_scene(text: str) -> tuple[Optional[bytes], float, str]:
 # ---------------------------------------------------------------------------
 # Stats / info for /pin command feedback
 # ---------------------------------------------------------------------------
+
+async def layered_generate(
+    background_prompt: str,
+    full_prompt: str,
+    negative_prompt: str,
+    payload_base: dict,
+    a1111_url: str,
+    char_denoise: float = 0.60,
+) -> tuple[bytes, bytes]:
+    """
+    Two-pass layered scene generation.
+    Pass 1 (txt2img): environment-only → clean background.
+    Pass 2 (img2img): full prompt + chars, background as init → composited scene.
+    Returns (final_bytes, background_bytes).
+    """
+    import httpx
+    import base64 as _b64
+
+    p1 = dict(payload_base)
+    p1["prompt"] = background_prompt
+    p1["negative_prompt"] = negative_prompt
+
+    async with httpx.AsyncClient(timeout=900.0) as http:
+        r = await http.post(f"{a1111_url}/sdapi/v1/txt2img", json=p1)
+        r.raise_for_status()
+        bg_bytes = _b64.b64decode(r.json()["images"][0])
+    logger.info(f"Layered pass 1 done ({len(bg_bytes):,} bytes) — compositing characters")
+
+    p2 = to_img2img_payload(dict(payload_base), bg_bytes, char_denoise)
+    p2["prompt"] = full_prompt
+    p2["negative_prompt"] = negative_prompt
+
+    try:
+        async with httpx.AsyncClient(timeout=900.0) as http:
+            r = await http.post(f"{a1111_url}/sdapi/v1/img2img", json=p2)
+            r.raise_for_status()
+            final_bytes = _b64.b64decode(r.json()["images"][0])
+        logger.info(f"Layered pass 2 done ({len(final_bytes):,} bytes)")
+    except Exception as _e:
+        logger.warning(f"Layered pass 2 failed ({_e!r}); returning pass-1 background as result")
+        final_bytes = bg_bytes
+
+    return final_bytes, bg_bytes
+
 
 def get_ref_stats() -> dict:
     """Return counts of stored references for DM info."""

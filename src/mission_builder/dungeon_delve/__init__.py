@@ -71,7 +71,6 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 DOCS_DIR = Path(__file__).resolve().parent.parent.parent.parent / "campaign_docs"
-GAZETTEER_FILE = DOCS_DIR / "city_gazetteer.json"
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "generated_modules"
 
 
@@ -89,14 +88,7 @@ def _load_gazetteer() -> Dict:
             return json.loads(cj) if isinstance(cj, str) else cj
     except Exception as e:
         logger.warning(f"🏰 Gazetteer DB load failed: {e}")
-    if not GAZETTEER_FILE.exists():
-        logger.warning("🏰 Gazetteer not found, using fallback locations")
-        return {}
-    try:
-        return json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
-    except Exception as e:
-        logger.error(f"🏰 Failed to load gazetteer: {e}")
-        return {}
+    return {}
 
 
 def get_dungeon_locations() -> List[Dict]:
@@ -218,7 +210,7 @@ async def generate_dungeon_delve(
     Args:
         location_name: Optional specific location name (auto-selects if None)
         faction: Sponsoring faction
-        party_level: Average party level (auto-detected from character_memory.txt if None)
+        party_level: Average party level (auto-detected from player_characters DB if None)
         tier: Mission tier (for mission board, defaults to "dungeon-delve")
         use_llm: Whether to use LLM for room descriptions
         generate_tiles: Whether to generate A1111 room tiles
@@ -238,7 +230,7 @@ async def generate_dungeon_delve(
         party_level = get_max_pc_level()
         if party_level <= 0:
             party_level = 5  # Fallback default
-            logger.warning("🏰 Could not detect party level from character_memory.txt, using default level 5")
+            logger.warning("🏰 Could not detect party level from DB, using default level 5")
         else:
             logger.info(f"🏰 Auto-detected party level: {party_level}")
     
@@ -315,7 +307,33 @@ async def generate_dungeon_delve(
     )
     
     logger.info(f"🏰 Dungeon delve generation complete: {location_name}")
-    
+
+    # Push encounter monsters to DDB homebrew — gated behind cop
+    async def _push_with_cop():
+        try:
+            from src.resource_cop import (
+                wait_for_ollama_turn, start_pipeline,
+                finish_pipeline, append_pipeline_failure,
+            )
+            _dec = await wait_for_ollama_turn("dungeon_ddb_push", track="primary")
+            if not _dec.run_now:
+                logger.warning(f"[DDB_HB] Dungeon DDB push deferred by cop: {_dec.reason}")
+                return
+            _run = await start_pipeline(
+                "dungeon_ddb_push",
+                mission_type="dungeon-delve",
+                phase="ddb_push",
+            )
+            try:
+                await _push_monsters_to_ddb(room_info, context.cr_target)
+                await finish_pipeline(_run.run_id, status="finished")
+            except Exception as _pe:
+                await append_pipeline_failure(_run.run_id, _pe)
+                await finish_pipeline(_run.run_id, status="failed")
+        except Exception:
+            await _push_monsters_to_ddb(room_info, context.cr_target)  # cop unavailable — push anyway
+    asyncio.create_task(_push_with_cop())
+
     return {
         "module_data": module_data,
         "composite_map": composite_map,
@@ -325,6 +343,44 @@ async def generate_dungeon_delve(
         "location": location,
         "context": context,
     }
+
+
+async def _push_monsters_to_ddb(room_info: Dict[str, Dict], cr_target: int) -> None:
+    """Push all unique encounter monsters to DDB homebrew after dungeon generation."""
+    try:
+        from src.ddb_homebrew import push_monster, ENABLED as _ddb_en
+        from src.mission_builder.monster_stat_gen import build_statblock
+    except ImportError:
+        return
+    if not _ddb_en:
+        return
+
+    # Collect unique monsters across all rooms
+    seen: set = set()
+    to_push: List[Dict] = []
+    for room_data in room_info.values():
+        enc = room_data.get("encounter") or {}
+        for creature in enc.get("creatures", []):
+            name = creature.get("name", "")
+            cr   = str(creature.get("cr", "1"))
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            to_push.append({"name": name, "cr": cr,
+                            "notes": creature.get("notes", "")})
+
+    if not to_push:
+        return
+
+    logger.info(f"🏰 Pushing {len(to_push)} monster(s) to DDB homebrew...")
+    for m in to_push:
+        try:
+            sb = build_statblock(m["name"], m["cr"], notes=m.get("notes", ""))
+            url = await push_monster(name=m["name"], **sb)
+            if url:
+                logger.info(f"[DDB_HB] Dungeon monster created: {m['name']} → {url}")
+        except Exception as e:
+            logger.warning(f"[DDB_HB] Failed to push dungeon monster {m['name']!r}: {e}")
 
 
 def _build_module_data(
@@ -509,7 +565,13 @@ async def save_dungeon_delve(
     
     # Save composite map
     map_path = dungeon_dir / "composite_map.png"
-    map_path.write_bytes(result["composite_map"])
+    from src.mission_builder.vtt_renderer import save_vtt_battlemap_bytes
+    map_context = {
+        "title": result.get("module_data", {}).get("title", location_name),
+        "location": location_name,
+        "kind": "dungeon delve cave sewer rooms",
+    }
+    save_vtt_battlemap_bytes(map_path, result["composite_map"], context=map_context)
     saved_files["composite_map"] = map_path
     
     # Save individual tiles

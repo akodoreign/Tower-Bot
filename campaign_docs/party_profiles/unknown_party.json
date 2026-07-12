@@ -1,60 +1,67 @@
 {
   "name": "Unknown Party",
-  "affiliation": "Serpent Choir",
-  "specialty": "Unyielding in the face of danger, the Unknown Party is renowned for their ability to navigate the unpredictable rifts of the Undercity, dismantling the destructive anomalies that threaten the city's stability.",
+  "affiliation": "Serpent Choir (disputed)",
+  "specialty": "The Unknown Party takes contracts nobody else will touch — jobs sitting too long, jobs too politically inconvenient to attach a name to, jobs where the outcome needs to be deniable. They are registered with the FTA under a deliberately blank filing. The Serpent Choir neither confirms nor denies the relationship. Somehow, they are always available.",
   "members": [
     {
-      "name": "Jax Thorne",
-      "role": "Leader",
-      "species": "Human",
-      "note": "Known for his scarred visage, a grim reminder of battles past, Jax leads his team with unwavering resolve."
+      "name": "The Ward",
+      "role": "Lead Contractor",
+      "species": "Human (presumed)",
+      "note": "Never without a veil of fine black mesh that obscures her face without fully hiding it. Wears a deactivated FTA identity chip on a chain around her neck — whether a trophy or a warning is unclear. Speaks in terms of contracts, deliverables, and acceptable losses. Has never been seen angry. Has never been seen surprised. Some people find this more unsettling than the Mute."
     },
     {
-      "name": "Vexa Nightshade",
-      "role": "Tracker",
-      "species": "Elf",
-      "note": "With her keen senses honed by centuries of experience, Vexa can find anyone or anything, even within the labyrinthine Undercity."
+      "name": "Carrion",
+      "role": "Combat Specialist",
+      "species": "Half-Orc",
+      "note": "Declared dead three years ago following a Rift containment incident in the Warrens. The FTA has a signed death certificate. He is aware of this and finds it professionally useful. Left the Patchwork Saints after the incident — Saints claim they have no record of him. Built wide, moves quiet, carries weapons that were clearly not purchased through legal channels. Specialty: tunnel fighting, high-damage containment, finishing what other parties started and didn't."
     },
     {
-      "name": "Gideon Ironfist",
-      "role": "Muscle",
-      "species": "Dwarf",
-      "note": "A battle-hardened dwarf, Gideon's strength and resilience are matched only by his fierce loyalty to the Unknown Party."
-    },
-    {
-      "name": "Zara Flamespark",
-      "role": "Arcanist",
+      "name": "Sable",
+      "role": "Arcanist / Rift Navigation",
       "species": "Tiefling",
-      "note": "The youngest member of the team, Zara's volatile magic is a constant reminder of the line between life and death."
+      "note": "The Rift-metal filaments woven into her left hand are technically a class-three FTA violation. She files them annually as 'decorative.' Has studied Rift behavior longer than most arcanists have been alive and treats active Rifts the way a surgeon treats an open wound — with focused attention and no unnecessary emotion. Claims Serpent Choir backing when it's useful, claims independent status when it isn't. The Choir has declined to clarify. Her notes on Rift navigation are reportedly for sale to the right buyer."
+    },
+    {
+      "name": "Locket",
+      "role": "Intelligence / Logistics",
+      "species": "Gnome",
+      "note": "Nobody knows how long Locket has been in the Undercity. Her earliest verifiable appearance in any record is a Serpent Choir contract log from fourteen years ago — listed as 'unnamed support asset.' Manages the party's contract selection, finances, and information network. Never seen outside a deep hood. Some people believe she is the actual leadership and the Ward is a face she hired. Locket has never denied this. The Ward has never confirmed it. The arrangement appears to work."
+    },
+    {
+      "name": "The Mute",
+      "role": "Tracker / Closer",
+      "species": "Dhampir",
+      "note": "No filed name. No registered species confirmation — 'Dhampir' is the working assumption based on physical presentation and what happens to people who get between them and a contract target. Has never spoken in front of a client. The Ward handles all communication. Available witness accounts of the Mute in the field are sparse, because the people who get a clear look at the Mute in the field tend to be the subject of the contract. Technically listed on the FTA filing as 'associate, role: unspecified.'"
     }
   ],
-  "visual": "Clad in leather armor, adorned with serpent-like symbols and weapons forged from rift metal, the Unknown Party stands apart as a formidable force in the Undercity.",
-  "reputation_note": "Whispers suggest they are backed by the Serpent Choir, but their allegiance remains a mystery, and they are feared for their efficiency and ruthlessness.",
+  "visual": "No uniform. No insignia. No identifying marks. They do not travel together visibly — witnesses report seeing them arrive at a location separately and leave the same way. The only consistent feature across reported sightings is that someone always seems to have been there before anyone else arrived. The name 'Unknown Party' appears on the contract board claim notice. Nothing else.",
+  "reputation_note": "One hundred and fifteen completed contracts. Thirty-four failures — which, for the tier and type of jobs they take, is considered an extraordinary success rate. The FTA keeps a file on them. Most of it is redacted, including the parts the FTA itself wrote. The Serpent Choir will neither confirm nor deny their relationship in any official capacity, which in Serpent Choir terms is essentially an endorsement. Other parties don't ask about them. The ones who did stopped after the question was met with a silence that lasted longer than comfortable.",
+  "oracle_notes": "The Unknown Party is believed to be a deliberate operational construct — a blank-name filing the Serpent Choir has maintained for years to run contracts that cannot be attached to any registered party without political consequence. Whether the current roster has always been these five, or whether 'Unknown Party' is a name that has been passed between different groups over the years, is unknown. The Ward has been asked this directly. She smiled behind the veil and said 'the contract doesn't care who holds it.'",
   "history": [
-    "[2026-03-30] Failed a tower-tier contract. Rank: Legendary (-2/5)",
-    "[2026-03-31] Completed a epic-tier contract. Rank: Legendary (+1/5)",
-    "[2026-03-31] Completed a rift-tier contract. Rank: Legendary (+4/5)",
-    "[2026-03-31] Completed a inter-guild-tier contract. Rank: Legendary → Legendary (+0/5)",
-    "[2026-03-31] Failed a escort-tier contract. Rank: Legendary (-1/5)",
-    "[2026-03-31] Completed a inter-guild-tier contract. Rank: Legendary (+1/5)",
-    "[2026-03-31] Completed a major-tier contract. Rank: Legendary (+3/5)",
-    "[2026-04-01] Completed a escort-tier contract. Rank: Legendary (+4/5)",
-    "[2026-04-01] Completed a escort-tier contract. Rank: Legendary → Legendary (+0/5)",
-    "[2026-04-01] Completed a local-tier contract. Rank: Legendary (+1/5)",
-    "[2026-04-01] Completed a local-tier contract. Rank: Legendary (+2/5)",
-    "[2026-04-01] Completed a local-tier contract. Rank: Legendary (+3/5)",
-    "[2026-04-01] Completed a epic-tier contract. Rank: Legendary → Legendary (+0/5)",
-    "[2026-04-02] Completed a epic-tier contract. Rank: Legendary (+3/5)",
-    "[2026-04-02] Completed a epic-tier contract. Rank: Legendary → Legendary (+0/5)",
-    "[2026-04-02] Completed a escort-tier contract. Rank: Legendary (+1/5)",
-    "[2026-04-02] Failed a local-tier contract. Rank: Legendary (+0/5)",
-    "[2026-04-02] Failed a escort-tier contract. Rank: Legendary (-1/5)",
-    "[2026-04-03] Failed a major-tier contract. Rank: Legendary (-3/5)",
-    "[2026-04-03] Failed a tower-tier contract. Rank: Legendary → Renowned (+0/5)"
+    "[2026-04-06] Completed a escort-tier contract. Rank: Legendary (+2/5)",
+    "[2026-04-06] Completed a escort-tier contract. Rank: Legendary (+3/5)",
+    "[2026-04-06] Completed a investigation-tier contract. Rank: Legendary (+4/5)",
+    "[2026-04-07] Completed a escort-tier contract. Rank: Legendary → Legendary (+0/5)",
+    "[2026-04-07] Completed a high-stakes-tier contract. Rank: Legendary (+2/5)",
+    "[2026-04-07] Completed a patrol-tier contract. Rank: Legendary (+3/5)",
+    "[2026-04-07] Completed a standard-tier contract. Rank: Legendary (+4/5)",
+    "[2026-04-07] Completed a standard-tier contract. Rank: Legendary → Legendary (+0/5)",
+    "[2026-04-07] Completed a dungeon-tier contract. Rank: Legendary (+2/5)",
+    "[2026-04-07] Completed a investigation-tier contract. Rank: Legendary (+3/5)",
+    "[2026-04-07] Completed a standard-tier contract. Rank: Legendary (+4/5)",
+    "[2026-04-07] Completed a escort-tier contract. Rank: Legendary → Legendary (+0/5)",
+    "[2026-04-07] Completed a tower-tier contract. Rank: Legendary (+3/5)",
+    "[2026-04-08] Completed a inter-guild-tier contract. Rank: Legendary → Legendary (+0/5)",
+    "[2026-04-08] Failed a rift-tier contract. Rank: Legendary (-3/5)",
+    "[2026-04-08] Failed a patrol-tier contract. Rank: Legendary (-4/5)",
+    "[2026-04-08] Completed a high-stakes-tier contract. Rank: Legendary (-2/5)",
+    "[2026-04-08] Completed a patrol-tier contract. Rank: Legendary (-1/5)",
+    "[2026-04-08] Failed a investigation-tier contract. Rank: Legendary (-2/5)",
+    "[2026-04-08] Failed a patrol-tier contract. Rank: Legendary (-3/5)"
   ],
-  "missions_completed": 87,
-  "missions_failed": 24,
-  "tier": "Renowned",
-  "points": 0,
+  "missions_completed": 115,
+  "missions_failed": 34,
+  "tier": "Legendary",
+  "points": -3,
   "generated": true
 }

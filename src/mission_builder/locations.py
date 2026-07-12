@@ -11,41 +11,59 @@ Provides functions to:
 from __future__ import annotations
 
 import json
+import os
 import random
+import time
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 
 DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "campaign_docs"
-GAZETTEER_FILE = DOCS_DIR / "city_gazetteer.json"
 
 # Cache the gazetteer after first load
 _gazetteer_cache: Optional[dict] = None
+_gazetteer_cache_ts: float = 0.0
+_gazetteer_cache_revision: str = ""
+GAZETTEER_CACHE_TTL = float(os.getenv("GAZETTEER_CACHE_TTL", "300"))
+_places_migrated: bool = False
+
+
+def invalidate_gazetteer_cache() -> None:
+    """Force the next gazetteer load to read from the source again."""
+    global _gazetteer_cache, _gazetteer_cache_ts, _gazetteer_cache_revision
+    _gazetteer_cache = None
+    _gazetteer_cache_ts = 0.0
+    _gazetteer_cache_revision = ""
 
 
 def load_gazetteer() -> dict:
-    """Load the city gazetteer from MySQL (cached after first call, falls back to file)."""
-    global _gazetteer_cache
-    if _gazetteer_cache is not None:
-        return _gazetteer_cache
+    """Load the city gazetteer from MySQL with revision-aware caching."""
+    global _gazetteer_cache, _gazetteer_cache_ts, _gazetteer_cache_revision
+    now = time.monotonic()
 
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT content_json FROM gazetteer LIMIT 1") or []
+        rows = _rq("SELECT content_json, updated_at FROM gazetteer LIMIT 1") or []
         if rows and rows[0].get("content_json"):
+            revision = str(rows[0].get("updated_at") or "")
+            if _gazetteer_cache is not None and revision and revision == _gazetteer_cache_revision:
+                _gazetteer_cache_ts = now
+                return _gazetteer_cache
+            if (
+                _gazetteer_cache is not None
+                and not revision
+                and (now - _gazetteer_cache_ts) < GAZETTEER_CACHE_TTL
+            ):
+                return _gazetteer_cache
             cj = rows[0]["content_json"]
             _gazetteer_cache = json.loads(cj) if isinstance(cj, str) else cj
+            _gazetteer_cache_ts = now
+            _gazetteer_cache_revision = revision
             return _gazetteer_cache
     except Exception:
-        pass
+        if _gazetteer_cache is not None and (now - _gazetteer_cache_ts) < GAZETTEER_CACHE_TTL:
+            return _gazetteer_cache
 
-    if not GAZETTEER_FILE.exists():
-        return {"districts": {}, "warrens_distribution": [], "underground_network": {}}
-
-    try:
-        _gazetteer_cache = json.loads(GAZETTEER_FILE.read_text(encoding="utf-8"))
-        return _gazetteer_cache
-    except Exception:
-        return {"districts": {}, "warrens_distribution": [], "underground_network": {}}
+    return {"districts": {}, "warrens_distribution": [], "underground_network": {}}
 
 
 def get_districts_by_faction(faction: str) -> List[str]:
@@ -287,6 +305,12 @@ def build_location_context(district_name: str, include_underground: bool = False
                 lines.append(f"\nUNDERGROUND ACCESS: {sewer.get('name')} — {sewer.get('description', '')}")
                 break
     
+    # Add new place types
+    place_ctx = build_place_context(district_name)
+    if place_ctx:
+        lines.append("")
+        lines.append(place_ctx)
+
     return "\n".join(lines)
 
 
@@ -359,3 +383,213 @@ def get_transit_info() -> dict:
     """Get transportation network info."""
     gaz = load_gazetteer()
     return gaz.get("transportation", {})
+
+
+# ---------------------------------------------------------------------------
+# New place-type accessors (places_of_interest, small_shops, parks, malls)
+# ---------------------------------------------------------------------------
+
+def get_places_of_interest(district_name: Optional[str] = None) -> List[dict]:
+    """Return places_of_interest, optionally filtered by district."""
+    return _collect_place_type("places_of_interest", district_name)
+
+
+def get_small_shops(district_name: Optional[str] = None, shop_type: Optional[str] = None) -> List[dict]:
+    """Return small_shops, optionally filtered by district and/or type tag."""
+    shops = _collect_place_type("small_shops", district_name)
+    if shop_type:
+        shops = [s for s in shops if shop_type.lower() in s.get("type", "").lower()]
+    return shops
+
+
+def get_parks(district_name: Optional[str] = None) -> List[dict]:
+    """Return parks/green spaces, optionally filtered by district."""
+    return _collect_place_type("parks", district_name)
+
+
+def get_malls(district_name: Optional[str] = None) -> List[dict]:
+    """Return market malls/covered bazaars, optionally filtered by district."""
+    return _collect_place_type("malls", district_name)
+
+
+def _collect_place_type(field: str, district_name: Optional[str] = None) -> List[dict]:
+    """Collect entries from a named list field across all (or one) district(s)."""
+    gaz = load_gazetteer()
+    results: List[dict] = []
+    districts = gaz.get("districts", {})
+    targets = {district_name: districts[district_name]} if district_name and district_name in districts else districts
+    for dist, info in targets.items():
+        for item in info.get(field, []):
+            entry = dict(item)
+            entry.setdefault("district", dist)
+            results.append(entry)
+    return results
+
+
+def get_all_places(district_name: Optional[str] = None) -> dict:
+    """Return all place types for a district (or all districts) in one call."""
+    return {
+        "places_of_interest": get_places_of_interest(district_name),
+        "small_shops": get_small_shops(district_name),
+        "parks": get_parks(district_name),
+        "malls": get_malls(district_name),
+    }
+
+
+def get_random_shop(district_name: Optional[str] = None) -> Optional[dict]:
+    """Return a random small shop, optionally from a specific district."""
+    shops = get_small_shops(district_name)
+    return random.choice(shops) if shops else None
+
+
+def get_random_place_of_interest(district_name: Optional[str] = None) -> Optional[dict]:
+    """Return a random place of interest, optionally from a specific district."""
+    pois = get_places_of_interest(district_name)
+    return random.choice(pois) if pois else None
+
+
+def build_place_context(district_name: str) -> str:
+    """
+    Build a prompt context block for shops, POIs, parks, and malls in a district.
+    Extends build_location_context() with the new place types.
+    """
+    places = get_all_places(district_name)
+    lines: List[str] = []
+
+    pois = places["places_of_interest"]
+    if pois:
+        lines.append("PLACES OF INTEREST:")
+        for p in pois[:4]:
+            lines.append(f"  - {p.get('name', '?')} ({p.get('type', 'landmark')}): {p.get('description', '')}")
+
+    shops = places["small_shops"]
+    if shops:
+        lines.append("SMALL SHOPS:")
+        for s in shops[:4]:
+            lines.append(f"  - {s.get('name', '?')} ({s.get('type', 'shop')}): {s.get('description', '')}")
+
+    parks = places["parks"]
+    if parks:
+        lines.append("PARKS & OPEN SPACES:")
+        for pk in parks[:3]:
+            lines.append(f"  - {pk.get('name', '?')}: {pk.get('description', '')}")
+
+    malls = places["malls"]
+    if malls:
+        lines.append("MARKET MALLS / COVERED BAZAARS:")
+        for m in malls[:3]:
+            lines.append(f"  - {m.get('name', '?')}: {m.get('description', '')}")
+
+    return "\n".join(lines) if lines else ""
+
+
+# ---------------------------------------------------------------------------
+# DB persistence helpers for places
+# ---------------------------------------------------------------------------
+
+def migrate_places_to_db() -> int:
+    """
+    One-time migration: load all place types from city_gazetteer.json into gazetteer_places table.
+    Returns count of rows inserted.
+    Idempotent — safe to call multiple times (uses INSERT IGNORE).
+    """
+    try:
+        from src.db_api import raw_execute
+    except ImportError:
+        return 0
+
+    raw_execute("""
+        CREATE TABLE IF NOT EXISTS gazetteer_places (
+            id          INT AUTO_INCREMENT PRIMARY KEY,
+            district    VARCHAR(100) NOT NULL,
+            place_type  ENUM('place_of_interest','small_shop','park','mall') NOT NULL,
+            name        VARCHAR(200) NOT NULL,
+            type_tag    VARCHAR(100),
+            description TEXT,
+            extra_json  JSON,
+            UNIQUE KEY uq_place (district, place_type, name),
+            INDEX idx_district (district),
+            INDEX idx_type (place_type)
+        )
+    """)
+
+    gaz = load_gazetteer()
+    total = 0
+    field_map = {
+        "places_of_interest": "place_of_interest",
+        "small_shops": "small_shop",
+        "parks": "park",
+        "malls": "mall",
+    }
+
+    for district, info in gaz.get("districts", {}).items():
+        for json_field, db_type in field_map.items():
+            for item in info.get(json_field, []):
+                import json as _json
+                name = item.get("name", "")
+                if not name:
+                    continue
+                type_tag = item.get("type", "")
+                description = item.get("description", "")
+                # Stash everything else in extra_json
+                extra = {k: v for k, v in item.items() if k not in ("name", "type", "description")}
+                try:
+                    raw_execute(
+                        """INSERT IGNORE INTO gazetteer_places
+                           (district, place_type, name, type_tag, description, extra_json)
+                           VALUES (%s, %s, %s, %s, %s, %s)""",
+                        (district, db_type, name, type_tag, description,
+                         _json.dumps(extra, ensure_ascii=False) if extra else None),
+                    )
+                    total += 1
+                except Exception:
+                    pass
+
+    return total
+
+
+def query_places_from_db(
+    district: Optional[str] = None,
+    place_type: Optional[str] = None,
+    limit: int = 20,
+) -> List[dict]:
+    """
+    Query gazetteer_places from DB. Falls back to JSON on DB failure.
+    place_type: 'place_of_interest' | 'small_shop' | 'park' | 'mall'
+    """
+    try:
+        from src.db_api import raw_query
+        clauses = []
+        params: list = []
+        if district:
+            clauses.append("district = %s")
+            params.append(district)
+        if place_type:
+            clauses.append("place_type = %s")
+            params.append(place_type)
+        where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+        rows = raw_query(f"SELECT * FROM gazetteer_places {where} LIMIT %s", (*params, limit)) or []
+        return list(rows)
+    except Exception:
+        # Fallback to in-memory JSON
+        field_map = {
+            "place_of_interest": "places_of_interest",
+            "small_shop": "small_shops",
+            "park": "parks",
+            "mall": "malls",
+        }
+        json_field = field_map.get(place_type, "") if place_type else None
+        if json_field:
+            return _collect_place_type(json_field, district)[:limit]
+        results = []
+        for f in field_map.values():
+            results.extend(_collect_place_type(f, district))
+        return results[:limit]
+
+
+# Auto-migrate on module import (best-effort — silently skipped if DB is unavailable)
+try:
+    migrate_places_to_db()
+    _places_migrated = True
+except Exception:
+    pass

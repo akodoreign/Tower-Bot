@@ -6,7 +6,7 @@ API endpoint provided by Ollama's Pi integration.
 
 Key differences from old direct Ollama calls:
     - Uses OpenAI-compatible API: http://localhost:11434/v1/chat/completions
-    - Supports both local models (qwen) and cloud models (kimi-k2.5:cloud)
+    - Supports the configured local Qwen model through Ollama
     - Structured response handling with AgentResponse dataclass
     - Built-in retry logic and error handling
     - Respects ollama_busy.py busy flag for graceful degradation
@@ -15,6 +15,8 @@ Key differences from old direct Ollama calls:
 from __future__ import annotations
 
 import os
+import re
+import time
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 class ModelType(Enum):
     """Types of models available in the Pi/OpenClaw stack."""
     LOCAL = "local"      # Runs entirely on local hardware (qwen)
-    CLOUD = "cloud"      # Cloud-hosted model (kimi-k2.5:cloud)
+    CLOUD = "cloud"      # Reserved for optional cloud-hosted models
 
 
 @dataclass
@@ -37,11 +39,12 @@ class AgentConfig:
     """Configuration for an agent instance."""
     model_name: str
     model_type: ModelType
-    base_url: str = "http://localhost:11434/v1"
+    base_url: str = "http://localhost:11434"
     timeout: float = 120.0
     max_retries: int = 2
     temperature: float = 0.7
     max_tokens: int = 4096
+    ollama_track: str = "primary"
     
     # Subagent configuration (for kimi)
     enable_subagents: bool = False
@@ -169,6 +172,7 @@ class BaseAgent(ABC):
             temperature=temperature,
             max_tokens=max_tokens,
             strip_preamble=strip_preamble,
+            force=force,
         )
     
     async def chat(
@@ -223,63 +227,140 @@ class BaseAgent(ABC):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         strip_preamble: bool = True,
+        force: bool = False,
     ) -> AgentResponse:
         """
         Make the actual API call to the OpenAI-compatible endpoint.
+
+        Args:
+            force: If True, bypass the busy check (use when the caller already
+                   holds the busy flag itself, e.g. inside a mission pipeline).
         """
         client = await self._get_client()
-        
+
+        num_ctx  = int(os.getenv("OLLAMA_AGENT_CTX", os.getenv("OLLAMA_NUM_CTX", "8192")))
+        num_pred = max_tokens or self.config.max_tokens
+        # The env value is a FLOOR: raise (never lower) the window when the
+        # conversation outgrows it -- an oversized prompt is silently truncated
+        # by Ollama and the reply degrades to near-empty. Board mission prompts
+        # already run ~4.6k tokens and grow with the world.
+        _chars = sum(len(m.get("content", "")) for m in messages)
+        _needed = _chars // 4 + num_pred + 768
+        if _needed > num_ctx:
+            num_ctx = next((c for c in (12288, 16384, 24576, 32768) if c >= _needed), 32768)
+        think_enabled = os.getenv("OLLAMA_AGENT_THINK", "false").lower() in ("1", "true", "yes", "on")
+        options = {
+            "temperature": temperature or self.config.temperature,
+            "num_predict": num_pred,
+            "num_ctx": num_ctx,
+            "think": think_enabled,
+        }
+        # Only override num_gpu if explicitly set to non-zero — otherwise let Modelfile control it
+        _num_gpu = int(os.getenv("OLLAMA_NUM_GPU", "0"))
+        if _num_gpu > 0:
+            options["num_gpu"] = _num_gpu
+
         payload = {
             "model": self.config.model_name,
             "messages": messages,
-            "temperature": temperature or self.config.temperature,
-            "max_tokens": max_tokens or self.config.max_tokens,
             "stream": False,
+            "options": options,
         }
-        
-        url = f"{self.config.base_url}/chat/completions"
+
+        url = f"{self.config.base_url.rstrip('/')}/api/chat"
 
         from src.ollama_queue import _lock as _ollama_lock
         from src.ollama_busy import is_available, get_busy_reason
 
+        agent_name = self.__class__.__name__
+        prompt_words = sum(len(m.get("content", "").split()) for m in messages)
+        logger.info(
+            f"🤖 [{agent_name}] → {self.config.model_name} | "
+            f"ctx={num_ctx} predict={num_pred} | "
+            f"prompt={prompt_words}w | timeout={self.config.timeout}s"
+        )
+
         for attempt in range(self.config.max_retries + 1):
             try:
-                if not is_available():
-                    logger.info(f"🔀 Agent [{self.__class__.__name__}] skipping — busy: {get_busy_reason()}")
+                if not force and not is_available():
+                    logger.info(f"🔀 [{agent_name}] skipping — busy: {get_busy_reason()}")
                     return AgentResponse(content="", model=self.config.model_name, success=False,
                                          error="Ollama busy")
+                if not force:
+                    from src.resource_cop import wait_for_ollama_turn
+
+                    decision = await wait_for_ollama_turn(
+                        f"agent:{agent_name}",
+                        track=self.config.ollama_track,
+                        max_wait_seconds=60,
+                    )
+                    if not decision.run_now:
+                        logger.info(f"[{agent_name}] skipping - dispatcher busy: {decision.reason}")
+                        return AgentResponse(
+                            content="",
+                            model=self.config.model_name,
+                            success=False,
+                            error=f"Ollama busy: {decision.reason}",
+                        )
+                if attempt > 0:
+                    logger.info(f"🤖 [{agent_name}] retry {attempt}/{self.config.max_retries} ...")
+                logger.info(f"🤖 [{agent_name}] → sending to {url} (waiting for response...)")
+                _t0 = time.monotonic()
                 async with _ollama_lock:
                     resp = await client.post(url, json=payload)
+                _elapsed = time.monotonic() - _t0
                 resp.raise_for_status()
                 data = resp.json()
-                
-                # Parse OpenAI-format response
+                logger.info(f"🤖 [{agent_name}] ← response received in {_elapsed:.1f}s")
+
+                # Parse native Ollama /api/chat response
                 content = ""
                 usage = {}
-                
-                if "choices" in data and len(data["choices"]) > 0:
-                    choice = data["choices"][0]
-                    message = choice.get("message", {})
-                    content = message.get("content", "")
-                elif "message" in data:
-                    # Fallback for native Ollama format
+
+                if "message" in data:
                     content = data["message"].get("content", "")
-                
-                if "usage" in data:
-                    usage = data["usage"]
-                
+                elif "choices" in data and data["choices"]:
+                    content = data["choices"][0].get("message", {}).get("content", "")
+
+                if data.get("eval_count") or data.get("prompt_eval_count"):
+                    usage = {
+                        "completion_tokens": data.get("eval_count", 0),
+                        "prompt_tokens": data.get("prompt_eval_count", 0),
+                        "total_tokens": data.get("eval_count", 0) + data.get("prompt_eval_count", 0),
+                    }
+
+                # Strip qwen3 thinking blocks unconditionally
+                raw_len = len(content)
+                _think_matches = re.findall(r"<think>(.*?)</think>", content, flags=re.DOTALL)
+                _think_chars = sum(len(t) for t in _think_matches)
+                if _think_chars:
+                    logger.info(f"🤖 [{agent_name}] thinking block: {_think_chars} chars")
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
                 if strip_preamble:
                     content = self._strip_preamble(content)
-                
+
+                resp_words = len(content.split())
+                resp_chars = len(content)
+                tok_in  = usage.get("prompt_tokens", 0)
+                tok_out = usage.get("completion_tokens", 0)
+                logger.info(
+                    f"🤖 [{agent_name}] ✓ {resp_words}w / {resp_chars} chars generated | "
+                    f"tokens in={tok_in} out={tok_out} | "
+                    f"raw={raw_len}ch | elapsed={_elapsed:.1f}s"
+                )
+                # Log first 120 chars of response as preview
+                preview = content[:120].replace("\n", " ")
+                logger.info(f"🤖 [{agent_name}] preview: {preview!r}")
+
                 return AgentResponse(
                     content=content,
                     model=self.config.model_name,
                     success=True,
                     usage=usage,
                 )
-                
+
             except httpx.TimeoutException as e:
-                logger.warning(f"🤖 Agent timeout (attempt {attempt + 1}): {e}")
+                logger.warning(f"🤖 [{agent_name}] TIMEOUT attempt {attempt + 1} after {self.config.timeout}s")
                 if attempt == self.config.max_retries:
                     return AgentResponse(
                         content="",
@@ -287,8 +368,25 @@ class BaseAgent(ABC):
                         success=False,
                         error=f"Timeout after {self.config.max_retries + 1} attempts",
                     )
+                # Before burning another full timeout, give Ollama 30s to settle then do a
+                # quick cop check. If the queue is still occupied, abort rather than retry.
+                import asyncio as _asyncio
+                logger.info(f"🤖 [{agent_name}] sleeping 30s after timeout before retry check ...")
+                await _asyncio.sleep(30)
+                from src.resource_cop import ask_ollama as _ask_ollama
+                _cop = await _ask_ollama(f"agent:{agent_name}:retry", track=self.config.ollama_track)
+                if not _cop.run_now:
+                    logger.info(
+                        f"🤖 [{agent_name}] aborting remaining retries — Ollama still busy: {_cop.reason}"
+                    )
+                    return AgentResponse(
+                        content="",
+                        model=self.config.model_name,
+                        success=False,
+                        error=f"Timeout + Ollama busy on retry check: {_cop.reason}",
+                    )
             except httpx.HTTPStatusError as e:
-                logger.error(f"🤖 Agent HTTP error: {e.response.status_code} - {e.response.text}")
+                logger.error(f"🤖 [{agent_name}] HTTP {e.response.status_code}: {e.response.text[:200]}")
                 return AgentResponse(
                     content="",
                     model=self.config.model_name,
@@ -296,7 +394,7 @@ class BaseAgent(ABC):
                     error=f"HTTP {e.response.status_code}: {e.response.text}",
                 )
             except Exception as e:
-                logger.error(f"🤖 Agent error: {type(e).__name__}: {e}")
+                logger.error(f"🤖 [{agent_name}] error: {type(e).__name__}: {e}")
                 return AgentResponse(
                     content="",
                     model=self.config.model_name,
@@ -333,8 +431,15 @@ async def quick_complete(
         logger.info(f"🔀 quick_complete skipping — busy: {get_busy_reason()}")
         return ""
 
-    # Use OpenAI-compatible API
-    url = "http://localhost:11434/v1/chat/completions"
+    from src.resource_cop import wait_for_ollama_turn
+    decision = await wait_for_ollama_turn("agent:quick_complete", track="quick", max_wait_seconds=45)
+    if not decision.run_now:
+        logger.info(f"quick_complete skipping - dispatcher busy: {decision.reason}")
+        return ""
+
+    url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
+    num_gpu = int(os.getenv("OLLAMA_NUM_GPU", "0"))
+    num_ctx = int(os.getenv("OLLAMA_AGENT_CTX", os.getenv("OLLAMA_NUM_CTX", "12288")))
 
     try:
         from src.ollama_queue import _lock as _ollama_lock
@@ -344,14 +449,14 @@ async def quick_complete(
                     "model": model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_gpu": num_gpu, "num_ctx": num_ctx},
                 })
             resp.raise_for_status()
             data = resp.json()
-            
-            if "choices" in data and len(data["choices"]) > 0:
-                return data["choices"][0]["message"]["content"].strip()
-            elif "message" in data:
+            if "message" in data:
                 return data["message"].get("content", "").strip()
+            elif "choices" in data and data["choices"]:
+                return data["choices"][0]["message"]["content"].strip()
             return ""
     except Exception as e:
         logger.error(f"quick_complete error: {e}")

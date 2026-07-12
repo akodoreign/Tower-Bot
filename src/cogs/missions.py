@@ -63,7 +63,7 @@ def setup(client):
         faction = mission.get("faction", "")
 
         # Delete old claim post from the mission board
-        board_channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        board_channel_id = int(mission.get("claim_channel_id") or os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
         board_channel = client.get_channel(board_channel_id)
         if board_channel:
             claim_msg_id = mission.get("claim_message_id")
@@ -100,7 +100,6 @@ RULES: Gritty, terse. No preamble, no sign-off."""
             mission["failed"] = True
             rep_result = on_mission_failed(faction) if faction else None
 
-        mission["resolved"] = True
         _save_missions(missions)
 
         if results_channel:
@@ -113,13 +112,74 @@ RULES: Gritty, terse. No preamble, no sign-off."""
             ephemeral=True
         )
 
+    # --- Force-post a mission to the board ---
+
+    @client.tree.command(
+        name="postmission",
+        description="(DM only) Force-post one new mission to the board immediately."
+    )
+    async def postmission(interaction: discord.Interaction):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if dm_id and interaction.user.id != dm_id:
+            await interaction.response.send_message("DM only.", ephemeral=True)
+            return
+        await interaction.response.defer(ephemeral=True)
+        try:
+            from src.mission_board import post_mission, _count_active_normal, MAX_ACTIVE_NORMAL
+            channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+            channel = client.get_channel(channel_id)
+            if not channel:
+                await interaction.followup.send("Mission board channel not found.", ephemeral=True)
+                return
+            active = _count_active_normal()
+            if active >= MAX_ACTIVE_NORMAL:
+                await interaction.followup.send(f"Board at cap ({active}/{MAX_ACTIVE_NORMAL}). Expire some missions first.", ephemeral=True)
+                return
+            await post_mission(channel)
+            await interaction.followup.send(f"Mission posted. Board now at {active + 1}/{MAX_ACTIVE_NORMAL}.", ephemeral=True)
+        except Exception as e:
+            logger.exception(f"/postmission error: {e}")
+            await interaction.followup.send(f"Error: {e}", ephemeral=True)
+
+    # --- Force-post a sub-contracted guild mission ---
+
+    @client.tree.command(
+        name="postsubcontract",
+        description="(DM only) Force-post one sub-contracted guild mission to the board immediately."
+    )
+    async def postsubcontract(interaction: discord.Interaction):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if dm_id and interaction.user.id != dm_id:
+            await interaction.response.send_message("DM only.", ephemeral=True)
+            return
+        await interaction.response.defer(ephemeral=True)
+        try:
+            from src.mission_board import post_subcontract_mission, _count_active_normal, MAX_ACTIVE_NORMAL
+            channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+            channel = client.get_channel(channel_id)
+            if not channel:
+                await interaction.followup.send("Mission board channel not found.", ephemeral=True)
+                return
+            active = _count_active_normal()
+            if active >= MAX_ACTIVE_NORMAL:
+                await interaction.followup.send(f"Board at cap ({active}/{MAX_ACTIVE_NORMAL}).", ephemeral=True)
+                return
+            posted = await post_subcontract_mission(channel)
+            if posted:
+                await interaction.followup.send(f"Sub-contracted mission posted. Board at {active + 1}/{MAX_ACTIVE_NORMAL}.", ephemeral=True)
+            else:
+                await interaction.followup.send("Generation skipped (Ollama busy or no affiliations found).", ephemeral=True)
+        except Exception as e:
+            logger.exception(f"/postsubcontract error: {e}")
+            await interaction.followup.send(f"Error: {e}", ephemeral=True)
+
     # --- Reaction handler for mission claims ---
 
     @client.event
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         """Handle ⚔️ (player claim) reactions on mission board posts."""
         logger.info(f"⚔️ RAW REACTION RECEIVED: emoji={payload.emoji}, channel={payload.channel_id}, user={payload.user_id}")
-        
+
         if payload.user_id == client.user.id:
             logger.debug("⚔️ Ignoring bot's own reaction")
             return

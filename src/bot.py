@@ -51,6 +51,28 @@ def run_discord_bot():
         logger.info("🔥 TOWER BOT STARTED")
         await discordClient.send_start_prompt()
         logger.info(f"✅ Connected as {discordClient.user} in {len(discordClient.guilds)} guild(s)")
+        try:
+            from src.db_api import set_global_state
+            from datetime import datetime
+            set_global_state("discord_status", {
+                "ok": True,
+                "label": str(discordClient.user).split("#")[0],
+                "updated_at": datetime.utcnow().isoformat(),
+            })
+        except Exception:
+            pass
+
+        # Connect to Mimir DM MCP server then run full sync
+        from src.mimir_client import get_mimir
+        from src.mimir_sync import startup_sync
+        mimir_ok = await get_mimir().connect()
+        if mimir_ok:
+            asyncio.create_task(startup_sync())
+
+        # Start headless Chrome for DDB homebrew pushes
+        from src.ddb_homebrew import ensure_chrome, ENABLED as DDB_HB_ENABLED
+        if DDB_HB_ENABLED:
+            asyncio.create_task(ensure_chrome())
 
         # Re-register persistent views so DM buttons survive restarts
         from src.mission_board import _load_missions, _MissionOutcomeView
@@ -103,4 +125,7 @@ def run_discord_bot():
                     pass
 
     # ---- Run ----
+    import atexit
+    from src.ddb_homebrew import shutdown_chrome
+    atexit.register(shutdown_chrome)
     discordClient.run(os.getenv("DISCORD_BOT_TOKEN"))

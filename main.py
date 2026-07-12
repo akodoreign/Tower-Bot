@@ -1,10 +1,23 @@
 #!/usr/bin/env python3
 import os
+import threading
 from dotenv import load_dotenv
+
+# Must run BEFORE any src.* imports — modules like src.city_scene read env vars
+# at import time via os.getenv() with hardcoded defaults. Loading .env after
+# those imports silently fell back to the defaults, ignoring .env values.
+load_dotenv()
+
 from src.bot import run_discord_bot
 from src.log import logger
 
-load_dotenv()
+def _start_dashboard():
+    try:
+        from Webpage.app import app
+        port = int(os.getenv("DASHBOARD_PORT", 5000))
+        app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+    except Exception as e:
+        logger.warning(f"Dashboard failed to start: {e}")
 
 def validate_environment():
     """Validate required environment variables"""
@@ -39,12 +52,16 @@ def validate_environment():
 def main():
     """Main entry point"""
     logger.info("Starting Discord AI Bot...")
-    
+
     if not validate_environment():
         return
-    
+
+    dashboard_thread = threading.Thread(target=_start_dashboard, daemon=True, name="dashboard")
+    dashboard_thread.start()
+    logger.info(f"Dashboard thread started on port {os.getenv('DASHBOARD_PORT', 5000)}")
+
     logger.info("Free provider configured - no authentication required")
-    
+
     try:
         run_discord_bot()
     except Exception as e:

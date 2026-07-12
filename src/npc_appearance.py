@@ -8,7 +8,6 @@ For each NPC in the database, generates:
   - Style description for Stable Diffusion (based on race, class, faction aesthetic)
 
 Stored in: MySQL npc_appearances table
-Also rebuilds npc_roster.txt for RAG system.
 
 Usage:
   python -m src.npc_appearance   (run once to generate all)
@@ -25,7 +24,13 @@ from pathlib import Path
 from typing import Optional
 
 from src.log import logger
-from src.db_api import raw_query, raw_execute, db
+from src.db_api import (
+    canonical_subclass_name,
+    pick_canonical_subclass,
+    raw_execute,
+    raw_query,
+    db,
+)
 
 # Keep NPC_APP_DIR for backward compatibility with npc_lifecycle.py references
 DOCS_DIR         = Path(__file__).resolve().parent.parent / "campaign_docs"
@@ -50,6 +55,243 @@ RACE_PHYSIQUE = {
     "kobold":     "small reptilian humanoid, about 2.5 feet, with a long snout and scaly skin",
     "unknown":    "their exact heritage is unclear — something in the way they move suggests it isn't entirely human",
 }
+
+# ─── Race → Stable Diffusion visual description ──────────────────────────────
+# Injected into SD prompts so the image model understands exotic species.
+# Ordered longest-key-first so substring matching picks the most specific entry.
+
+RACE_SD_TRAITS: dict[str, str] = {
+    # ── Core PHB 2024 ────────────────────────────────────────────────────────
+    "human":           "human, normal humanoid proportions, no unusual features",
+    "half-elf":        "half-elf, slightly pointed ears, graceful humanoid, otherworldly but approachable",
+    "high elf":        "high elf, tall slender humanoid, sharply pointed ears, angular elegant face, no body hair, ethereal",
+    "wood elf":        "wood elf, pointed ears, tanned copper skin, lean athletic build, green or amber eyes",
+    "dark elf":        "dark elf drow, pointed ears, dark grey or obsidian skin, white or silver hair, pale glowing eyes",
+    "drow":            "dark elf drow, pointed ears, dark grey or obsidian skin, white or silver hair, pale glowing eyes",
+    "eladrin":         "eladrin elf, pointed ears, faintly luminous skin that shifts with seasons, otherworldly glow",
+    "sea elf":         "sea elf, pointed ears, blue-green or seafoam skin, webbed fingers, deep blue eyes",
+    "shadar-kai":      "shadar-kai, pointed ears, pale ash-grey skin, dark shadows beneath eyes, ghostly quality",
+    "elf":             "elf, tall slender humanoid, sharply pointed ears, angular face, ageless quality",
+    "hill dwarf":      "dwarf, stocky 4.5ft humanoid, broad shoulders, thick beard, heavy brow",
+    "mountain dwarf":  "dwarf, stocky 4.5ft humanoid, broad shoulders, stone-hard muscles, thick braided beard",
+    "dwarf":           "dwarf, stocky 4.5ft humanoid, broad shoulders, thick beard or braids, heavy build",
+    "lightfoot halfling": "halfling, 3ft tall humanoid, curly hair, large bare feet, round cheerful face, large eyes",
+    "stout halfling":  "halfling, 3ft tall humanoid, slightly broader build, curly hair, large feet, ruddy cheeks",
+    "halfling":        "halfling, 3ft tall humanoid, curly hair, large bare feet, round face, large bright eyes",
+    "forest gnome":    "gnome, small humanoid under 3ft, large bright eyes, long nose, wild hair, quick movements",
+    "rock gnome":      "gnome, small humanoid under 3ft, large eyes, prominent nose, goggles or spectacles often",
+    "deep gnome":      "deep gnome svirfneblin, small pale grey-skinned humanoid, bald or sparse white hair, large dark eyes",
+    "gnome":           "gnome, small humanoid under 3ft, large expressive eyes, prominent nose",
+    "half-orc":        "half-orc, 6ft+ humanoid, greenish grey skin, prominent lower tusks, heavy muscled frame",
+    "orc":             "orc, massive humanoid, deep green or slate grey skin, heavy prominent tusks, thick neck and jaw",
+    "tiefling":        "tiefling, humanoid with small curved horns, long thin tail, solid-colored eyes, skin in red or purple or lavender tones, slightly sharp teeth",
+    "aasimar":         "aasimar, humanoid with faintly glowing skin, silver or gold undertones, luminous eyes, occasional wings of light emerging",
+    "dragonborn":      "dragonborn, tall scaled humanoid with a clear draconic lizard head, long snout, scales covering entire body, no human nose, no human hair, no human ears, tail, 6ft+",
+    "goliath":         "goliath, enormous humanoid 7ft+, mottled grey and white stone-like skin, bony protrusions on brow and skull, bald",
+    # ── Extended PHB and sourcebooks ─────────────────────────────────────────
+    "firbolg":         "firbolg, giant-kin humanoid 7-8ft, barrel-chested, large bovine nose, faintly blue-grey or pink skin, mild giant features",
+    "satyr":           "satyr, humanoid upper body on goat lower body, small curved horns, pointed ears, goat legs with hooves, fur on lower half",
+    "centaur":         "centaur, humanoid torso emerging from horse body, four hooved legs, horse tail, powerful physique",
+    "minotaur":        "minotaur, humanoid with bull head and horns, covered in short fur, hooves, muscular 7ft frame, bovine snout",
+    "leonin":          "leonin, humanoid lion, tawny or dark fur covering body, full mane, feline face with fangs, clawed hands",
+    "loxodon":         "loxodon, humanoid elephant, broad grey trunk for nose, large fan ears, thick tough grey hide, tusks, 7ft",
+    "tabaxi":          "tabaxi catfolk, adult humanoid feline person, human-like face structure with visible lips and chin, cat ears on top of head, light short facial fur or markings, feline eyes, small catlike nose, long tail, lithe",
+    "aarakocra":       "aarakocra, humanoid eagle-bird, feathered body, beak, wings on arms or separate, taloned feet, 5ft",
+    "kenku":           "kenku, humanoid raven, black iridescent feathers, corvid beak, dark intelligent eyes, 5ft, no wings",
+    "owlin":           "owlin, humanoid owl, soft feathers, large forward-facing eyes, short hooked beak, silent wings on back",
+    "lizardfolk":      "lizardfolk, reptilian humanoid, scales covering body, slit pupils, flat nose, no hair, long tail, 6ft",
+    "tortle":          "tortle, humanoid turtle, large domed shell on back, beak-like mouth, scaled arms, clawed hands, 5ft",
+    "yuan-ti":         "yuan-ti pureblood, humanoid with subtle serpent features, forked tongue, slit pupils, patches of scales on skin, cold inhuman eyes",
+    "grung":           "grung, small frog humanoid 3ft, brightly colored toxic skin, large sticky hands, wide flat face, large eyes",
+    "locathah":        "locathah, fish-humanoid, scaled body, finned ridges, gills on neck, webbed hands, no hair, aquatic features",
+    "triton":          "triton, humanoid aquatic, blue-green tinted skin, finned ears, gills, webbed hands, flowing silver or blue hair",
+    "tabaxi":          "tabaxi catfolk, adult humanoid feline person, human-like face structure with visible lips and chin, cat ears on top of head, light short facial fur or markings, feline eyes, small catlike nose, long tail, lithe athletic build",
+    # ── Genasi variants ──────────────────────────────────────────────────────
+    "fire genasi":     "fire genasi, humanoid with deep red or orange skin, hair that flickers and moves like flame, ember-like eyes",
+    "water genasi":    "water genasi, humanoid with blue-green skin, hair that flows like underwater, gills, amphibious features",
+    "air genasi":      "air genasi, humanoid with pale or sky-blue tinted skin, constantly moving silver or white hair, light and ethereal",
+    "earth genasi":    "earth genasi, humanoid with brown or grey rocky skin, heavy solid build, hair of packed earth or stone",
+    "genasi":          "genasi, humanoid with elemental features, unusual skin tone and hair reflecting their element",
+    # ── Eberron species ──────────────────────────────────────────────────────
+    "changeling":      "changeling, pale featureless humanoid, white hair, colorless grey eyes, features subtly shifting and unfinished-looking",
+    "shifter":         "shifter, humanoid with bestial features, slightly elongated canines, clawed fingertips, faint fur on forearms",
+    "warforged":       "warforged, humanoid construct of metal and dark wood, no organic features, glowing crystal eyes, plated chest, articulated metal limbs",
+    "kalashtar":       "kalashtar, tall slender humanoid, serene angular features, faint luminous quality to skin, deep calm eyes",
+    # ── Spelljammer / Astral ─────────────────────────────────────────────────
+    "astral elf":      "astral elf, tall pointed-ear humanoid, silver or starfield-blue skin, hair like spun starlight, otherworldly calm",
+    "giff":            "giff, 6ft+ humanoid hippopotamus, thick grey hairless hide, broad flat mouth, small eyes, military bearing",
+    "hadozee":         "hadozee, monkey humanoid, covered in brown or grey fur, gliding membranes between wrists and ankles, dexterous",
+    "thri-kreen":      "thri-kreen, insectoid humanoid, chitinous exoskeleton, six limbs (four arms two legs), mandibles, compound eyes, no hair",
+    "plasmoid":        "plasmoid, amorphous semi-translucent ooze-being, roughly humanoid shape with pseudopod limbs, internal organs faintly visible",
+    "autognome":       "autognome, small mechanical gnome construct, clockwork gears visible, brass and copper plating, glowing gem eyes",
+    # ── Ravnica / Theros ─────────────────────────────────────────────────────
+    "vedalken":        "vedalken, slim blue-grey humanoid, bald, three fingers per hand, calm analytical expression",
+    "simic hybrid":    "simic hybrid, humanoid with aquatic or animal features grafted on, fins or scales or extra limbs or bioluminescence",
+    # ── Monstrous ────────────────────────────────────────────────────────────
+    "harengon":              "harengon, humanoid rabbit, tall pointed ears, rabbit snout, large rear feet, fur covering body",
+    "aether-touched accursed": "harengon, anthropomorphic hare, tall pointed rabbit ears, dark mottled brown and black fur, amber orange eyes, rabbit snout, digitigrade legs",
+    "fairy":           "fairy, tiny 1-2ft humanoid, insect or butterfly wings, delicate features, luminous skin",
+    "githyanki":       "githyanki, lean humanoid, yellow-green skin, angular gaunt face, pointed ears, military bearing, sword always present",
+    "githzerai":       "githzerai, lean humanoid, pale yellow skin, serene angular face, pointed ears, monastic bearing",
+    "hobgoblin":       "hobgoblin, disciplined humanoid, reddish-brown skin, flat broad nose, dark orange or yellow eyes, military posture",
+    "bugbear":         "bugbear, large hairy humanoid 7ft, brown or grey fur covering body, bear-like flat face, small dark eyes, long arms",
+    "goblin":          "goblin, small 3.5ft humanoid, bright green or yellow-green skin, large flat nose, bat-like ears, wide eyes",
+    "kobold":          "kobold, very small reptilian humanoid 2.5ft, narrow lizard snout, scaly skin in reds and browns, small horns, large expressive eyes, wiry body, not human",
+    "specter":         "specter, translucent ghostly undead humanoid, faintly luminous edges, hollow eyes, semi-corporeal body, death-touched presence",
+    "ghost":           "ghost, translucent ethereal undead humanoid, pale spectral glow, wispy edges, haunted eyes, partially see-through form",
+    "revenant":        "revenant, deathless undead humanoid, grey cold skin, sunken eyes, visible scars, grim relentless expression, corpse-touched but intact",
+    "wight":           "wight, gaunt undead humanoid, ashen skin, glowing hungry eyes, withered features, old grave-cold presence",
+    "lich":            "lich, skeletal undead spellcaster, parchment-dry skin over bone, glowing eyes, ancient regal decay, arcane death aura",
+    "shade":           "shade, shadow-touched humanoid, dark translucent skin, smoky silhouette, dim glowing eyes, edges dissolving into darkness",
+    "skeleton":        "skeleton, animated humanoid bones, empty eye sockets with faint glow, no skin, visible skull and bony hands",
+    "zombie":          "zombie, reanimated undead humanoid, grey torn skin, dull eyes, stiff posture, visible mortal wounds",
+    "vampire":         "vampire, pale predatory undead humanoid, sharp fangs, elegant cold features, red or dark eyes, aristocratic menace",
+    "dhampir":         "dhampir, pale half-vampire humanoid, subtle fangs, intense eyes, elegant predatory stillness, death-touched beauty",
+    # ── Fallback ─────────────────────────────────────────────────────────────
+    "unknown":         "humanoid of indeterminate heritage, something subtly unusual in their build or features",
+}
+
+
+SPECIES_PORTRAIT_RULES: dict[str, tuple[str, str]] = {
+    "harengon": (
+        "Mandatory harengon anatomy: anthropomorphic rabbit humanoid, tall pointed rabbit ears, rabbit snout and nose, fur covering body and face, large rear feet.",
+        "ordinary human face, no ears, human nose, bald, scales, cat ears, dog snout",
+    ),
+    "aether-touched accursed": (
+        "Mandatory anatomy: anthropomorphic hare, tall pointed rabbit ears, rabbit snout, dark mottled brown fur, amber eyes. Must read as a rabbit-person, not a human.",
+        "ordinary human, human face, no rabbit ears, bald human head, smooth skin, missing fur",
+    ),
+    "dragonborn": (
+        "Mandatory dragonborn anatomy: fully draconic lizard head and snout, scaled face and body, no hair, no human nose, no human ears.",
+        "human face, human nose, human ears, human hair, smooth human skin, cat ears, furry mammal face",
+    ),
+    "tabaxi": (
+        "Mandatory tabaxi anatomy: adult humanoid catfolk, human-like facial structure, visible humanlike lips and chin, small catlike nose, cat ears on top of head, feline eyes, subtle whisker marks or light short facial fur, long tail, lithe humanoid body. Must read as a humanoid feline woman or man, not a housecat head.",
+        "ordinary human, missing cat ears, domestic cat, house cat, full animal head, cat head on human body, full animal snout, protruding muzzle, big cat head, pet cat face, fursuit, mascot head, heavy fur, dog features, reptile scales",
+    ),
+    "kobold": (
+        "Mandatory kobold anatomy: very small adult reptilian humanoid, narrow lizard snout, scales, small horns, large eyes, wiry frame.",
+        "human face, child, toddler, tall dragonborn, goblin ears, mammal fur, cat ears",
+    ),
+    "halfling": (
+        "Mandatory halfling anatomy: short adult humanoid around 3 feet tall, adult face, compact proportions, large expressive eyes, grounded stance.",
+        "child, toddler, baby face, giant, tall human, dwarf beard dominance",
+    ),
+    "gnome": (
+        "Mandatory gnome anatomy: very short adult humanoid, clever adult face, bright eyes, prominent nose, wiry compact build.",
+        "child, toddler, baby face, tall human, halfling feet focus",
+    ),
+    "dwarf": (
+        "Mandatory dwarf anatomy: short stocky adult humanoid, broad shoulders, heavy brow, dense build, clearly not human height.",
+        "tall human, slender elf body, child, halfling proportions",
+    ),
+    "goblin": (
+        "Mandatory goblin anatomy: small wiry adult humanoid, green or yellow-green skin, large ears, wide eyes, sharp nose.",
+        "human face, child, tabaxi, cat ears, kobold scales",
+    ),
+    "lizardfolk": (
+        "Mandatory lizardfolk anatomy: reptilian humanoid, scaled body, lizard head, slit pupils, flat reptile nose, no hair, long tail.",
+        "human face, human hair, mammal fur, cat ears, dragonborn armor-only cosplay",
+    ),
+    "tortle": (
+        "Mandatory tortle anatomy: turtle humanoid, beak-like mouth, scaled limbs, shell visible behind shoulders, no hair.",
+        "human face, human hair, cat ears, smooth human skin",
+    ),
+    "yuan-ti": (
+        "Mandatory yuan-ti anatomy: humanoid with serpent traits, slit pupils, subtle scales, forked tongue or serpentine eyes, cold expression.",
+        "ordinary human, cat ears, mammal fur, dragon snout",
+    ),
+    "kenku": (
+        "Mandatory kenku anatomy: raven-like humanoid, black feathers, corvid beak, dark intelligent eyes, no human mouth.",
+        "human face, human lips, cat ears, mammal fur, owl face",
+    ),
+    "owlin": (
+        "Mandatory owlin anatomy: owl-like humanoid, soft feathers, large forward-facing eyes, short hooked beak, feathered head.",
+        "human face, human lips, cat ears, raven beak, mammal fur",
+    ),
+    "aarakocra": (
+        "Mandatory aarakocra anatomy: bird humanoid, feathered body, beak, taloned hands or feet, avian eyes.",
+        "human face, human lips, cat ears, mammal fur, reptile scales",
+    ),
+    "tiefling": (
+        "Mandatory tiefling anatomy: humanoid with horns, tail, unusual skin tone, solid or luminous eyes, subtle sharp teeth.",
+        "missing horns, missing tail, ordinary human, cat ears, reptile snout",
+    ),
+    "warforged": (
+        "Mandatory warforged anatomy: humanoid construct, metal and wood plating, articulated limbs, glowing eyes, no organic skin.",
+        "human skin, human hair, flesh face, cat ears, reptile scales",
+    ),
+    "specter": (
+        "Mandatory specter anatomy: translucent ghostly undead form, hollow luminous eyes, semi-corporeal edges, death-touched silhouette.",
+        "ordinary human skin, solid living body, cheerful healthy complexion",
+    ),
+    "revenant": (
+        "Mandatory revenant anatomy: deathless undead humanoid, cold grey skin, scars, sunken eyes, grim corpse-touched presence.",
+        "healthy human complexion, child, glowing angelic skin",
+    ),
+}
+
+
+def current_visual_species(species: str) -> str:
+    """Return the species the image model should portray right now."""
+    raw = (species or "").strip()
+    if not raw:
+        return "unknown"
+    current = re.sub(r"\s*\(formerly\s+[^)]*\)", "", raw, flags=re.IGNORECASE).strip()
+    current = re.sub(r"\s*\(former\s+[^)]*\)", "", current, flags=re.IGNORECASE).strip()
+    current = re.sub(r"\s*\([^)]*\)", "", current).strip()
+    return current or raw
+
+
+def species_visual_guard(species: str) -> str:
+    """Short prompt line that prevents former-race parentheticals from winning."""
+    current = current_visual_species(species)
+    m = re.search(r"\(formerly\s+([^)]+)\)", species or "", re.IGNORECASE)
+    if m:
+        former = m.group(1).strip()
+        return (
+            f"Current species is {current}; former species {former} is backstory only. "
+            f"Portray the current {current} form, not a {former}."
+        )
+    return f"Current species is {current}; portray that species accurately."
+
+
+def species_portrait_constraints(species: str) -> tuple[str, str]:
+    """Return positive and negative prompt fragments for portrait generation."""
+    s = current_visual_species(species).lower().strip()
+    for key in sorted(SPECIES_PORTRAIT_RULES.keys(), key=len, reverse=True):
+        if key in s:
+            return SPECIES_PORTRAIT_RULES[key]
+    if s and s != "human":
+        return (
+            f"Mandatory species anatomy: portray this NPC as {current_visual_species(species)}, with visible non-human traits appropriate to that species.",
+            "ordinary human, wrong species, missing species traits",
+        )
+    return ("", "")
+
+
+def get_race_sd_traits(species: str) -> str:
+    """Return SD-prompt visual description for a given species string.
+    Matches longest key first to prefer 'high elf' over 'elf'."""
+    s = current_visual_species(species).lower().strip()
+    for key in sorted(RACE_SD_TRAITS.keys(), key=len, reverse=True):
+        if key in s:
+            return RACE_SD_TRAITS[key]
+    return RACE_SD_TRAITS["unknown"]
+
+
+def infer_gender_tag(text: str) -> str:
+    """Infer 'female' or 'male' from gendered pronouns in description text.
+    Returns empty string if ambiguous or no pronouns found."""
+    t = (text or "").lower()
+    fem  = len(re.findall(r'\bshe\b|\bher\b|\bhers\b|\bherself\b', t))
+    masc = len(re.findall(r'\bhe\b|\bhim\b|\bhis\b|\bhimself\b', t))
+    if fem > masc:
+        return "female"
+    if masc > fem:
+        return "male"
+    return ""
+
 
 # ─── Class → combat role, stat priority, weapon, armour ────────────────────
 
@@ -190,6 +432,33 @@ CLASS_PROFILES = {
         "style_note": "scarred, dark, the smell of alchemical reagents — clothing shows the cost of the power",
     },
     # Non-class roles — estimate by faction role
+    "gunslinger": {
+        "role":      "firearm duelist",
+        "primary":   ["DEX 17", "CHA 14", "CON 13"],
+        "secondary": ["WIS 12", "INT 10", "STR 9"],
+        "hp_range":  "38-54",
+        "weapons":   "pistol, rifle, dagger",
+        "armour":    "studded leather coat",
+        "style_note": "powder-stained coat, ammunition belts, calm quick-draw posture",
+    },
+    "monster hunter": {
+        "role":      "professional monster slayer",
+        "primary":   ["DEX 16", "INT 14", "CON 14"],
+        "secondary": ["STR 12", "WIS 12", "CHA 8"],
+        "hp_range":  "48-65",
+        "weapons":   "longsword, crossbow, monster traps",
+        "armour":    "studded leather or chain mail",
+        "style_note": "grim field kit, trophy scars, alchemical oils, traps and monster notes close at hand",
+    },
+    "pugilist": {
+        "role":      "bare-knuckle brawler",
+        "primary":   ["STR 17", "CON 15", "DEX 12"],
+        "secondary": ["CHA 11", "WIS 10", "INT 8"],
+        "hp_range":  "55-72",
+        "weapons":   "fists, improvised weapons, brass knuckles",
+        "armour":    "light armour or no armour",
+        "style_note": "scarred hands, street-fighting stance, practical clothing that can take a beating",
+    },
     "senior acquisitions agent": {
         "role":      "field agent and broker",
         "primary":   ["CHA 16", "DEX 14", "INT 13"],
@@ -351,38 +620,64 @@ def _slug(name: str) -> str:
 
 
 def _race_key(species: str) -> str:
-    s = species.lower()
+    s = current_visual_species(species).lower()
     for key in RACE_PHYSIQUE:
         if key in s:
             return key
     return "unknown"
 
 
-def _class_key(rank: str) -> str:
-    """Map an NPC rank/role string to the closest CLASS_PROFILES key."""
-    r = rank.lower()
-    # Direct matches first
-    for key in CLASS_PROFILES:
-        if key in r:
+def _class_key(rank: str, role: str = "") -> str:
+    """Map NPC rank + role text to the closest CLASS_PROFILES key.
+
+    Rank alone is often just 'Member' — role text carries the real information.
+    We search the combined string so role keywords override the generic rank.
+    """
+    combined = (rank + " " + role).lower()
+
+    # Direct CLASS_PROFILES key substring match (longest keys first to avoid
+    # 'blood hunter' matching 'hunter' before it matches itself)
+    for key in sorted(CLASS_PROFILES.keys(), key=len, reverse=True):
+        if key in combined:
             return key
-    # Fuzzy fallbacks
-    if "blade" in r:        return "senior blade"
-    if "warden" in r:       return "warden"
-    if "inspector" in r:    return "inspector"
-    if "agent" in r:        return "senior acquisitions agent"
-    if "broker" in r:       return "information broker"
-    if "archivist" in r:    return "archivist"
-    if "scribe" in r:       return "contract scribe"
-    if "mediator" in r:     return "contract mediator"
-    if "compliance" in r:   return "compliance officer"
-    if "runner" in r:       return "street runner"
-    if "speaker" in r:      return "speaker"
-    if "acolyte" in r:      return "acolyte"
-    if "captain" in r:      return "field captain"
-    if "officer" in r:      return "officer"
-    if "architect" in r:    return "memory architect"
-    if "sergeant" in r:     return "warden"
-    if "mercenary" in r or "freelance" in r or "prospect" in r: return "freelance"
+
+    # Role-text keyword fallbacks — ordered most-specific first
+    kw = combined
+    if any(x in kw for x in ("alchemist", "potion", "alchemy")):      return "artificer"
+    if any(x in kw for x in ("gunslinger", "gunfighter", "pistol", "rifle", "firearm", "quickdraw", "quick-draw")): return "gunslinger"
+    if any(x in kw for x in ("monster hunter", "monster-hunter", "slayer", "quarry")): return "monster hunter"
+    if any(x in kw for x in ("pugilist", "brawler", "boxer", "bare-knuckle", "bareknuckle")): return "pugilist"
+    if any(x in kw for x in ("intelligence", "informant", "info")):   return "information broker"
+    if any(x in kw for x in ("acquisition", "relic", "retrieval")):   return "senior acquisitions agent"
+    if any(x in kw for x in ("archive", "librarian", "catalogu")):    return "archivist"
+    if any(x in kw for x in ("scroll", "scribe", "legal")):             return "contract scribe"
+    if any(x in kw for x in ("mediat", "diplomat", "negotiat")):      return "contract mediator"
+    if any(x in kw for x in ("memory", "vial", "psychic")):           return "memory architect"
+    if any(x in kw for x in ("heal", "medic", "doctor", "clinic",
+                              "resurrect", "divine", "priest")):       return "cleric"
+    if any(x in kw for x in ("preach", "sermon", "doctrine",
+                              "recruit", "cult", "interpret")):        return "warlock"
+    if any(x in kw for x in ("ritual", "spell", "arcane", "magic",
+                              "enchant", "rune")):                     return "wizard"
+    if any(x in kw for x in ("blade", "sword", "arena", "champion",
+                              "bout", "fighter", "combatant")):        return "senior blade"
+    if any(x in kw for x in ("patrol", "warden", "guard", "defend",
+                              "city wall", "checkpoint")):             return "warden"
+    if any(x in kw for x in ("captain", "command", "coordinate",
+                              "field leader")):                        return "field captain"
+    if any(x in kw for x in ("inspector", "investigate", "inquisit")): return "inspector"
+    if any(x in kw for x in ("compliance", "fta", "regulation")):     return "compliance officer"
+    if any(x in kw for x in ("speaker", "orator", "broadcast")):      return "speaker"
+    if any(x in kw for x in ("acolyte", "novice", "initiat")):        return "acolyte"
+    if any(x in kw for x in ("courier", "runner", "messenger", "delivery")): return "street runner"
+    if any(x in kw for x in ("smuggl", "shadow", "infiltrat",
+                              "assassin", "spy", "dagger")):           return "rogue"
+    if any(x in kw for x in ("ranger", "tracker", "hunt", "scout")):  return "ranger"
+    if any(x in kw for x in ("bard", "musician", "perform", "song",
+                              "network", "social")):                   return "bard"
+    if any(x in kw for x in ("sergeant", "officer")):                 return "officer"
+    if any(x in kw for x in ("mercenary", "freelance", "prospect")):  return "freelance"
+    if any(x in kw for x in ("agent", "broker", "operative")):        return "senior acquisitions agent"
     return "mercenary"  # safe fallback — fighter-type
 
 
@@ -417,7 +712,215 @@ FACTION_SD_NOTES = {
 }
 
 
-async def _generate_npc_profile(npc: dict) -> dict:
+# ─── D&D 5e stat block generation ───────────────────────────────────────────
+
+_CLASS_TO_DND: dict[str, tuple[str, str | None]] = {
+    "fighter":                   ("Fighter",      None),
+    "arcane archer":             ("Fighter",      "Arcane Archer"),
+    "rogue":                     ("Rogue",        None),
+    "wizard":                    ("Wizard",       None),
+    "cleric":                    ("Cleric",       None),
+    "ranger":                    ("Ranger",       None),
+    "paladin":                   ("Paladin",      None),
+    "barbarian":                 ("Barbarian",    None),
+    "bard":                      ("Bard",         None),
+    "warlock":                   ("Warlock",      None),
+    "druid":                     ("Druid",        None),
+    "monk":                      ("Monk",         None),
+    "sorcerer":                  ("Sorcerer",     None),
+    "artificer":                 ("Artificer",    None),
+    "blood hunter":              ("Blood Hunter", None),
+    "gunslinger":                ("Gunslinger",   None),
+    "monster hunter":            ("Monster Hunter", None),
+    "pugilist":                  ("Pugilist",     None),
+    # Non-class roles mapped to closest D&D equivalent
+    "senior acquisitions agent": ("Rogue",        "Mastermind"),
+    "inspector":                 ("Rogue",        "Inquisitor"),
+    "information broker":        ("Rogue",        "Mastermind"),
+    "archivist":                 ("Wizard",       "Order of Scribes"),
+    "memory architect":          ("Wizard",       "Diviner"),
+    "contract mediator":         ("Cleric",       "Order Domain"),
+    "field captain":             ("Fighter",      "Battle Master"),
+    "speaker":                   ("Bard",         "College of Eloquence"),
+    "senior blade":              ("Fighter",      "Champion"),
+    "warden":                    ("Fighter",      "Battle Master"),
+    "officer":                   ("Fighter",      "Battle Master"),
+    "compliance officer":        ("Rogue",        "Inquisitor"),
+    "acolyte":                   ("Cleric",       None),
+    "contract scribe":           ("Rogue",        "Mastermind"),
+    "mercenary":                 ("Fighter",      None),
+    "street runner":             ("Rogue",        None),
+    "freelance":                 ("Fighter",      None),
+}
+
+_CLASS_HIT_DIE: dict[str, int] = {
+    "Barbarian":    12,
+    "Fighter":      10,
+    "Paladin":      10,
+    "Ranger":       10,
+    "Blood Hunter": 10,
+    "Cleric":       8,
+    "Druid":        8,
+    "Monk":         8,
+    "Rogue":        8,
+    "Warlock":      8,
+    "Bard":         8,
+    "Artificer":    8,
+    "Gunslinger":   8,
+    "Monster Hunter": 10,
+    "Pugilist":     10,
+    "Wizard":       6,
+    "Sorcerer":     6,
+}
+
+_CLASS_SAVES: dict[str, list[str]] = {
+    "Fighter":      ["STR", "CON"],
+    "Barbarian":    ["STR", "CON"],
+    "Paladin":      ["WIS", "CHA"],
+    "Ranger":       ["STR", "DEX"],
+    "Rogue":        ["DEX", "INT"],
+    "Cleric":       ["WIS", "CHA"],
+    "Druid":        ["INT", "WIS"],
+    "Monk":         ["STR", "DEX"],
+    "Bard":         ["DEX", "CHA"],
+    "Warlock":      ["WIS", "CHA"],
+    "Sorcerer":     ["CON", "CHA"],
+    "Wizard":       ["INT", "WIS"],
+    "Artificer":    ["CON", "INT"],
+    "Blood Hunter": ["DEX", "INT"],
+    "Gunslinger":   ["DEX", "CHA"],
+    "Monster Hunter": ["DEX", "INT"],
+    "Pugilist":     ["STR", "CON"],
+}
+
+# rank keywords → (min_level, max_level)
+# Also searched against role text (via _rank_to_level's combined param)
+_RANK_LEVELS: list[tuple[list[str], tuple[int, int]]] = [
+    (["legendary", "mythic", "demigod"],                                                 (15, 18)),
+    (["grand", "arch", "supreme", "high", "head", "director", "master", "grandmaster",
+      "final authority", "sets strategy", "commands all"],                               (12, 16)),
+    (["leader", "commander", "chief", "matriarch", "patriarch", "widow",
+      "sets contract", "approves mission", "strategic direction"],                       (10, 13)),
+    (["captain", "senior", "sergeant", "veteran", "lieutenant"],                         (7, 10)),
+    (["inspector", "agent", "advocate", "specialist", "broker", "officer"],              (5, 8)),
+    (["member", "associate", "operative", "blade", "warden", "scribe", "mediator",
+      "archivist", "speaker", "runner"],                                                  (4, 6)),
+    (["prospect", "acolyte", "apprentice", "initiate", "novice", "recruit"],            (2, 4)),
+]
+
+_STAT_NAMES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+
+
+def _stat_modifier(score: int) -> int:
+    return (score - 10) // 2
+
+
+def _parse_stat_scores(primary: list, secondary: list) -> dict[str, int]:
+    """Parse CLASS_PROFILES primary/secondary lists into a full {STAT: int} dict."""
+    scores: dict[str, int] = {}
+    pat = re.compile(r"([A-Z]{3})\s+(\d+)")
+    for entry in list(primary) + list(secondary):
+        if isinstance(entry, str):
+            m = pat.search(entry)
+            if m:
+                scores[m.group(1)] = int(m.group(2))
+    for s in _STAT_NAMES:
+        if s not in scores:
+            scores[s] = 10
+    return scores
+
+
+def _rank_to_level(rank_str: str, npc_name: str = "", role_str: str = "") -> int:
+    """Map rank+role text to NPC level. Deterministic per name so gearruns are idempotent."""
+    combined = (rank_str + " " + role_str).lower()
+    for keywords, (lo, hi) in _RANK_LEVELS:
+        if any(kw in combined for kw in keywords):
+            offset = abs(hash(npc_name)) % (hi - lo + 1) if npc_name else 0
+            return lo + offset
+    return 5
+
+
+def _calc_ac(armour_str: str, stats: dict[str, int], dnd_class: str) -> int:
+    """Estimate AC from armour description string."""
+    a = armour_str.lower()
+    dex = _stat_modifier(stats.get("DEX", 10))
+    con = _stat_modifier(stats.get("CON", 10))
+    wis = _stat_modifier(stats.get("WIS", 10))
+    if "plate" in a and "half" not in a:   return 18
+    if "half plate" in a:                  return 15 + min(dex, 2)
+    if "chain mail" in a:                  return 16
+    if "breastplate" in a:                 return 14 + min(dex, 2)
+    if "scale mail" in a:                  return 14
+    if "chain shirt" in a:                 return 13 + min(dex, 2)
+    if "studded leather" in a:             return 12 + min(dex, 2)
+    if "hide" in a:                        return 12 + min(con, 2)
+    if "leather" in a:                     return 11 + dex
+    if "padded" in a:                      return 11 + dex
+    if "no armour" in a or "unarmoured" in a:
+        if dnd_class == "Monk":            return 10 + dex + wis
+        return 13 + dex  # mage armour
+    if any(x in a for x in ("robe", "vestment", "uniform", "coat", "clothing", "none")):
+        return 11 + min(dex, 2)
+    return 12 + min(dex, 2)
+
+
+def _calc_hp(dnd_class: str, level: int, con_score: int) -> int:
+    """Average HP for the given class and level."""
+    die    = _CLASS_HIT_DIE.get(dnd_class, 8)
+    con    = _stat_modifier(con_score)
+    avg    = (die // 2) + 1           # average die result
+    return die + (avg * (level - 1)) + (con * level)
+
+
+def _proficiency_bonus(level: int) -> int:
+    return 2 + (level - 1) // 4
+
+
+def _build_dnd_statblock(class_key: str, class_prof: dict,
+                          rank_str: str, npc_name: str = "",
+                          role_str: str = "") -> dict:
+    """Return a full D&D 5e-compatible stat block dict for an NPC."""
+    dnd_class, subclass = _CLASS_TO_DND.get(class_key, ("Fighter", None))
+    if dnd_class == "Wizard" and any(
+        word in f"{npc_name} {rank_str} {role_str}".lower()
+        for word in ("final authority", "yaulderna", "witch")
+    ):
+        subclass = "Witch"
+    subclass = canonical_subclass_name(dnd_class, subclass or "") or pick_canonical_subclass(
+        dnd_class,
+        f"{npc_name}:{rank_str}:{role_str}:{class_key}",
+    )
+
+    scores  = _parse_stat_scores(
+        class_prof.get("primary",   ["STR 14", "CON 12", "DEX 10"]),
+        class_prof.get("secondary", ["WIS 10", "INT 10", "CHA 10"]),
+    )
+    level   = _rank_to_level(rank_str, npc_name, role_str)
+    armour  = class_prof.get("armour", "leather armour")
+    hp      = _calc_hp(dnd_class, level, scores["CON"])
+    ac      = _calc_ac(armour, scores, dnd_class)
+    prof    = _proficiency_bonus(level)
+    saves   = _CLASS_SAVES.get(dnd_class, ["STR", "CON"])
+
+    return {
+        "class":              dnd_class,
+        "subclass":           subclass,
+        "level":              level,
+        "STR":                scores["STR"],
+        "DEX":                scores["DEX"],
+        "CON":                scores["CON"],
+        "INT":                scores["INT"],
+        "WIS":                scores["WIS"],
+        "CHA":                scores["CHA"],
+        "HP":                 hp,
+        "AC":                 ac,
+        "proficiency_bonus":  prof,
+        "save_proficiencies": saves,
+        "hit_die":            f"d{_CLASS_HIT_DIE.get(dnd_class, 8)}",
+    }
+
+
+async def _generate_npc_profile(npc: dict, force: bool = False) -> dict:
     """Generate a full appearance, stats, equipment, and SD style profile for one NPC."""
     from src.style_agent import FACTION_STYLE_NOTES
 
@@ -430,24 +933,54 @@ async def _generate_npc_profile(npc: dict) -> dict:
     role       = npc.get("role", "")
 
     race_key    = _race_key(species)
-    class_key   = _class_key(rank)
     faction_key = _faction_key(faction)
 
+    # Prefer dnd_class from data (canonical) over role-text inference.
+    # For multiclass (e.g. "Wizard / Rogue"), blend both profiles visually.
+    dnd_class_raw = npc.get("dnd_class") or npc.get("stats", {}).get("class") or ""
+    if dnd_class_raw and "/" in dnd_class_raw:
+        # Multiclass — take primary (left) for equipment, blend style notes
+        parts = [p.strip().lower() for p in dnd_class_raw.split("/")]
+        primary_key   = _class_key(parts[0], "")
+        secondary_key = _class_key(parts[1], "") if len(parts) > 1 else primary_key
+        prof_a = CLASS_PROFILES.get(primary_key,   CLASS_PROFILES["mercenary"])
+        prof_b = CLASS_PROFILES.get(secondary_key, CLASS_PROFILES["mercenary"])
+        class_key  = primary_key
+        class_prof = {
+            **prof_a,
+            # Blend: primary weapons + secondary style flavour
+            "style_note": f"{prof_a['style_note']}; also carries hallmarks of {secondary_key} training — {prof_b['style_note'].split(';')[0].split('—')[-1].strip()}",
+        }
+    elif dnd_class_raw:
+        class_key  = _class_key(dnd_class_raw.lower(), role)
+        class_prof = CLASS_PROFILES.get(class_key, CLASS_PROFILES["mercenary"])
+    else:
+        class_key  = _class_key(rank, role)
+        class_prof = CLASS_PROFILES.get(class_key, CLASS_PROFILES["mercenary"])
+
     race_note    = RACE_PHYSIQUE.get(race_key, RACE_PHYSIQUE["unknown"])
-    class_prof   = CLASS_PROFILES.get(class_key, CLASS_PROFILES["mercenary"])
+    race_sd      = get_race_sd_traits(species)
+    race_guard   = species_visual_guard(species)
     faction_vis  = FACTION_SD_NOTES.get(faction_key, FACTION_SD_NOTES["independent"])
+
+    # Infer gender from pronouns in the appearance text
+    gender_tag = infer_gender_tag(appearance + " " + role)
 
     # Ask Ollama to write the enriched style description
     ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
     ollama_url   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
 
-    prompt = f"""You are writing a visual character profile for an Undercity NPC. 
+    prompt = f"""You are writing a visual character profile for an Undercity NPC.
 The Undercity is a dark sealed fantasy city containing fashion, materials, and people from all devoured worlds.
 Write in the style of a Stable Diffusion image prompt: specific, vivid, tactile, no generic fantasy descriptions.
 
 CHARACTER:
 Name: {name}
-Species: {species} — {race_note}
+Species: {species}
+Gender: {gender_tag or "unknown"}
+Species portrayal rule: {race_guard}
+Species visual reference: {race_sd}
+Build/physique note: {race_note}
 Faction: {faction}
 Role/Rank: {rank}
 Known appearance: {appearance}
@@ -459,7 +992,8 @@ CLASS/ROLE EQUIPMENT: {class_prof['weapons']}, wearing {class_prof['armour']}
 CLASS STYLE NOTE: {class_prof['style_note']}
 
 Write a SINGLE PARAGRAPH (3-4 sentences) describing this NPC as they would appear in a scene.
-Include: build/height from species, skin/hair/eye details, outfit (faction-appropriate), equipment visible on their person, one distinctive visual detail.
+Use the species visual reference to accurately describe their physical form — do not describe exotic races as human.
+Include: build/height, distinctive species features (ears, scales, fur, horns etc.), skin/hair/eye details, outfit (faction-appropriate), equipment visible on their person, one distinctive visual detail.
 Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD prompt phrases."""
 
     sd_description = ""
@@ -473,6 +1007,7 @@ Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD pro
             },
             timeout=90.0,
             caller="npc_appearance",
+            force=force,
         )
 
         if isinstance(data, dict):
@@ -493,7 +1028,13 @@ Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD pro
             f"carrying {class_prof['weapons']}, {faction_vis}"
         )
 
+    # Prepend gender tag if inferred and not already present
+    if gender_tag and gender_tag not in sd_description.lower():
+        sd_description = f"{gender_tag}, {sd_description}"
+
     home_district = _location_to_district_key(npc.get("location", ""))
+
+    dnd_stats = _build_dnd_statblock(class_key, class_prof, rank, name, role)
 
     profile = {
         "name":          name,
@@ -502,11 +1043,7 @@ Output ONLY the paragraph. No names, no preamble, no sign-off. Written as SD pro
         "rank":          rank,
         "role":          class_key,
         "home_district": home_district,
-        "stats":         {
-            "primary":   class_prof["primary"],
-            "secondary": class_prof["secondary"],
-            "hp_range":  class_prof["hp_range"],
-        },
+        "dnd_stats":     dnd_stats,
         "equipment": {
             "weapons":   class_prof["weapons"],
             "armour":    class_prof["armour"],
@@ -632,18 +1169,37 @@ async def generate_all_npc_appearances(force: bool = False) -> dict[str, str]:
             profile = await _generate_npc_profile(npc)
             _save_npc_appearance(name, profile)
             results[name] = profile.get("sd_appearance", "")
-            logger.info(f"✓ Saved profile: {name}")
+
+            # Write dnd_stats back into npcs.data_json so stat block is live
+            dnd = profile.get("dnd_stats")
+            if dnd:
+                try:
+                    npc_row = raw_query("SELECT data_json FROM npcs WHERE name = %s", (name,))
+                    if npc_row:
+                        existing = npc_row[0].get("data_json") or {}
+                        if isinstance(existing, str):
+                            existing = json.loads(existing) if existing else {}
+                        existing["stats"]     = dnd
+                        existing["dnd_class"] = dnd.get("class", "")
+                        existing["level"]     = dnd.get("level", 1)
+                        raw_execute(
+                            "UPDATE npcs SET data_json = %s WHERE name = %s",
+                            (json.dumps(existing, ensure_ascii=False), name),
+                        )
+                except Exception as db_err:
+                    logger.warning(f"⚙ Could not write dnd_stats to npcs for {name}: {db_err}")
+
+            logger.info(
+                f"✓ Saved profile: {name} "
+                f"[{dnd.get('class','?')} {dnd.get('level','?')} | "
+                f"HP {dnd.get('HP','?')} AC {dnd.get('AC','?')}]"
+            )
         except Exception as e:
             logger.error(f"✗ Failed to generate profile for {name}: {e}")
             results[name] = npc.get("appearance", "")
 
         # Small delay to not hammer Ollama
         await asyncio.sleep(2)
-
-    # Also write a flat lookup JSON for quick image prompt access (legacy compatibility)
-    flat_path = NPC_APP_DIR / "_all_sd_prompts.json"
-    flat_path.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"💾 Saved flat SD prompt lookup: {flat_path}")
 
     return results
 
@@ -772,7 +1328,7 @@ def get_npc_home_district(name: str) -> str:
     return ""
 
 
-def find_npc_in_text(text: str) -> list[tuple[str, str, str]]:
+def find_npc_in_text(text: str, exact_only: bool = False) -> list[tuple[str, str, str]]:
     """
     Scan text for NPC names.
     Returns list of (name, sd_prompt, home_district_key) for every NPC found.
@@ -782,8 +1338,10 @@ def find_npc_in_text(text: str) -> list[tuple[str, str, str]]:
     found = []
     text_lower = text.lower()
     for name, prompt in sd_prompts.items():
+        full_name_hit = re.search(rf"(?<!\w){re.escape(name.lower())}(?!\w)", text_lower) is not None
         first = name.split()[0].lower()
-        if name.lower() in text_lower or first in text_lower:
+        first_name_hit = bool(first) and re.search(rf"(?<!\w){re.escape(first)}(?!\w)", text_lower) is not None
+        if full_name_hit or (first_name_hit and not exact_only):
             home = get_npc_home_district(name)
             found.append((name, prompt, home))
     return found

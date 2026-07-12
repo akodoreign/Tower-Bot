@@ -88,33 +88,52 @@ def _load_listings() -> List[Dict]:
     """Load all listings from database."""
     try:
         rows = raw_query("SELECT * FROM player_listings ORDER BY created_at DESC")
-        listings = []
-        for row in rows:
-            # Try to get full listing from listing_json, fall back to row data
-            listing_data = row.get("listing_json")
-            if listing_data:
-                if isinstance(listing_data, str):
-                    listing = json.loads(listing_data)
-                else:
-                    listing = listing_data
-            else:
-                # Construct from row columns
-                listing = {
-                    "id": f"pl_{row.get('id')}",
-                    "player_id": int(row.get("player_id", 0)) if row.get("player_id") else 0,
-                    "player_name": row.get("player_name", ""),
-                    "item_name": row.get("item_name", ""),
-                    "min_bid": row.get("asking_price", 0),
-                    "current_bid": row.get("asking_price", 0),
-                    "status": row.get("status", "active"),
-                    "listed_at": row.get("created_at").isoformat() if row.get("created_at") else datetime.now().isoformat(),
-                    "expires_at": (row.get("created_at") + timedelta(days=AUCTION_DAYS)).isoformat() if row.get("created_at") else (datetime.now() + timedelta(days=AUCTION_DAYS)).isoformat(),
-                }
-            listings.append(listing)
-        return listings
+        return [_listing_from_row(row) for row in rows]
     except Exception as e:
         logger.error(f"PlayerListings load error: {e}")
         return []
+
+
+def _listing_from_row(row: Dict) -> Dict:
+    """Build a listing dict from a DB row, with DB columns as live truth."""
+    listing_data = row.get("listing_json")
+    if listing_data:
+        if isinstance(listing_data, str):
+            try:
+                listing = json.loads(listing_data)
+            except Exception:
+                listing = {}
+        else:
+            listing = dict(listing_data)
+    else:
+        listing = {}
+
+    created_at = row.get("created_at")
+    listed_at = created_at.isoformat() if created_at else datetime.now().isoformat()
+    expires_at = (
+        (created_at + timedelta(days=AUCTION_DAYS)).isoformat()
+        if created_at else (datetime.now() + timedelta(days=AUCTION_DAYS)).isoformat()
+    )
+    listing.update({
+        "id": f"pl_{row.get('id')}",
+        "player_id": int(row.get("player_id", 0)) if row.get("player_id") else listing.get("player_id", 0),
+        "player_name": row.get("player_name", listing.get("player_name", "")),
+        "item_name": row.get("item_name", listing.get("item_name", "")),
+        "min_bid": listing.get("min_bid", row.get("asking_price", 0)),
+        "current_bid": row.get("asking_price", listing.get("current_bid", 0)),
+        "status": row.get("status", listing.get("status", "active")),
+        "listed_at": listing.get("listed_at", listed_at),
+        "expires_at": listing.get("expires_at", expires_at),
+        "buy_now_price": row.get("buy_now_price") if row.get("buy_now_price") is not None else listing.get("buy_now_price"),
+        "highest_bidder_id": row.get("highest_bidder_id") if row.get("highest_bidder_id") is not None else listing.get("highest_bidder_id"),
+        "highest_bidder_name": row.get("highest_bidder_name") if row.get("highest_bidder_name") is not None else listing.get("highest_bidder_name"),
+        "proxy_max": row.get("proxy_max") if row.get("proxy_max") is not None else listing.get("proxy_max"),
+    })
+    listing.setdefault("description", listing.get("item_name", ""))
+    listing.setdefault("bid_count", 0)
+    listing.setdefault("bid_log", [])
+    listing.setdefault("last_bidder", "")
+    return listing
 
 
 def _save_listing(listing: Dict) -> None:
@@ -157,6 +176,13 @@ def _save_listing(listing: Dict) -> None:
                 "listing_json": listing_json,
             })
             listing["id"] = f"pl_{new_id}"
+            # Write back corrected JSON so the real DB id is stored.
+            # Without this, every future _load_listings() call gets the old
+            # timestamp-based id, fails the id lookup, and inserts a duplicate.
+            raw_execute(
+                "UPDATE player_listings SET listing_json=%s WHERE id=%s",
+                (json.dumps(listing, ensure_ascii=False, default=str), new_id),
+            )
     except Exception as e:
         logger.error(f"PlayerListings save error: {e}")
 
@@ -167,9 +193,89 @@ def _save_listings(listings: List[Dict]) -> None:
         _save_listing(listing)
 
 
+def _prune_completed_listings(max_rows: int = 500, max_age_days: int = 30) -> int:
+    """
+    Delete old completed (sold/unsold/retired) rows to keep the table lean.
+    Keeps whichever limit is stricter — rows older than max_age_days OR
+    anything beyond the newest max_rows completed rows, whichever removes more.
+    Never touches active or pending_dm rows.
+    Returns the number of rows deleted.
+    """
+    try:
+        deleted = 0
+        while True:
+            batch_deleted = raw_execute(
+                """
+                DELETE FROM player_listings
+                WHERE status IN ('sold', 'unsold', 'retired')
+                  AND created_at < DATE_SUB(NOW(), INTERVAL %s DAY)
+                ORDER BY id ASC
+                LIMIT 500
+                """,
+                (max_age_days,),
+            ) or 0
+            deleted += batch_deleted
+            if batch_deleted < 500:
+                break
+
+        count_rows = raw_query(
+            "SELECT COUNT(*) AS n FROM player_listings WHERE status IN ('sold','unsold','retired')"
+        )
+        total = int((count_rows or [{}])[0].get("n") or 0)
+        overflow = max(0, total - max_rows)
+        while overflow > 0:
+            batch_limit = min(500, overflow)
+            batch_deleted = raw_execute(
+                """
+                DELETE FROM player_listings
+                WHERE status IN ('sold', 'unsold', 'retired')
+                ORDER BY id ASC
+                LIMIT %s
+                """,
+                (batch_limit,),
+            ) or 0
+            deleted += batch_deleted
+            if batch_deleted <= 0:
+                break
+            overflow -= batch_deleted
+
+        if deleted:
+            logger.info("🧹 player_listings pruned %d completed rows", deleted)
+        return deleted
+    except Exception as exc:
+        logger.warning("player_listings prune failed: %s", exc)
+        return 0
+
+
 # ---------------------------------------------------------------------------
 # Tick — called every bulletin cycle (from tower_economy.tick_towerbay)
 # ---------------------------------------------------------------------------
+
+def _load_active_listings() -> List[Dict]:
+    """Load only active listings — avoids touching sold/unsold rows on every tick."""
+    try:
+        rows = raw_query("SELECT * FROM player_listings WHERE status='active' ORDER BY created_at DESC")
+        return [_listing_from_row(row) for row in rows]
+    except Exception as e:
+        logger.error(f"PlayerListings load_active error: {e}")
+        return []
+
+
+def _load_active_listing(listing_id: str) -> Optional[Dict]:
+    """Load one active listing by public id such as pl_123."""
+    try:
+        if not listing_id.startswith("pl_"):
+            return None
+        db_id = int(listing_id[3:])
+        rows = raw_query(
+            "SELECT * FROM player_listings WHERE id=%s AND status='active' LIMIT 1",
+            (db_id,),
+        ) or []
+        return _listing_from_row(rows[0]) if rows else None
+    except Exception as e:
+        logger.error(f"PlayerListings load_one error: {e}")
+        return None
+
 
 def tick_player_listings() -> List[Dict]:
     """
@@ -179,13 +285,12 @@ def tick_player_listings() -> List[Dict]:
     - Expired listings: marked sold (normal) or unsold (frozen).
     Returns list of listings that JUST closed this tick (sold or unsold).
     """
-    listings = _load_listings()
+    listings = _load_active_listings()
     now      = datetime.now()
     sold_now = []
+    changed  = []
 
     for item in listings:
-        if item.get("status") != "active":
-            continue
 
         try:
             expires = datetime.fromisoformat(item["expires_at"])
@@ -197,11 +302,11 @@ def tick_player_listings() -> List[Dict]:
         # --- EXPIRED ---
         if now >= expires:
             if frozen:
-                # Frozen = overpriced, no interest — closes unsold
                 item["status"]      = "unsold"
                 item["sold_at"]     = now.isoformat()
                 item["final_price"] = None
                 sold_now.append(item)
+                changed.append(item)
                 logger.info(
                     f"🏪 Player listing unsold (frozen): {item['item_name']} "
                     f"(player: {item['player_name']})"
@@ -209,38 +314,32 @@ def tick_player_listings() -> List[Dict]:
             else:
                 item["status"]  = "sold"
                 item["sold_at"] = now.isoformat()
-                # Final price: current bid + small bump (3-10%)
                 final = int(item["current_bid"] * random.uniform(1.03, 1.10))
                 item["final_price"] = final
                 item["current_bid"] = final
                 sold_now.append(item)
+                changed.append(item)
                 logger.info(
                     f"🏪 Player listing sold: {item['item_name']} "
                     f"→ {final:,} EC (player: {item['player_name']})"
                 )
             continue
 
-        # --- SKIP PHANTOM BIDDING FOR FROZEN LISTINGS ---
         if frozen:
             continue
 
-        # --- HOT PHASE CHECK ---
         days_elapsed = (now - datetime.fromisoformat(item["listed_at"])).days
         in_hot_phase = days_elapsed >= HOT_PHASE_START_DAY
-
-        # Base bid probability
         bid_chance = 0.40 if in_hot_phase else 0.15
 
         if random.random() > bid_chance:
             continue
 
-        # Pick a phantom bidder (never repeat the last one)
         last_bidder = item.get("last_bidder", "")
         pool = [b for b in _PHANTOM_BIDDERS if b != last_bidder]
         bidder = random.choice(pool)
 
         if in_hot_phase:
-            # Hot phase — multiple escalating bids possible on one tick
             bid_rounds = random.choices([1, 2, 3], weights=[0.50, 0.35, 0.15])[0]
             for _ in range(bid_rounds):
                 increment = random.uniform(0.05, 0.18)
@@ -255,7 +354,6 @@ def tick_player_listings() -> List[Dict]:
                 })
                 bidder = bidder2
         else:
-            # Normal phase — single quiet bid
             increment = random.uniform(0.03, 0.09)
             item["current_bid"] = int(item["current_bid"] * (1 + increment))
             item["bid_count"]  += 1
@@ -267,14 +365,140 @@ def tick_player_listings() -> List[Dict]:
             })
 
         item["last_bidder"] = bidder
+        changed.append(item)
 
-    _save_listings(listings)
+    _save_listings(changed)
+    _prune_completed_listings()
     return sold_now
 
 
 # ---------------------------------------------------------------------------
 # Create a listing (called after DM decision)
 # ---------------------------------------------------------------------------
+
+def place_bid_on_player_listing(
+    listing_id: str,
+    bidder_id: int,
+    bidder_name: str,
+    amount: int,
+    proxy_max: Optional[int] = None,
+) -> Dict:
+    """
+    Place a real player bid on a player-submitted listing.
+    Returns same shape as tower_economy.place_bid().
+    """
+    from src.tower_economy import _log_bid
+
+    item = _load_active_listing(listing_id)
+
+    if not item:
+        return {"success": False, "message": "That listing doesn't exist or has already closed.", "outbid_user": None}
+
+    if item.get("player_id") == bidder_id:
+        return {"success": False, "message": "You can't bid on your own listing.", "outbid_user": None}
+
+    current_bid = int(item.get("current_bid", item.get("min_bid", 0)))
+    curr_holder = item.get("highest_bidder_id")
+    curr_proxy  = item.get("proxy_max")
+    item_name   = item.get("item_name", "Unknown")
+
+    if curr_holder and curr_holder == bidder_id:
+        if proxy_max and proxy_max > (curr_proxy or 0):
+            item["proxy_max"] = proxy_max
+            _save_listing(item)
+            return {
+                "success": True,
+                "message": f"Your max auto-bid updated to **{proxy_max:,} EC**.",
+                "outbid_user": None,
+                "new_price": current_bid,
+                "item_name": item_name,
+            }
+        return {"success": False, "message": "You're already the highest bidder!", "outbid_user": None}
+
+    min_bid = max(current_bid + 500, int(current_bid * 1.05))
+    if amount < min_bid:
+        return {
+            "success": False,
+            "message": f"Minimum bid is **{min_bid:,} EC** (5% above current {current_bid:,} EC).",
+            "outbid_user": None,
+        }
+
+    # Existing proxy counters
+    if curr_holder and curr_proxy and curr_proxy >= amount:
+        counter = min(int(amount * 1.05), curr_proxy)
+        item["current_bid"] = counter
+        _save_listing(item)
+        _log_bid(listing_id, "player", bidder_id, bidder_name, amount, False)
+        return {
+            "success": False,
+            "message": f"A proxy bid countered yours. Current bid is now **{counter:,} EC**.",
+            "outbid_user": None,
+            "new_price": counter,
+        }
+
+    outbid_user = None
+    if curr_holder:
+        outbid_user = {"id": curr_holder, "name": item.get("highest_bidder_name") or "Unknown"}
+
+    item["current_bid"]         = amount
+    item["bid_count"]           = item.get("bid_count", 0) + 1
+    item["highest_bidder_id"]   = bidder_id
+    item["highest_bidder_name"] = bidder_name
+    item["proxy_max"]           = proxy_max
+    item.setdefault("bid_log", []).append({
+        "bidder": bidder_name, "amount": amount,
+        "at": datetime.now().isoformat(), "real": True,
+    })
+    _save_listing(item)
+    _log_bid(listing_id, "player", bidder_id, bidder_name, amount, True, proxy_max)
+    logger.info(f"🏪 Real bid on player listing: {bidder_name} → {listing_id} at {amount:,} EC")
+
+    return {
+        "success":     True,
+        "message":     f"Bid placed: **{amount:,} EC** on *{item_name}*.",
+        "outbid_user": outbid_user,
+        "new_price":   amount,
+        "item_name":   item_name,
+    }
+
+
+def buy_now_player_listing(listing_id: str, buyer_id: int, buyer_name: str) -> Dict:
+    """Instantly purchase a player listing at its buy_now_price."""
+    from src.tower_economy import _log_bid
+
+    item = _load_active_listing(listing_id)
+
+    if not item:
+        return {"success": False, "message": "That listing doesn't exist or has already closed."}
+
+    buy_now_price = item.get("buy_now_price")
+    if not buy_now_price:
+        return {"success": False, "message": "This listing doesn't have a Buy Now price."}
+
+    if item.get("player_id") == buyer_id:
+        return {"success": False, "message": "You can't buy your own listing."}
+
+    item_name = item.get("item_name", "Unknown")
+    outbid_user = None
+    if item.get("highest_bidder_id"):
+        outbid_user = {"id": item["highest_bidder_id"], "name": item.get("highest_bidder_name") or "Unknown"}
+
+    item["status"]      = "sold"
+    item["sold_at"]     = datetime.now().isoformat()
+    item["final_price"] = buy_now_price
+    item["current_bid"] = buy_now_price
+    _save_listing(item)
+    _log_bid(listing_id, "player", buyer_id, buyer_name, buy_now_price, True)
+    logger.info(f"🏪 Buy Now (player listing): {buyer_name} → {listing_id} *{item_name}* at {buy_now_price:,} EC")
+
+    return {
+        "success":     True,
+        "message":     f"You bought *{item_name}* for **{buy_now_price:,} EC**!",
+        "price":       buy_now_price,
+        "item_name":   item_name,
+        "outbid_user": outbid_user,
+    }
+
 
 def create_listing(
     player_id: int,
@@ -283,6 +507,7 @@ def create_listing(
     description: str,
     min_bid: int,
     frozen: bool = False,
+    buy_now_price: Optional[int] = None,
 ) -> Dict:
     """Create and save a new active listing. Returns the listing dict.
     frozen=True: lists publicly for 7 days but gets no phantom bids and closes as unsold."""
@@ -298,13 +523,17 @@ def create_listing(
         "current_bid":  min_bid,
         "bid_count":    0,
         "bid_log":      [],
-        "last_bidder":  "",
-        "listed_at":    now.isoformat(),
-        "expires_at":   (now + timedelta(days=AUCTION_DAYS)).isoformat(),
-        "status":       "active",
-        "frozen":       frozen,
-        "final_price":  None,
-        "sold_at":      None,
+        "last_bidder":        "",
+        "listed_at":          now.isoformat(),
+        "expires_at":         (now + timedelta(days=AUCTION_DAYS)).isoformat(),
+        "status":             "active",
+        "frozen":             frozen,
+        "buy_now_price":      buy_now_price,
+        "highest_bidder_id":  None,
+        "highest_bidder_name": None,
+        "proxy_max":          None,
+        "final_price":        None,
+        "sold_at":            None,
     }
 
     _save_listing(listing)
@@ -349,8 +578,7 @@ def _hot_indicator(item: Dict) -> str:
 
 def format_player_listings_embed() -> Optional[discord.Embed]:
     """Returns a Discord embed showing all active player listings, or None if empty."""
-    listings = _load_listings()
-    active   = [l for l in listings if l.get("status") == "active"]
+    active = _load_active_listings()
 
     if not active:
         return None
@@ -441,12 +669,14 @@ class _ListingApprovalView(discord.ui.View):
         description: str,
         min_bid: int,
         player_channel: discord.TextChannel,
+        buy_now_price: Optional[int] = None,
     ):
         super().__init__(timeout=48 * 3600)
         self.player         = player
         self.item_name      = item_name
         self.description    = description
         self.min_bid        = min_bid
+        self.buy_now_price  = buy_now_price
         self.player_channel = player_channel
         self.decided        = False
 
@@ -459,23 +689,26 @@ class _ListingApprovalView(discord.ui.View):
         self.disable_all_items()
 
         create_listing(
-            player_id   = self.player.id,
-            player_name = self.player.display_name,
-            item_name   = self.item_name,
-            description = self.description,
-            min_bid     = self.min_bid,
-            frozen      = False,
+            player_id     = self.player.id,
+            player_name   = self.player.display_name,
+            item_name     = self.item_name,
+            description   = self.description,
+            min_bid       = self.min_bid,
+            frozen        = False,
+            buy_now_price = self.buy_now_price,
         )
 
+        buy_now_note = f" (Buy Now: {self.buy_now_price:,} EC)" if self.buy_now_price else ""
         await interaction.response.edit_message(
-            content=f"✅ **Approved** — *{self.item_name}* is now live on TowerBay.",
+            content=f"✅ **Approved** — *{self.item_name}* is now live on TowerBay.{buy_now_note}",
             view=self,
         )
 
         try:
+            bn = f" · Buy Now: **{self.buy_now_price:,} EC**" if self.buy_now_price else ""
             await self.player_channel.send(
                 f"{self.player.mention} Your listing **{self.item_name}** "
-                f"is now live on TowerBay for **{self.min_bid:,} EC** minimum bid! "
+                f"is now live on TowerBay for **{self.min_bid:,} EC** minimum bid{bn}! "
                 f"The auction runs for 7 days. ⚔️ *Don't forget to remove it from your character sheet.*"
             )
         except Exception as e:
@@ -541,6 +774,12 @@ class _TowerBayModal(discord.ui.Modal, title="TowerBay — List an Item"):
         max_length=12,
         required=True,
     )
+    buy_now_str = discord.ui.TextInput(
+        label="Buy Now price (EC) — optional",
+        placeholder="Leave blank for auction only. e.g. 25000",
+        max_length=12,
+        required=False,
+    )
 
     def __init__(self, dm_user_id: int):
         super().__init__()
@@ -559,12 +798,27 @@ class _TowerBayModal(discord.ui.Modal, title="TowerBay — List an Item"):
             )
             return
 
+        buy_now_price = None
+        raw_bn = self.buy_now_str.value.strip().replace(",", "").replace(" ", "")
+        if raw_bn:
+            try:
+                buy_now_price = int(raw_bn)
+                if buy_now_price <= min_bid:
+                    await interaction.response.send_message(
+                        "❌ Buy Now price must be higher than your minimum bid.",
+                        ephemeral=True,
+                    )
+                    return
+            except ValueError:
+                buy_now_price = None  # ignore bad input
+
         details = self.item_details.value.strip()
         name = details.splitlines()[0][:80].strip()
         desc = details
 
+        bn_note = f" · Buy Now at **{buy_now_price:,} EC**" if buy_now_price else ""
         await interaction.response.send_message(
-            f"📬 Submitted for DM review at **{min_bid:,} EC** minimum.\n"
+            f"📬 Submitted for DM review at **{min_bid:,} EC** minimum{bn_note}.\n"
             f"⚠️ **Remember to remove this item from your D&D Beyond character sheet** "
             f"before next session once it's approved.\n"
             f"You'll be notified here when the DM makes a decision.",
@@ -575,17 +829,20 @@ class _TowerBayModal(discord.ui.Modal, title="TowerBay — List an Item"):
             title=f"🏪 TowerBay Listing — {interaction.user.display_name}",
             color=discord.Color.blurple(),
         )
-        approval_embed.add_field(name="Player", value=interaction.user.display_name, inline=True)
-        approval_embed.add_field(name="Min bid", value=f"{min_bid:,} EC", inline=True)
+        approval_embed.add_field(name="Player",    value=interaction.user.display_name,     inline=True)
+        approval_embed.add_field(name="Min bid",   value=f"{min_bid:,} EC",                 inline=True)
+        if buy_now_price:
+            approval_embed.add_field(name="Buy Now", value=f"{buy_now_price:,} EC",         inline=True)
         approval_embed.add_field(name="Item details", value=desc, inline=False)
         approval_embed.set_footer(text="✅ List it = full auction  |  ❌ Too Much = lists frozen, closes unsold")
 
         view = _ListingApprovalView(
-            player=interaction.user,
-            item_name=name,
-            description=desc,
-            min_bid=min_bid,
-            player_channel=interaction.channel,
+            player         = interaction.user,
+            item_name      = name,
+            description    = desc,
+            min_bid        = min_bid,
+            player_channel = interaction.channel,
+            buy_now_price  = buy_now_price,
         )
 
         try:

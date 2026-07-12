@@ -11,7 +11,7 @@ Uses Qwen running locally via Ollama for zero-cost, low-latency inference.
 No cloud tokens, no rate limits, instant responses.
 
 Configuration via environment variables:
-    QWEN_MODEL: Model name (default: "qwen")
+    QWEN_MODEL: Model name (default: "qwen3-8b-slim:latest")
     OLLAMA_URL: Base URL (default: "http://localhost:11434")
 """
 
@@ -43,14 +43,7 @@ class QwenAgent(BaseAgent):
     def _get_config(self) -> AgentConfig:
         """Return Qwen-specific configuration."""
         model = os.getenv("QWEN_MODEL", "qwen3-8b-slim:latest")
-        base_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
-        
-        # Ensure we're using the v1 API endpoint
-        if not base_url.endswith("/v1"):
-            if base_url.endswith("/api/chat"):
-                base_url = base_url.replace("/api/chat", "/v1")
-            else:
-                base_url = f"{base_url.rstrip('/')}/v1"
+        base_url = os.getenv("OLLAMA_URL", "http://localhost:11434").split("/api")[0].split("/v1")[0].rstrip("/")
         
         return AgentConfig(
             model_name=model,

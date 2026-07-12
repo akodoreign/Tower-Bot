@@ -31,7 +31,7 @@ from .mission_json_builder import (
     create_mission_module,
 )
 from .schemas import validate_mission_module
-from .encounters import get_cr, get_max_pc_level
+from .encounters import get_cr, get_max_pc_level, get_party_size
 from .mission_types import (
     get_mission_type,
     map_difficulty_to_tier,
@@ -184,17 +184,30 @@ def set_use_skills(enabled: bool) -> None:
     logger.info(f"Skills usage: {'enabled' if enabled else 'disabled'}")
 
 
-async def _get_system_prompt_with_skills() -> str:
-    """Get system prompt enhanced with creative writing skills."""
+async def _get_system_prompt_with_skills(mission_type: str = "") -> str:
+    """Get system prompt enhanced with mission type context and creative writing skills.
+
+    The mission type block is prepended so the 'author' knows exactly what kind
+    of story they are writing before generating any content — who, what, why,
+    where, how, combat intensity, roleplay intensity, act structure.
+    """
+    base = SYSTEM_PROMPT
+
+    # Inject mission type knowledge so the author writes the right kind of story
+    if mission_type:
+        type_context = _get_system_prompt_for_mission_type(mission_type)
+        if type_context:
+            base = base + "\n\n" + type_context.strip()
+
     if not _USE_SKILLS:
-        return SYSTEM_PROMPT
+        return base
 
     try:
         from src.skills import load_all_skills, build_system_prompt_with_skills
 
         skills = load_all_skills()
         enhanced = build_system_prompt_with_skills(
-            SYSTEM_PROMPT,
+            base,
             "mission generation",
             skills,
             use_multiple=True,
@@ -204,7 +217,7 @@ async def _get_system_prompt_with_skills() -> str:
 
     except Exception as e:
         logger.warning(f"Failed to load skills, using base prompt: {e}")
-        return SYSTEM_PROMPT
+        return base
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -213,14 +226,14 @@ async def _get_system_prompt_with_skills() -> str:
 
 async def _gen_overview(ctx: Dict) -> str:
     """Generate module overview."""
-    system_prompt = await _get_system_prompt_with_skills()
+    system_prompt = await _get_system_prompt_with_skills(ctx.get("mission_type", ""))
     
     prompt = f"""Create a DM-facing module overview for this D&D 5e 2024 mission.
 
 MISSION: {ctx['title']}
 FACTION: {ctx['faction']}
 TIER: {ctx['tier']} (Challenge Rating: {ctx['cr']})
-PARTY INFO: Highest PC level is {ctx['max_pc_level']}. Design for a party of 4.
+PARTY INFO: {ctx['party_size']} active players, highest PC level is {ctx['max_pc_level']}. Design all encounters for CR {ctx['cr']}.
 MISSION DETAILS: {ctx['body']}
 
 Write the following sections:
@@ -241,7 +254,7 @@ Output ONLY the sections above. Use markdown format."""
 
 async def _gen_acts_1_2(ctx: Dict, overview: str) -> str:
     """Generate Acts 1-2: Briefing and Investigation."""
-    system_prompt = await _get_system_prompt_with_skills()
+    system_prompt = await _get_system_prompt_with_skills(ctx.get("mission_type", ""))
     
     prompt = f"""Continue building the D&D 5e 2024 module for: {ctx['title']}
 CR: {ctx['cr']} | Tier: {ctx['tier']} | Faction: {ctx['faction']}
@@ -279,8 +292,8 @@ Output ONLY Acts 1 and 2."""
 
 async def _gen_acts_3_4(ctx: Dict, overview: str) -> str:
     """Generate Acts 3-4: Complication and Confrontation."""
-    system_prompt = await _get_system_prompt_with_skills()
-    
+    system_prompt = await _get_system_prompt_with_skills(ctx.get("mission_type", ""))
+
     prompt = f"""Continue building the D&D 5e 2024 module for: {ctx['title']}
 CR: {ctx['cr']} | Tier: {ctx['tier']} | Faction: {ctx['faction']}
 
@@ -317,13 +330,12 @@ How can clever players avoid or shortcut this fight?
 
 Output ONLY Acts 3 and 4."""
 
-    system_prompt = await _get_system_prompt_with_skills()
     return await _ollama_generate(prompt, system=system_prompt, timeout=240.0)
 
 
 async def _gen_act_5_rewards(ctx: Dict, overview: str) -> str:
     """Generate Act 5: Resolution and Rewards."""
-    system_prompt = await _get_system_prompt_with_skills()
+    system_prompt = await _get_system_prompt_with_skills(ctx.get("mission_type", ""))
     
     prompt = f"""Continue building the D&D 5e 2024 module for: {ctx['title']}
 CR: {ctx['cr']} | Tier: {ctx['tier']} | Faction: {ctx['faction']}
@@ -384,12 +396,12 @@ async def generate_module_json(
     faction = mission.get("faction", "Unknown")
     tier = mission.get("tier", "standard")
     mission_type = mission.get("type", mission.get("mission_type", tier))
-    difficulty_rating = mission.get("difficulty_rating", 5)  # Default: Challenging
+    difficulty = mission.get("difficulty", 5)  # Default: Challenging
     
     logger.info(f"📋 ════════════════════════════════════════")
     logger.info(f"📋 JSON MODULE GENERATION STARTED")
     logger.info(f"📋   Mission: {title}")
-    logger.info(f"📋   Type: {mission_type} | Difficulty: {get_difficulty_description(difficulty_rating)}")
+    logger.info(f"📋   Type: {mission_type} | Difficulty: {get_difficulty_description(difficulty)}")
     logger.info(f"📋   Faction: {faction} | Tier: {tier}")
     logger.info(f"📋   Player: {player_name}")
     logger.info(f"📋 ════════════════════════════════════════")
@@ -408,7 +420,7 @@ async def generate_module_json(
             title=title,
             mission_type=mission_type,
             faction=faction,
-            difficulty=difficulty_rating,
+            difficulty=difficulty,
         )
         logger.info(f"📋   Updated title: {title}")
     except Exception as e:
@@ -417,7 +429,7 @@ async def generate_module_json(
     
     # Add mission type context to generation
     ctx["mission_type"] = mission_type
-    ctx["difficulty_rating"] = difficulty_rating
+    ctx["difficulty"] = difficulty
     ctx["title"] = title  # Use enhanced title
     
     # Build forbidden names list
@@ -430,7 +442,7 @@ async def generate_module_json(
     t = datetime.now()
     overview = await _gen_overview(ctx)
     elapsed = (datetime.now() - t).total_seconds()
-    logger.info(f"📋 │   {len(overview.split()) if overview else 0} words in {elapsed:.0f}s")
+    logger.info(f"📋 |{len(overview.split()) if overview else 0} words in {elapsed:.0f}s")
     
     if not overview:
         logger.error("📋 └─ Overview generation failed — aborting")
@@ -443,7 +455,7 @@ async def generate_module_json(
     t = datetime.now()
     acts_1_2 = await _gen_acts_1_2(ctx, overview)
     elapsed = (datetime.now() - t).total_seconds()
-    logger.info(f"📋 │   {len(acts_1_2.split()) if acts_1_2 else 0} words in {elapsed:.0f}s")
+    logger.info(f"📋 |{len(acts_1_2.split()) if acts_1_2 else 0} words in {elapsed:.0f}s")
     
     acts_1_2 = _post_process_module_text(acts_1_2, forbidden_names)
     
@@ -452,7 +464,7 @@ async def generate_module_json(
     t = datetime.now()
     acts_3_4 = await _gen_acts_3_4(ctx, overview)
     elapsed = (datetime.now() - t).total_seconds()
-    logger.info(f"📋 │   {len(acts_3_4.split()) if acts_3_4 else 0} words in {elapsed:.0f}s")
+    logger.info(f"📋 |{len(acts_3_4.split()) if acts_3_4 else 0} words in {elapsed:.0f}s")
     
     acts_3_4 = _post_process_module_text(acts_3_4, forbidden_names)
     
@@ -461,7 +473,7 @@ async def generate_module_json(
     t = datetime.now()
     act_5_rewards = await _gen_act_5_rewards(ctx, overview)
     elapsed = (datetime.now() - t).total_seconds()
-    logger.info(f"📋 │   {len(act_5_rewards.split()) if act_5_rewards else 0} words in {elapsed:.0f}s")
+    logger.info(f"📋 |{len(act_5_rewards.split()) if act_5_rewards else 0} words in {elapsed:.0f}s")
     
     act_5_rewards = _post_process_module_text(act_5_rewards, forbidden_names)
     
@@ -477,12 +489,12 @@ async def generate_module_json(
         cr=ctx['cr'],
         party_level=ctx['max_pc_level'],
         player_name=player_name,
-        player_count=4,
+        player_count=ctx.get('party_size', 4),
     )
     
     # Add difficulty rating to metadata
     builder.set_metadata(
-        difficulty_rating=difficulty_rating,
+        difficulty=difficulty,
         mission_type=mission_type,
     )
     

@@ -37,8 +37,12 @@ Write-Host "  Done." -ForegroundColor Green
 # 2. START OLLAMA
 # ------------------------------------------
 Write-Host "[2/6] Starting Ollama..." -ForegroundColor Yellow
-$env:OLLAMA_NUM_CTX = "8192"
-[System.Environment]::SetEnvironmentVariable("OLLAMA_NUM_CTX", "8192", "User")
+# OLLAMA_FLASH_ATTENTION and OLLAMA_KEEP_ALIVE are real Ollama server env vars.
+# OLLAMA_NUM_CTX / OLLAMA_NUM_GPU are passed per-request in options{}, not server env vars.
+$env:OLLAMA_FLASH_ATTENTION = "1"
+$env:OLLAMA_KEEP_ALIVE = "30m"
+[System.Environment]::SetEnvironmentVariable("OLLAMA_FLASH_ATTENTION", "1", "User")
+[System.Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "30m", "User")
 Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
 Start-Sleep 5
 
@@ -52,13 +56,18 @@ try {
 }
 
 # ------------------------------------------
-# 3. WARM UP MISTRAL (force GPU load with 8K context)
+# 3. WARM UP QWEN3 (force GPU load with 32K context, uses all VRAM via ZBAR)
 # ------------------------------------------
-Write-Host "[3/6] Loading Mistral onto GPU..." -ForegroundColor Yellow
-$body = @{model="mistral-8k"; messages=@(@{role="user"; content="hi"}); stream=$false} | ConvertTo-Json
+Write-Host "[3/6] Loading qwen3:8b onto GPU (32K ctx, ZBAR extended VRAM)..." -ForegroundColor Yellow
+$body = @{
+    model="qwen3:8b"
+    messages=@(@{role="user"; content="hi"})
+    stream=$false
+    options=@{num_gpu=99; num_ctx=32768; num_predict=8}
+} | ConvertTo-Json -Depth 5
 try {
     Invoke-RestMethod -Uri "http://localhost:11434/api/chat" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 120 | Out-Null
-    Write-Host "  Mistral loaded." -ForegroundColor Green
+    Write-Host "  qwen3:8b loaded onto GPU." -ForegroundColor Green
 } catch {
     Write-Host "  Warmup timed out — will load on first use." -ForegroundColor Yellow
 }
@@ -112,15 +121,34 @@ if (-not $a1111Already) {
 # ------------------------------------------
 # 5. START THE BOT
 # ------------------------------------------
-Write-Host "[5/6] Starting Tower Bot..." -ForegroundColor Yellow
+Write-Host "[5/7] Starting Tower Bot..." -ForegroundColor Yellow
 Set-Location $BotDir
 Start-Process "python" -ArgumentList "main.py" -RedirectStandardError "$LogDir\bot_stderr.log"
 Start-Sleep 3
 
 # ------------------------------------------
-# 6. VERIFY EVERYTHING
+# 6. START DASHBOARD (Flask)
 # ------------------------------------------
-Write-Host "[6/6] Verifying..." -ForegroundColor Yellow
+# Ensure firewall allows port 5000 inbound
+$fwRule = Get-NetFirewallRule -DisplayName "Tower Dashboard" -ErrorAction SilentlyContinue
+if (-not $fwRule) {
+    New-NetFirewallRule -DisplayName "Tower Dashboard" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5000 | Out-Null
+    Write-Host "  Firewall: port 5000 opened." -ForegroundColor Green
+}
+Write-Host "[6/7] Starting Mission Dashboard..." -ForegroundColor Yellow
+Start-Process "python" -ArgumentList "-m flask --app Webpage/app.py run --host 0.0.0.0 --port 5000" -WorkingDirectory $BotDir -RedirectStandardError "$LogDir\dashboard_stderr.log" -WindowStyle Hidden
+Start-Sleep 2
+try {
+    Invoke-RestMethod -Uri "http://localhost:5000/api/status" -TimeoutSec 5 | Out-Null
+    Write-Host "  Dashboard: RUNNING at http://localhost:5000" -ForegroundColor Green
+} catch {
+    Write-Host "  Dashboard: starting (check logs\dashboard_stderr.log)" -ForegroundColor Yellow
+}
+
+# ------------------------------------------
+# 7. VERIFY EVERYTHING
+# ------------------------------------------
+Write-Host "[7/7] Verifying..." -ForegroundColor Yellow
 
 # Ollama
 try {

@@ -6,8 +6,8 @@ The Tower bot uses a two-agent architecture running 100% locally via Ollama:
 
 | Agent | Model | Use Case | Cost |
 |-------|-------|----------|------|
-| **QwenAgent** | `qwen` (fast, small) | Fast, simple tasks | $0 |
-| **KimiAgent** | `qwen:32b` or larger | Complex reasoning | $0 |
+| **QwenAgent** | `qwen3-8b-slim:latest` | Fast, simple tasks | $0 |
+| **KimiAgent** | `qwen3-8b-slim:latest` | Complex reasoning | $0 |
 
 **All models run locally — no cloud required.**
 
@@ -58,10 +58,10 @@ result = await kimi.generate_bulletin(news_type="rumour", memory_context=...)
 OLLAMA_URL=http://localhost:11434
 
 # QwenAgent model (fast, small)
-QWEN_MODEL=qwen              # or qwen:7b, mistral:7b, phi3
+QWEN_MODEL=qwen3-8b-slim:latest
 
-# KimiAgent model (complex tasks, larger)
-KIMI_MODEL=qwen:32b          # or mistral, llama3:70b, mixtral
+# KimiAgent model (complex tasks)
+KIMI_MODEL=qwen3-8b-slim:latest
 KIMI_ENABLE_SUBAGENTS=false  # Disabled for local-only setup
 
 # Legacy (still supported)
@@ -69,8 +69,8 @@ OLLAMA_MODEL=qwen3-8b-slim:latest         # Fallback model
 ```
 
 **Recommended Local Models:**
-- Fast (QwenAgent): `qwen`, `qwen:7b`, `qwen3-8b-slim:latest`, `phi3`
-- Complex (KimiAgent): `qwen:32b`, `qwen3-8b-slim:latest`, `llama3:70b`
+- Fast (QwenAgent): `qwen3-8b-slim:latest`
+- Complex (KimiAgent): `qwen3-8b-slim:latest`
 
 ## API Endpoints
 
@@ -118,7 +118,7 @@ from src.ollama_busy import is_available, mark_busy, mark_available
 
 # Agents automatically check is_available() before calling
 # Long-running tasks should use:
-mark_busy("generating mission module", model="qwen:32b")
+mark_busy("generating mission module", model="qwen3-8b-slim:latest")
 try:
     # ... long task ...
 finally:

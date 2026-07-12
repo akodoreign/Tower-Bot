@@ -182,3 +182,38 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 Pipfile*
+# --- added 2026-07-12: personal / generated / runtime content stays local ---
+# Runtime logs
+logs/
+*.log
+webpage_log.txt
+backfill_log.txt
+
+# Browser profile used for DDB automation (cookies, cache -- NEVER commit)
+.chrome_ddb_profile/
+
+# Player-personal appearance data (llava descriptions of uploaded player images)
+src/character_appearance/
+character_appearance/
+
+# Generated campaign content (world data lives in MySQL; these are artifacts)
+campaign_docs/archives/
+campaign_docs/npc_appearances/
+campaign_docs/char_snapshots/
+campaign_docs/battle_maps/
+campaign_docs/TrainingPDFS/
+*.odt
+
+# Local scratch
+/_*.py
+stop_tower.zip
+~/
+.codesight/
+Webpage/area_maps/
+Webpage/scraps/
+# Copyrighted commercial adventure texts -- never distribute
+campaign_docs/skills/training_modules/
+# Old backup snapshots + generated staging artifacts
+archive/
+scripts/npc_ddb_staging.json
+scripts/creature_ddb_staging.json

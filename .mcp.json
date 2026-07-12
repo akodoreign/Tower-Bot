@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mimir-dm": {
+      "command": "C:\\Program Files\\Mimir\\mimir-mcp.exe",
+      "args": [],
+      "env": {
+        "MIMIR_DATABASE_PATH": ""
+      }
+    }
+  }
+}

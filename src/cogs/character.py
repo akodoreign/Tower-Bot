@@ -165,6 +165,16 @@ def setup(client):
         )
 
         try:
+            from src.resource_cop import wait_for_ollama_turn
+
+            decision = await wait_for_ollama_turn("character_llava", track="quick", max_wait_seconds=60)
+            if not decision.run_now:
+                await interaction.followup.send(
+                    f"\u23f3 llava is busy right now ({decision.reason}). Try again in a minute.",
+                    ephemeral=True,
+                )
+                return
+
             async with httpx.AsyncClient(timeout=120.0) as http:
                 resp = await http.post(ollama_url, json={
                     "model": "llava",

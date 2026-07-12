@@ -23,16 +23,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from src.db_api import raw_query as _rq, raw_execute as _rx, add_npc_history_event
+
 logger = logging.getLogger(__name__)
 
 DOCS_DIR        = Path(__file__).resolve().parent.parent / "campaign_docs"
-OUTCOMES_FILE   = DOCS_DIR / "mission_outcomes.json"  # fallback only
-NPC_JSON_FILE   = DOCS_DIR / "npc_roster.json"
-GRAVEYARD_FILE  = DOCS_DIR / "npc_graveyard.json"
 ARCHIVES_DIR    = DOCS_DIR / "archives"
 MISSION_ARCHIVE = ARCHIVES_DIR / "missions"
 NEWS_ARCHIVE    = ARCHIVES_DIR / "news"
-MEMORY_FILE     = DOCS_DIR / "news_memory.txt"
 
 
 # ---------------------------------------------------------------------------
@@ -41,72 +39,62 @@ MEMORY_FILE     = DOCS_DIR / "news_memory.txt"
 
 def _load_outcomes() -> List[Dict]:
     try:
-        from src.db_api import raw_query as _rq
         rows = _rq("SELECT * FROM mission_outcomes ORDER BY id") or []
         results = []
         for row in rows:
             o = dict(row)
             cj = o.pop("consequences_json", None)
             if cj:
-                o["consequences"] = json.loads(cj) if isinstance(cj, str) else cj
+                try:
+                    o["consequences"] = json.loads(cj) if isinstance(cj, str) else cj
+                except Exception:
+                    o["consequences"] = []
             else:
                 o["consequences"] = []
             results.append(o)
         if results:
             return results
     except Exception as e:
-        logger.warning(f"mission_outcomes DB load error: {e}")
-    # Fallback to file
-    if not OUTCOMES_FILE.exists():
-        return []
-    try:
-        return json.loads(OUTCOMES_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
+        logger.exception(f"mission_outcomes DB load error: {e}")
+    return []
 
 
 def _save_outcomes(outcomes: List[Dict]) -> None:
-    """Write new outcome entries to MySQL. Keeps file in sync for fallback."""
+    """Write new outcome entries to MySQL (DB is authoritative)."""
     try:
-        from src.db_api import raw_query as _rq, raw_execute as _rx, db
         existing_ids = {r["id"] for r in (_rq("SELECT id FROM mission_outcomes") or [])}
         for o in outcomes:
             oid = o.get("id")
             if oid and oid in existing_ids:
-                continue  # already persisted, skip
+                continue
             _rx(
                 """INSERT INTO mission_outcomes
-                   (mission_title, faction, opposing_faction, tier, completed_by,
+                   (mission_id, mission_title, faction, opposing_faction, tier, completed_by,
                     completed_at, result, npcs_killed, key_decisions, location_changes,
                     loose_threads, notable_moments, consequences_json)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (o.get("mission_title"), o.get("faction"), o.get("opposing_faction",""),
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (o.get("mission_id") or None, o.get("mission_title"), o.get("faction"), o.get("opposing_faction",""),
                  o.get("tier"), o.get("completed_by"), o.get("completed_at"),
                  o.get("result"), o.get("npcs_killed"), o.get("key_decisions"),
                  o.get("location_changes"), o.get("loose_threads"), o.get("notable_moments"),
                  json.dumps(o.get("consequences", []), ensure_ascii=False))
             )
     except Exception as e:
-        logger.error(f"mission_outcomes DB save error: {e}")
-    # Keep file in sync
-    try:
-        OUTCOMES_FILE.write_text(
-            json.dumps(outcomes, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
-    except Exception as e:
-        logger.warning(f"mission_outcomes file sync error: {e}")
+        logger.exception(f"mission_outcomes DB save error: {e}")
 
 
 def get_recent_outcomes(n: int = 10) -> List[Dict]:
     """Return the N most recent outcomes for code-level queries."""
     try:
-        from src.db_api import raw_query as _rq
         rows = _rq("SELECT * FROM mission_outcomes ORDER BY id DESC LIMIT %s", (n,)) or []
         results = []
         for row in rows:
             o = dict(row)
             cj = o.pop("consequences_json", None)
-            o["consequences"] = (json.loads(cj) if isinstance(cj, str) else cj) or []
+            try:
+                o["consequences"] = (json.loads(cj) if isinstance(cj, str) else cj) or []
+            except Exception:
+                o["consequences"] = []
             results.append(o)
         return list(reversed(results))
     except Exception:
@@ -118,17 +106,15 @@ def get_recent_outcomes(n: int = 10) -> List[Dict]:
 # ---------------------------------------------------------------------------
 
 def save_outcome(outcome: Dict) -> None:
-    """Save a mission outcome to MySQL and a readable archive file."""
-    # Write to DB
+    """Save a mission outcome to MySQL (DB is authoritative)."""
     try:
-        from src.db_api import raw_execute as _rx
         _rx(
             """INSERT INTO mission_outcomes
-               (mission_title, faction, opposing_faction, tier, completed_by,
+               (mission_id, mission_title, faction, opposing_faction, tier, completed_by,
                 completed_at, result, npcs_killed, key_decisions, location_changes,
                 loose_threads, notable_moments, consequences_json)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-            (outcome.get("mission_title"), outcome.get("faction"), outcome.get("opposing_faction",""),
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (outcome.get("mission_id") or None, outcome.get("mission_title"), outcome.get("faction"), outcome.get("opposing_faction",""),
              outcome.get("tier"), outcome.get("completed_by"), outcome.get("completed_at"),
              outcome.get("result"), outcome.get("npcs_killed"), outcome.get("key_decisions"),
              outcome.get("location_changes"), outcome.get("loose_threads"), outcome.get("notable_moments"),
@@ -136,15 +122,6 @@ def save_outcome(outcome: Dict) -> None:
         )
     except Exception as e:
         logger.error(f"save_outcome DB error: {e}")
-    # Keep file in sync
-    try:
-        outcomes = _load_outcomes()
-        outcomes.append(outcome)
-        OUTCOMES_FILE.write_text(
-            json.dumps(outcomes, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
-    except Exception as e:
-        logger.warning(f"save_outcome file sync error: {e}")
 
     # Write readable .md archive file
     MISSION_ARCHIVE.mkdir(parents=True, exist_ok=True)
@@ -212,47 +189,47 @@ def save_outcome(outcome: Dict) -> None:
 # ---------------------------------------------------------------------------
 
 def archive_news_weekly() -> Optional[str]:
-    """Archive the current news_memory.txt to a dated file and trim it.
+    """Archive news_memory rows older than 7 days to a dated txt file, then delete them.
     Returns the archive filename, or None if nothing to archive."""
     NEWS_ARCHIVE.mkdir(parents=True, exist_ok=True)
-
-    if not MEMORY_FILE.exists():
-        return None
-
-    try:
-        content = MEMORY_FILE.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return None
-
-    if not content.strip():
-        return None
-
-    # Save archive
     now = datetime.now()
-    fname = f"news_week_{now.strftime('%Y-%m-%d')}.txt"
-    archive_path = NEWS_ARCHIVE / fname
 
     try:
-        # Append to existing weekly file if same week, or create new
+        from src.db_api import raw_query as _rq, raw_execute as _rx
+        # Fetch all rows older than 7 days
+        rows = _rq(
+            "SELECT id, bulletin_text, facts, news_type, created_at FROM news_memory "
+            "WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY id"
+        ) or []
+        if not rows:
+            logger.info("📰 News archive: no entries older than 7 days — nothing to archive")
+            return None
+
+        # Build archive text
+        lines = [f"# News Archive — Week of {now.strftime('%Y-%m-%d')}\n"]
+        for row in rows:
+            ts = row.get("created_at", "")
+            if hasattr(ts, "isoformat"):
+                ts = ts.isoformat()
+            text = row.get("bulletin_text") or row.get("facts") or ""
+            lines.append(f"[{ts}]\n{text}\n---ENTRY---")
+
+        content = "\n".join(lines)
+        fname = f"news_week_{now.strftime('%Y-%m-%d')}.txt"
+        archive_path = NEWS_ARCHIVE / fname
+
         if archive_path.exists():
             existing = archive_path.read_text(encoding="utf-8", errors="ignore")
-            archive_path.write_text(
-                existing + "\n\n--- CONTINUED ---\n\n" + content,
-                encoding="utf-8"
-            )
+            archive_path.write_text(existing + "\n\n--- CONTINUED ---\n\n" + content, encoding="utf-8")
         else:
-            header = f"# News Archive — Week of {now.strftime('%Y-%m-%d')}\n\n"
-            archive_path.write_text(header + content, encoding="utf-8")
+            archive_path.write_text(content, encoding="utf-8")
 
-        # Trim memory to last 15 entries (keep recent for continuity, archive the rest)
-        entries = [e.strip() for e in content.split("\n---ENTRY---\n") if e.strip()]
-        if len(entries) > 15:
-            trimmed = entries[-15:]
-            MEMORY_FILE.write_text("\n---ENTRY---\n".join(trimmed), encoding="utf-8")
-            logger.info(f"📰 News archived to {fname} — trimmed memory from {len(entries)} to 15 entries")
-        else:
-            logger.info(f"📰 News archived to {fname} — memory has {len(entries)} entries (no trim needed)")
+        # Delete archived rows from DB
+        ids = [r["id"] for r in rows]
+        id_placeholders = ",".join(["%s"] * len(ids))
+        _rx(f"DELETE FROM news_memory WHERE id IN ({id_placeholders})", tuple(ids))
 
+        logger.info(f"📰 News archived to {fname} — {len(rows)} entries removed from DB")
         return fname
     except Exception as e:
         logger.error(f"📰 News archive failed: {e}")
@@ -260,16 +237,23 @@ def archive_news_weekly() -> Optional[str]:
 
 
 def archive_outcomes_weekly() -> Optional[str]:
-    """Archive older mission outcomes (keep last 10 in active JSON)."""
+    """Archive older mission outcomes (keep last 10 in DB)."""
     outcomes = _load_outcomes()
     if len(outcomes) <= 10:
         return None  # nothing to archive
 
-    # Already archived as individual .md files — just trim the JSON
     kept = outcomes[-10:]
-    archived_count = len(outcomes) - 10
-    _save_outcomes(kept)
-    logger.info(f"📋 Trimmed mission_outcomes.json: archived {archived_count}, kept {len(kept)}")
+    kept_ids = {o.get("id") for o in kept if o.get("id")}
+    to_delete = [o["id"] for o in outcomes if o.get("id") and o["id"] not in kept_ids]
+    archived_count = len(to_delete)
+    if to_delete:
+        try:
+            placeholders = ",".join(["%s"] * len(to_delete))
+            _rx(f"DELETE FROM mission_outcomes WHERE id IN ({placeholders})", tuple(to_delete))
+        except Exception as e:
+            logger.error(f"📋 Outcome trim failed: {e}")
+            return None
+    logger.info(f"📋 Trimmed mission_outcomes: archived {archived_count}, kept {len(kept)}")
     return f"trimmed_{archived_count}_outcomes"
 
 
@@ -277,32 +261,33 @@ def archive_outcomes_weekly() -> Optional[str]:
 # Consequence processing — NPC deaths, faction enmity, etc.
 # ---------------------------------------------------------------------------
 
+def _hist(npc: dict, body: str) -> None:
+    npc_id = npc.get("_db_id") or npc.get("id")
+    if npc_id:
+        add_npc_history_event(int(npc_id), body)
+    npc.setdefault("history", []).append(body)
+
 def _load_npcs() -> List[Dict]:
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT name, faction, role, location, status, data_json FROM npcs WHERE status IN ('alive','injured') ORDER BY name") or []
+        rows = _rq("SELECT id, name, faction, role, location, status, data_json FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
         npcs = []
         for row in rows:
-            npc = {"name": row["name"], "faction": row["faction"], "role": row["role"],
-                   "location": row["location"], "status": row["status"]}
             dj = row.get("data_json") or {}
             if isinstance(dj, str):
                 try: dj = json.loads(dj)
                 except: dj = {}
-            npc.update(dj)
+            # DB columns win over stale data_json values
+            npc = {**dj,
+                   "_db_id": row["id"], "name": row["name"], "faction": row["faction"],
+                   "role": row["role"], "location": row["location"], "status": row["status"]}
             if "history" not in npc:
                 npc["history"] = []
             npcs.append(npc)
         return npcs
     except Exception as e:
         logger.warning(f"_load_npcs DB error: {e}")
-    # Fallback
-    if not NPC_JSON_FILE.exists():
-        return []
-    try:
-        return json.loads(NPC_JSON_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
+    return []
 
 
 def _save_npcs(npcs: List[Dict]) -> None:
@@ -334,13 +319,7 @@ def _load_graveyard() -> List[Dict]:
         return npcs
     except Exception as e:
         logger.warning(f"_load_graveyard DB error: {e}")
-    # Fallback
-    if not GRAVEYARD_FILE.exists():
-        return []
-    try:
-        return json.loads(GRAVEYARD_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
+    return []
 
 
 def _save_graveyard(graveyard: List[Dict]) -> None:
@@ -398,9 +377,12 @@ def process_npc_deaths(killed_text: str, mission_title: str) -> List[str]:
 
         # Mark dead and move to graveyard
         npc["status"] = "dead"
-        npc["history"].append(f"[{today}] Killed during mission: {mission_title}")
+        _hist(npc, f"[{today}] Killed during mission: {mission_title}")
         npc["moved_to_graveyard_at"] = datetime.now().isoformat()
-        npc["cause_of_death"] = f"Killed by adventurers during '{mission_title}'"
+        npc["death_cause"] = f"Killed by adventurers during '{mission_title}'"
+        npc_id = npc.get("_db_id") or npc.get("id")
+        if npc_id:
+            _rx("UPDATE npcs SET death_cause=%s WHERE id=%s", (npc["death_cause"], npc_id))
 
         # Avoid duplicate in graveyard
         if not any(g.get("name") == npc_name for g in graveyard):
@@ -422,12 +404,10 @@ def process_npc_deaths(killed_text: str, mission_title: str) -> List[str]:
         # Add enmity to same-faction NPCs
         faction_allies = [n for n in npcs
                          if n.get("faction", "").lower() == faction.lower()
-                         and n.get("status") in ("alive", "injured")]
+                         and n.get("status") in ("alive", "injured", "undead", "doppelganger")]
         for ally in faction_allies:
             ally_name = ally.get("name", "?")
-            ally["history"].append(
-                f"[{today}] Faction-mate {npc_name} was killed by adventurers. Enmity noted."
-            )
+            _hist(ally, f"[{today}] Faction-mate {npc_name} was killed by adventurers. Enmity noted.")
             existing_notes = ally.get("oracle_notes", "")
             enmity_note = f"Hostile toward adventurers who killed {npc_name}."
             if enmity_note not in existing_notes:

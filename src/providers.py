@@ -78,8 +78,8 @@ class FreeProvider(BaseProvider):
 
     def __init__(self):
         super().__init__(api_key=None)
-        # Default to qwen for fast local inference
-        self.default_model_name = os.getenv("QWEN_MODEL", "qwen")
+        # Default to the installed slim Qwen model for fast local inference.
+        self.default_model_name = os.getenv("QWEN_MODEL", "qwen3-8b-slim:latest")
         self._qwen_agent = None
         self._kimi_agent = None
 
@@ -107,7 +107,7 @@ class FreeProvider(BaseProvider):
         Route chat to appropriate agent based on model name.
         
         Model routing:
-            - 'kimi' or 'kimi-k2.5:cloud' → KimiAgent (complex reasoning)
+            - 'kimi' in the model name → KimiAgent (complex reasoning)
             - anything else → QwenAgent (fast local)
         """
         if model_name is None:
@@ -152,13 +152,31 @@ class FreeProvider(BaseProvider):
         if model_name is None:
             model_name = self.default_model_name
 
+        # Fit the context window to the conversation (RAG blocks can be large;
+        # with no num_ctx Ollama silently truncates and the reply degrades).
+        _chars = sum(len(m.get("content", "")) for m in messages)
+        _needed = _chars // 4 + 1024 + 768
+        _num_ctx = next((c for c in (8192, 12288, 16384, 24576, 32768) if c >= _needed), 32768)
+
         payload = {
             "model": model_name,
             "messages": messages,
             "stream": False,
+            "options": {"num_ctx": _num_ctx},
         }
 
         try:
+            from src.resource_cop import wait_for_ollama_turn
+
+            decision = await wait_for_ollama_turn(
+                "provider:fallback_ollama_chat",
+                track="quick",
+                max_wait_seconds=45,
+            )
+            if not decision.run_now:
+                logger.warning(f"FreeProvider fallback deferred: {decision.reason}")
+                return f"*Local model busy: {decision.reason}*"
+
             async with httpx.AsyncClient(timeout=120.0) as client:
                 resp = await client.post(
                     "http://localhost:11434/api/chat",
@@ -215,8 +233,8 @@ class FreeProvider(BaseProvider):
 
     def get_available_models(self) -> List[ModelInfo]:
         """Return available local models."""
-        qwen_model = os.getenv("QWEN_MODEL", "qwen")
-        kimi_model = os.getenv("KIMI_MODEL", "kimi-k2.5:cloud")
+        qwen_model = os.getenv("QWEN_MODEL", "qwen3-8b-slim:latest")
+        kimi_model = os.getenv("KIMI_MODEL", "qwen3-8b-slim:latest")
         
         return [
             ModelInfo(
@@ -323,7 +341,7 @@ class ClaudeProvider(BaseProvider):
     ) -> str:
         try:
             if not model:
-                model = "claude-haiku-4-5"
+                model = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 
             system_message = None
             claude_messages = []
@@ -537,7 +555,7 @@ class ProviderManager:
         """Validate API key format"""
         if not api_key or len(api_key) < 10:
             logger.warning(
-                f"Invalid {provider_name} API key: too short (length: {len(api_key)})"
+                f"Invalid {provider_name} API key: too short (length: {len(api_key or '')})"
             )
             return False
 

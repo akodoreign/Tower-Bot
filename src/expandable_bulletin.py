@@ -27,6 +27,7 @@ from io import BytesIO
 import discord
 from discord import ui
 
+from src.text_mojibake import repair_mojibake, repair_payload
 from src.tts_engine import generate_tts_audio
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ def _db_store_bulletin(
     """Persist a bulletin to the bulletin_cache table (best-effort)."""
     try:
         from src.db_api import raw_execute, raw_query
-        payload = json.dumps({
+        payload_data = repair_payload({
             "preview": preview,
             "full_content": full_content,
             "headline": headline,
@@ -102,7 +103,8 @@ def _db_store_bulletin(
             "source_attribution": source_attribution,
             "venue": venue,
             "created_at": created_at.isoformat(),
-        }, ensure_ascii=False)
+        })
+        payload = json.dumps(payload_data, ensure_ascii=False)
         existing = raw_query(
             "SELECT id FROM bulletin_cache WHERE bulletin_id = %s", (bulletin_id,)
         )
@@ -133,6 +135,7 @@ def _db_get_bulletin(bulletin_id: str) -> Optional["StoredBulletin"]:
         data = rows[0]["payload"]
         if isinstance(data, str):
             data = json.loads(data)
+        data = repair_payload(data)
         return StoredBulletin(
             bulletin_id=bulletin_id,
             preview=data.get("preview", ""),
@@ -186,6 +189,7 @@ def get_archived_headlines(limit: int = 40) -> list[dict]:
                     data = json.loads(data)
                 except Exception:
                     data = {}
+            data = repair_payload(data)
             results.append({
                 "bulletin_id": row.get("bulletin_id", ""),
                 "headline": data.get("headline", ""),
@@ -244,6 +248,13 @@ class BulletinStorage:
         venue: Optional[str] = None,
     ) -> str:
         """Store a bulletin in memory and persist it to the DB."""
+        preview = repair_mojibake(preview or "")
+        full_content = repair_mojibake(full_content or "")
+        headline = repair_mojibake(headline or "")
+        bulletin_type = repair_mojibake(bulletin_type or "news")
+        source_attribution = repair_mojibake(source_attribution or "TNN")
+        venue = repair_mojibake(venue) if venue else venue
+
         bulletin_id = str(uuid.uuid4())[:8]
         now = datetime.now()
 
@@ -297,22 +308,23 @@ class BulletinStorage:
     
     async def _cleanup_loop(self):
         """Remove bulletins older than 24 hours from memory and DB."""
-        await asyncio.sleep(3600)  # Check every hour
+        while True:
+            await asyncio.sleep(3600)  # Check every hour
 
-        cutoff = datetime.now() - timedelta(hours=24)
-        to_remove = [
-            bid for bid, b in self._bulletins.items()
-            if b.created_at < cutoff
-        ]
+            cutoff = datetime.now() - timedelta(hours=24)
+            to_remove = [
+                bid for bid, b in self._bulletins.items()
+                if b.created_at < cutoff
+            ]
 
-        for bid in to_remove:
-            del self._bulletins[bid]
+            for bid in to_remove:
+                del self._bulletins[bid]
 
-        if to_remove:
-            logger.info(f"📰 Evicted {len(to_remove)} old bulletins from memory cache")
+            if to_remove:
+                logger.info(f"📰 Evicted {len(to_remove)} old bulletins from memory cache")
 
-        # Archive in DB (never deleted — kept for anti-repetition lookups)
-        _db_archive_old_bulletins(cutoff)
+            # Archive in DB (never deleted — kept for anti-repetition lookups)
+            _db_archive_old_bulletins(cutoff)
 
 
 # Global storage instance
@@ -377,6 +389,10 @@ class ExpandBulletinView(ui.View):
         )
         self.listen_button.callback = self.on_listen
         self.add_item(self.listen_button)
+
+        for item in self.children:
+            if hasattr(item, "label") and item.label:
+                item.label = repair_mojibake(item.label)
     
     def _get_button_style(self) -> discord.ButtonStyle:
         """Get button style based on bulletin type."""
@@ -420,7 +436,7 @@ class ExpandBulletinView(ui.View):
         await interaction.response.defer(ephemeral=True)
 
         try:
-            audio_bytes = await generate_tts_audio(bulletin.full_content)
+            audio_bytes = await generate_tts_audio(bulletin.full_content, bulletin.bulletin_type)
             if audio_bytes:
                 audio_file = discord.File(
                     BytesIO(audio_bytes),
@@ -466,7 +482,9 @@ class ExpandBulletinButton(ui.Button):
             style=styles.get(bulletin_type, discord.ButtonStyle.primary),
             custom_id=f"bulletin_expand:{bulletin_id}",
         )
-    
+        if self.label:
+            self.label = repair_mojibake(self.label)
+
     async def callback(self, interaction: discord.Interaction):
         """Handle button click."""
         bulletin = get_bulletin(self.bulletin_id)
@@ -516,7 +534,13 @@ def create_preview_embed(
     """
     Create the preview embed (3-line version shown in channel).
     """
+    preview = repair_mojibake(preview or "")
+    headline = repair_mojibake(headline or "")
+    source_attribution = repair_mojibake(source_attribution or "")
+    venue = repair_mojibake(venue) if venue else venue
+
     icon = _get_embed_icon(bulletin_type)
+    icon = repair_mojibake(icon)
     color = _get_embed_color(bulletin_type)
     
     # Build title
@@ -529,14 +553,21 @@ def create_preview_embed(
     else:
         title = f"{icon} Undercity Dispatch"
     
+    if len(preview) > 4096:
+        preview = preview[:4093] + "…"
+    safe_title = repair_mojibake(title)
+    if len(safe_title) > 256:
+        safe_title = safe_title[:253] + "…"
     embed = discord.Embed(
-        title=title,
+        title=safe_title,
         description=preview,
         color=color,
     )
-    
+
     embed.set_footer(text=f"{source_attribution} • Click Read More for full story")
-    
+    if getattr(embed.footer, "text", None):
+        embed.set_footer(text=repair_mojibake(embed.footer.text))
+
     return embed
 
 
@@ -545,6 +576,7 @@ def create_expanded_embed(bulletin: StoredBulletin) -> discord.Embed:
     Create the expanded embed (full content shown on button click).
     """
     icon = _get_embed_icon(bulletin.bulletin_type)
+    icon = repair_mojibake(icon)
     color = _get_embed_color(bulletin.bulletin_type)
     
     # Build title
@@ -557,13 +589,16 @@ def create_expanded_embed(bulletin: StoredBulletin) -> discord.Embed:
     else:
         title = f"{icon} Undercity Dispatch"
     
+    full_text = repair_mojibake(bulletin.full_content or "")
+    if len(full_text) > 4096:
+        full_text = full_text[:4093] + "…"
     embed = discord.Embed(
-        title=title,
-        description=bulletin.full_content,
+        title=repair_mojibake(title),
+        description=full_text,
         color=color,
     )
     
-    embed.set_footer(text=bulletin.source_attribution)
+    embed.set_footer(text=repair_mojibake(bulletin.source_attribution or ""))
     embed.timestamp = bulletin.created_at
     
     return embed
@@ -660,7 +695,7 @@ async def handle_bulletin_interaction(interaction: discord.Interaction):
         
         await interaction.response.defer(ephemeral=True)
         try:
-            audio_bytes = await generate_tts_audio(bulletin.full_content)
+            audio_bytes = await generate_tts_audio(bulletin.full_content, bulletin.bulletin_type)
             if audio_bytes:
                 audio_file = discord.File(
                     BytesIO(audio_bytes),
@@ -683,6 +718,32 @@ async def handle_bulletin_interaction(interaction: discord.Interaction):
                 ephemeral=True,
             )
         return
+
+
+# ---------------------------------------------------------------------------
+# Convenience helpers
+# ---------------------------------------------------------------------------
+
+def make_bulletin_view(
+    full_text: str,
+    bulletin_type: str = "news",
+    headline: str = "",
+    source_attribution: str = "TNN",
+) -> "ExpandBulletinView":
+    """
+    Store a bulletin and return an ExpandBulletinView (Read More + Listen).
+    Drop-in companion to wrap_bulletin() — call this, attach to channel.send().
+    """
+    lines = [ln for ln in full_text.splitlines() if ln.strip()]
+    preview = "\n".join(lines[:4]) if len(lines) > 4 else full_text
+    bulletin_id = store_bulletin(
+        preview=preview,
+        full_content=full_text,
+        headline=headline,
+        bulletin_type=bulletin_type,
+        source_attribution=source_attribution,
+    )
+    return ExpandBulletinView(bulletin_id, bulletin_type)
 
 
 # ---------------------------------------------------------------------------

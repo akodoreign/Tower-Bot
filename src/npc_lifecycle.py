@@ -18,18 +18,24 @@ from pathlib import Path
 from typing import List, Optional
 
 from src.log import logger
-from src.db_api import raw_query, raw_execute, db
+from src.db_api import raw_query, raw_execute, db, add_npc_history_event, get_npc_history, get_npc_history_count, add_party_history_event, add_revealed_secret, get_revealed_secrets, has_revealed_secrets
 
 # Keep txt file path for RAG system compatibility
 DOCS_DIR          = Path(__file__).resolve().parent.parent / "campaign_docs"
 NPC_TXT_FILE      = DOCS_DIR / "npc_roster.txt"
 
+# Module-level force flag — True while run_daily_lifecycle is active so all
+# _generate() calls bypass the Ollama busy check. Cleared in the finally block.
+_lifecycle_force: bool = False
+
 # ---------------------------------------------------------------------------
 # Factions and ranks
 # ---------------------------------------------------------------------------
 
+# Major factions — used for new NPC generation and defection targets
 FACTIONS = [
     "Iron Fang Consortium",
+    "Iron Fang Syndicate",
     "Argent Blades",
     "Wardens of Ash",
     "Serpent Choir",
@@ -44,8 +50,19 @@ FACTIONS = [
     "Wizards Tower",
 ]
 
+# Generic corporate rank ladder applied to any (Guild) faction
+GUILD_RANKS = [
+    "Contracted Operative",
+    "Senior Operative",
+    "Department Lead",
+    "Division Manager",
+    "Guild Director",
+    "Guild Executive",
+]
+
 FACTION_RANKS = {
     "Iron Fang Consortium":   ["Street Runner", "Acquisition Agent", "Senior Agent", "Floor Boss", "Underboss", "Guildmaster"],
+    "Iron Fang Syndicate":    ["Runner", "Earner", "Collector", "Enforcer", "Capo", "Underboss", "Guildmaster"],
     "Argent Blades":          ["Prospect", "Blade", "Senior Blade", "Champion", "Vanguard", "Guildmaster"],
     "Wardens of Ash":         ["Recruit", "Warden", "Sergeant", "Lieutenant", "Captain", "Commander"],
     "Serpent Choir":          ["Petitioner", "Acolyte", "Contract Scribe", "Mediator", "High Scribe", "High Apostle"],
@@ -57,8 +74,27 @@ FACTION_RANKS = {
     "Tower Authority":        ["Compliance Intern", "Field Compliance Officer", "Senior Officer", "Magister", "Director"],
     "Independent":            ["Street Level", "Known Operator", "Respected Freelance", "City Legend"],
     "Brother Thane's Cult":   ["Follower", "Devoted", "Speaker", "Inner Circle", "Second", "Thane"],
-    "Wizards Tower":           ["Apprentice", "Journeyman", "Researcher", "Senior Researcher", "Magister", "Archmage"],
+    "Wizards Tower":          ["Apprentice", "Journeyman", "Researcher", "Senior Researcher", "Magister", "Archmage"],
 }
+
+
+def _get_guild_factions() -> list:
+    """Return all (Guild) faction names from DB. Cached per-process after first call."""
+    try:
+        rows = raw_query(
+            "SELECT faction_name FROM faction_reputation "
+            "WHERE faction_name LIKE '%(Guild)%' ORDER BY faction_name"
+        )
+        return [r["faction_name"] for r in rows] if rows else []
+    except Exception:
+        return []
+
+
+def _ranks_for_faction(faction: str) -> list:
+    """Return the rank ladder for a faction, using GUILD_RANKS for (Guild) factions."""
+    if "(Guild)" in (faction or ""):
+        return GUILD_RANKS
+    return FACTION_RANKS.get(faction, ["Member"])
 
 SPECIES_LIST = [
     "Human", "Half-Elf", "Dwarf", "Tiefling", "Halfling", "Gnome",
@@ -77,10 +113,16 @@ NPC_EVENTS = [
     "betrayal",
     "new_secret",
     "public_incident",
-    "daily_generated",      # uses a fresh AI-generated event scenario
+    "daily_generated",      # fresh AI-generated event scenario
+    "guild_hire",           # independent/faction NPC picked up by a (Guild)
+    "guild_promotion",      # promoted within a (Guild) — better title, more pay
+    "guild_fired",          # terminated from (Guild) — voluntary, forced, or "accidental"
+    "guild_poached",        # rival (Guild) offers more and NPC jumps ship
 ]
 
-EVENT_WEIGHTS = [0.15, 0.08, 0.10, 0.15, 0.08, 0.02, 0.12, 0.10, 0.12, 0.08, 0.10]
+# Weights must sum to 1.0 — guild events sit at ~10% combined weight
+EVENT_WEIGHTS = [0.12, 0.07, 0.08, 0.12, 0.07, 0.02, 0.09, 0.08, 0.09, 0.07, 0.09,
+                 0.03, 0.03, 0.02, 0.02]
 
 # ---------------------------------------------------------------------------
 # Daily generated event system — stored in DB lifecycle_daily_events
@@ -132,7 +174,7 @@ def _save_daily_events(data: dict) -> None:
         date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
         events = data.get("events", [])
         events_json = json.dumps(events, ensure_ascii=False)
-        
+
         # Upsert
         existing = raw_query(
             "SELECT id FROM lifecycle_daily_events WHERE event_date = %s",
@@ -161,10 +203,6 @@ async def refresh_daily_events_if_needed() -> None:
     """Generate 5 fresh, specific lifecycle event scenarios for today.
     Called at lifecycle startup. No-op if already generated today."""
     if not _needs_new_daily_events():
-        return
-
-    from src.ollama_busy import is_available
-    if not is_available():
         return
 
     prompt = f"""{_LORE}
@@ -220,11 +258,14 @@ def _get_random_daily_event() -> Optional[str]:
 def _load_npcs() -> List[dict]:
     """Load all NPCs from database (excluding dead ones in graveyard)."""
     try:
-        rows = raw_query("SELECT * FROM npcs WHERE status != 'dead' OR status IS NULL")
+        rows = raw_query(
+            "SELECT id, name, faction, role, location, status, species, "
+            "`rank`, motivation, quote, oracle_notes, secret, relationships, party_name, data_json "
+            "FROM npcs WHERE status != 'dead' OR status IS NULL"
+        )
         npcs = []
         for row in rows:
-            # Parse data_json which stores full NPC data
-            # MySQL returns JSON columns as dict or None — guard against NULL
+            # Parse data_json for remaining non-promoted fields
             npc_data = row.get("data_json") or {}
             if isinstance(npc_data, str):
                 try:
@@ -233,15 +274,23 @@ def _load_npcs() -> List[dict]:
                     npc_data = {}
             elif not isinstance(npc_data, dict):
                 npc_data = {}
-            # Merge DB columns with JSON data (DB columns take precedence for indexed fields)
+            # Real columns take precedence over data_json for promoted fields
             npc = {
                 **npc_data,
-                "name": row.get("name") or npc_data.get("name", "Unknown"),
-                "faction": row.get("faction") or npc_data.get("faction", "Independent"),
-                "role": row.get("role") or npc_data.get("role", ""),
-                "location": row.get("location") or npc_data.get("location", ""),
-                "status": row.get("status") or npc_data.get("status", "alive"),
-                "_db_id": row.get("id"),  # Track DB ID for updates
+                "name":         row.get("name") or npc_data.get("name", "Unknown"),
+                "faction":      row.get("faction") or npc_data.get("faction", "Independent"),
+                "role":         row.get("role") or npc_data.get("role", ""),
+                "location":     row.get("location") or npc_data.get("location", ""),
+                "status":       row.get("status") or npc_data.get("status", "alive"),
+                "species":      row.get("species") or npc_data.get("species", "Human"),
+                "rank":         row.get("rank") or npc_data.get("rank", ""),
+                "motivation":   row.get("motivation") or npc_data.get("motivation", ""),
+                "quote":        row.get("quote") or npc_data.get("quote", ""),
+                "oracle_notes": row.get("oracle_notes") or npc_data.get("oracle_notes", ""),
+                "secret":       row.get("secret") or npc_data.get("secret", ""),
+                "relationships":row.get("relationships") or npc_data.get("relationships", ""),
+                "party_name":   row.get("party_name") or "",
+                "_db_id":       row.get("id"),
             }
             # Ensure history is always a list (fixes KeyError: 'history')
             if "history" not in npc or not isinstance(npc.get("history"), list):
@@ -256,40 +305,112 @@ def _load_npcs() -> List[dict]:
         return []
 
 
+def _hist(npc: dict, body: str) -> None:
+    """Append one history event for npc to npc_history table."""
+    npc_id = npc.get("_db_id") or npc.get("id")
+    if npc_id:
+        add_npc_history_event(int(npc_id), body)
+    # Also keep in-memory list so same-session reads still work
+    if isinstance(npc.get("history"), list):
+        npc["history"].append(body)
+
+
+def _scalar(value) -> str | None:
+    """Coerce a value to a plain string for VARCHAR/TEXT columns.
+    Dicts and lists (which arrive from data_json blobs) are JSON-serialized
+    rather than passed raw, which would cause 'Python type dict cannot be
+    converted' errors from the MySQL connector."""
+    if value is None:
+        return None
+    if isinstance(value, (dict, list)):
+        s = json.dumps(value, ensure_ascii=False, default=str)
+        return s or None
+    s = str(value).strip()
+    return s or None
+
+
 def _save_npc(npc: dict) -> None:
     """Save a single NPC to database (insert or update)."""
     try:
         name = npc.get("name", "Unknown")
-        # Prepare data_json (exclude _db_id from storage)
-        npc_copy = {k: v for k, v in npc.items() if k != "_db_id"}
+        # Prepare data_json — strip runtime-only keys and fields now in real columns
+        npc_copy = {k: v for k, v in npc.items() if k not in ("_db_id", "history", "revealed_secrets", "death_cause", "cause_of_death", "tower_absorbed", "party_name")}
         data_json = json.dumps(npc_copy, ensure_ascii=False, default=str)
-        
+
         # Check if exists by name
         existing = raw_query("SELECT id FROM npcs WHERE name = %s", (name,))
-        
+
         if existing:
             raw_execute(
-                "UPDATE npcs SET faction = %s, role = %s, location = %s, status = %s, data_json = %s WHERE name = %s",
+                """UPDATE npcs SET
+                   faction        = %s,
+                   role           = %s,
+                   location       = %s,
+                   status         = %s,
+                   `rank`         = %s,
+                   motivation     = %s,
+                   quote          = %s,
+                   oracle_notes   = %s,
+                   secret         = %s,
+                   relationships  = %s,
+                   death_cause    = %s,
+                   tower_absorbed = %s,
+                   data_json      = %s
+                   WHERE name = %s""",
                 (
-                    npc.get("faction", "Independent"),
-                    npc.get("role", ""),
-                    npc.get("location", ""),
-                    npc.get("status", "alive"),
+                    npc.get("faction") or "Independent",
+                    npc.get("role") or "",
+                    npc.get("location") or "",
+                    npc.get("status") or "alive",
+                    _scalar(npc.get("rank")),
+                    _scalar(npc.get("motivation")),
+                    _scalar(npc.get("quote")),
+                    _scalar(npc.get("oracle_notes")),
+                    _scalar(npc.get("secret")),
+                    _scalar(npc.get("relationships")),
+                    _scalar(npc.get("death_cause") or npc.get("cause_of_death")),
+                    1 if npc.get("tower_absorbed") else 0,
                     data_json,
-                    name
+                    name,
                 )
             )
         else:
             db.insert("npcs", {
-                "name": name,
-                "faction": npc.get("faction", "Independent"),
-                "role": npc.get("role", ""),
-                "location": npc.get("location", ""),
-                "status": npc.get("status", "alive"),
-                "data_json": data_json,
+                "name":          name,
+                "faction":       npc.get("faction") or "Independent",
+                "role":          npc.get("role") or "",
+                "location":      npc.get("location") or "",
+                "status":        npc.get("status") or "alive",
+                "rank":          _scalar(npc.get("rank")),
+                "motivation":    _scalar(npc.get("motivation")),
+                "quote":         _scalar(npc.get("quote")),
+                "oracle_notes":  _scalar(npc.get("oracle_notes")),
+                "secret":        _scalar(npc.get("secret")),
+                "relationships": _scalar(npc.get("relationships")),
+                "death_cause":   _scalar(npc.get("death_cause") or npc.get("cause_of_death")),
+                "tower_absorbed": 1 if npc.get("tower_absorbed") else 0,
+                "data_json":      data_json,
             })
+            # Write any founding history events that were in the dict before it was stripped
+            founding = npc.get("history") or []
+            if founding:
+                row = raw_query("SELECT id FROM npcs WHERE name=%s", (name,))
+                if row:
+                    for entry in (founding if isinstance(founding, list) else []):
+                        if entry:
+                            add_npc_history_event(row[0]["id"], str(entry))
     except Exception as e:
         logger.error(f"NPC save error for {npc.get('name', '?')}: {e}")
+        return
+
+    # Trigger Mimir sync for this NPC (fire-and-forget, safe if Mimir is down)
+    try:
+        rows = raw_query("SELECT id FROM npcs WHERE name=%s", (npc.get("name", ""),))
+        if rows:
+            from src.mimir_sync import trigger_npc_sync
+            trigger_npc_sync(rows[0]["id"])
+    except Exception:
+        pass
 
 
 def _save_npcs(npcs: List[dict]) -> None:
@@ -328,27 +449,27 @@ def _rebuild_txt(npcs: List[dict]) -> None:
         lines.append(f"ROLE: {npc.get('role', '')}")
         if npc.get("secret"):
             lines.append(f"SECRET: {npc['secret']}")
-        if npc.get("revealed_secrets"):
-            lines.append(f"REVEALED: {' | '.join(npc['revealed_secrets'])}")
+        _revealed = npc.get("revealed_secrets") or []
+        if not _revealed:
+            _nid = npc.get("_db_id") or npc.get("id")
+            if _nid:
+                _revealed = get_revealed_secrets(int(_nid))
+        if _revealed:
+            lines.append(f"REVEALED: {' | '.join(_revealed)}")
         if npc.get("relationships"):
             lines.append(f"RELATIONSHIPS: {npc['relationships']}")
         if npc.get("oracle_notes"):
             lines.append(f"ORACLE NOTES: {npc['oracle_notes']}")
-        if npc.get("history"):
-            lines.append(f"HISTORY: {' | '.join(npc['history'][-5:])}")
+        hist_in_mem = npc.get("history") or []
+        if not hist_in_mem:
+            npc_id = npc.get("_db_id") or npc.get("id")
+            if npc_id:
+                hist_in_mem = [r["body"] for r in get_npc_history(int(npc_id), limit=10)]
+        if hist_in_mem:
+            lines.append(f"HISTORY: {' | '.join(hist_in_mem[-5:])}")
         lines.append("---END NPC---")
         lines.append("")
-    try:
-        NPC_TXT_FILE.write_text("\n".join(lines), encoding="utf-8")
-    except Exception as e:
-        logger.error(f"NPC txt rebuild error: {e}")
-    # Also write npc_roster.json for any code still reading the file (backward compat)
-    try:
-        roster_json = [n for n in npcs if n.get("status") != "dead"]
-        json_path = NPC_TXT_FILE.parent / "npc_roster.json"
-        json_path.write_text(json.dumps(roster_json, indent=2), encoding="utf-8")
-    except Exception as e:
-        logger.warning(f"NPC json rebuild error: {e}")
+    # DB is the source of truth — no file write-back needed
 
 
 # ---------------------------------------------------------------------------
@@ -387,11 +508,19 @@ def _save_graveyard(graveyard: List[dict]) -> None:
 def _move_to_graveyard(npc: dict, npcs: List[dict]) -> None:
     """Mark an NPC as dead (moves them to graveyard status).
     Removes from the npcs list in-place."""
+    now = datetime.now()
     npc["status"] = "dead"
-    npc["moved_to_graveyard_at"] = datetime.now().isoformat()
+    npc["moved_to_graveyard_at"] = now.isoformat()
+    npc["death_date"] = now.strftime("%Y-%m-%d %H:%M")  # consistent format for recently_deceased_block
     _save_npc(npc)
+    # Also stamp deceased_at on the DB row directly
+    try:
+        from src.db_api import raw_execute as _rx
+        _rx("UPDATE npcs SET deceased_at=%s WHERE name=%s", (now, npc.get("name")))
+    except Exception as _e:
+        logger.warning(f"💀 Could not set deceased_at for {npc.get('name')}: {_e}")
     logger.info(f"💀 {npc.get('name')} moved to graveyard")
-    
+
     # Remove from active roster list
     try:
         npcs.remove(npc)
@@ -426,26 +555,62 @@ def _sweep_dead_to_graveyard(npcs: List[dict]) -> int:
 # Ollama generation helper
 # ---------------------------------------------------------------------------
 
-async def _generate(prompt: str, timeout: float = 300.0, retries: int = 2) -> Optional[str]:
-    """Call Ollama and return the text response. Queued via ollama_queue FIFO lock."""
-    from src.ollama_queue import call_ollama, OllamaBusyError
-    ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
+async def _generate(prompt: str, timeout: float = 300.0, retries: int = 3,
+                    num_predict: int = 900, fast=None) -> Optional[str]:
+    """Call Ollama and return the text response. Queued via ollama_queue FIFO lock.
 
-    try:
-        data = await call_ollama(
-            payload={
-                "model": ollama_model,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-                "options": {"num_predict": 512, "think": False},
-            },
-            timeout=timeout,
-            caller="npc_lifecycle",
-        )
-    except OllamaBusyError:
+    fast=True  -> uses OLLAMA_FAST_MODEL with small context. For short texts.
+    fast=False -> uses OLLAMA_MODEL with larger context. For quality generation.
+    """
+    import asyncio
+    from src.ollama_queue import call_ollama, OllamaBusyError
+    from src.ollama_busy import is_priority_busy
+
+    # Auto-route: short outputs -> the fast path; long/complex outputs -> more context.
+    # Callers can override by passing fast=True/False explicitly.
+    if fast is None:
+        fast = num_predict < 1800  # short announcements/events/bulletins -> fast
+    if fast:
+        ollama_model = os.getenv("OLLAMA_FAST_MODEL", "qwen3-8b-slim:latest")
+        num_ctx = 4096
+    else:
+        ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
+        num_ctx = 8192
+
+    # Even in lifecycle-force mode, yield immediately if mission building claimed priority.
+    if _lifecycle_force and is_priority_busy():
+        logger.info("🧬 Lifecycle yielding to high-priority task (mission building)")
         return None
-    except Exception as e:
-        logger.warning(f"🧬 npc_lifecycle _generate error: {type(e).__name__}: {e}")
+
+    for attempt in range(1, retries + 1):
+        try:
+            data = await call_ollama(
+                payload={
+                    "model": ollama_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "stream": False,
+                    "options": {"num_predict": num_predict, "think": True, "num_ctx": num_ctx},
+                },
+                timeout=timeout,
+                caller="npc_lifecycle",
+                force=_lifecycle_force,
+            )
+            break  # success — exit retry loop
+        except OllamaBusyError:
+            if attempt < retries:
+                logger.info(f"🧬 Ollama busy (attempt {attempt}/{retries}), retrying in 5s…")
+                await asyncio.sleep(5)
+                continue
+            logger.warning("🧬 Ollama busy after all retries — skipping")
+            return None
+        except Exception as e:
+            if attempt < retries:
+                logger.info(f"🧬 _generate error attempt {attempt}/{retries} ({type(e).__name__}), retrying in 5s…")
+                await asyncio.sleep(5)
+                continue
+            logger.warning(f"🧬 npc_lifecycle _generate error: {type(e).__name__}: {e}")
+            return None
+    else:
         return None
 
     text = ""
@@ -453,6 +618,9 @@ async def _generate(prompt: str, timeout: float = 300.0, retries: int = 2) -> Op
         msg = data.get("message", {})
         if isinstance(msg, dict):
             text = msg.get("content", "").strip()
+
+    # Strip qwen3 thinking blocks before any processing
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
     lines = text.splitlines()
     skip = ("sure", "here's", "here is", "as requested", "certainly",
@@ -467,24 +635,196 @@ async def _generate(prompt: str, timeout: float = 300.0, retries: int = 2) -> Op
 # ---------------------------------------------------------------------------
 
 _LORE = """\
-SETTING: The Undercity — a sealed city under a Dome around the Tower of Last Chance.
+SETTING: The Undercity — a vast city under a Dome around the Tower of Last Chance.
 Rifts tear reality constantly. Adventurers are an economic class. Gods harvest heroic souls.
-FACTIONS (use ONLY these): Iron Fang Consortium, Argent Blades, Wardens of Ash, Serpent Choir,
+The city has sunny plazas, neon-lit markets, grim warrens, and everything in between.
+MAJOR FACTIONS: Iron Fang Consortium (Serrik Dhal -- orthodox relics + infrastructure) and its breakaway rival the Iron Fang Syndicate (Sera Voss -- rackets + stock manipulation), now openly at civil war; Argent Blades, Wardens of Ash, Serpent Choir,
 Obsidian Lotus, Glass Sigil, Patchwork Saints, Adventurers Guild, Guild of Ashen Scrolls,
-Tower Authority, Wizards Tower, Independent, Brother Thane's Cult.
-TONE: Dark urban fantasy. Gritty, specific, noir. No generic fantasy filler.\
+Tower Authority, Wizards Tower, Leaden Crown, Brother Thane's Cult.
+MEGA-GUILDS (big corporate employers): Flying Fleet, Ironworks Combine, Crystal Lens Syndicate,
+Tidecrest Exchange, Hearthwall Builders, Aurelius Medicant, The Long Plate, Silkthread Market,
+Deepvein Extractors, Arclight Engineers, Wayfarer's Congress, Clearwater Authority,
+The Grand Register, Brightfire Entertainers, Thornwall Security, Ashcraft Reclamation,
+Goldenleaf Hospitality, Mirrorgate Communications, Spellwright Collective,
+The Stonecrown Council, Verdant Gardens, Irondraft Logistics, The Polished Seal, Runemark Academy.
+Guild NPCs hold corporate titles: Contracted Operative up through Guild Executive.
+Jobs come and go — NPCs get hired, promoted, fired, or poached by rival guilds.
+TONE: Cyberpunk-fantasy mix. Specific and grounded. Match the district wealth tier.\
 """
+
+
+# ---------------------------------------------------------------------------
+# Home district logic
+# ---------------------------------------------------------------------------
+
+# Faction -> tiered district lists: index 0 = elite, 1 = senior, 2 = standard, 3 = junior
+_FACTION_DISTRICTS = {
+    "Iron Fang Consortium": [
+        ["Markets Infinite"],              # elite (Floor Boss / Underboss / Guildmaster)
+        ["Markets Infinite", "Hearthstone District"],  # senior (Senior Agent)
+        ["Markets Infinite", "Coppergate"],            # standard (Acquisition Agent)
+        ["Ironworks", "Shantytown Heights"],            # junior (Street Runner)
+    ],
+    "Iron Fang Syndicate": [
+        ["Markets Infinite"],                          # elite (Capo / Underboss / Guildmaster)
+        ["Markets Infinite", "Coppergate"],            # senior (Enforcer)
+        ["Markets Infinite", "Ironworks"],             # standard (Collector / Earner)
+        ["Shantytown Heights", "Ironworks"],            # junior (Runner)
+    ],
+    "Argent Blades": [
+        ["Guild Spires"],
+        ["Guild Spires", "Hearthstone District"],
+        ["Hearthstone District", "Coppergate"],
+        ["Coppergate", "Ember Ward"],
+    ],
+    "Wardens of Ash": [
+        ["Outer Wall"],
+        ["Outer Wall", "Ember Ward"],
+        ["Outer Wall", "Ember Ward"],
+        ["Outer Wall", "Shantytown Heights"],
+    ],
+    "Serpent Choir": [
+        ["Sanctum Quarter"],
+        ["Sanctum Quarter", "Temple Row"],
+        ["Temple Row"],
+        ["Temple Row", "Cult Corners"],
+    ],
+    "Obsidian Lotus": [
+        ["Duskhollow"],
+        ["Duskhollow", "Neon Row"],
+        ["Neon Row", "Duskhollow"],
+        ["Neon Row", "Collapsed Plaza"],
+    ],
+    "Glass Sigil": [
+        ["Archive Row"],
+        ["Archive Row", "Academy Heights"],
+        ["Archive Row", "Artisan Quarter"],
+        ["Artisan Quarter", "Coppergate"],
+    ],
+    "Patchwork Saints": [
+        ["Ember Ward"],
+        ["Ember Ward", "Shantytown Heights"],
+        ["Shantytown Heights", "Ember Ward"],
+        ["Shantytown Heights", "Collapsed Plaza"],
+    ],
+    "Adventurers Guild": [
+        ["Guild Spires"],
+        ["Guild Spires", "Hearthstone District"],
+        ["Hearthstone District", "Coppergate"],
+        ["Coppergate", "Ember Ward"],
+    ],
+    "Guild of Ashen Scrolls": [
+        ["Archive Row"],
+        ["Archive Row", "Artisan Quarter"],
+        ["Artisan Quarter"],
+        ["Artisan Quarter", "Coppergate"],
+    ],
+    "Tower Authority": [
+        ["Grand Forum"],
+        ["Grand Forum", "Guild Spires"],
+        ["Hearthstone District", "Coppergate"],
+        ["Coppergate", "Ember Ward"],
+    ],
+    "Independent": [
+        ["Grand Forum", "Floating Bazaar"],
+        ["Cobbleway Market", "Neon Row"],
+        ["Hearthstone District", "Coppergate"],
+        ["Ember Ward", "Shantytown Heights"],
+    ],
+    "Brother Thane's Cult": [
+        ["Cult Corners"],
+        ["Cult Corners", "Collapsed Plaza"],
+        ["Collapsed Plaza", "Cult Corners"],
+        ["Collapsed Plaza", "Shantytown Heights"],
+    ],
+    "Wizards Tower": [
+        ["Academy Heights"],
+        ["Academy Heights"],
+        ["Academy Heights", "Hearthstone District"],
+        ["Academy Heights", "Coppergate"],
+    ],
+}
+
+# Rank keywords mapped to prestige tier index (0=elite, 1=senior, 2=standard, 3=junior)
+_RANK_TIER_MAP = {
+    0: {  # elite
+        "leader", "guildmaster", "director", "archmaster", "high apostle", "archmage",
+        "grand archivist", "commander", "the widow", "thane", "head archivist",
+        "shadow director", "magister",
+    },
+    1: {  # senior
+        "captain", "lieutenant", "senior", "master", "elder", "vanguard",
+        "champion", "underboss", "high scribe", "coordinator", "sigil master",
+        "field captain", "archivist first class", "senior officer", "second",
+        "specialist", "handler",
+    },
+    2: {  # standard
+        "member", "agent", "soldier", "archivist", "mage", "blade",
+        "warden", "saint", "mediator", "operative", "scribe", "researcher",
+        "floor boss", "sergeant", "field lead", "acquisition agent", "contract scribe",
+        "compliance officer", "city legend", "respected freelance",
+        "archivist second class", "senior blade",
+    },
+    3: {  # junior
+        "junior", "prospect", "initiate", "apprentice", "recruit", "volunteer",
+        "ghost", "petitioner", "follower", "devoted", "unranked",
+        "street runner", "street level", "known operator",
+        "compliance intern", "journeyman", "f-rank", "e-rank", "d-rank",
+    },
+}
+
+
+def _rank_to_tier(rank: str) -> int:
+    """Map a rank string to a prestige tier (0=elite, 1=senior, 2=standard, 3=junior)."""
+    rank_lower = rank.lower()
+    for tier, keywords in _RANK_TIER_MAP.items():
+        for kw in keywords:
+            if kw in rank_lower:
+                return tier
+    # Default to standard if no match
+    return 2
+
+
+def get_home_district(faction: str, rank: str, species: str = "") -> str:
+    """
+    Return the most logical home district for an NPC based on faction, rank, and species.
+
+    Species overrides:
+    - undead / shade / revenant -> Duskhollow
+    - golem / construct -> Scrapworks
+    """
+    species_lower = species.lower()
+    if any(k in species_lower for k in ("undead", "shade", "revenant")):
+        return "Duskhollow"
+    if any(k in species_lower for k in ("golem", "construct")):
+        return "Scrapworks"
+
+    tier = _rank_to_tier(rank)
+    district_options = _FACTION_DISTRICTS.get(faction, [
+        ["Grand Forum"],
+        ["Cobbleway Market"],
+        ["Hearthstone District"],
+        ["Ember Ward"],
+    ])
+
+    # Clamp tier index to available options
+    tier = min(tier, len(district_options) - 1)
+    choices = district_options[tier]
+    return random.choice(choices)
 
 
 # ---------------------------------------------------------------------------
 # Generate a brand new NPC
 # ---------------------------------------------------------------------------
 
-async def generate_new_npc(existing_npcs: List[dict]) -> Optional[dict]:
-    faction  = random.choice(FACTIONS)
-    ranks    = FACTION_RANKS.get(faction, ["Member"])
+async def generate_new_npc(existing_npcs: List[dict], faction_override: Optional[str] = None) -> Optional[dict]:
+    faction  = faction_override or random.choice(FACTIONS)
+    ranks    = _ranks_for_faction(faction)
     rank     = ranks[random.randint(0, min(2, len(ranks) - 1))]
     species  = random.choice(SPECIES_LIST)
+
+    # Determine home district based on faction, rank, and species
+    home_district = get_home_district(faction, rank, species)
 
     existing_names = [n.get("name", "") for n in existing_npcs]
     names_block    = ", ".join(existing_names[-20:]) if existing_names else "none yet"
@@ -507,38 +847,73 @@ Output ONLY a JSON object with these exact keys, nothing else:
   "rank": "{rank}",
   "species": "{species}",
   "age": "number or range like 30s",
-  "appearance": "2 sentences — specific physical details, how they carry themselves",
-  "location": "specific district and sub-location",
-  "motivation": "2 sentences — what they actually want and why",
-  "role": "1 sentence — what they do day to day",
+  "appearance": "2 sentences — specific physical details, how they carry themselves, one distinctive visual mark",
+  "location": "specific district and sub-location in the city",
+  "home_district": "specific district where they live",
+  "motivation": "2 sentences — what they actually want and the real reason why",
+  "role": "1 sentence — what they do day to day in the city",
+  "equipment": "weapons they carry and armour or clothing type — faction-appropriate and specific",
+  "style": "1 sentence — their visual style, how they're immediately recognizable in a crowd",
   "secret": "1-2 sentences — something hidden that could change everything if revealed",
   "relationships": "1-2 sentences — notable connections to other people or factions",
-  "oracle_notes": "1-2 sentences — what the Oracle would sense about this person"
+  "oracle_notes": "1-2 sentences — what the Oracle would sense about this person beyond the obvious",
+  "quote": "1 sentence in their own voice — something they'd actually say on the street or at work. Specific to this person, not generic Undercity wisdom. No quotation marks."
 }}
 
 RULES:
 - Be specific. Invent a real name, real location, real secret.
+- Equipment and style must fit their faction ({faction}) and rank ({rank}).
 - Secret should be genuinely interesting — hidden identity, crime, loyalty, supernatural fact.
+- home_district should be "{home_district}" (their residential neighbourhood — can differ from work location).
 - Do NOT output anything except the JSON object.
 - Do NOT use markdown code fences."""
 
-    text = await _generate(prompt)
+    text = await _generate(prompt, timeout=600.0, num_predict=2500, retries=2)
     if not text:
         return None
 
     text = re.sub(r"```(?:json)?", "", text).strip().rstrip("`").strip()
 
+    data = None
+
+    # 1. Try clean parse
     try:
         data = json.loads(text)
     except Exception:
+        pass
+
+    # 2. Try extracting a complete {...} block
+    if data is None:
         match = re.search(r'\{.*\}', text, re.DOTALL)
-        if not match:
-            logger.warning(f"NPC generation: could not parse JSON:\n{text[:200]}")
-            return None
-        try:
-            data = json.loads(match.group())
-        except Exception:
-            logger.warning("NPC generation: JSON extraction failed")
+        if match:
+            try:
+                data = json.loads(match.group())
+            except Exception:
+                pass
+
+    # 3. Truncation recovery — JSON was cut off mid-string.
+    #    Find the last fully-completed key-value pair and close the object.
+    if data is None:
+        obj_start = text.find("{")
+        if obj_start >= 0:
+            partial = text[obj_start:]
+            # Try appending progressively heavier closers
+            for closer in ('"}', '"', '}'):
+                candidate = partial.rstrip().rstrip(',') + closer + "}"
+                try:
+                    recovered = json.loads(candidate)
+                    if isinstance(recovered, dict) and recovered.get("name"):
+                        data = recovered
+                        logger.info(
+                            f"🧬 NPC JSON was truncated — recovered partial record for "
+                            f"\"{recovered.get('name','?')}\" (missing fields will use defaults)"
+                        )
+                        break
+                except Exception:
+                    pass
+
+        if data is None:
+            logger.warning(f"🧬 NPC generation: could not parse JSON:\n{text[:300]}")
             return None
 
     return {
@@ -549,12 +924,18 @@ RULES:
         "age":              str(data.get("age", "unknown")),
         "appearance":       data.get("appearance", ""),
         "location":         data.get("location", ""),
+        "home_district":    data.get("home_district", home_district),
         "motivation":       data.get("motivation", ""),
         "role":             data.get("role", ""),
+        "equipment":        data.get("equipment", ""),
+        "style":            data.get("style", ""),
         "secret":           data.get("secret", ""),
         "relationships":    data.get("relationships", ""),
         "oracle_notes":     data.get("oracle_notes", ""),
+        "quote":            data.get("quote", ""),
         "status":           "alive",
+        "stats":            {},   # filled in after appearance profile runs
+        "sd_prompt":        "",   # filled in after appearance profile runs
         "revealed_secrets": [],
         "history":          [f"[{datetime.now().strftime('%Y-%m-%d')}] Introduced to the Undercity roster."],
         "created_at":       datetime.now().isoformat(),
@@ -566,7 +947,7 @@ RULES:
 # Apply a lifecycle event to an existing NPC
 # ---------------------------------------------------------------------------
 
-async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
+async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> tuple:
     # ── Injured NPCs: resolve before anything else ────────────────────────────
     # 90% recover, 10% die. Either way generate a bulletin explaining the outcome.
     if npc.get("status") == "injured":
@@ -587,6 +968,15 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             logger.info(f"\U0001f451 Protected leader {npc.get('name')} from random death — rerolling event")
             event = random.choice(["promotion", "public_incident", "new_secret", "revelation"])
 
+        # Party-bound NPCs (npcs.party_name) live their career through their crew:
+        # party_lifecycle drives contracts/splits/merges, so ambient faction-career
+        # events would contradict it. Reroll those into personal events.
+        _CREW_CAREER_EVENTS = {"promotion", "demotion", "faction_defection",
+                               "guild_hire", "guild_promotion", "guild_fired", "guild_poached"}
+        if npc.get("party_name") and event in _CREW_CAREER_EVENTS:
+            event = random.choice(["revelation", "new_secret", "public_incident",
+                                   "alliance", "betrayal", "daily_generated"])
+
     name    = npc.get("name", "Unknown")
     faction = npc.get("faction", "Independent")
     rank    = npc.get("rank", "Member")
@@ -595,12 +985,12 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
     announcement = None
 
     if event == "promotion":
-        ranks       = FACTION_RANKS.get(faction, ["Member"])
+        ranks       = _ranks_for_faction(faction)
         current_idx = ranks.index(rank) if rank in ranks else 0
         if current_idx < len(ranks) - 1:
             new_rank    = ranks[current_idx + 1]
             npc["rank"] = new_rank
-            npc["history"].append(f"[{today}] Promoted from {rank} to {new_rank} within {faction}.")
+            _hist(npc, f"[{today}] Promoted from {rank} to {new_rank} within {faction}.")
             announcement = await _generate(
                 f"{_LORE}\nNPC: {name}, {species}, {faction}.\n"
                 f"Event: Promoted from {rank} to {new_rank}.\n"
@@ -609,12 +999,12 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             )
 
     elif event == "demotion":
-        ranks       = FACTION_RANKS.get(faction, ["Member"])
+        ranks       = _ranks_for_faction(faction)
         current_idx = ranks.index(rank) if rank in ranks else 0
         if current_idx > 0:
             new_rank    = ranks[current_idx - 1]
             npc["rank"] = new_rank
-            npc["history"].append(f"[{today}] Demoted from {rank} to {new_rank} within {faction}.")
+            _hist(npc, f"[{today}] Demoted from {rank} to {new_rank} within {faction}.")
             announcement = await _generate(
                 f"{_LORE}\nNPC: {name}, {faction}.\n"
                 f"Event: Demoted from {rank} to {new_rank}. Imply something went wrong.\n"
@@ -622,12 +1012,14 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             )
 
     elif event == "faction_defection":
-        new_faction    = random.choice([f for f in FACTIONS if f != faction])
-        new_rank       = FACTION_RANKS.get(new_faction, ["Member"])[0]
+        # Can defect to a major faction OR a guild — whichever pays or believes more
+        all_targets = FACTIONS + _get_guild_factions()
+        new_faction    = random.choice([f for f in all_targets if f != faction])
+        new_rank       = _ranks_for_faction(new_faction)[0]
         old_faction    = faction
         npc["faction"] = new_faction
         npc["rank"]    = new_rank
-        npc["history"].append(f"[{today}] Defected from {old_faction} to {new_faction} (rank: {new_rank}).")
+        _hist(npc, f"[{today}] Defected from {old_faction} to {new_faction} (rank: {new_rank}).")
         announcement = await _generate(
             f"{_LORE}\nNPC: {name}.\n"
             f"Event: Defected from {old_faction} to {new_faction}. Now ranked {new_rank}.\n"
@@ -635,12 +1027,91 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             f"No preamble. Output only the bulletin."
         )
 
+    elif event == "guild_hire":
+        # Independent or faction NPC gets a corporate contract offer
+        guilds = _get_guild_factions()
+        if not guilds:
+            return None, None
+        new_guild   = random.choice([g for g in guilds if g != faction] or guilds)
+        new_rank    = GUILD_RANKS[0]
+        old_faction = faction
+        npc["faction"] = new_guild
+        npc["rank"]    = new_rank
+        _hist(npc, f"[{today}] Hired by {new_guild} from {old_faction} as {new_rank}.")
+        announcement = await _generate(
+            f"{_LORE}\nNPC: {name}, {species}. Previously: {old_faction}.\n"
+            f"Event: Contracted by {new_guild} as {new_rank}.\n"
+            f"Write a 2-3 line Undercity bulletin — new hire notice, corporate tone mixed with city grit.\n"
+            f"No preamble. Output only the bulletin."
+        )
+
+    elif event == "guild_promotion":
+        # Existing guild NPC moves up the corporate ladder
+        if "(Guild)" not in (faction or ""):
+            return None, None
+        ranks       = GUILD_RANKS
+        current_idx = ranks.index(rank) if rank in ranks else 0
+        if current_idx >= len(ranks) - 1:
+            return None, None
+        new_rank    = ranks[current_idx + 1]
+        npc["rank"] = new_rank
+        _hist(npc, f"[{today}] Promoted within {faction}: {rank} -> {new_rank}.")
+        announcement = await _generate(
+            f"{_LORE}\nNPC: {name}, {species}, {faction}.\n"
+            f"Event: Internal promotion from {rank} to {new_rank}.\n"
+            f"Write a 2-3 line Undercity bulletin — corporate announcement with implied city politics.\n"
+            f"No preamble. Output only the bulletin."
+        )
+
+    elif event == "guild_fired":
+        # Terminated from guild — could be voluntary, forced, or permanently 'resolved'
+        if "(Guild)" not in (faction or ""):
+            return None, None
+        guilds = _get_guild_factions()
+        termination_type = random.choice(["resigned", "terminated", "disappeared quietly"])
+        old_guild   = faction
+        npc["faction"] = "Independent"
+        npc["rank"]    = FACTION_RANKS["Independent"][0]
+        _hist(npc, f"[{today}] {termination_type.capitalize()} from {old_guild}. Now independent.")
+        announcement = await _generate(
+            f"{_LORE}\nNPC: {name}, {species}.\n"
+            f"Event: {termination_type.capitalize()} from {old_guild}. Now at street level.\n"
+            f"Write a 2-3 line Undercity bulletin. Tone matches termination type — resigned is neutral, "
+            f"terminated implies conflict, disappeared quietly implies something darker.\n"
+            f"No preamble. Output only the bulletin."
+        )
+
+    elif event == "guild_poached":
+        # A rival guild makes a better offer — NPC jumps ship mid-contract
+        guilds = _get_guild_factions()
+        if "(Guild)" not in (faction or "") or not guilds:
+            return None, None
+        rival_guild = random.choice([g for g in guilds if g != faction] or guilds)
+        old_guild   = faction
+        # Poaching usually comes with a rank bump
+        ranks       = GUILD_RANKS
+        current_idx = ranks.index(rank) if rank in ranks else 0
+        new_rank    = ranks[min(current_idx + 1, len(ranks) - 1)]
+        npc["faction"] = rival_guild
+        npc["rank"]    = new_rank
+        _hist(npc, f"[{today}] Poached from {old_guild} by {rival_guild} at {new_rank}.")
+        announcement = await _generate(
+            f"{_LORE}\nNPC: {name}, {species}.\n"
+            f"Event: Poached from {old_guild} by {rival_guild}. New rank: {new_rank}. Better pay implied.\n"
+            f"Write a 2-3 line Undercity bulletin — inter-guild rivalry, corporate poaching drama.\n"
+            f"No preamble. Output only the bulletin."
+        )
+
     elif event == "revelation":
         secret = npc.get("secret", "")
-        if secret and secret not in npc.get("revealed_secrets", []):
-            npc.setdefault("revealed_secrets", []).append(secret)
-            npc["secret"] = ""
-            npc["history"].append(f"[{today}] Secret revealed: {secret[:60]}...")
+        npc_id = npc.get("_db_id") or npc.get("id")
+        if secret and npc_id:
+            existing = get_revealed_secrets(int(npc_id))
+            if secret not in existing:
+                add_revealed_secret(int(npc_id), secret)
+                npc.setdefault("revealed_secrets", []).append(secret)
+                npc["secret"] = ""
+                _hist(npc, f"[{today}] Secret revealed: {secret[:60]}...")
             announcement = await _generate(
                 f"{_LORE}\nNPC: {name}, {faction}, {rank}.\n"
                 f"Their secret was: {secret}\n"
@@ -650,8 +1121,8 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
 
     elif event == "death":
         npc["status"] = "dead"
-        npc["history"].append(f"[{today}] Killed. Faction: {faction}, Rank: {rank}.")
-        _death_cause = random.choice([
+        _hist(npc, f"[{today}] Killed. Faction: {faction}, Rank: {rank}.")
+        _death_cause = random.choice([  # noqa: saved to npc["death_cause"] below
             # Faction violence
             "assassinated by a faction rival — clean job, no witnesses",
             "killed in a turf war between two factions over a market lane",
@@ -687,6 +1158,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             "killed in a full Rift breach event in the Outer Wall district",
             "consumed by a Rift tear — no body, just a scorch mark",
         ])
+        npc["death_cause"] = _death_cause
         announcement = await _generate(
             f"{_LORE}\nNPC: {name}, {faction}, {rank}.\n"
             f"Cause of death: {_death_cause}.\n"
@@ -698,7 +1170,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
     # --- INJURY RECOVERY ---
     elif event == "injury_recovery":
         npc["status"] = "alive"
-        npc["history"].append(f"[{today}] Recovered from injuries.")
+        _hist(npc, f"[{today}] Recovered from injuries.")
         announcement = await _generate(
             f"{_LORE}\nNPC: {name}, {faction}, {rank}.\n"
             f"Event: Was injured. Has now recovered and is back on their feet.\n"
@@ -706,10 +1178,10 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             f"Imply the experience may have changed them. No preamble. Output only the bulletin."
         )
 
-    # --- INJURY → DEATH ---
+    # --- INJURY -> DEATH ---
     elif event == "injury_death":
         npc["status"] = "dead"
-        npc["history"].append(f"[{today}] Succumbed to injuries. Faction: {faction}, Rank: {rank}.")
+        _hist(npc, f"[{today}] Succumbed to injuries. Faction: {faction}, Rank: {rank}.")
         _complication = random.choice([
             "infection set in and Patchwork Saints couldn't hold it",
             "internal bleeding that wasn't caught in time",
@@ -731,30 +1203,68 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
         )
 
     elif event == "resurrection":
-        npc["status"] = "alive"
-        npc["history"].append(f"[{today}] Returned from death. Changed.")
-        new_secret = await _generate(
-            f"NPC {name} has returned from death in the Undercity.\n"
-            f"Generate ONE new secret they now carry. Something changed. Something wrong.\n"
-            f"Output ONLY the secret in 1-2 sentences. No preamble."
-        )
-        if new_secret:
-            npc["secret"] = new_secret
-        announcement = await _generate(
-            f"{_LORE}\nNPC: {name}, previously of {faction}.\n"
-            f"Event: Has returned from death. Unexplained. Changed.\n"
-            f"Write a 2-3 line Undercity bulletin. Unsettling. Raise questions, answer none.\n"
-            f"No preamble. Output only the bulletin."
-        )
+        # Three return paths: 40% Tower Fund Me (legit), 30% doppelganger, 30% undead
+        _return_roll = random.random()
+        if _return_roll < 0.40:
+            # Legitimate Tower Fund Me resurrection
+            npc["status"] = "alive"
+            _hist(npc, f"[{today}] Returned from death via Tower Fund Me. Alive again, for a price.")
+            new_secret = await _generate(
+                f"NPC {name} was crowdfunded back to life via the Tower's resurrection service.\n"
+                f"Generate ONE secret about what they had to give up or what changed in them.\n"
+                f"Output ONLY the secret in 1-2 sentences. No preamble."
+            )
+            if new_secret:
+                npc["secret"] = new_secret
+            announcement = await _generate(
+                f"{_LORE}\nNPC: {name}, previously of {faction}.\n"
+                f"Event: Has returned via a Tower Fund Me — publicly funded resurrection through the Tower's services.\n"
+                f"Write a 2-3 line Undercity bulletin. Bittersweet. Debts owed. Something is different.\n"
+                f"No preamble. Output only the bulletin."
+            )
+        elif _return_roll < 0.70:
+            # Doppelganger — something is wearing their face
+            npc["status"] = "doppelganger"
+            _hist(npc, f"[{today}] A doppelganger wearing {name}'s face has appeared. The original is still dead.")
+            new_secret = await _generate(
+                f"Something is wearing the face of {name}, {rank} of {faction}, who died in the Undercity.\n"
+                f"Generate ONE secret about what this imposter wants or what it is hiding.\n"
+                f"Output ONLY the secret in 1-2 sentences. No preamble."
+            )
+            if new_secret:
+                npc["secret"] = new_secret
+            announcement = await _generate(
+                f"{_LORE}\nNPC: {name}, {rank} of {faction} — confirmed dead.\n"
+                f"Event: Someone matching their description has been seen alive. Multiple witnesses. Something is wrong.\n"
+                f"Write a 2-3 line Undercity rumour bulletin. Disturbing. Wrong details. Nobody can explain it.\n"
+                f"No preamble. Output only the bulletin."
+            )
+        else:
+            # Undead return — reanimated, wrong
+            npc["status"] = "undead"
+            _hist(npc, f"[{today}] Returned as undead. Reanimated. Not the same.")
+            new_secret = await _generate(
+                f"NPC {name} has returned as an undead form in the Undercity.\n"
+                f"Generate ONE secret about what drives them now — what fragment of memory or purpose survived.\n"
+                f"Output ONLY the secret in 1-2 sentences. No preamble."
+            )
+            if new_secret:
+                npc["secret"] = new_secret
+            announcement = await _generate(
+                f"{_LORE}\nNPC: {name}, {rank} of {faction} — died, confirmed.\n"
+                f"Event: Has returned — but wrong. Moving wrong. Speaking wrong. Looking through people, not at them.\n"
+                f"Write a 2-3 line Undercity bulletin. Horror-adjacent. Real fear in the district.\n"
+                f"No preamble. Output only the bulletin."
+            )
 
     elif event == "alliance":
-        candidates = [n for n in all_npcs if n.get("name") != name and n.get("status") == "alive"]
+        candidates = [n for n in all_npcs if n.get("name") != name and n.get("status") in ("alive","undead","doppelganger")]
         if candidates:
             ally         = random.choice(candidates)
             ally_name    = ally.get("name", "Unknown")
             ally_faction = ally.get("faction", "Unknown")
-            npc["history"].append(f"[{today}] Formed alliance with {ally_name} ({ally_faction}).")
-            npc["relationships"] = npc.get("relationships", "") + f" | Alliance with {ally_name} ({ally_faction})."
+            _hist(npc, f"[{today}] Formed alliance with {ally_name} ({ally_faction}).")
+            npc["relationships"] = str(npc.get("relationships") or "") + f" | Alliance with {ally_name} ({ally_faction})."
             announcement = await _generate(
                 f"{_LORE}\nNPC: {name} ({faction}) has formed a notable alliance with {ally_name} ({ally_faction}).\n"
                 f"Write a 2-3 line Undercity bulletin. What does it mean for the balance of power?\n"
@@ -762,7 +1272,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             )
 
     elif event == "betrayal":
-        npc["history"].append(f"[{today}] Committed a significant betrayal within {faction}.")
+        _hist(npc, f"[{today}] Committed a significant betrayal within {faction}.")
         announcement = await _generate(
             f"{_LORE}\nNPC: {name}, {faction}, {rank}.\n"
             f"Event: Has betrayed someone within their faction. Details not fully known.\n"
@@ -779,7 +1289,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
         )
         if new_secret:
             npc["secret"] = new_secret
-            npc["history"].append(f"[{today}] New secret acquired.")
+            _hist(npc, f"[{today}] New secret acquired.")
         return None, "new_secret"  # no public announcement
 
     elif event == "public_incident":
@@ -790,7 +1300,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
             f"No preamble. Output only the bulletin."
         )
         if announcement:
-            npc["history"].append(f"[{today}] Public incident.")
+            _hist(npc, f"[{today}] Public incident.")
 
     elif event == "daily_generated":
         scenario = _get_random_daily_event()
@@ -806,7 +1316,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
                 f"No preamble. Output only the bulletin."
             )
             if announcement:
-                npc["history"].append(f"[{today}] {scenario[:80]}{'...' if len(scenario) > 80 else ''}")
+                _hist(npc, f"[{today}] {scenario[:80]}{'...' if len(scenario) > 80 else ''}")
                 logger.info(f"🧬 Daily event for {name}: {scenario[:60]}")
         else:
             # No daily events available — fall back to public incident
@@ -816,7 +1326,7 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> Optional[str]:
                 f"Write a 2-3 line Undercity bulletin. No preamble. Output only the bulletin."
             )
             if announcement:
-                npc["history"].append(f"[{today}] Public incident.")
+                _hist(npc, f"[{today}] Public incident.")
 
     npc["last_event_at"] = datetime.now().isoformat()
 
@@ -874,17 +1384,105 @@ def _seed_from_txt() -> List[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Quote generation — backfill existing NPCs that pre-date the quote field
+# ---------------------------------------------------------------------------
+
+async def _generate_npc_quote(npc: dict) -> str:
+    """
+    Generate a unique in-character quote for one NPC based on their full
+    context. Returns the quote string, or — on failure.
+    """
+    name       = npc.get("name", "Unknown")
+    faction    = npc.get("faction", "Independent")
+    rank       = npc.get("rank", "Member")
+    role       = npc.get("role", "")
+    motivation = npc.get("motivation", "")
+    appearance = npc.get("description", "") or npc.get("appearance", "")
+    species    = npc.get("species", "Human")
+
+    prompt = f"""Write ONE in-character quote for this NPC from the Undercity — a sealed dome city mixing dark fantasy and cyberpunk.
+
+NPC:
+- Name: {name}
+- Faction: {faction} ({rank})
+- Species: {species}
+- Role: {role}
+- Appearance: {appearance[:120] if appearance else 'not described'}
+- What they want: {motivation[:120] if motivation else 'not known'}
+
+RULES:
+- Exactly 1 sentence. First person. Their actual voice — gruff, formal, weary, sharp, devout, or sly depending on who they are.
+- Specific to this character. Not generic Undercity wisdom that any NPC could say.
+- No quotation marks. No preamble. Output the sentence only."""
+
+    text = await _generate(prompt, timeout=90.0, num_predict=120, retries=1)
+    if not text:
+        return ""
+    # Strip any accidental quotation marks or leading/trailing noise
+    quote = text.strip().strip('"').strip("'").strip()
+    # If the model returned multiple sentences take only the first
+    first = re.split(r'(?<=[.!?])\s', quote, maxsplit=1)[0].strip()
+    return first
+
+
+async def _backfill_npc_quotes(npcs: list, max_per_run: int = 3) -> int:
+    """
+    Generate and persist quotes for alive NPCs that don't have one yet.
+    Capped at max_per_run per lifecycle cycle so it doesn't hammer Ollama.
+    Returns the number of quotes generated.
+    """
+    from src.resource_cop import wait_for_ollama_turn
+    missing = [n for n in npcs if not n.get("quote") and n.get("status") == "alive"]
+    if not missing:
+        return 0
+    logger.info(f"🗣️ Backfilling quotes for {min(len(missing), max_per_run)}/{len(missing)} NPCs without one")
+    generated = 0
+    for npc in missing[:max_per_run]:
+        decision = await wait_for_ollama_turn("npc_quote_backfill", track="quick")
+        if not decision.run_now:
+            logger.info(f"🗣️ Ollama busy — stopping quote backfill at {generated} (will resume next cycle)")
+            break
+        quote = await _generate_npc_quote(npc)
+        if quote:
+            npc["quote"] = quote
+            _save_npc(npc)
+            logger.info(f"🗣️ Quote saved for {npc['name']}: {quote[:60]}…")
+            generated += 1
+    return generated
+
+
+# ---------------------------------------------------------------------------
 # Main daily lifecycle tick
 # ---------------------------------------------------------------------------
 
-async def run_daily_lifecycle(channel) -> None:
-    import discord
+async def run_daily_lifecycle(channel) -> bool:
+    """Run one NPC lifecycle cycle.
 
-    # Skip if Ollama is busy with a long-running task (e.g. module generation)
-    from src.ollama_busy import is_available, get_busy_reason
+    Returns False when the cycle was deferred because Ollama was busy, so the
+    caller can retry soon instead of losing the daily lifecycle window.
+    """
+    global _lifecycle_force
+    from src.ollama_busy import is_available, get_busy_reason, mark_busy, mark_available
+
     if not is_available():
         logger.info(f"🧬 Ollama busy ({get_busy_reason()}) — skipping lifecycle cycle")
-        return
+        return False
+
+    mark_busy("npc lifecycle cycle")
+    _lifecycle_force = True
+    try:
+        await _lifecycle_cycle(channel)
+    except Exception as e:
+        logger.exception(f"🧬 Lifecycle cycle error — cleanup still running: {e}")
+    finally:
+        _lifecycle_force = False
+        mark_available()
+    return True
+
+
+async def _lifecycle_cycle(channel) -> None:
+    """Inner lifecycle body — always called inside run_daily_lifecycle's try/finally."""
+    import discord
 
     # Generate fresh daily event scenarios if stale
     try:
@@ -911,48 +1509,168 @@ async def run_daily_lifecycle(channel) -> None:
 
     # Generate 1 new NPC
     new_npc = await generate_new_npc(npcs)
+    if not new_npc:
+        logger.warning("🧬 generate_new_npc returned None — Ollama may be unavailable")
     if new_npc:
         npcs.append(new_npc)
         _save_npcs(npcs)
         logger.info(f"🧬 New NPC: {new_npc['name']} ({new_npc['faction']}, {new_npc['rank']})")
 
-        # Auto-generate appearance profile for the new NPC so they're immediately
-        # usable in story image prompts and captions without a manual /gearrun.
+        # Auto-generate appearance profile (stats, equipment, style, SD prompt)
+        # and merge it back into the NPC's data_json so it's visible everywhere.
+        _app_profile: dict = {}
         try:
             from src.npc_appearance import _generate_npc_profile, _save_npc_appearance, get_all_sd_prompts, NPC_APP_DIR
             import json as _json
-            profile = await _generate_npc_profile(new_npc)
-            _save_npc_appearance(new_npc["name"], profile)
+            _app_profile = await _generate_npc_profile(new_npc, force=True)
+            _save_npc_appearance(new_npc["name"], _app_profile)
+            # Merge stats / equipment / style back into the NPC's own record
+            new_npc["stats"]     = _app_profile.get("dnd_stats", {})
+            new_npc["equipment"] = _app_profile.get("equipment", {})
+            new_npc["style"]     = _app_profile.get("style_note", "")
+            new_npc["sd_prompt"] = _app_profile.get("sd_appearance", "")
+            _save_npcs(npcs)
             # Also update flat lookup file for legacy compatibility
-            flat = get_all_sd_prompts()
-            flat[new_npc["name"]] = profile.get("sd_appearance", "")
-            (NPC_APP_DIR / "_all_sd_prompts.json").write_text(
-                _json.dumps(flat, indent=2, ensure_ascii=False), encoding="utf-8"
-            )
             logger.info(f"🎨 Appearance profile generated for new NPC: {new_npc['name']}")
         except Exception as _ae:
             logger.warning(f"🎨 Appearance profile failed for {new_npc['name']}: {_ae}")
 
+        # Generate quote for the new NPC if the generation prompt didn't produce one
+        if not new_npc.get("quote"):
+            try:
+                _q = await _generate_npc_quote(new_npc)
+                if _q:
+                    new_npc["quote"] = _q
+                    _save_npc(new_npc)
+                    logger.info(f"🗣️ Quote generated for new NPC {new_npc['name']}: {_q[:60]}…")
+            except Exception as _qe:
+                logger.warning(f"🗣️ Quote generation failed for {new_npc['name']}: {_qe}")
+
+        # Backfill quotes for existing NPCs that pre-date this feature (3 per cycle)
+        try:
+            _backfilled = await _backfill_npc_quotes(npcs, max_per_run=3)
+            if _backfilled:
+                logger.info(f"🗣️ Backfilled {_backfilled} NPC quote(s) this cycle")
+        except Exception as _be:
+            logger.warning(f"🗣️ Quote backfill error: {_be}")
+
+        # Build the intro announcement with full NPC context
+        _npc_appearance  = new_npc.get("appearance", "")
+        _npc_motivation  = new_npc.get("motivation", "")
+        _npc_role        = new_npc.get("role", "")
+        _npc_location    = new_npc.get("location", "")
+        _npc_relations   = new_npc.get("relationships", "")
+        _npc_equip       = _app_profile.get("equipment", {}) if _app_profile else {}
+        # Fall back to the LLM-generated string field if appearance profile didn't run
+        _equip_str       = new_npc.get("equipment", "")
+        if _npc_equip and isinstance(_npc_equip, dict):
+            _equip_line = f"Carries: {_npc_equip.get('weapons','')}, wears {_npc_equip.get('armour','')}."
+        elif _equip_str:
+            _equip_line = f"Equipment: {_equip_str}."
+        else:
+            _equip_line = ""
+        _style_line      = _app_profile.get("style_note", "") if _app_profile else new_npc.get("style", "")
+
         intro = await _generate(
-            f"{_LORE}\n"
-            f"A new person has stepped into relevance in the Undercity.\n"
-            f"Name: {new_npc['name']}\nFaction: {new_npc['faction']}\nRank: {new_npc['rank']}\n"
-            f"Species: {new_npc['species']}\nRole: {new_npc['role']}\nLocation: {new_npc['location']}\n"
-            f"Write a SHORT 2-3 line bulletin introducing them as someone the city is starting to notice.\n"
-            f"Do NOT reveal their secret. No preamble. Output only the bulletin."
+            f"{_LORE}\n\n"
+            f"Write a city bulletin announcing a new person now operating in the Undercity.\n"
+            f"Vary your opener — options include: 'Word is out:', 'A new face in the Undercity:', "
+            f"'The city is talking about:', 'Making rounds in the {new_npc['faction']} circles:', "
+            f"'Fresh blood in the {new_npc['faction']}:', or any similar gritty opening that fits.\n\n"
+            f"NPC PROFILE:\n"
+            f"Name: {new_npc['name']}\n"
+            f"Species: {new_npc['species']}\n"
+            f"Faction: {new_npc['faction']}\n"
+            f"Rank: {new_npc['rank']}\n"
+            f"Role: {_npc_role}\n"
+            f"Location: {_npc_location}\n"
+            f"Appearance: {_npc_appearance}\n"
+            f"Motivation: {_npc_motivation}\n"
+            f"Known connections: {_npc_relations}\n"
+            f"{_equip_line}\n"
+            f"Style: {_style_line}\n\n"
+            f"REQUIREMENTS:\n"
+            f"- 4-6 sentences. A Read More button handles overflow so be generous.\n"
+            f"- First sentence: who they are and what they do day-to-day\n"
+            f"- Second sentence: their faction affiliation and rank\n"
+            f"- Third sentence: something distinctive — appearance, equipment, how they carry themselves\n"
+            f"- Fourth+ sentences: rumours, tensions, hooks, known associates (not their secret)\n"
+            f"- Gritty, specific. Reads like city gossip or a posted notice.\n"
+            f"- Do NOT reveal their secret. No preamble. Output only the bulletin text."
         )
         if intro and channel:
-            embed = discord.Embed(
-                title=f"👤 New Face — {new_npc['name']}",
-                description=intro,
-                color=discord.Color.teal()
-            )
-            embed.set_footer(text=f"{new_npc['rank']} · {new_npc['faction']} · {new_npc['species']}")
-            await channel.send(embed=embed)
+            logger.info(f"🧬 Posting new NPC intro: {new_npc['name']}")
+            try:
+                _dnd   = _app_profile.get("dnd_stats", new_npc.get("stats", {}))
+                _cls   = _dnd.get("class", "")
+                _sub   = _dnd.get("subclass", "")
+                _lv    = _dnd.get("level", "")
+                _hp    = _dnd.get("HP", "")
+                _ac    = _dnd.get("AC", "")
+                _class_str = f"{_cls}/{_sub}" if _sub else _cls
+                _level_str = f"{_class_str} {_lv}" if _cls and _lv else ""
+                _statline = (
+                    f"STR {_dnd.get('STR','?')} · DEX {_dnd.get('DEX','?')} · CON {_dnd.get('CON','?')}"
+                    f" · INT {_dnd.get('INT','?')} · WIS {_dnd.get('WIS','?')} · CHA {_dnd.get('CHA','?')}"
+                ) if _dnd.get("STR") else ""
+                embed = discord.Embed(
+                    title=f"👤 New Face — {new_npc['name']}",
+                    description=intro,
+                    color=discord.Color.teal()
+                )
+                embed.add_field(name="Faction", value=f"{new_npc['rank']} · {new_npc['faction']}", inline=True)
+                embed.add_field(name="Species", value=new_npc["species"], inline=True)
+                if _level_str:
+                    embed.add_field(name="Class", value=_level_str, inline=True)
+                if _npc_location:
+                    embed.add_field(name="Location", value=_npc_location, inline=True)
+                if _npc_equip:
+                    embed.add_field(
+                        name="Equipment",
+                        value=f"**Weapons:** {_npc_equip.get('weapons','?')}\n**Armour:** {_npc_equip.get('armour','?')}",
+                        inline=True
+                    )
+                if _hp and _ac:
+                    embed.add_field(name="HP / AC", value=f"HP {_hp} · AC {_ac}", inline=True)
+                elif _hp:
+                    embed.add_field(name="HP", value=str(_hp), inline=True)
+                if _statline:
+                    embed.add_field(name="Stats", value=_statline, inline=False)
+                try:
+                    from src.expandable_bulletin import make_bulletin_view
+                    _npc_view = make_bulletin_view(
+                        intro, "news",
+                        headline=f"New Face — {new_npc['name']}",
+                        source_attribution="TNN City Desk",
+                    )
+                    await channel.send(embed=embed, view=_npc_view)
+                except Exception:
+                    await channel.send(embed=embed)
+            except Exception as _de:
+                logger.warning(f"🧬 Discord send failed (new NPC intro): {_de}")
+        elif not intro:
+            logger.warning(f"🧬 New NPC intro generation returned None — posting minimal announcement")
+            if channel:
+                try:
+                    _fallback_embed = discord.Embed(
+                        title=f"👤 New Face — {new_npc['name']}",
+                        description=(
+                            f"A new contact has surfaced in the Undercity. "
+                            f"Details are still coming in."
+                        ),
+                        color=discord.Color.teal(),
+                    )
+                    _fallback_embed.add_field(name="Faction", value=f"{new_npc.get('rank','')} · {new_npc.get('faction','')}", inline=True)
+                    _fallback_embed.add_field(name="Species", value=new_npc.get("species", "Unknown"), inline=True)
+                    if new_npc.get("location"):
+                        _fallback_embed.add_field(name="Location", value=new_npc["location"], inline=True)
+                    await channel.send(embed=_fallback_embed)
+                except Exception as _fe:
+                    logger.warning(f"🧬 Fallback NPC announce failed: {_fe}")
 
     # Roll events for 1-3 existing NPCs
     # Include injured NPCs — they MUST resolve on the next cycle
-    alive_npcs       = [n for n in npcs if n.get("status") == "alive"]
+    alive_npcs       = [n for n in npcs if n.get("status") in ("alive","undead","doppelganger")]
     injured_npcs     = [n for n in npcs if n.get("status") == "injured"]
     # Injured NPCs are always included; sample from alive for the remainder
     sample_count     = max(0, random.randint(1, 3) - len(injured_npcs))
@@ -977,18 +1695,18 @@ async def run_daily_lifecycle(channel) -> None:
         if announcement and channel:
             # Event-specific embed colors — each event type is visually distinct
             _EVENT_COLORS = {
-                "promotion":        0x55AA44,  # green-gold — good news
-                "demotion":         0xBB6622,  # dark orange — bad career move
-                "faction_defection": 0x9944CC, # purple — dramatic shift
-                "revelation":       0xCCAA33,  # amber/gold — secrets exposed
-                "death":            0x992222,  # dark red — death
-                "injury_recovery":  0x55BB77,  # soft green — healing
-                "injury_death":     0x992222,  # dark red — death from injury
-                "resurrection":     0xAA33CC,  # violet — supernatural return
-                "alliance":         0x3366BB,  # blue — political
-                "betrayal":         0xCC3344,  # crimson — treachery
-                "public_incident":  0x667788,  # slate grey — city news
-                "daily_generated":  0x338899,  # teal — daily event
+                "promotion":        0x55AA44,
+                "demotion":         0xBB6622,
+                "faction_defection": 0x9944CC,
+                "revelation":       0xCCAA33,
+                "death":            0x992222,
+                "injury_recovery":  0x55BB77,
+                "injury_death":     0x992222,
+                "resurrection":     0xAA33CC,
+                "alliance":         0x3366BB,
+                "betrayal":         0xCC3344,
+                "public_incident":  0x667788,
+                "daily_generated":  0x338899,
             }
             _EVENT_EMOJI = {
                 "promotion":        "📈",
@@ -1007,14 +1725,15 @@ async def run_daily_lifecycle(channel) -> None:
             evt = event_type or "public_incident"
             color = _EVENT_COLORS.get(evt, 0x667788)
             emoji = _EVENT_EMOJI.get(evt, "📰")
-            embed = discord.Embed(
-                description=announcement,
-                color=color
-            )
-            embed.set_footer(
-                text=f"{emoji} {npc['name']} · {npc.get('faction','?')} · {npc.get('rank','?')}"
-            )
-            await channel.send(embed=embed)
+            logger.info(f"🧬 Posting event ({evt}) for {npc['name']}")
+            try:
+                embed = discord.Embed(description=announcement, color=color)
+                embed.set_footer(
+                    text=f"{emoji} {npc['name']} · {npc.get('faction','?')} · {npc.get('rank','?')}"
+                )
+                await channel.send(embed=embed)
+            except Exception as _de:
+                logger.warning(f"🧬 Discord send failed (event {evt} for {npc['name']}): {_de}")
 
         await asyncio.sleep(5)
 
@@ -1043,7 +1762,7 @@ async def run_daily_lifecycle(channel) -> None:
     for npc in injury_targets:
         npc["status"]        = "injured"
         npc["last_event_at"] = datetime.now().isoformat()
-        npc["history"].append(f"[{today_str}] Injured.")
+        _hist(npc, f"[{today_str}] Injured.")
         _save_npcs(npcs)
 
         _injury_cause = random.choice([
@@ -1108,12 +1827,18 @@ async def run_daily_lifecycle(channel) -> None:
         )
 
         if injury_bulletin and channel:
-            embed = discord.Embed(
-                description=injury_bulletin,
-                color=discord.Color.orange()
-            )
-            embed.set_footer(text=f"🩹 {npc['name']} · {npc.get('faction', '?')} · {npc.get('rank', '?')}")
-            await channel.send(embed=embed)
+            logger.info(f"🧬 Posting injury bulletin for {npc['name']}")
+            try:
+                embed = discord.Embed(
+                    description=injury_bulletin,
+                    color=discord.Color.orange()
+                )
+                embed.set_footer(text=f"🩹 {npc['name']} · {npc.get('faction', '?')} · {npc.get('rank', '?')}")
+                await channel.send(embed=embed)
+            except Exception as _de:
+                logger.warning(f"🧬 Discord send failed (injury bulletin for {npc['name']}): {_de}")
+        elif not injury_bulletin:
+            logger.warning(f"🧬 Injury bulletin generation returned None for {npc['name']}")
 
         await asyncio.sleep(5)
 
@@ -1123,13 +1848,30 @@ async def run_daily_lifecycle(channel) -> None:
     )
 
     # --- Graveyard Events: super rare resurrection / undead / doppelganger ---
-    graveyard = _load_graveyard()
-    if graveyard:
-        logger.info(f"🪦 Checking graveyard events ({len(graveyard)} dead NPCs)...")
+    # Always run so a coroner's report posts even on quiet cycles.
+    try:
+        await _check_graveyard_events(channel)
+    except Exception as e:
+        logger.warning(f"🪦 Graveyard event error: {e}")
+
+    # --- Party guild contract events: one party per cycle ---
+    try:
+        await _run_party_guild_event(channel)
+    except Exception as e:
+        logger.warning(f"🏢 Party guild event error: {e}")
+
+    # --- Stat block backfill: background task, waits for Ollama slot ---
+    async def _backfill_task():
         try:
-            await _check_graveyard_events(channel)
+            from src.npc_statblock_backfill import run_statblock_backfill
+            _sb_filled = await run_statblock_backfill(n=2)
+            if _sb_filled:
+                logger.info(f"📋 Stat block backfill: filled {_sb_filled} NPC(s)")
         except Exception as e:
-            logger.warning(f"🪦 Graveyard event error: {e}")
+            logger.warning(f"📋 Stat block backfill error: {e}")
+    asyncio.create_task(_backfill_task())
+
+    # Cleanup is handled by run_daily_lifecycle's finally block — do not call here.
 
 
 # ---------------------------------------------------------------------------
@@ -1142,6 +1884,7 @@ async def run_daily_lifecycle(channel) -> None:
 
 FACTION_LEADERS = {
     "Iron Fang Consortium":   "Serrik Dhal",
+    "Iron Fang Syndicate":    "Sera Voss",
     "Argent Blades":          "Lady Cerys Valemont",
     "Wardens of Ash":         "Captain Havel Korin",
     "Serpent Choir":          "High Apostle Yzura",
@@ -1167,6 +1910,124 @@ def is_faction_leader(npc_name: str) -> bool:
 def get_leader_faction(npc_name: str) -> Optional[str]:
     """Return the faction a leader leads, or None."""
     return _LEADER_NAMES.get(npc_name.lower())
+
+
+def injure_npc_by_name(name: str, cause: str = "") -> bool:
+    """Mark a specific NPC as injured (e.g. survived an assassination attempt).
+    The normal lifecycle tick then resolves injured NPCs (~90% recover, ~10% die
+    and move to the graveyard). Returns True if an NPC was found and injured."""
+    if not name:
+        return False
+    try:
+        npcs = _load_npcs()
+    except Exception as e:
+        logger.warning(f"injure_npc_by_name load failed: {e}")
+        return False
+    target = next((n for n in npcs if str(n.get("name", "")).lower() == name.lower()), None)
+    if not target:
+        return False
+    if str(target.get("status", "")).lower() in ("dead", "deceased"):
+        return False
+    today = datetime.now().strftime("%Y-%m-%d")
+    target["status"] = "injured"
+    target["last_event_at"] = datetime.now().isoformat()
+    _hist(target, f"[{today}] Injured in an assassination attempt{(' -- ' + cause) if cause else ''}.")
+    try:
+        _save_npcs(npcs)
+    except Exception as e:
+        logger.warning(f"injure_npc_by_name save failed: {e}")
+        return False
+    logger.info(f"\U0001fa78 {name} injured by an assassination attempt -- lifecycle will resolve recovery or death")
+    return True
+
+
+def wound_npc_in_combat(name: str, cause: str = "") -> bool:
+    """Wound a specific NPC in combat (battle/assault/ambush) -- the general-purpose
+    counterpart to the assassination-specific injure_npc_by_name. Sets status='injured'
+    with a combat history line; the normal lifecycle tick then resolves recovery (~90%)
+    or a move to the graveyard (~10%). Refuses faction leaders (a random combat tick must
+    never kill a leader -- only deliberate, gated outcomes can) and only wounds the living.
+    Returns True if an NPC was found and wounded."""
+    if not name:
+        return False
+    if is_faction_leader(name):
+        return False
+    try:
+        npcs = _load_npcs()
+    except Exception as e:
+        logger.warning(f"wound_npc_in_combat load failed: {e}")
+        return False
+    target = next((n for n in npcs if str(n.get("name", "")).lower() == name.lower()), None)
+    if not target:
+        return False
+    if str(target.get("status", "")).lower() not in ("alive", "", "active"):
+        return False  # only wound the living -- skip injured/undead/doppelganger/dead
+    today = datetime.now().strftime("%Y-%m-%d")
+    target["status"] = "injured"
+    target["last_event_at"] = datetime.now().isoformat()
+    _hist(target, f"[{today}] Wounded in the fighting{(' -- ' + cause) if cause else ''}.")
+    try:
+        _save_npcs(npcs)
+    except Exception as e:
+        logger.warning(f"wound_npc_in_combat save failed: {e}")
+        return False
+    logger.info(f"\U0001fa78 {name} wounded in combat ({cause or 'fighting'}) -- lifecycle will resolve recovery or death")
+    return True
+
+
+def wound_random_faction_member(faction: str, cause: str = "") -> str:
+    """Pick a random LIVING, non-leader member of a faction and wound them in combat.
+    Used by battle/assault/ambush butterfly consequences so violence has real casualties
+    without ever random-killing a faction leader. Returns the wounded NPC's name, or ''."""
+    if not faction:
+        return ""
+    f = faction.strip().lower()
+    try:
+        npcs = _load_npcs()
+    except Exception as e:
+        logger.warning(f"wound_random_faction_member load failed: {e}")
+        return ""
+    candidates = []
+    for n in npcs:
+        nf = str(n.get("faction", "")).strip().lower()
+        if not nf or not (f in nf or nf in f):
+            continue
+        if str(n.get("status", "")).lower() not in ("alive", "", "active"):
+            continue
+        nm = str(n.get("name", "")).strip()
+        if not nm or is_faction_leader(nm) or is_unknown_party_member(nm):
+            continue
+        candidates.append(nm)
+    if not candidates:
+        return ""
+    chosen = random.choice(candidates)
+    return chosen if wound_npc_in_combat(chosen, cause=cause) else ""
+
+
+# ---------------------------------------------------------------------------
+# Unknown Party — members receive special graveyard handling identical in
+# weight to faction leaders (automatic, not random chance).
+# ---------------------------------------------------------------------------
+
+UNKNOWN_PARTY_MEMBERS = {
+    "The Ward":  {"true_faction": "Tower Authority",        "designation": "WARD",    "cover": "Independent enforcer"},
+    "Carrion":   {"true_faction": "Iron Fang Consortium",   "designation": "CARRION", "cover": "Independent scavenger"},
+    "Sable":     {"true_faction": "Glass Sigil",            "designation": "SABLE",   "cover": "Serpent Choir (disputed)"},
+    "Locket":    {"true_faction": "Obsidian Lotus",         "designation": "LOCKET",  "cover": "Independent"},
+    "The Mute":  {"true_faction": "Wardens of Ash",         "designation": "VIGIL",   "cover": "Independent"},
+}
+
+_PARTY_MEMBER_NAMES = {k.lower(): v for k, v in UNKNOWN_PARTY_MEMBERS.items()}
+
+
+def is_unknown_party_member(npc_name: str) -> bool:
+    """Check if an NPC is a known Unknown Party member."""
+    return npc_name.lower() in _PARTY_MEMBER_NAMES
+
+
+def get_party_member_data(npc_name: str) -> Optional[dict]:
+    """Return Unknown Party metadata for the NPC, or None."""
+    return _PARTY_MEMBER_NAMES.get(npc_name.lower())
 
 
 # Leader death outcomes and weights
@@ -1215,7 +2076,7 @@ async def _handle_leader_death(dead_npc: dict, npcs: List[dict], channel) -> str
         )
 
         dead_npc["status"] = "injured"
-        dead_npc["history"].append(f"[{today}] KILLED AND RAISED. Faction emergency resurrection. Weakened.")
+        _hist(dead_npc, f"[{today}] KILLED AND RAISED. Faction emergency resurrection. Weakened.")
         dead_npc.pop("cause_of_death", None)
         dead_npc.pop("moved_to_graveyard_at", None)
         dead_npc["last_event_at"] = datetime.now().isoformat()
@@ -1269,7 +2130,7 @@ async def _handle_leader_death(dead_npc: dict, npcs: List[dict], channel) -> str
 
         dead_npc["status"] = "alive"
         dead_npc["species"] = f"{new_species} (formerly {species})"
-        dead_npc["history"].append(
+        _hist(dead_npc,
             f"[{today}] KILLED AND RESURRECTED \u2014 returned as {new_species}. "
             f"Personality shifted: {personality_shift}.{' Gender changed.' if gender_flip else ''}"
         )
@@ -1304,14 +2165,14 @@ async def _handle_leader_death(dead_npc: dict, npcs: List[dict], channel) -> str
         faction_members = [
             n for n in npcs
             if n.get("faction") == faction
-            and n.get("status") in ("alive", "injured")
+            and n.get("status") in ("alive", "injured", "undead", "doppelganger")
             and n.get("name") != name
         ]
 
         successor = None
         successor_name = "no one"
         if faction_members:
-            ranks = FACTION_RANKS.get(faction, [])
+            ranks = _ranks_for_faction(faction)
             rank_order = {r: i for i, r in enumerate(ranks)}
 
             def rank_score(npc):
@@ -1325,7 +2186,7 @@ async def _handle_leader_death(dead_npc: dict, npcs: List[dict], channel) -> str
             old_rank = successor.get("rank", "?")
             top_rank = ranks[-1] if ranks else "Leader"
             successor["rank"] = top_rank
-            successor["history"].append(
+            _hist(successor,
                 f"[{today}] PROMOTED to {top_rank} of {faction} following the permanent loss of {name}."
             )
             successor["oracle_notes"] = (
@@ -1364,8 +2225,11 @@ async def _handle_leader_death(dead_npc: dict, npcs: List[dict], channel) -> str
         )
 
         # Mark as permanently absorbed in graveyard
-        dead_npc["history"].append(f"[{today}] TOWER ABSORBED \u2014 soul claimed permanently. No resurrection possible.")
+        _hist(dead_npc, f"[{today}] TOWER ABSORBED \u2014 soul claimed permanently. No resurrection possible.")
         dead_npc["tower_absorbed"] = True
+        npc_id = dead_npc.get("_db_id") or dead_npc.get("id")
+        if npc_id:
+            raw_execute("UPDATE npcs SET tower_absorbed=1 WHERE id=%s", (npc_id,))
         _save_graveyard(graveyard)
 
         if bulletin and channel:
@@ -1387,15 +2251,103 @@ GRAVEYARD_EVENT_CHANCES = {
 }
 
 
+async def _handle_party_member_death(dead_npc: dict, npcs: List[dict], channel) -> None:
+    """
+    Special graveyard processing for Unknown Party member deaths.
+    Unlike faction leaders (who have public power), party members are covert —
+    their death is significant because it risks exposing the whole cell.
+    Always fires (no random roll), once per cycle.
+    """
+    import discord
+
+    name       = dead_npc.get("name", "Unknown")
+    faction    = dead_npc.get("faction", "Independent")
+    species    = dead_npc.get("species", "Human")
+    today      = datetime.now().strftime("%Y-%m-%d")
+    party_data = get_party_member_data(name)
+    true_faction  = party_data["true_faction"] if party_data else "Unknown"
+    designation   = party_data["designation"]  if party_data else "UNKNOWN"
+    cover         = party_data["cover"]         if party_data else "Independent"
+
+    # Remaining alive party members
+    alive_members = [
+        m for m in UNKNOWN_PARTY_MEMBERS
+        if m != name and any(n.get("name") == m and n.get("status") in ("alive","injured","undead","doppelganger") for n in npcs)
+    ]
+    member_count_line = (
+        f"Remaining active designations: {', '.join(alive_members)}." if alive_members
+        else "No remaining active designations confirmed."
+    )
+
+    bulletin = await _generate(
+        f"{_LORE}\n\n"
+        f"CLASSIFIED CONTEXT (do NOT reveal explicitly in the bulletin):\n"
+        f"'{name}' was designation {designation}, a covert operative of {true_faction} "
+        f"embedded in an anonymous adventuring cell called the Unknown Party. "
+        f"Their public cover was: {cover}.\n"
+        f"{member_count_line}\n\n"
+        f"Write TWO short items:\n\n"
+        f"ITEM 1 — A public city notice (2-3 lines): announce the death of '{name}' as the city "
+        f"would see it — as a {cover}, with no mention of their true allegiance. "
+        f"Terse, grim. The city barely knew them.\n\n"
+        f"ITEM 2 — An intercepted internal dispatch (2-3 lines): a fragment of a coded message "
+        f"between {true_faction} handlers. Uses the designation {designation}. "
+        f"Implies the cell's cover may be compromised. Does not name the Unknown Party directly. "
+        f"Reads like a bureaucratic warning with an edge of controlled panic.\n\n"
+        f"Format:\n"
+        f"PUBLIC: [bulletin text]\n"
+        f"INTERCEPTED: [dispatch text]\n\n"
+        f"No preamble. Output only those two labeled blocks."
+    )
+
+    # Update the dead NPC's history
+    _hist(dead_npc,
+        f"[{today}] Unknown Party member. Designation {designation} ({true_faction}). "
+        f"Special graveyard protocol triggered."
+    )
+    _save_graveyard([dead_npc])
+
+    logger.info(f"🎭 Unknown Party death protocol for {name} (designation {designation})")
+
+    if bulletin and channel:
+        try:
+            embed = discord.Embed(
+                title=f"🎭 Designation {designation} — Lost",
+                description=bulletin,
+                color=0x2a2a3a,  # near-black — covert, heavy
+            )
+            embed.set_footer(text=f"Unknown Party · {name} · {true_faction} (classified)")
+            await channel.send(embed=embed)
+        except Exception as _de:
+            logger.warning(f"🎭 Unknown Party death Discord send failed: {_de}")
+
+
+_CORONER_QUIET = [
+    "Nothing to report from the city morgue today. The dead are staying dead. For now.",
+    "Status check: all registered deceased remain accounted for. No anomalies. No movement. No sightings.",
+    "The Serpent Choir reports quiet from the other side. No disturbances logged at the boundary.",
+    "Graveyard sweep complete. No incidents. No resurrections. No doppelganger sightings. The records stand.",
+    "All current cases in the morgue register are closed. The Undercity's dead are, at present, cooperating.",
+    "No new reports from the Registry of the Deceased. The graveyard holds. The city sleeps a little easier.",
+    "Morgue dispatch: quiet night. No unusual activity among known deceased. File updated. Nothing to act on.",
+    "The dead were checked on today. They had nothing new to say. This is, officially, a good sign.",
+    "Registry of the Dead — cycle check complete. {n} cases on file. All at rest. No further action required.",
+    "The Wardens of Ash confirm: no graveyard anomalies this cycle. The wards are holding. The dead remain still.",
+    "Coroner's note: {n} files closed, {n} bodies quiet. Anyone claiming otherwise should bring evidence or stop wasting oxygen.",
+    "Morgue window statement: no walking dead, no duplicate corpses, no unauthorized miracles. The office will not be taking questions from TNN today.",
+    "Registry check complete. The dead did their part. The living are advised to try matching that level of cooperation.",
+    "City Coroner dispatch: diamonds remain expensive, grief remains louder, and every body on file stayed where the tag says it belongs.",
+]
+
+
 async def _check_graveyard_events(channel) -> None:
     """Roll for rare events involving dead NPCs in the graveyard.
-    At most ONE event fires per lifecycle cycle to keep things special."""
+    At most ONE event fires per lifecycle cycle to keep things special.
+    Always posts a coroner's report — either an event or a quiet notice."""
     import discord
 
     graveyard = _load_graveyard()
-    if not graveyard:
-        return
-
+    n_dead = len(graveyard)
     npcs = _load_npcs()
     today = datetime.now().strftime("%Y-%m-%d")
     event_fired = False
@@ -1435,6 +2387,16 @@ async def _check_graveyard_events(channel) -> None:
             event_fired = True
             break
 
+        # UNKNOWN PARTY MEMBERS get special handling — automatic, covert bulletin
+        if is_unknown_party_member(name):
+            logger.info(f"🎭 Unknown Party member {name} found in graveyard — triggering party death protocol")
+            try:
+                await _handle_party_member_death(dead_npc, npcs, channel)
+            except Exception as e:
+                logger.error(f"🎭 Party member death handling failed for {name}: {e}")
+            event_fired = True
+            break
+
         # Roll for each event type (normal NPCs)
         roll = random.random()
         cumulative = 0.0
@@ -1454,7 +2416,7 @@ async def _check_graveyard_events(channel) -> None:
                     f"A community fundraising campaign called 'Tower Fund Me' has raised enough "
                     f"Kharma and EC to hire a Serpent Choir resurrection contract for {name}.\n"
                     f"Write a 3-4 line news bulletin about the successful resurrection. "
-                    f"Include: who organized it, how much it cost (use a large Kharma amount), "
+                    f"Include: who organized it, how much it cost (between 800 and 3000 Kharma — a major communal effort), "
                     f"the Serpent Choir's involvement, and {name}'s confused first words.\n"
                     f"{name} is alive but weakened — they'll need time to recover.\n"
                     f"Tone: hopeful but with an edge. Resurrection has consequences in this world.\n"
@@ -1463,7 +2425,7 @@ async def _check_graveyard_events(channel) -> None:
 
                 # Move NPC back to active roster
                 dead_npc["status"] = "injured"  # comes back weak
-                dead_npc["history"].append(f"[{today}] RESURRECTED via Tower Fund Me campaign. Weakened but alive.")
+                _hist(dead_npc, f"[{today}] RESURRECTED via Tower Fund Me campaign. Weakened but alive.")
                 dead_npc.pop("cause_of_death", None)
                 dead_npc.pop("moved_to_graveyard_at", None)
                 dead_npc["last_event_at"] = datetime.now().isoformat()
@@ -1539,10 +2501,10 @@ async def _check_graveyard_events(channel) -> None:
                     f"No preamble. Output only the bulletin."
                 )
 
-                # Move back to roster as an undead NPC
-                dead_npc["status"] = "alive"
+                # Move back to roster as an undead NPC (status='undead' for DB queries)
+                dead_npc["status"] = "undead"
                 dead_npc["species"] = f"{utype} (formerly {species})"
-                dead_npc["history"].append(f"[{today}] RETURNED FROM DEATH as {utype}. {udesc}.")
+                _hist(dead_npc, f"[{today}] RETURNED FROM DEATH as {utype}. {udesc}.")
                 dead_npc.pop("cause_of_death", None)
                 dead_npc.pop("moved_to_graveyard_at", None)
                 dead_npc["last_event_at"] = datetime.now().isoformat()
@@ -1566,6 +2528,55 @@ async def _check_graveyard_events(channel) -> None:
                     embed.set_footer(text=f"🧟 {name} · {utype} · RETURNED FROM DEATH")
                     await channel.send(embed=embed)
 
+                # Generate a Strange Occurrence mission for the undead return
+                try:
+                    from src.mission_board import _generate as _gen_mission, _parse_mission, _add_mission, _expiry_for_tier
+
+                    undead_mission_prompt = f"""{_LORE}
+
+---
+MISSION TYPE: Strange Occurrence (Undead Return)
+Generate ONE mission posting about {name}, formerly {species} of {faction}, who has returned from death as a {utype}.
+{udesc}
+{name} is now somewhere in the Undercity. They were confirmed dead — now they are something else entirely.
+The posting faction should be {faction} (alarmed by the return) or the Adventurers Guild.
+
+This is a Strange Occurrence mission — heavily weighted toward roleplay and investigation, with possible combat.
+The mission is NOT just "go destroy the undead." The party must investigate WHAT {name} has been doing since returning,
+and WHY — what unfinished business, what hunger, what purpose drives a {utype}.
+Focus: track {name}'s movements, interview witnesses who have encountered them, understand what they want.
+The resolution may be combat, a ritual, a bargain, or something no one expected.
+
+REQUIRED FORMAT:
+
+**[FACTION NAME] — MISSION TITLE**
+*Type: Strange Occurrences | Tier: investigation | Expires: TBD | Reward: [X EC + any extras]*
+*Opposes: None*
+
+[3-4 sentences. Name specific locations where {name} has been sighted, describe one specific unsettling thing
+they were seen doing — something that reflects the nature of a {utype}. Be specific to this undead type.
+End with the objective: find {name}, understand what they have become and what they want, and resolve it.]
+
+*Contact: [named NPC], [location]*
+
+RULES:
+- Tier must be investigation
+- The mission title should feel eerie and specific to this kind of undead return — not generic
+- Do NOT give the party a simple kill order — the posting should leave open whether destruction or something else is right
+- No preamble, no sign-off. Output the mission post only."""
+
+                    mission_text = await _gen_mission(undead_mission_prompt)
+                    if mission_text:
+                        mission = _parse_mission(mission_text)
+                        mission["undead_return_of"] = name
+                        mission["undead_type"] = utype
+                        mission["type"] = "Strange Occurrences"
+                        mission["mission_type"] = "strange_occurrence"
+                        _add_mission(mission)
+                        logger.info(f"🧟 Strange Occurrence (undead return) mission created: {mission.get('title', '?')}")
+                except Exception as e:
+                    logger.warning(f"🧟 Undead return mission creation failed: {e}")
+
                 event_fired = True
 
             # === DOPPELGANGER — Someone is impersonating the dead NPC ===
@@ -1586,8 +2597,22 @@ async def _check_graveyard_events(channel) -> None:
                     f"No preamble. Output only the bulletin."
                 )
 
-                # Add to dead NPC's graveyard history (they stay dead)
-                dead_npc["history"].append(f"[{today}] Doppelganger sighting — someone impersonating {name} spotted in the Undercity.")
+                # Move to active roster as doppelganger — status='doppelganger' makes it queryable
+                # by Strange Occurrences mission logic. Original NPC is still "dead" conceptually
+                # but this entry represents the impostor now operating in the city.
+                dead_npc["status"] = "doppelganger"
+                _hist(dead_npc, f"[{today}] DOPPELGANGER active — something is impersonating {name} in the Undercity.")
+                dead_npc["oracle_notes"] = (
+                    dead_npc.get("oracle_notes", "") +
+                    f" A doppelganger is wearing {name}'s face. The original is dead. This entity has its own agenda."
+                ).strip()
+                dead_npc.pop("moved_to_graveyard_at", None)
+                dead_npc["last_event_at"] = datetime.now().isoformat()
+
+                npcs.append(dead_npc)
+                _save_npcs(npcs)
+
+                graveyard = [g for g in graveyard if g.get("name") != name]
                 _save_graveyard(graveyard)
 
                 if bulletin and channel:
@@ -1598,38 +2623,49 @@ async def _check_graveyard_events(channel) -> None:
                     embed.set_footer(text=f"🎭 Doppelganger · {name} · IDENTITY UNKNOWN")
                     await channel.send(embed=embed)
 
-                # Generate a mission for the doppelganger investigation
+                # Generate a Strange Occurrence mission for the doppelganger
                 try:
                     from src.mission_board import _generate as _gen_mission, _parse_mission, _add_mission, _expiry_for_tier
 
                     mission_prompt = f"""{_LORE}
 
 ---
-Generate ONE investigation mission about a doppelganger impersonating the deceased {name} ({species}, {faction}).
-Someone or something is walking the Undercity wearing {name}'s face. They were confirmed dead.
-The posting faction should be {faction} (they want answers about their dead member) or the Adventurers Guild.
+MISSION TYPE: Strange Occurrence (Doppelganger)
+Generate ONE mission posting about a doppelganger impersonating the deceased {name} ({species}, {faction}).
+{name} was confirmed dead. Something or someone is now wearing their face and moving through the Undercity.
+The posting faction should be {faction} (they want answers) or the Adventurers Guild.
+
+This is a Strange Occurrence mission — heavily weighted toward roleplay and investigation, with possible combat at the end.
+The mission is NOT just "kill the impersonator." The party must first figure out WHAT it is and WHY it is here.
+Focus: witness interviews, tracking the entity's movements, uncovering its purpose.
+The resolution may be combat, a confrontation, an unmasking, or something stranger.
 
 REQUIRED FORMAT:
 
 **[FACTION NAME] — MISSION TITLE**
-*Tier: investigation | Expires: TBD | Reward: [X EC + any extras]*
+*Type: Strange Occurrences | Tier: investigation | Expires: TBD | Reward: [X EC + any extras]*
 *Opposes: None*
 
-[2-3 sentences. Specific sighting locations, named witnesses, clear objective: find and identify the impersonator.]
+[3-4 sentences. Name specific sighting locations, name a witness or two, describe what the entity was doing —
+NOT just "it looked like them" but something specific and unsettling it did or said. End with the clear objective:
+find out what it is, what it wants, and deal with it.]
 
 *Contact: [named NPC], [location]*
 
 RULES:
 - Tier must be investigation
-- Make it feel creepy and personal — this is someone wearing a dead person's face
+- The mission title should feel eerie and personal — this is someone wearing a dead person's face
+- Do NOT resolve the mystery in the posting — leave it open and unsettling
 - No preamble, no sign-off. Output the mission post only."""
 
                     mission_text = await _gen_mission(mission_prompt)
                     if mission_text:
                         mission = _parse_mission(mission_text)
                         mission["doppelganger_of"] = name
+                        mission["type"] = "Strange Occurrences"
+                        mission["mission_type"] = "strange_occurrence"
                         _add_mission(mission)
-                        logger.info(f"🎭 Doppelganger mission created: {mission.get('title', '?')}")
+                        logger.info(f"🎭 Strange Occurrence (doppelganger) mission created: {mission.get('title', '?')}")
                 except Exception as e:
                     logger.warning(f"🎭 Doppelganger mission creation failed: {e}")
 
@@ -1637,8 +2673,206 @@ RULES:
 
             break  # Only one event type per NPC per cycle
 
+    # Always post a coroner's report — either as the main event or as a brief addendum
+    if not channel:
+        logger.info("🪦 Graveyard event processed this cycle" if event_fired else "🪦 Graveyard quiet this cycle (no channel)")
+        return
+
     if event_fired:
-        logger.info("🪦 Graveyard event processed this cycle")
+        # After an event fires, post a brief one-line coroner's tally as a footer follow-up
+        logger.info("🪦 Graveyard event processed this cycle — posting case-count addendum")
+        try:
+            tally_lines = [
+                f"The Office of the City Coroner notes {n_dead} cases currently on file.",
+                f"City Coroner files updated. Active cases: {n_dead}. Cycle closed.",
+                f"Coroner's addendum: {n_dead} deceased on the registry following this cycle's proceedings.",
+                f"Registry updated. {n_dead} cases on file. The Coroner's office has no further comment at this time.",
+                f"One case processed this cycle. {n_dead} total remain on record with the Office of the City Coroner.",
+            ]
+            tally = random.choice(tally_lines)
+            names_on_file = ", ".join(g.get("name", "?") for g in graveyard[:10])
+            if n_dead > 10:
+                names_on_file += f" (and {n_dead - 10} more)"
+            embed = discord.Embed(
+                title="🪦 Coroner's Office — Case Update",
+                description=tally,
+                color=0x445566,
+            )
+            embed.add_field(name=f"Registry ({n_dead} on file)", value=names_on_file or "None", inline=False)
+            embed.set_footer(text="Office of the City Coroner — Filed this cycle")
+            await channel.send(embed=embed)
+        except Exception as _de:
+            logger.warning(f"🪦 Coroner's addendum Discord send failed: {_de}")
+        return
+
+    # No event fired — post the full quiet coroner's report
+    quiet_msg = random.choice(_CORONER_QUIET).replace("{n}", str(n_dead))
+    if n_dead == 0:
+        quiet_msg = "Registry of the Dead is empty — no deceased on file. A remarkably peaceful record."
+
+    logger.info(f"🪦 Graveyard quiet this cycle — posting coroner's report ({n_dead} on file)")
+    try:
+        embed = discord.Embed(
+            title="🪦 Coroner's Report",
+            description=quiet_msg,
+            color=0x445566,
+        )
+        if n_dead > 0:
+            names_on_file = ", ".join(g.get("name", "?") for g in graveyard[:10])
+            if n_dead > 10:
+                names_on_file += f" (and {n_dead - 10} more)"
+            embed.add_field(name=f"Deceased on file ({n_dead})", value=names_on_file, inline=False)
+        embed.set_footer(text="Office of the City Coroner — Filed this cycle")
+        await channel.send(embed=embed)
+    except Exception as _de:
+        logger.warning(f"🪦 Coroner's report Discord send failed: {_de}")
+
+
+# ---------------------------------------------------------------------------
+# Party guild contract events — runs once per lifecycle cycle
+# ---------------------------------------------------------------------------
+
+async def _run_party_guild_event(channel) -> None:
+    """Once per lifecycle cycle, roll a guild contract event for one NPC party.
+
+    Possible outcomes:
+    - contract_awarded  : unaffiliated party picked up by a guild
+    - contract_ended    : party loses guild contract, goes independent
+    - poached_to_guild  : party jumps from one guild to a higher-paying rival
+    - promotion_in_guild: party's faction rank bumps up within their current guild
+    """
+    import discord as _discord
+
+    try:
+        guilds = _get_guild_factions()
+        if not guilds:
+            return
+
+        # Pick a random party to affect
+        all_parties = raw_query(
+            "SELECT id, party_name, faction, profile_json FROM party_profiles "
+            "WHERE status='active' ORDER BY RAND() LIMIT 20"
+        ) or []
+        if not all_parties:
+            return
+
+        party = random.choice(all_parties)
+        pname   = party["party_name"]
+        current = (party.get("faction") or "").strip()
+
+        pj = party.get("profile_json") or {}
+        if isinstance(pj, str):
+            try: pj = json.loads(pj)
+            except: pj = {}
+
+        today = datetime.now().strftime("%Y-%m-%d")
+        guild_affiliated = "(Guild)" in current
+
+        # Weight: 50% contract events for guild parties, 50% for independents
+        if guild_affiliated:
+            outcome = random.choice([
+                "contract_ended", "contract_ended",
+                "poached_to_guild",
+                "promotion_in_guild", "promotion_in_guild",
+            ])
+        else:
+            outcome = "contract_awarded"
+
+        announcement = None
+        embed_color  = 0x4a90d9
+
+        if outcome == "contract_awarded":
+            new_guild = random.choice(guilds)
+            pj["faction"]  = new_guild
+            pj["employer"] = new_guild
+            add_party_history_event(party["id"], f"[{today}] Contracted by {new_guild}.")
+            raw_execute(
+                "UPDATE party_profiles SET faction=%s, employer=%s, profile_json=%s WHERE id=%s",
+                (new_guild, new_guild, json.dumps({k:v for k,v in pj.items() if k!="history"}, ensure_ascii=False), party["id"])
+            )
+            announcement = await _generate(
+                f"{_LORE}\nParty: {pname} (previously independent or minor faction).\n"
+                f"Event: Awarded a contract by {new_guild}. First posting as Contracted Operatives.\n"
+                f"Write a 2-3 line Undercity bulletin — job board tone, corporate meets gritty city.\n"
+                f"No preamble. Output only the bulletin."
+            )
+            embed_color = 0x2ecc71
+
+        elif outcome == "contract_ended":
+            old_guild = current
+            pj["faction"]  = "Independent"
+            pj["employer"] = ""
+            add_party_history_event(party["id"], f"[{today}] Contract with {old_guild} ended.")
+            raw_execute(
+                "UPDATE party_profiles SET faction=%s, employer=%s, profile_json=%s WHERE id=%s",
+                ("Independent", None, json.dumps({k:v for k,v in pj.items() if k!="history"}, ensure_ascii=False), party["id"])
+            )
+            reason = random.choice([
+                "contract term expired",
+                "terminated for cause",
+                "mutual parting of ways",
+                "guild restructuring — position eliminated",
+                "party declined renewal",
+            ])
+            announcement = await _generate(
+                f"{_LORE}\nParty: {pname}. Previously under {old_guild}.\n"
+                f"Event: Contract ended ({reason}). Now independent.\n"
+                f"Write a 2-3 line Undercity notice. Neutral tone — could be mundane or imply conflict.\n"
+                f"No preamble. Output only the bulletin."
+            )
+            embed_color = 0xe67e22
+
+        elif outcome == "poached_to_guild":
+            rival = random.choice([g for g in guilds if g != current] or guilds)
+            old_guild = current
+            pj["faction"]  = rival
+            pj["employer"] = rival
+            add_party_history_event(party["id"], f"[{today}] Poached from {old_guild} to {rival}.")
+            raw_execute(
+                "UPDATE party_profiles SET faction=%s, employer=%s, profile_json=%s WHERE id=%s",
+                (rival, rival, json.dumps({k:v for k,v in pj.items() if k!="history"}, ensure_ascii=False), party["id"])
+            )
+            announcement = await _generate(
+                f"{_LORE}\nParty: {pname}. Previously under {old_guild}.\n"
+                f"Event: Poached by {rival} at better terms. {old_guild} not pleased.\n"
+                f"Write a 2-3 line Undercity bulletin — inter-guild rivalry, implied backstory.\n"
+                f"No preamble. Output only the bulletin."
+            )
+            embed_color = 0x9b59b6
+
+        elif outcome == "promotion_in_guild":
+            tier = pj.get("tier", "Unknown")
+            tiers = ["Unknown", "Recognized", "Established", "Trusted", "Elite"]
+            idx = tiers.index(tier) if tier in tiers else 0
+            if idx < len(tiers) - 1:
+                new_tier = tiers[idx + 1]
+                pj["tier"] = new_tier
+                add_party_history_event(party["id"], f"[{today}] Promoted within {current}: tier {tier} -> {new_tier}.")
+                raw_execute(
+                    "UPDATE party_profiles SET tier=%s, profile_json=%s WHERE id=%s",
+                    (new_tier, json.dumps({k:v for k,v in pj.items() if k!="history"}, ensure_ascii=False), party["id"])
+                )
+                announcement = await _generate(
+                    f"{_LORE}\nParty: {pname}, contracted to {current}.\n"
+                    f"Event: Internal promotion — tier {tier} to {new_tier}. More responsibility, better pay.\n"
+                    f"Write a 2-3 line Undercity notice — guild internal bulletin, slightly corporate.\n"
+                    f"No preamble. Output only the bulletin."
+                )
+                embed_color = 0x1abc9c
+            else:
+                return  # already at top tier, skip
+
+        if announcement and channel:
+            try:
+                embed = _discord.Embed(description=announcement, color=embed_color)
+                embed.set_footer(text=f"Party Contract Notice: {pname}")
+                await channel.send(embed=embed)
+                logger.info(f"Party guild event [{outcome}]: {pname}")
+            except Exception as _e:
+                logger.warning(f"Party guild event Discord send failed: {_e}")
+
+    except Exception as e:
+        logger.warning(f"_run_party_guild_event error: {e}")
 
 
 # ---------------------------------------------------------------------------

@@ -29,6 +29,15 @@ from .image_generator import (
 from .api import generate_mission_async, get_mission_output_path
 
 
+def _mission_title(mission_module: Dict[str, Any], fallback: str = "Untitled Mission") -> str:
+    metadata = mission_module.get("metadata") or {}
+    if isinstance(metadata, dict):
+        title = metadata.get("title")
+        if title:
+            return str(title)
+    return str(mission_module.get("title") or fallback)
+
+
 async def generate_mission_with_images(
     title: str,
     faction: str,
@@ -66,7 +75,6 @@ async def generate_mission_with_images(
         tier=tier,
         body=body,
         player_name=player_name,
-        model_name=model_name,
     )
 
     if not mission_module:
@@ -131,19 +139,15 @@ def generate_mission_with_images_sync(
     Runs async function in a managed event loop.
     """
     try:
-        loop = asyncio.get_running_loop()
-        # If we're already in an async context, return the coroutine
-        return generate_mission_with_images(
-            title=title,
-            faction=faction,
-            tier=tier,
-            body=body,
-            player_name=player_name,
-            include_images=include_images,
-            image_style=image_style,
-            model_name=model_name,
+        asyncio.get_running_loop()
+        # Already in an async context — caller must use generate_mission_with_images() directly
+        raise RuntimeError(
+            "Use generate_mission_with_images() directly in async contexts"
         )
-    except RuntimeError:
+    except RuntimeError as exc:
+        if "async contexts" in str(exc):
+            raise
+
         # No event loop, create one
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -203,11 +207,9 @@ async def generate_complete_mission(
         return None
 
     # Determine output paths
-    mission_output_path = get_mission_output_path(title)
-
-    # Create mission directory
-    mission_dir = mission_output_path.parent
+    mission_dir = output_dir or get_mission_output_path(title)
     mission_dir.mkdir(parents=True, exist_ok=True)
+    mission_output_path = mission_dir / "module_data.json"
 
     # Save mission JSON
     with open(mission_output_path, "w", encoding="utf-8") as f:
@@ -240,7 +242,7 @@ async def update_mission_with_images(
         with open(mission_file, "r", encoding="utf-8") as f:
             mission_module: MissionModule = json.load(f)
 
-        mission_title = mission_module.get("title", "Untitled Mission")
+        mission_title = _mission_title(mission_module)
         logger.info(f"[{mission_title}] Loading mission for image generation...")
 
         # Extract and generate images
@@ -299,14 +301,9 @@ def extract_dungeon_rooms_from_mission(mission_module: MissionModule) -> List[Du
     rooms: List[DungeonRoom] = []
 
     try:
-        acts = mission_module.get("acts", [])
-        for act in acts:
-            encounters = act.get("encounters", [])
-            for encounter in encounters:
-                dungeon = encounter.get("dungeon_delve")
-                if dungeon:
-                    encounter_rooms = dungeon.get("rooms", [])
-                    rooms.extend(encounter_rooms)
+        dungeon_delve = mission_module.get("dungeon_delve", {})
+        encounter_rooms = dungeon_delve.get("rooms", [])
+        rooms.extend(encounter_rooms)
 
     except Exception as e:
         logger.warning(f"Could not extract dungeon rooms: {e}")

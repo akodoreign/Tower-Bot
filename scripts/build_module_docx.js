@@ -73,6 +73,57 @@ function parseInline(text) {
 }
 
 /**
+ * Render a stat block (multiple lines) as a parchment-colored scroll box.
+ * Triggered by lines prefixed with ">> " in the markdown.
+ */
+function renderStatBlock(lines, factionColor) {
+  const PARCHMENT = "FDF5E6";
+  const BORDER_COLOR = "C8A86B";
+  const paras = [];
+  const nonEmpty = lines.filter(l => l.trim());
+  if (nonEmpty.length === 0) return paras;
+
+  nonEmpty.forEach((line, i) => {
+    const isFirst = i === 0;
+    const isLast  = i === nonEmpty.length - 1;
+    const trimLine = line.trim();
+
+    const B = (size) => ({ style: BorderStyle.SINGLE, size, color: BORDER_COLOR });
+    const border = {
+      left:  B(8),
+      right: B(8),
+      ...(isFirst ? { top:    B(6) } : {}),
+      ...(isLast  ? { bottom: B(6) } : {}),
+    };
+
+    // Section separator inside stat block (--- or ───)
+    if (/^[-─═]{3,}$/.test(trimLine)) {
+      paras.push(new Paragraph({
+        indent: { left: 360, right: 360 },
+        spacing: { before: 30, after: 30 },
+        border,
+        shading: { type: ShadingType.CLEAR, fill: PARCHMENT },
+        children: [new TextRun({ text: "──────────────────", color: "D4A96A", size: 18 })],
+        alignment: AlignmentType.CENTER,
+      }));
+      return;
+    }
+
+    // Bold header lines (e.g. ACTIONS, TRAITS)
+    const isHeader = /^\*\*(ACTIONS|BONUS ACTIONS|REACTIONS|LEGENDARY|TRAITS|FEATURES|LOOT)\**/.test(trimLine);
+    paras.push(new Paragraph({
+      indent: { left: 360, right: 360 },
+      spacing: { before: isFirst ? 160 : (isHeader ? 60 : 20), after: isLast ? 160 : 20 },
+      border,
+      shading: { type: ShadingType.CLEAR, fill: PARCHMENT },
+      children: parseInline(trimLine),
+    }));
+  });
+
+  return paras;
+}
+
+/**
  * Convert a markdown text block into an array of docx Paragraph objects.
  */
 function markdownToParagraphs(md, bulletRef, numberRef, factionColor) {
@@ -80,12 +131,28 @@ function markdownToParagraphs(md, bulletRef, numberRef, factionColor) {
 
   const lines = md.split("\n");
   const paragraphs = [];
-  let inTable = false;
   let tableRows = [];
+  let statBlockLines = [];
+
+  const flushStatBlock = () => {
+    if (statBlockLines.length > 0) {
+      paragraphs.push(...renderStatBlock(statBlockLines, factionColor));
+      statBlockLines = [];
+    }
+  };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
+
+    // Stat block line — accumulate
+    if (trimmed.startsWith(">> ")) {
+      statBlockLines.push(trimmed.slice(3));
+      continue;
+    }
+
+    // Non->> line — flush any pending stat block
+    flushStatBlock();
 
     // Skip empty lines
     if (!trimmed) continue;
@@ -179,7 +246,94 @@ function markdownToParagraphs(md, bulletRef, numberRef, factionColor) {
       continue;
     }
 
-    // Read-aloud boxed text (starts with > )
+    // SIDEBAR box — right-float table (sidebar in right 40%, spacer left 60%)
+    if (trimmed.startsWith("> SIDEBAR:") || trimmed.startsWith(">SIDEBAR:")) {
+      const content = trimmed.replace(/^>?\s*SIDEBAR:\s*/i, "");
+      const SB_WIDTH = 3600;  // ~38% of 9360 page width
+      const SP_WIDTH = 5400;  // spacer
+      const sideB = (sz) => ({ style: BorderStyle.SINGLE, size: sz, color: factionColor });
+      const noneB = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+
+      const headerPara = new Paragraph({
+        spacing: { before: 80, after: 60 },
+        children: [new TextRun({
+          text: "◆ SIDEBAR",
+          bold: true,
+          size: 18,
+          color: factionColor,
+          font: "Arial",
+        })],
+        shading: { type: ShadingType.CLEAR, fill: "EEF4FB" },
+      });
+      const contentPara = new Paragraph({
+        spacing: { before: 0, after: 80 },
+        children: parseInline(content),
+        shading: { type: ShadingType.CLEAR, fill: "EEF4FB" },
+      });
+
+      const sidebarCell = new TableCell({
+        width: { size: SB_WIDTH, type: WidthType.DXA },
+        borders: {
+          top:    sideB(4), bottom: sideB(4),
+          left:   sideB(8), right:  sideB(4),
+        },
+        shading: { type: ShadingType.CLEAR, fill: "EEF4FB" },
+        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        children: [headerPara, contentPara],
+      });
+      const spacerCell = new TableCell({
+        width: { size: SP_WIDTH, type: WidthType.DXA },
+        borders: { top: noneB, bottom: noneB, left: noneB, right: noneB },
+        children: [new Paragraph({ children: [] })],
+      });
+      paragraphs.push(new Table({
+        width: { size: 9360, type: WidthType.DXA },
+        rows: [new TableRow({ children: [spacerCell, sidebarCell] })],
+      }));
+      paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [] }));
+      continue;
+    }
+
+    // SNIPPET box — in-world story flavor (journal entry, rumor, notice)
+    if (trimmed.startsWith("> SNIPPET:") || trimmed.startsWith(">SNIPPET:")) {
+      const content = trimmed.replace(/^>?\s*SNIPPET:\s*/i, "");
+      paragraphs.push(new Paragraph({
+        indent: { left: 720, right: 720 },
+        spacing: { before: 160, after: 60 },
+        children: [new TextRun({
+          text: "— — — — — — — — — —",
+          color: "AAAAAA",
+          size: 16,
+          font: "Georgia",
+        })],
+        alignment: AlignmentType.CENTER,
+      }));
+      paragraphs.push(new Paragraph({
+        indent: { left: 720, right: 720 },
+        spacing: { before: 0, after: 0 },
+        children: [new TextRun({
+          text: content,
+          italics: true,
+          color: "444444",
+          font: "Georgia",
+          size: 21,
+        })],
+      }));
+      paragraphs.push(new Paragraph({
+        indent: { left: 720, right: 720 },
+        spacing: { before: 60, after: 160 },
+        children: [new TextRun({
+          text: "— — — — — — — — — —",
+          color: "AAAAAA",
+          size: 16,
+          font: "Georgia",
+        })],
+        alignment: AlignmentType.CENTER,
+      }));
+      continue;
+    }
+
+    // Read-aloud / flavor blockquote (starts with > )
     if (trimmed.startsWith("> ")) {
       const content = trimmed.replace(/^>\s*/, "");
       paragraphs.push(new Paragraph({
@@ -205,6 +359,9 @@ function markdownToParagraphs(md, bulletRef, numberRef, factionColor) {
       children: parseInline(trimmed),
     }));
   }
+
+  // Flush any remaining stat block
+  flushStatBlock();
 
   // Flush final table if any
   if (tableRows.length > 0) {
@@ -267,8 +424,9 @@ function buildDocument(data) {
   const faction = data.faction || "Independent";
   const tier = data.tier || "Unknown";
   const title = data.title || "Untitled Mission";
-  const cr = data.cr || "?";
-  const playerLevel = data.player_level || "?";
+  const cr = data.cr !== undefined ? data.cr : (data.metadata && data.metadata.cr !== undefined ? data.metadata.cr : "?");
+  const playerLevel = data.player_level || (data.metadata && data.metadata.party_level) || "?";
+  const playerCount = data.player_count || (data.metadata && data.metadata.player_count) || "4–6";
   const playerName = data.player_name || "Unclaimed";
   const reward = data.reward || "TBD";
   const generatedAt = data.generated_at || new Date().toISOString();
@@ -315,7 +473,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
       children: [new TextRun({
-        text: `Tier: ${tier.toUpperCase()}  |  Challenge Rating: ${cr}  |  Level: ${playerLevel}`,
+        text: `Tier: ${tier.toUpperCase()}  |  CR: ${cr}  |  Level: ${playerLevel}  |  Party: ${playerCount} Players`,
         size: 24,
         color: "555555",
       })],
@@ -324,7 +482,7 @@ function buildDocument(data) {
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
       children: [new TextRun({
-        text: `Estimated Runtime: ~2 Hours`,
+        text: `Estimated Runtime: ~4–5 Hours`,
         size: 22,
         color: "777777",
       })],
@@ -378,18 +536,13 @@ function buildDocument(data) {
   ];
 
   // Content sections
-  const overviewParas = markdownToParagraphs(
-    data.sections.overview, bulletRef, numberRef, factionColor
-  );
-  const acts12Paras = markdownToParagraphs(
-    data.sections.acts_1_2, bulletRef, numberRef, factionColor
-  );
-  const acts34Paras = markdownToParagraphs(
-    data.sections.acts_3_4, bulletRef, numberRef, factionColor
-  );
-  const act5Paras = markdownToParagraphs(
-    data.sections.act_5_rewards, bulletRef, numberRef, factionColor
-  );
+  const s = data.sections || {};
+  const overviewParas = markdownToParagraphs(s.overview       || s.acts_1_2 || "", bulletRef, numberRef, factionColor);
+  const ch1Paras      = markdownToParagraphs(s.chapter_1      || s.acts_1_2 || "", bulletRef, numberRef, factionColor);
+  const ch2Paras      = markdownToParagraphs(s.chapter_2      || s.acts_3_4 || "", bulletRef, numberRef, factionColor);
+  const ch3Paras      = markdownToParagraphs(s.chapter_3      || "",               bulletRef, numberRef, factionColor);
+  const ch4Paras      = markdownToParagraphs(s.chapter_4      || s.act_5_rewards || "", bulletRef, numberRef, factionColor);
+  const ch5Paras      = markdownToParagraphs(s.chapter_5      || "",               bulletRef, numberRef, factionColor);
 
   // Section dividers
   const divider = () => new Paragraph({
@@ -398,18 +551,17 @@ function buildDocument(data) {
     children: [new TextRun({ text: "━━━━━━━━━━", color: factionColor, size: 18 })],
   });
 
+  // Build content: overview (DM spine) + 5 chapters
+  const chapterSections = [ch1Paras, ch2Paras, ch3Paras, ch4Paras, ch5Paras].filter(p => p.length > 0);
   const allChildren = [
     ...coverPage,
     ...overviewParas,
     divider(),
     new Paragraph({ children: [new PageBreak()] }),
-    ...acts12Paras,
-    divider(),
-    new Paragraph({ children: [new PageBreak()] }),
-    ...acts34Paras,
-    divider(),
-    new Paragraph({ children: [new PageBreak()] }),
-    ...act5Paras,
+    ...chapterSections.flatMap((paras, i) => [
+      ...paras,
+      ...(i < chapterSections.length - 1 ? [divider(), new Paragraph({ children: [new PageBreak()] })] : []),
+    ]),
   ];
 
   return new Document({

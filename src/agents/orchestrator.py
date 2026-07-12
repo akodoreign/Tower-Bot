@@ -95,14 +95,18 @@ class AgentOrchestrator:
                 self._journal("ERROR: Agent analysis failed")
                 return None
             
-            # PHASE 3: Project Manager synthesis
-            self._journal(f"PHASE 3: Project Manager Synthesis ({datetime.now().strftime('%H:%M:%S')})")
-            pm_analysis = await self._run_project_manager(specialist_analyses, data)
-            
-            specialist_analyses.append(pm_analysis)
+            # PHASE 3: Guild Council deliberation (replaces single Project Manager)
+            self._journal(f"PHASE 3: Grand Council Session ({datetime.now().strftime('%H:%M:%S')})")
+            specialist_findings = self._extract_findings(specialist_analyses)
+            council_session = await self._run_guild_council(
+                specialist_findings, data,
+                channel=getattr(self, "_discord_channel", None),
+            )
+            self.council_session = council_session
+
             self.analyses = specialist_analyses
-            
-            # PHASE 4: Safe code changes
+
+            # PHASE 4: Safe code changes (from specialist agents only)
             self._journal(f"PHASE 4: Code Change Application ({datetime.now().strftime('%H:%M:%S')})")
             await self._apply_safe_changes(specialist_analyses)
             
@@ -184,14 +188,9 @@ class AgentOrchestrator:
                 m = {**mj, "title": row["title"], "tier": row["tier"], "faction": row["faction"],
                      "outcome": s if s in ("completed","failed","expired") else None}
                 missions.append(m)
-        except Exception:
-            mission_path = self.campaign_docs / "mission_memory.json"
-            if not mission_path.exists():
-                return {"total_missions": 0, "completion_rate": 0}
-            try:
-                missions = json.loads(mission_path.read_text(encoding="utf-8"))
-            except Exception:
-                return {"total_missions": 0, "completion_rate": 0}
+        except Exception as _db_err:
+            logger.warning(f"[orchestrator] mission stats DB query failed: {_db_err}")
+            return {"total_missions": 0, "completion_rate": 0}
 
         try:
             # Calculate stats
@@ -203,13 +202,13 @@ class AgentOrchestrator:
             # Difficulty distribution
             difficulty_dist = {}
             for m in missions[-30:]:  # Last 30
-                diff = m.get("difficulty_rating", 5)
+                diff = m.get("difficulty", m.get("difficulty_rating", 5))
                 difficulty_dist[diff] = difficulty_dist.get(diff, 0) + 1
             
             # Success rates by difficulty
-            deadly_dict = [m for m in missions if m.get("difficulty_rating", 5) >= 8]
-            hard_dict = [m for m in missions if 4 <= m.get("difficulty_rating", 5) <= 7]
-            easy_dict = [m for m in missions if m.get("difficulty_rating", 5) <= 3]
+            deadly_dict = [m for m in missions if m.get("difficulty", m.get("difficulty_rating", 5)) >= 8]
+            hard_dict = [m for m in missions if 4 <= m.get("difficulty", m.get("difficulty_rating", 5)) <= 7]
+            easy_dict = [m for m in missions if m.get("difficulty", m.get("difficulty_rating", 5)) <= 3]
             
             deadly_success = sum(1 for m in deadly_dict if m.get("outcome") == "completed") / len(deadly_dict) if deadly_dict else 0
             hard_success = sum(1 for m in hard_dict if m.get("outcome") == "completed") / len(hard_dict) if hard_dict else 0
@@ -221,7 +220,7 @@ class AgentOrchestrator:
                 "failed": failed,
                 "expired": expired,
                 "completion_rate": completed / total if total > 0 else 0,
-                "average_difficulty": sum(m.get("difficulty_rating", 5) for m in missions) / total if total > 0 else 5,
+                "average_difficulty": sum(m.get("difficulty", m.get("difficulty_rating", 5)) for m in missions) / total if total > 0 else 5,
                 "difficulty_distribution": difficulty_dist,
                 "deadly_success_rate": deadly_success,
                 "hard_success_rate": hard_success,
@@ -252,15 +251,9 @@ class AgentOrchestrator:
                                   "faction": row["faction"],
                                   "outcome": s if s in ("completed","failed","expired") else None})
             return missions
-        except Exception:
-            mission_path = self.campaign_docs / "mission_memory.json"
-            if not mission_path.exists():
-                return []
-            try:
-                missions = json.loads(mission_path.read_text(encoding="utf-8"))
-                return missions[-count:] if len(missions) > count else missions
-            except Exception:
-                return []
+        except Exception as _db_err:
+            logger.warning(f"[orchestrator] recent missions DB query failed: {_db_err}")
+            return []
     
     def _collect_code_files(self) -> Dict[str, str]:
         """Collect source code from mission builder modules."""
@@ -329,20 +322,14 @@ class AgentOrchestrator:
             from src.db_api import raw_query as _rq
             rows = _rq(
                 "SELECT name, faction, role, location, status FROM npcs "
-                "WHERE status IN ('alive','injured') ORDER BY name LIMIT 20"
+                "WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name LIMIT 20"
             ) or []
             npcs = [dict(r) for r in rows]
-            total = (_rq("SELECT COUNT(*) as cnt FROM npcs WHERE status IN ('alive','injured')") or [{}])[0].get("cnt", 0)
+            total = (_rq("SELECT COUNT(*) as cnt FROM npcs WHERE status IN ('alive','injured','undead','doppelganger')") or [{}])[0].get("cnt", 0)
             return {"npcs": npcs, "total_count": total, "by_faction": {}}
-        except Exception:
-            roster_path = self.campaign_docs / "npc_roster.json"
-            if not roster_path.exists():
-                return {"npcs": [], "total_count": 0}
-            try:
-                npcs = json.loads(roster_path.read_text(encoding="utf-8"))
-                return {"npcs": npcs[:20], "total_count": len(npcs), "by_faction": {}}
-            except Exception:
-                return {"npcs": [], "total_count": 0}
+        except Exception as _db_err:
+            logger.warning(f"[orchestrator] NPC roster DB query failed: {_db_err}")
+            return {"npcs": [], "total_count": 0}
 
     def _collect_faction_info(self) -> Dict[str, Any]:
         """Collect faction information from MySQL."""
@@ -351,14 +338,9 @@ class AgentOrchestrator:
             rows = get_all_faction_reputations() or []
             return {r["faction_name"]: {"tier": r["tier"], "points": r["reputation_score"]}
                     for r in rows}
-        except Exception:
-            rep_path = self.campaign_docs / "faction_reputation.json"
-            if not rep_path.exists():
-                return {}
-            try:
-                return json.loads(rep_path.read_text(encoding="utf-8"))
-            except Exception:
-                return {}
+        except Exception as _db_err:
+            logger.warning(f"[orchestrator] faction reputation DB query failed: {_db_err}")
+            return {}
     
     def _get_difficulty_scale(self) -> Dict[int, str]:
         """Get the current difficulty scale mapping."""
@@ -381,43 +363,39 @@ class AgentOrchestrator:
         data: Dict[str, Any],
     ) -> List[AgentAnalysis]:
         """Run the 4 specialist agents in parallel."""
-        tasks = []
-        
-        # Python Veteran analysis
-        tasks.append(
-            self.agents["python_veteran"].analyze_code(data.get("code_files", {}))
-        )
-        
-        # D&D Expert analysis
-        tasks.append(
-            self.agents["dnd_expert"].analyze_balance(
-                data.get("mission_metrics", {}),
-                data.get("difficulty_scale", {}),
-            )
-        )
-        
-        # D&D Veteran analysis
-        tasks.append(
-            self.agents["dnd_veteran"].analyze_narrative(
-                data.get("mission_samples", []),
-                data.get("npc_data", {}),
-                data.get("faction_info", {}),
-            )
-        )
-        
-        # AI Critic analysis
-        tasks.append(
-            self.agents["ai_critic"].analyze_system(data.get("code_metrics", {}))
-        )
+        specialist_tasks = [
+            (
+                "python_veteran",
+                self.agents["python_veteran"].analyze_code(data.get("code_files", {})),
+            ),
+            (
+                "dnd_expert",
+                self.agents["dnd_expert"].analyze_balance(
+                    data.get("mission_metrics", {}),
+                    data.get("difficulty_scale", {}),
+                ),
+            ),
+            (
+                "dnd_veteran",
+                self.agents["dnd_veteran"].analyze_narrative(
+                    data.get("mission_samples", []),
+                    data.get("npc_data", {}),
+                    data.get("faction_info", {}),
+                ),
+            ),
+            (
+                "ai_critic",
+                self.agents["ai_critic"].analyze_system(data.get("code_metrics", {})),
+            ),
+        ]
         
         # Run all in parallel
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        results = await asyncio.gather(*(task for _, task in specialist_tasks), return_exceptions=True)
         
         # Handle exceptions
         analyses = []
-        for i, result in enumerate(results):
+        for (agent_name, _), result in zip(specialist_tasks, results):
             if isinstance(result, Exception):
-                agent_name = list(self.agents.keys())[i + 1]  # Skip project manager
                 logger.error(f"Agent {agent_name} failed: {result}")
                 self._journal(f"ERROR: Agent {agent_name} analysis failed")
             else:
@@ -436,6 +414,44 @@ class AgentOrchestrator:
             specialist_analyses,
             data.get("mission_metrics", {}),
         )
+
+    def _extract_findings(self, analyses: List[AgentAnalysis]) -> List[str]:
+        """Flatten specialist agent findings into a short briefing list."""
+        findings = []
+        for a in analyses:
+            for issue in a.issues_found[:2]:
+                findings.append(f"[{a.agent_name}] {issue}")
+            for rec in a.recommendations[:1]:
+                findings.append(f"[{a.agent_name} rec] {rec}")
+        return findings[:10]
+
+    async def _run_guild_council(
+        self,
+        specialist_findings: List[str],
+        data: Dict[str, Any],
+        channel=None,
+    ):
+        """Convene the Grand Council of Guilds to vote on world-state rulings."""
+        from src.agents.guild_council import GuildCouncil
+        council = GuildCouncil()
+        try:
+            session = await council.run_session(
+                specialist_findings=specialist_findings,
+                world_data=data,
+                channel=channel,
+            )
+            self._journal(
+                f"COUNCIL: {session.passed_count} ruling(s) passed, "
+                f"{session.failed_count} failed"
+            )
+            for r in session.rulings:
+                result = "PASSED" if r.passed else "FAILED"
+                self._journal(f"COUNCIL [{result}]: {r.topic} — {r.proposal[:80]}")
+            return session
+        except Exception as e:
+            logger.error(f"🏛️ Guild council error: {e}")
+            self._journal(f"COUNCIL ERROR: {e}")
+            return None
     
     async def _apply_safe_changes(self, analyses: List[AgentAnalysis]) -> None:
         """

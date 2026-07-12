@@ -425,7 +425,7 @@ class MissionJsonBuilder:
             safe_title = safe_title.replace(" ", "_")[:50]
             filename = safe_title
         
-        filename = filename.rstrip(".json")
+        filename = filename.removesuffix(".json")
         filepath = output_dir / f"{filename}.json"
         
         try:

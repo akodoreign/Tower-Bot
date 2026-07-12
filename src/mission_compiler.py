@@ -5,7 +5,8 @@ This is Stage 2 of the mission pipeline:
   Stage 1: Generate mission JSON (via mission_json_builder.py or mission_board.py)
   Stage 2: Compile JSON → use agents + skills → expand content → build .docx → post to Discord
 
-The compiler uses three agents for quality enhancement:
+The compiler uses FOUR agents for quality enhancement:
+  - ProAuthorAgent: FIRST PASS - transforms JSON into compelling narrative prose
   - DNDExpertAgent: Validates mechanics, CR, encounter balance, D&D 5e 2024 compliance
   - DNDVeteranAgent: Enhances narrative, NPC dialogue, atmosphere, world consistency  
   - AICriticAgent: Final quality check, identifies gaps, suggests improvements
@@ -31,7 +32,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, Tuple
 
 from src.log import logger
-from src.ollama_busy import mark_busy, mark_available, is_available
+from src.ollama_busy import mark_priority_busy, unmark_priority_busy, is_available
 from src.skills import (
     load_all_skills,
     get_skill_for_task,
@@ -42,6 +43,7 @@ from src.agents.learning_agents import (
     DNDExpertAgent,
     DNDVeteranAgent,
     AICriticAgent,
+    ProAuthorAgent,
 )
 from src.mission_builder.docx_builder import build_docx, format_module_for_docx
 from src.mission_builder.mission_json_builder import MissionJsonBuilder
@@ -53,8 +55,8 @@ PENDING_DIR = GENERATED_DIR / "pending"
 COMPLETED_DIR = GENERATED_DIR / "completed"
 CAMPAIGN_DOCS = PROJECT_ROOT / "campaign_docs"
 
-# Discord channel for posting modules
-MODULE_CHANNEL_ID = 1484147249637359769
+# Discord channel for posting modules (set MODULE_OUTPUT_CHANNEL_ID in .env)
+MODULE_CHANNEL_ID = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "1484147249637359769"))
 
 # Tier → CR mapping (same as module_generator.py)
 TIER_CR_MAP = {
@@ -66,13 +68,13 @@ TIER_CR_MAP = {
 
 # Mission type → skill mapping
 MISSION_TYPE_SKILLS = {
-    "standard": ["cw-mission-gen", "tower-bot"],
-    "dungeon-delve": ["cw-mission-gen", "dnd5e-srd", "tower-bot"],
-    "investigation": ["cw-mission-gen", "tower-bot"],
-    "combat": ["cw-mission-gen", "dnd5e-srd"],
-    "social": ["cw-mission-gen", "tower-bot"],
-    "heist": ["cw-mission-gen", "tower-bot"],
-    "rift": ["cw-mission-gen", "tower-bot"],
+    "standard": ["module-quality", "cw-mission-gen", "tower-bot"],
+    "dungeon-delve": ["module-quality", "cw-mission-gen", "dnd5e-srd", "tower-bot"],
+    "investigation": ["module-quality", "cw-mission-gen", "tower-bot"],
+    "combat": ["module-quality", "cw-mission-gen", "dnd5e-srd"],
+    "social": ["module-quality", "cw-mission-gen", "tower-bot"],
+    "heist": ["module-quality", "cw-mission-gen", "tower-bot"],
+    "rift": ["module-quality", "cw-mission-gen", "tower-bot"],
 }
 
 
@@ -95,6 +97,7 @@ class MissionCompiler:
         """
         self.client = client
         self.agents = {
+            "pro_author": ProAuthorAgent(),  # Runs FIRST
             "dnd_expert": DNDExpertAgent(),
             "dnd_veteran": DNDVeteranAgent(),
             "ai_critic": AICriticAgent(),
@@ -155,30 +158,35 @@ class MissionCompiler:
         """Load campaign context (NPCs, factions, recent news)."""
         context = {}
         
-        # NPC roster
-        roster_path = CAMPAIGN_DOCS / "npc_roster.json"
-        if roster_path.exists():
-            try:
-                npcs = json.loads(roster_path.read_text(encoding="utf-8"))
-                context["npcs"] = [n for n in npcs if n.get("status") == "alive"][:20]
-            except Exception:
-                context["npcs"] = []
+        # NPC roster — from MySQL
+        try:
+            from src.db_api import raw_query as _rq_mc
+            _npc_rows = _rq_mc(
+                "SELECT name, faction, role, location, status FROM npcs "
+                "WHERE status = 'alive' ORDER BY name LIMIT 20"
+            ) or []
+            context["npcs"] = [dict(r) for r in _npc_rows]
+        except Exception:
+            context["npcs"] = []
+
+        # Faction info — from MySQL
+        try:
+            from src.db_api import get_all_faction_reputations
+            _rep_rows = get_all_faction_reputations() or []
+            context["factions"] = {
+                r["faction_name"]: {"tier": r["tier"], "points": r["reputation_score"]}
+                for r in _rep_rows
+            }
+        except Exception:
+            context["factions"] = {}
         
-        # Faction info
-        rep_path = CAMPAIGN_DOCS / "faction_reputation.json"
-        if rep_path.exists():
-            try:
-                context["factions"] = json.loads(rep_path.read_text(encoding="utf-8"))
-            except Exception:
-                context["factions"] = {}
-        
-        # Recent news
-        news_path = CAMPAIGN_DOCS / "news_memory.txt"
-        if news_path.exists():
-            try:
-                context["news"] = news_path.read_text(encoding="utf-8")[-3000:]
-            except Exception:
-                context["news"] = ""
+        # Recent news — from MySQL
+        try:
+            from src.db_api import raw_query as _rq_n
+            _nrows = _rq_n("SELECT facts FROM news_memory ORDER BY id DESC LIMIT 8") or []
+            context["news"] = "\n".join(r.get("facts") or "" for r in _nrows if r.get("facts"))
+        except Exception:
+            context["news"] = ""
         
         return context
     
@@ -493,48 +501,60 @@ Write 300-500 words.""",
         system = f"""You are a master D&D 5e 2024 module writer for the Tower of Last Chance campaign.
 The setting is the Undercity — a dark urban fantasy underworld beneath a massive tower.
 
+═══ ANTI-PATTERNS (NEVER USE) ═══
+❌ Purple prose ("ethereal glow", "otherworldly pallor")
+❌ Echo chamber (saying the same thing multiple ways)
+❌ Hedging ("seemed to", "appeared to", "might be")
+❌ Adjective avalanche (more than one adjective per noun)
+❌ Generic locations ("a warehouse" → name it specifically)
+❌ Banned phrases: "It is worth noting", "Needless to say", "A sense of"
+
+═══ REQUIRED PATTERNS ═══
+✓ Specific names, numbers, times, locations
+✓ Sensory grounding (sight, sound, smell, texture)
+✓ Read-aloud text in present tense, second person
+✓ Short sentences for action, varied length for description
+✓ NPCs have: Appearance (2-3 details), Voice, Knows, Wants
+✓ Encounters have: Setup, Terrain, Morale, Loot
+
 SKILL GUIDANCE:
-{skill_context[:2000]}
+{skill_context[:4000]}
 
-Write vivid, specific, playable content. Include:
-- Read-aloud text marked with >>> for key moments
-- Specific DCs for skill checks
-- Named NPCs with brief personalities
-- Tactical encounter details
-- Atmospheric descriptions
-
-Never be vague. Every scene should be immediately runnable at the table."""
+Write vivid, specific, playable content. Every scene should be immediately runnable at the table."""
         
-        ollama_model = os.getenv("OLLAMA_MODEL", "mistral")
+        ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
         ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
         
         try:
-            async with httpx.AsyncClient(timeout=300.0) as client:
-                resp = await client.post(ollama_url, json={
+            from src.ollama_queue import call_ollama, OllamaBusyError
+            data = await call_ollama(
+                payload={
                     "model": ollama_model,
                     "messages": [
                         {"role": "system", "content": system},
                         {"role": "user", "content": prompt},
                     ],
                     "stream": False,
-                })
-                resp.raise_for_status()
-                data = resp.json()
-                
-                content = ""
-                if isinstance(data, dict):
-                    msg = data.get("message", {})
-                    if isinstance(msg, dict):
-                        content = msg.get("content", "").strip()
-                
-                # Strip AI preamble
-                lines = content.splitlines()
-                skip_prefixes = ("sure", "here's", "here is", "certainly", "of course")
-                while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip_prefixes):
-                    lines.pop(0)
-                
-                return "\n".join(lines).strip()
-                
+                },
+                timeout=300.0,
+                caller="mission_compiler",
+                force=True,  # bypass busy flag — we already own it
+            )
+
+            content = ""
+            if isinstance(data, dict):
+                msg = data.get("message", {})
+                if isinstance(msg, dict):
+                    content = msg.get("content", "").strip()
+
+            # Strip AI preamble
+            lines = content.splitlines()
+            skip_prefixes = ("sure", "here's", "here is", "certainly", "of course")
+            while lines and lines[0].lower().strip().rstrip("!:,.").startswith(skip_prefixes):
+                lines.pop(0)
+
+            return "\n".join(lines).strip()
+
         except Exception as e:
             logger.error(f"📖 Section generation failed ({section_name}): {e}")
             return f"[Section {section_name} generation failed]"
@@ -560,8 +580,8 @@ Never be vague. Every scene should be immediately runnable at the table."""
         logger.info(f"📖 Starting mission compilation: {title}")
         logger.info(f"📖 Mission type: {mission_type}, Player: {player_name}")
         
-        # Mark Ollama busy
-        mark_busy(f"compiling module: {title}")
+        # Mark Ollama busy with high priority so NPC lifecycle yields immediately
+        mark_priority_busy(f"compiling module: {title}")
         
         try:
             # Load skills and campaign context
@@ -590,6 +610,16 @@ Never be vague. Every scene should be immediately runnable at the table."""
             # Combine for agent enhancement
             full_content = accumulated
             
+            # Agent pass 0: ProAuthor (narrative transformation) - RUNS FIRST
+            logger.info("📖 Agent pass: ProAuthor (narrative transformation)")
+            pro_author = self.agents["pro_author"]
+            enhanced, author_feedback = await pro_author.transform_to_narrative(
+                mission_data, full_content, campaign_context
+            )
+            if author_feedback["success"]:
+                full_content = enhanced
+                logger.info(f"📖 ProAuthor enhanced: {author_feedback['enhancement_ratio']:.1%} ratio")
+            
             # Agent pass 1: Mechanics
             logger.info("📖 Agent pass: DNDExpert (mechanics)")
             enhanced, mech_feedback = await self._agent_enhance_mechanics(
@@ -597,6 +627,15 @@ Never be vague. Every scene should be immediately runnable at the table."""
             )
             if mech_feedback["success"]:
                 full_content = enhanced
+            
+            # DNDExpert: Generate creature appendix
+            logger.info("📖 Generating creature appendix...")
+            dnd_expert = self.agents["dnd_expert"]
+            cr = mission_data.get("metadata", {}).get("cr", 6)
+            tier = mission_data.get("metadata", {}).get("tier", "standard")
+            creature_appendix = await dnd_expert.generate_creature_appendix(
+                full_content, cr, tier
+            )
             
             # Agent pass 2: Narrative
             logger.info("📖 Agent pass: DNDVeteran (narrative)")
@@ -606,10 +645,22 @@ Never be vague. Every scene should be immediately runnable at the table."""
             if narr_feedback["success"]:
                 full_content = enhanced
             
+            # DNDVeteran: Generate location appendix (includes rumors, charts)
+            logger.info("📖 Generating location appendix...")
+            dnd_veteran = self.agents["dnd_veteran"]
+            faction = mission_data.get("metadata", {}).get("faction", "Unknown")
+            location_appendix, location_names = await dnd_veteran.generate_location_appendix(
+                full_content, faction, tier
+            )
+            logger.info(f"📖 Extracted {len(location_names)} locations for map generation")
+            
             # Agent pass 3: Quality check
             logger.info("📖 Agent pass: AICritic (quality)")
             quality = await self._agent_quality_check(full_content, mission_data)
             logger.info(f"📖 Quality score: {quality['score']}/10")
+            
+            # Append appendices to content
+            full_content_with_appendices = full_content + creature_appendix + location_appendix
             
             # Build docx data
             # Split content back into sections for docx builder
@@ -618,7 +669,7 @@ Never be vague. Every scene should be immediately runnable at the table."""
                 overview=sections.get("overview", ""),
                 acts_1_2=sections.get("act_1", "") + "\n\n" + sections.get("act_2", ""),
                 acts_3_4=sections.get("act_3", ""),
-                act_5_rewards=sections.get("rewards", ""),
+                act_5_rewards=sections.get("rewards", "") + creature_appendix + location_appendix,
                 metadata=mission_data.get("metadata", {}),
             )
             
@@ -627,8 +678,9 @@ Never be vague. Every scene should be immediately runnable at the table."""
                 "compiled_at": datetime.now().isoformat(),
                 "player_name": player_name,
                 "quality_score": quality["score"],
-                "agents_used": ["DNDExpert", "DNDVeteran", "AICritic"],
+                "agents_used": ["ProAuthor", "DNDExpert", "DNDVeteran", "AICritic"],
                 "skills_used": self._get_skills_for_mission(mission_type),
+                "location_names": location_names,  # For map generation
             }
             
             # Build docx
@@ -643,10 +695,35 @@ Never be vague. Every scene should be immediately runnable at the table."""
             if docx_path and docx_path.exists():
                 logger.info(f"📖 Module compiled: {docx_path}")
                 
+                # Generate VTT maps for locations from appendix
+                if location_names:
+                    try:
+                        from src.mission_builder.maps import generate_module_maps
+                        _map_module_data = {
+                            "title": title,
+                            "sections": {
+                                "acts_1_2": sections.get("act_1", "") + "\n\n" + sections.get("act_2", ""),
+                                "acts_3_4": sections.get("act_3", ""),
+                            },
+                            "metadata": mission_data.get("metadata", {}),
+                        }
+                        map_paths = await generate_module_maps(
+                            _map_module_data, output_subdir=safe_title, max_maps=4
+                        )
+                        if map_paths:
+                            logger.info(f"📖 Generated {len(map_paths)} VTT maps")
+                            docx_data["map_paths"] = [str(p) for p in map_paths]
+                            self._last_map_paths = map_paths
+                    except Exception as e:
+                        logger.warning(f"📖 Map generation failed (non-fatal): {e}")
+                
                 # Save JSON to completed
                 json_path = COMPLETED_DIR / f"{filename}.json"
-                mission_data["compilation"] = docx_data.get("compilation", {})
-                json_path.write_text(json.dumps(mission_data, indent=2), encoding="utf-8")
+                _comp = docx_data.get("compilation", {})
+                if docx_data.get("map_paths"):
+                    _comp["map_paths"] = docx_data["map_paths"]
+                mission_data["compilation"] = _comp
+                json_path.write_text(json.dumps(mission_data, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
                 
                 return docx_path
             else:
@@ -657,7 +734,7 @@ Never be vague. Every scene should be immediately runnable at the table."""
             logger.exception(f"📖 Compilation error: {e}")
             return None
         finally:
-            mark_available()
+            unmark_priority_busy()
     
     async def compile_and_post(
         self,
@@ -737,7 +814,16 @@ Never be vague. Every scene should be immediately runnable at the table."""
                 file = discord.File(str(docx_path), filename=docx_path.name)
                 await channel.send(embed=embed, file=file)
                 logger.info(f"📖 Module posted to channel: {title}")
-                
+
+                # Post VTT maps if generated
+                _map_paths = getattr(self, "_last_map_paths", None)
+                if _map_paths:
+                    from src.mission_builder.maps import post_maps_to_channel
+                    _existing = [p for p in _map_paths if p.exists()]
+                    if _existing:
+                        await post_maps_to_channel(client, _existing, {"title": title}, channel=channel)
+                    self._last_map_paths = None
+
             except Exception as e:
                 logger.error(f"📖 Failed to post module: {e}")
         

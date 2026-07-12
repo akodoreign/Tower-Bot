@@ -19,7 +19,7 @@ import json
 import random
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 
 from src.agents.base import BaseAgent, AgentConfig, AgentResponse, ModelType
@@ -27,10 +27,6 @@ from src.agents.base import BaseAgent, AgentConfig, AgentResponse, ModelType
 logger = logging.getLogger(__name__)
 
 DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "campaign_docs"
-NPC_ROSTER = DOCS_DIR / "npc_roster.json"
-NPC_GRAVEYARD = DOCS_DIR / "npc_graveyard.json"
-CITY_GAZETTEER = DOCS_DIR / "city_gazetteer.json"
-ARENA_VENUES = DOCS_DIR / "arena_venues.json"
 
 
 # ---------------------------------------------------------------------------
@@ -47,22 +43,17 @@ class FactCheckerMixin:
     - Arena venue accuracy
     """
     
-    _cache: Dict[str, any] = {}
-    
-    @classmethod
-    def _load_json(cls, path: Path, cache_key: str) -> Dict:
-        """Load JSON with caching."""
-        if cache_key not in cls._cache:
-            try:
-                cls._cache[cache_key] = json.loads(path.read_text(encoding="utf-8"))
-            except Exception:
-                cls._cache[cache_key] = {}
-        return cls._cache[cache_key]
-    
-    @classmethod
-    def clear_cache(cls):
-        """Clear cached data (call when world state changes)."""
-        cls._cache.clear()
+    @property
+    def _cache(self) -> Dict[str, Any]:
+        cache = self.__dict__.get("_fact_check_cache")
+        if cache is None:
+            cache = {}
+            self.__dict__["_fact_check_cache"] = cache
+        return cache
+
+    def clear_cache(self):
+        """Clear this agent's cached fact data."""
+        self._cache.clear()
     
     def get_npc_roster(self) -> List[Dict]:
         """Get all living NPCs from MySQL (alive + injured)."""
@@ -70,28 +61,26 @@ class FactCheckerMixin:
             try:
                 from src.db_api import raw_query as _rq
                 rows = _rq(
-                    "SELECT name, faction, role, status, location, data_json FROM npcs "
-                    "WHERE status IN ('alive', 'injured') ORDER BY name"
+                    "SELECT id, name, faction, role, status, location, `rank`, motivation, species "
+                    "FROM npcs WHERE status IN ('alive', 'injured', 'undead', 'doppelganger') ORDER BY name"
                 )
                 npcs = []
                 for row in (rows or []):
-                    npc = {"name": row["name"], "faction": row["faction"],
-                           "role": row["role"], "status": row["status"],
-                           "location": row["location"]}
-                    dj = row.get("data_json") or {}
-                    if isinstance(dj, str):
-                        import json as _json
-                        try:
-                            dj = _json.loads(dj)
-                        except Exception:
-                            dj = {}
-                    npc.update(dj)
+                    npc = {
+                        "_db_id":     row["id"],
+                        "name":       row["name"],
+                        "faction":    row["faction"],
+                        "role":       row["role"],
+                        "status":     row["status"],
+                        "location":   row["location"],
+                        "rank":       row.get("rank") or "",
+                        "motivation": row.get("motivation") or "",
+                        "species":    row.get("species") or "",
+                    }
                     npcs.append(npc)
                 self._cache["roster"] = npcs
             except Exception:
-                # Fallback to JSON file if DB unavailable
-                data = self._load_json(NPC_ROSTER, "_roster_file")
-                self._cache["roster"] = data if isinstance(data, list) else data.get("npcs", [])
+                self._cache["roster"] = []
         return self._cache["roster"]
     
     def get_npc_graveyard(self) -> List[Dict]:
@@ -100,30 +89,30 @@ class FactCheckerMixin:
             try:
                 from src.db_api import raw_query as _rq
                 rows = _rq(
-                    "SELECT name, faction, role, status, data_json FROM npcs "
-                    "WHERE status = 'dead' ORDER BY name"
+                    "SELECT id, name, faction, role, deceased_at, death_cause, `rank`, species "
+                    "FROM npcs WHERE status = 'dead' ORDER BY name"
                 )
                 npcs = []
                 for row in (rows or []):
-                    npc = {"name": row["name"], "faction": row["faction"],
-                           "role": row["role"], "status": "dead"}
-                    dj = row.get("data_json") or {}
-                    if isinstance(dj, str):
-                        import json as _json
-                        try:
-                            dj = _json.loads(dj)
-                        except Exception:
-                            dj = {}
-                    npc.update(dj)
+                    npc = {
+                        "_db_id":      row["id"],
+                        "name":        row["name"],
+                        "faction":     row["faction"],
+                        "role":        row["role"],
+                        "status":      "dead",
+                        "deceased_at": row.get("deceased_at"),
+                        "death_cause": row.get("death_cause") or "",
+                        "rank":        row.get("rank") or "",
+                        "species":     row.get("species") or "",
+                    }
                     npcs.append(npc)
                 self._cache["graveyard"] = npcs
             except Exception:
-                data = self._load_json(NPC_GRAVEYARD, "_graveyard_file")
-                self._cache["graveyard"] = data if isinstance(data, list) else data.get("npcs", [])
+                self._cache["graveyard"] = []
         return self._cache["graveyard"]
     
     def get_locations(self) -> Dict:
-        """Get city gazetteer from MySQL (falls back to file)."""
+        """Get city gazetteer from MySQL."""
         if "gazetteer" not in self._cache:
             try:
                 from src.db_api import raw_query as _rq
@@ -132,15 +121,28 @@ class FactCheckerMixin:
                     cj = rows[0]["content_json"]
                     self._cache["gazetteer"] = json.loads(cj) if isinstance(cj, str) else cj
                 else:
-                    raise ValueError("no gazetteer row")
+                    self._cache["gazetteer"] = {}
             except Exception:
-                self._cache["gazetteer"] = self._load_json(CITY_GAZETTEER, "_gaz_file")
+                self._cache["gazetteer"] = {}
         return self._cache["gazetteer"]
     
     def get_arena_venues(self) -> List[Dict]:
-        """Get arena venues."""
-        data = self._load_json(ARENA_VENUES, "venues")
-        return data.get("venues", []) if isinstance(data, dict) else []
+        """Get arena venues from DB (global_state), falling back to empty list."""
+        if "venues" not in self._cache:
+            try:
+                from src.db_api import raw_query as _rq
+                rows = _rq(
+                    "SELECT state_value FROM global_state WHERE state_key = 'arena_venues'"
+                )
+                if rows and rows[0].get("state_value"):
+                    val = rows[0]["state_value"]
+                    data = json.loads(val) if isinstance(val, str) else val
+                    self._cache["venues"] = data.get("venues", data) if isinstance(data, dict) else data
+                else:
+                    self._cache["venues"] = []
+            except Exception:
+                self._cache["venues"] = []
+        return self._cache["venues"]
     
     def npc_exists(self, name: str) -> bool:
         """Check if NPC exists (alive or dead)."""
@@ -541,6 +543,7 @@ class SportsColumnistAgent(BaseAgent, FactCheckerMixin):
             max_retries=2,
             temperature=0.75,
             max_tokens=2048,
+            ollama_track="quick",
         )
     
     def _build_system_prompt(self, context: Optional[str] = None) -> str:

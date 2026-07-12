@@ -63,12 +63,17 @@ def _load_missing() -> List[Dict]:
 def _save_missing_record(record: Dict) -> int:
     """Save a new missing person record."""
     try:
-        return db.insert("missing_persons", {
+        row = {
             "person_name": record.get("name", "Unknown"),
             "last_seen_location": record.get("district", "Unknown"),
             "status": "missing" if not record.get("resolved") else "found",
             "reported_at": datetime.now(),
-        })
+        }
+        if record.get("body"):
+            row["body"] = record["body"]
+        if record.get("filed_by"):
+            row["filed_by"] = record["filed_by"]
+        return db.insert("missing_persons", row)
     except Exception as e:
         logger.error(f"Missing persons save error: {e}")
         return 0
@@ -103,7 +108,7 @@ async def generate_missing_bulletin() -> Optional[str]:
     desc, district, filed_by, urgency = random.choice(_SUBJECT_POOLS)
     now   = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
     prompt = f"""You are writing a missing persons notice for the Undercity Dispatch.
 The Undercity is a sealed dark fantasy city under a Dome.
@@ -161,7 +166,7 @@ def tick_missing_resolutions() -> List[str]:
     """Check for expired missing persons. 20% get a 'found' bulletin."""
     now     = datetime.now()
     tower   = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts      = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    ts      = f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
     outputs = []
 
     try:

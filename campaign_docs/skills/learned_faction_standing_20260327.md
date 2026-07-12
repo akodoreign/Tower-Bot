@@ -1,25 +1,21 @@
 # Skill: Faction Standing Report  
 **Keywords:** faction, reputation, standing, allied, hostile, political, relations  
 **Category:** learned  
-**Version:** 14  
+**Version:** 20  
 **Source:** self-learned  
 
-**1. Allied vs Antagonistic:**  
-Allied: *Adventurers Guild* (Friendly), *Argent Blades* (Friendly), *Patchwork Saints* (Friendly), *Wizards Tower* (Partner).  
-Antagonistic: *Iron Fang Consortium* (Disliked, +2), *Serpent Choir* (Disliked, -1).  
-Neutral/Liked: *Glass Sigil* (Liked), *Wardens of Ash* (Liked), *Obsidian Lotus* (Neutral), *Tower Authority* (Neutral).  
+**Allied Factions:** Adventurers Guild, Argent Blades, Patchwork Saints, Wizards Tower (Partner).  
+**Antagonistic Factions:** Serpent Choir (Disliked, +2 points).  
 
-**2. Recent Changes:**  
-- *Adventurers Guild* (+1): Likely due to recent cooperative quests.  
-- *Iron Fang Consortium* (+2): Escalated conflicts over resource control.  
-- *Serpent Choir* (-1): Minor clashes over territorial disputes.  
-- *Obsidian Lotus* (-2): Suffered reputational damage from failed alliances.  
+**Recent Changes:**  
+- Serpent Choir’s +2 points likely from recent conflicts or betrayals.  
+- Obsidian Lotus’s -2 points may stem from covert sabotage or failed negotiations.  
+- Adventurers Guild’s +1 point reflects recent aid or favors.  
 
-**3. Opportunities/Dangers:**  
-- Leverage *Wizards Tower*’s Partner status for magical aid.  
-- *Iron Fang*’s high Disliked tier poses threat if provoked.  
-- *Tower Authority* (Neutral) could be swayed toward alliance with strategic incentives.  
-- *Glass Sigil* (Liked) may offer intelligence but requires cautious diplomacy.  
-- *Serpent Choir*’s low standing risks escalating into open conflict.  
+**Opportunities/Dangers:**  
+- Leverage Adventurers Guild and Argent Blades for resource-sharing.  
+- Serpent Choir’s hostility poses a threat; avoid provoking them.  
+- Obsidian Lotus’s negative stance could lead to espionage risks.  
+- Neutral factions (Iron Fang, Tower Authority) offer potential for sway or alliances.  
 
-**Strategic Note:** Prioritize alliances with Friendly factions while avoiding entanglements with Disliked groups. Neutral factions like the *Tower Authority* may become critical allies if pressures mount.
+**Note:** Prioritize diplomacy with Liked factions (Glass Sigil, Wardens of Ash) to stabilize relations.

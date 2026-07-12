@@ -18,7 +18,10 @@ from src.player_listings import _TowerBayModal, format_player_listings_embed
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-PATCHES_FILE = PROJECT_ROOT / "skills" / "module-quality" / "PATCHES.md"
+try:
+    from src.module_quality_trainer import PATCHES_FILE
+except Exception:
+    PATCHES_FILE = PROJECT_ROOT / "logs" / "learning" / "module_quality_patches.md"
 
 
 def _parse_pending_patches() -> list:
@@ -387,21 +390,61 @@ def setup(client):
             color=discord.Color.blue(),
         )
         embed.add_field(
-            name="Chat",
-            value="`/chat` \u2014 Talk to the Tower\n`/reset` \u2014 Reset conversation",
+            name="💬 Chat",
+            value="`/chat` — Talk to the Oracle\n`/reset` — Clear conversation",
             inline=False,
         )
         embed.add_field(
-            name="Character",
-            value="`/setcharprofile` \u2014 Set character\n`/showcharprofile` \u2014 View character",
+            name="👤 Character",
+            value=(
+                "`/setcharprofile` — Register your character\n"
+                "`/showcharprofile` — View saved character info\n"
+                "`/showcharappearance` — View character appearance"
+            ),
             inline=False,
         )
         embed.add_field(
-            name="Admin",
-            value="`/sync` \u2014 Sync slash commands",
+            name="🌍 World & Lore",
+            value=(
+                "`/factionrep` — Faction reputation standings\n"
+                "`/partyrep` — NPC party records\n"
+                "`/style` — Style/outfit for a character or faction\n"
+                "`/skills` — Tower's learned knowledge base"
+            ),
             inline=False,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=False)
+        embed.add_field(
+            name="📖 Rules",
+            value="`/rules` — Look up a D&D 5e rule\n`/spell` — Look up a spell or class feature",
+            inline=False,
+        )
+        embed.add_field(
+            name="💰 Economy",
+            value=(
+                "`/finances` — EC/Kharma rate & price tables\n"
+                "`/prices` — Item price lookup\n"
+                "`/towerbay` — List an item at auction\n"
+                "`/myauctions` — Your active TowerBay listings"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="🎨 Images",
+            value="`/draw` — Generate a dark fantasy image",
+            inline=False,
+        )
+        embed.add_field(
+            name="⚙️ Admin",
+            value=(
+                "`/provider` — Switch AI provider\n"
+                "`/switchpersona` — Switch Oracle persona\n"
+                "`/private` — Toggle private replies\n"
+                "`/sync` — Re-sync slash commands"
+            ),
+            inline=False,
+        )
+        embed.set_footer(text="DM-only commands not listed. Use /help for this menu anytime.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # ---- /towerbay, /myauctions ----
 
@@ -649,3 +692,262 @@ def setup(client):
             f"{'Bulletin posted to channel.' if bulletin and channel else 'No bulletin generated.'}",
             ephemeral=True,
         )
+
+    # \u2500\u2500 /clearboard \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+    @client.tree.command(
+        name="clearboard",
+        description="[DM only] Delete all active missions from Discord and DB so they regenerate fresh.",
+    )
+    async def clearboard_cmd(interaction: discord.Interaction):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_id:
+            await interaction.response.send_message("\u274c DM only.", ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        from src.db_api import raw_query, raw_execute
+
+        board_channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        board_channel = client.get_channel(board_channel_id) if board_channel_id else None
+
+        # Load all non-completed, non-archived missions
+        rows = raw_query(
+            "SELECT id, message_id, mission_json FROM missions "
+            "WHERE status NOT IN ('completed', 'failed', 'archived') OR status IS NULL"
+        ) or []
+
+        deleted_discord = 0
+        failed_discord = 0
+
+        for row in rows:
+            msg_id = row.get("message_id")
+            if msg_id and board_channel:
+                try:
+                    msg = await board_channel.fetch_message(int(msg_id))
+                    await msg.delete()
+                    deleted_discord += 1
+                except Exception:
+                    failed_discord += 1
+
+        # Wipe them from the DB
+        raw_execute("DELETE FROM missions WHERE status NOT IN ('completed', 'failed', 'archived') OR status IS NULL")
+
+        await interaction.followup.send(
+            f"\u2705 **Mission board cleared.**\n"
+            f"\u2022 Discord messages deleted: **{deleted_discord}** (failed: {failed_discord})\n"
+            f"\u2022 DB rows removed: **{len(rows)}**\n"
+            f"New missions will generate on the next board tick.",
+            ephemeral=True,
+        )
+
+    # \u2500\u2500 /newareas \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+    @client.tree.command(
+        name="newareas",
+        description="[DM only] Generate new sub-areas (taverns, shops, sightseeing, etc.) across all districts.",
+    )
+    @app_commands.describe(
+        district="Leave blank to run all districts. Specify one to target a single district.",
+        count="Number of new places per district (default 7).",
+        force="Re-generate even if a district already has many places.",
+    )
+    async def newareas_cmd(
+        interaction: discord.Interaction,
+        district: str = "",
+        count: int = 7,
+        force: bool = False,
+    ):
+        import asyncio as _asyncio
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_id:
+            await interaction.response.send_message("\u274c DM only.", ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        from src.area_places import (
+            generate_places_for_district,
+            generate_all_new_areas,
+            BANNED_DISTRICTS,
+        )
+        from src.db_api import raw_query as _rq
+
+        if district.strip():
+            if district in BANNED_DISTRICTS:
+                await interaction.followup.send(
+                    f"\u274c **{district}** is off-limits for new area generation.", ephemeral=True
+                )
+                return
+            known = {r["district"] for r in (_rq("SELECT DISTINCT district FROM gazetteer_places") or [])}
+            # Also accept districts from gazetteer JSON meta
+            try:
+                from src.db_api import raw_query as rq
+                import json as _json
+                gaz_row = rq("SELECT content_json FROM gazetteer LIMIT 1")
+                if gaz_row:
+                    gaz = gaz_row[0]["content_json"]
+                    if isinstance(gaz, str):
+                        gaz = _json.loads(gaz)
+                    known.update(gaz.get("districts", {}).keys())
+            except Exception:
+                pass
+
+            if district not in known:
+                await interaction.followup.send(
+                    f"\u274c Unknown district: **{district}**", ephemeral=True
+                )
+                return
+
+            await interaction.followup.send(
+                f"\U0001f3d9\ufe0f Generating **{count}** new places for **{district}**\u2026 I'll DM you when done.",
+                ephemeral=True,
+            )
+
+            async def _run_one():
+                try:
+                    n = await generate_places_for_district(district, count=count, force=True)
+                    dm_user = await client.fetch_user(dm_id)
+                    await dm_user.send(
+                        f"\u2705 **{district}** \u2014 {n} new places inserted into DB.\n"
+                        f"Gazetteer dashboard will show them immediately."
+                    )
+                except Exception as e:
+                    logger.error(f"newareas single error: {e}")
+                    try:
+                        dm_user = await client.fetch_user(dm_id)
+                        await dm_user.send(f"\u274c newareas failed for **{district}**: {e}")
+                    except Exception:
+                        pass
+
+            _asyncio.get_event_loop().create_task(_run_one())
+            return
+
+        # \u2500\u2500 Full run \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        try:
+            from src.db_api import raw_query as rq2
+            import json as _j2
+            gaz_row2 = rq2("SELECT content_json FROM gazetteer LIMIT 1")
+            gaz2 = gaz_row2[0]["content_json"] if gaz_row2 else {}
+            if isinstance(gaz2, str):
+                gaz2 = _j2.loads(gaz2)
+            total_districts = len([d for d in gaz2.get("districts", {}) if d not in BANNED_DISTRICTS])
+        except Exception:
+            total_districts = 26  # 27 minus Tower
+
+        await interaction.followup.send(
+            f"\U0001f3d9\ufe0f **New areas generation starting.**\n"
+            f"Districts: **{total_districts}** (Tower of Last Chance excluded)\n"
+            f"**{count}** new places per district \u00b7 runs in background\n"
+            f"I'll DM you when complete.",
+            ephemeral=True,
+        )
+
+        log: list[str] = []
+
+        async def _progress(dist, inserted, total):
+            log.append(f"\u2705 {dist}")
+            logger.info(f"[NewAreas] {dist} done ({inserted} total inserted)")
+
+        async def _run_all():
+            try:
+                stats = await generate_all_new_areas(
+                    count_per_district=count,
+                    force=force,
+                    progress_callback=_progress,
+                )
+                dm_user = await client.fetch_user(dm_id)
+                tail = "\n".join(log[-12:])
+                if len(log) > 12:
+                    tail = f"\u2026({len(log)-12} more)\u2026\n" + tail
+                await dm_user.send(
+                    f"\u2705 **New areas complete.**\n"
+                    f"Districts processed: **{stats['total_districts']}**\n"
+                    f"Places inserted: **{stats['total_inserted']}**\n"
+                    f"Skipped (already full): {stats['skipped']}\n\n"
+                    f"**Last entries:**\n{tail}\n\n"
+                    f"Gazetteer dashboard will show all new areas immediately."
+                )
+            except Exception as e:
+                logger.error(f"newareas all error: {e}")
+                try:
+                    dm_user = await client.fetch_user(dm_id)
+                    await dm_user.send(f"\u274c newareas failed: {e}")
+                except Exception:
+                    pass
+
+        _asyncio.get_event_loop().create_task(_run_all())
+
+    # ---- /npcgearrun ----
+
+    @client.tree.command(
+        name="npcgearrun",
+        description="(Admin) Infer and push equipment to all NPC Mimir characters",
+    )
+    @app_commands.describe(force="Re-infer gear even if equipment already exists")
+    async def npc_gear_run(interaction: discord.Interaction, force: bool = False):
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("❌ Admin only.", ephemeral=True)
+            return
+
+        await interaction.response.send_message(
+            "⚙️ NPC gear run started — inferring equipment from class/role/appearance…",
+            ephemeral=True,
+        )
+        dm_id = interaction.user.id
+        import asyncio as _asyncio
+
+        async def _run_gear():
+            try:
+                from src.mimir_sync import run_npc_gear_run, get_sync_engine
+                stats = await run_npc_gear_run(force=force)
+                # Trigger full NPC sync so Mimir gets the new gear
+                engine = get_sync_engine()
+                synced = await engine.sync_all_npcs()
+                dm_user = await client.fetch_user(dm_id)
+                await dm_user.send(
+                    f"✅ **NPC gear run complete.**\n"
+                    f"NPCs processed: **{stats['total']}**\n"
+                    f"Gear inferred: **{stats['done']}**\n"
+                    f"Already had gear: {stats['skipped']}\n"
+                    f"Failed: {stats['failed']}\n"
+                    f"Mimir characters synced: **{synced}**"
+                )
+            except Exception as e:
+                logger.error(f"npcgearrun error: {e}")
+                try:
+                    dm_user = await client.fetch_user(dm_id)
+                    await dm_user.send(f"❌ npcgearrun failed: {e}")
+                except Exception:
+                    pass
+
+        _asyncio.get_event_loop().create_task(_run_gear())
+
+    # ── /towerbay_restock ────────────────────────────────────────────────────
+
+    @client.tree.command(
+        name="towerbay_restock",
+        description="[DM only] Pull rare+ magic items from Mimir into Tower Bay immediately.",
+    )
+    @app_commands.describe(count="Number of Mimir items to inject (default 5, max 10)")
+    async def towerbay_restock(interaction: discord.Interaction, count: int = 5):
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_id:
+            await interaction.response.send_message("❌ DM only.", ephemeral=True)
+            return
+
+        count = max(1, min(count, 10))
+        await interaction.response.defer(ephemeral=True)
+
+        try:
+            from src.tower_economy import seed_towerbay_from_mimir
+            added = await seed_towerbay_from_mimir(count)
+            await interaction.followup.send(
+                f"🏪 **TowerBay restocked**: {added}/{count} Mimir item(s) added to the board.\n"
+                f"Items will appear on the next `/towerbay` or board post.",
+                ephemeral=True,
+            )
+        except Exception as e:
+            logger.error(f"towerbay_restock error: {e}")
+            await interaction.followup.send(f"❌ Restock failed: {e}", ephemeral=True)

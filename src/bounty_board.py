@@ -109,6 +109,14 @@ def _save_bounty(bounty: Dict) -> int:
             "status": "active" if not bounty.get("resolved") else "expired",
             "created_at": datetime.now(),
         }
+        if bounty.get("body"):
+            insert_data["body"] = bounty["body"]
+        if bounty.get("issuer"):
+            insert_data["issuer"] = bounty["issuer"]
+        if bounty.get("proxy_faction"):
+            insert_data["proxy_faction"] = bounty["proxy_faction"]
+        if bounty.get("expires_at"):
+            insert_data["expires_at"] = bounty["expires_at"]
         if bounty.get("claimed_by"):
             insert_data["claimed_by"] = bounty["claimed_by"]
         
@@ -265,6 +273,7 @@ RULES:
         
         # Save to database
         bounty_id = _save_bounty(bounty_data)
+        bounty_data["id"] = bounty_id
         bounty_data["db_id"] = bounty_id
         
         return bounty_data
@@ -283,7 +292,7 @@ def format_bounty_news_bulletin(bounty: Dict) -> str:
     proxy_line = f" (filed through {issuer} by {proxy})" if proxy else f" by {issuer}"
     now   = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
     return (
         f"-# 🕰️ {ts}\n"
@@ -294,33 +303,29 @@ def format_bounty_news_bulletin(bounty: Dict) -> str:
 
 
 async def check_bounty_expirations(channel) -> None:
-    """Remove expired bounties from the board."""
+    """Expire bounties older than 30 days."""
     try:
-        # Get all active bounties that have expired
-        # Note: We need to add expires_at column to bounties table or track differently
-        # For now, just check status
-        bounties = raw_query(
-            "SELECT * FROM bounties WHERE status = 'active'"
-        )
-        
+        bounties = raw_query("SELECT * FROM bounties WHERE status = 'active'") or []
         if not bounties:
             return
-            
+
         now = datetime.now()
-        
         for b in bounties:
-            # Check if we have an expiry date in the title or created_at + 30 days
             created = b.get("created_at")
-            if created:
-                # Default expiry: 30 days from creation
-                expiry = created + timedelta(days=30)
-                if now >= expiry:
-                    # Mark as expired
-                    raw_execute(
-                        "UPDATE bounties SET status = 'expired' WHERE id = %s",
-                        (b["id"],)
-                    )
-                    logger.info(f"🎯 Bounty expired: {b['title']}")
-                    
+            if not created:
+                continue
+            # Ensure datetime (MySQL may return datetime or string)
+            if isinstance(created, str):
+                try:
+                    from datetime import datetime as _dt
+                    created = _dt.fromisoformat(created.split(".")[0].replace(" ", "T"))
+                except Exception:
+                    continue
+            if (now - created).days >= 30:
+                raw_execute(
+                    "UPDATE bounties SET status = 'expired' WHERE id = %s",
+                    (b["id"],),
+                )
+                logger.info(f"🎯 Bounty expired: {b.get('title', b['id'])}")
     except Exception as e:
-        logger.error(f"Error checking bounty expirations: {e}")
+        logger.error(f"check_bounty_expirations error: {e}")

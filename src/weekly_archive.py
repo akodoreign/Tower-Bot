@@ -78,158 +78,210 @@ def _append_to_archive(category: str, records: list) -> int:
 # Individual archivers
 # ---------------------------------------------------------------------------
 
+def _db_rows_to_list(rows) -> list:
+    """Convert DB rows (dicts) to plain serialisable list."""
+    result = []
+    for row in (rows or []):
+        r = dict(row)
+        for k, v in r.items():
+            if hasattr(v, "isoformat"):
+                r[k] = v.isoformat()
+        result.append(r)
+    return result
+
+
+def _archive_query_in_batches(category: str, where_sql: str = "", params: tuple = (), batch_size: int = 500) -> int:
+    """Append matching DB rows to an archive without loading a whole table at once."""
+    from src.db_api import raw_query
+
+    total = 0
+    last_id = 0
+    while True:
+        rows = raw_query(
+            f"SELECT * FROM {category} WHERE id > %s {where_sql} ORDER BY id ASC LIMIT %s",
+            (last_id, *params, batch_size),
+        ) or []
+        if not rows:
+            break
+        records = _db_rows_to_list(rows)
+        total += _append_to_archive(category, records)
+        last_id = int(rows[-1]["id"])
+        if len(rows) < batch_size:
+            break
+    return total
+
+
+def _archive_named_query_in_batches(category: str, table: str, where_sql: str = "", params: tuple = (), batch_size: int = 500) -> int:
+    """Append rows from table into a differently named archive category."""
+    from src.db_api import raw_query
+
+    total = 0
+    last_id = 0
+    while True:
+        rows = raw_query(
+            f"SELECT * FROM {table} WHERE id > %s {where_sql} ORDER BY id ASC LIMIT %s",
+            (last_id, *params, batch_size),
+        ) or []
+        if not rows:
+            break
+        records = _db_rows_to_list(rows)
+        total += _append_to_archive(category, records)
+        last_id = int(rows[-1]["id"])
+        if len(rows) < batch_size:
+            break
+    return total
+
+
 def _archive_missions() -> int:
-    """Archive resolved missions from mission_memory.json."""
-    path = DOCS_DIR / "mission_memory.json"
-    if not path.exists():
-        return 0
+    """Archive completed/failed/expired missions from DB."""
     try:
-        missions = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_query_in_batches("missions", "AND status IN ('completed','failed','expired')")
+        if count:
+            logger.info("Archived %d resolved missions", count)
+        return count
+        from src.db_api import raw_query, raw_execute
+        rows = raw_query(
+            "SELECT * FROM missions WHERE status IN ('completed','failed','expired')"
+        ) or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("missions", records)
+        logger.info(f"📦 Archived {count} resolved missions")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_missions DB error: {e}")
         return 0
-
-    resolved = [m for m in missions if m.get("resolved")]
-    active   = [m for m in missions if not m.get("resolved")]
-
-    if not resolved:
-        return 0
-
-    count = _append_to_archive("missions", resolved)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} resolved missions ({len(active)} still active)")
-    return count
 
 
 def _archive_towerbay() -> int:
-    """Archive sold TowerBay listings."""
-    path = DOCS_DIR / "towerbay.json"
-    if not path.exists():
-        return 0
+    """Archive sold/ended TowerBay auctions from DB."""
     try:
-        listings = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_named_query_in_batches("towerbay", "towerbay_auctions", "AND status IN ('sold','ended','expired')")
+        if count:
+            logger.info("Archived %d TowerBay auctions", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query(
+            "SELECT * FROM towerbay_auctions WHERE status IN ('sold','ended','expired')"
+        ) or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("towerbay", records)
+        logger.info(f"📦 Archived {count} TowerBay auctions")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_towerbay DB error: {e}")
         return 0
-
-    sold   = [l for l in listings if l.get("sold")]
-    active = [l for l in listings if not l.get("sold")]
-
-    if not sold:
-        return 0
-
-    count = _append_to_archive("towerbay", sold)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} sold TowerBay listings ({len(active)} still active)")
-    return count
 
 
 def _archive_player_listings() -> int:
-    """Archive closed player auction listings (sold or unsold)."""
-    path = DOCS_DIR / "player_listings.json"
-    if not path.exists():
-        return 0
+    """Archive closed player listings (sold/unsold) from DB."""
     try:
-        listings = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_query_in_batches("player_listings", "AND status IN ('sold','unsold','expired')")
+        if count:
+            logger.info("Archived %d player listings", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query(
+            "SELECT * FROM player_listings WHERE status IN ('sold','unsold','expired')"
+        ) or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("player_listings", records)
+        logger.info(f"📦 Archived {count} player listings")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_player_listings DB error: {e}")
         return 0
-
-    closed = [l for l in listings if l.get("status") in ("sold", "unsold")]
-    active = [l for l in listings if l.get("status") not in ("sold", "unsold")]
-
-    if not closed:
-        return 0
-
-    count = _append_to_archive("player_listings", closed)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} closed player listings ({len(active)} still active)")
-    return count
 
 
 def _archive_bounties() -> int:
-    """Archive resolved bounties."""
-    path = DOCS_DIR / "bounty_board.json"
-    if not path.exists():
-        return 0
+    """Archive resolved/completed bounties from DB."""
     try:
-        bounties = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_query_in_batches("bounties", "AND status IN ('completed','expired','cancelled')")
+        if count:
+            logger.info("Archived %d bounties", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query(
+            "SELECT * FROM bounties WHERE status IN ('completed','expired','cancelled')"
+        ) or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("bounties", records)
+        logger.info(f"📦 Archived {count} bounties")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_bounties DB error: {e}")
         return 0
-
-    resolved = [b for b in bounties if b.get("resolved")]
-    active   = [b for b in bounties if not b.get("resolved")]
-
-    if not resolved:
-        return 0
-
-    count = _append_to_archive("bounties", resolved)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} resolved bounties ({len(active)} still active)")
-    return count
 
 
 def _archive_missing_persons() -> int:
-    """Archive resolved missing persons cases."""
-    path = DOCS_DIR / "missing_persons.json"
-    if not path.exists():
-        return 0
+    """Archive resolved missing persons cases from DB."""
     try:
-        records = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_query_in_batches("missing_persons", "AND status IN ('found','resolved','closed')")
+        if count:
+            logger.info("Archived %d missing persons cases", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query(
+            "SELECT * FROM missing_persons WHERE status IN ('found','resolved','closed')"
+        ) or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("missing_persons", records)
+        logger.info(f"📦 Archived {count} missing persons cases")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_missing_persons DB error: {e}")
         return 0
-
-    resolved = [r for r in records if r.get("resolved")]
-    active   = [r for r in records if not r.get("resolved")]
-
-    if not resolved:
-        return 0
-
-    count = _append_to_archive("missing_persons", resolved)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} resolved missing persons ({len(active)} still active)")
-    return count
 
 
 def _archive_outcomes() -> int:
-    """Archive mission outcomes (completed debriefs)."""
-    path = DOCS_DIR / "mission_outcomes.json"
-    if not path.exists():
-        return 0
+    """Archive mission outcome debriefs from DB."""
     try:
-        outcomes = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_named_query_in_batches("outcomes", "mission_outcomes")
+        if count:
+            logger.info("Archived %d mission outcomes", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query("SELECT * FROM mission_outcomes ORDER BY id") or []
+        records = _db_rows_to_list(rows)
+        if not records:
+            return 0
+        count = _append_to_archive("outcomes", records)
+        logger.info(f"📦 Archived {count} mission outcomes")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_outcomes DB error: {e}")
         return 0
-
-    if not outcomes:
-        return 0
-
-    count = _append_to_archive("outcomes", outcomes)
-    # Clear the active file — outcomes are write-once records
-    path.write_text("[]", encoding="utf-8")
-    logger.info(f"📦 Archived {count} mission outcomes")
-    return count
 
 
 def _archive_graveyard() -> int:
-    """Archive tower-absorbed NPCs from npc_graveyard.json.
-    These can never come back, so they're safe to move out of active data.
-    Non-absorbed dead NPCs stay — they might get graveyard events."""
-    path = DOCS_DIR / "npc_graveyard.json"
-    if not path.exists():
-        return 0
+    """Archive tower-absorbed NPCs from DB (status=dead, tower_absorbed=1)."""
     try:
-        graveyard = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+        count = _archive_named_query_in_batches("graveyard", "npcs", "AND status = 'dead' AND tower_absorbed = 1")
+        if count:
+            logger.info("Archived %d tower-absorbed NPCs", count)
+        return count
+        from src.db_api import raw_query
+        rows = raw_query(
+            "SELECT * FROM npcs WHERE status = 'dead' AND tower_absorbed = 1"
+        ) or []
+        absorbed = _db_rows_to_list(rows)
+        if not absorbed:
+            return 0
+        count = _append_to_archive("graveyard", absorbed)
+        logger.info(f"📦 Archived {count} tower-absorbed NPCs")
+        return count
+    except Exception as e:
+        logger.warning(f"📦 _archive_graveyard DB error: {e}")
         return 0
-
-    absorbed = [n for n in graveyard if n.get("tower_absorbed")]
-    active   = [n for n in graveyard if not n.get("tower_absorbed")]
-
-    if not absorbed:
-        return 0
-
-    count = _append_to_archive("graveyard", absorbed)
-    path.write_text(json.dumps(active, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info(f"📦 Archived {count} tower-absorbed NPCs ({len(active)} still in graveyard)")
-    return count
 
 
 def _snapshot_news() -> bool:
@@ -250,13 +302,7 @@ def _snapshot_news() -> bool:
     except Exception:
         pass
     if not content:
-        path = DOCS_DIR / "news_memory.txt"
-        if not path.exists():
-            return False
-        try:
-            content = path.read_text(encoding="utf-8")
-        except Exception:
-            return False
+        return False
 
     if not content.strip():
         return False

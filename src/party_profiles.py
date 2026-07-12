@@ -25,7 +25,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from src.log import logger
-from src.db_api import raw_query, raw_execute, db
+from src.db_api import raw_query, raw_execute, db, add_party_history_event
 
 # ---------------------------------------------------------------------------
 # Rank ladder
@@ -121,6 +121,23 @@ def _slug(name: str) -> str:
 # Persistence — MySQL via db_api
 # ---------------------------------------------------------------------------
 
+def _parse_json_col(raw) -> dict:
+    """Safely parse a DB JSON column — handles str, dict, list, None."""
+    if raw is None:
+        return {}
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, list):
+        return {}  # old list-only format — treat as empty, regenerate
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+    return {}
+
+
 def load_profile(name: str) -> Optional[dict]:
     """Load party profile from database."""
     try:
@@ -131,63 +148,96 @@ def load_profile(name: str) -> Optional[dict]:
         if not rows:
             return None
         row = rows[0]
-        # Parse members_json which stores the full profile
-        profile_data = row.get("members_json", {})
-        if isinstance(profile_data, str):
-            profile_data = json.loads(profile_data)
-        # Merge DB columns with JSON data
+        # Prefer profile_json (full profile), fall back to members_json
+        profile_data = _parse_json_col(row.get("profile_json")) or _parse_json_col(row.get("members_json"))
         profile_data["name"] = row.get("party_name", name)
+        profile_data["_db_id"] = row.get("id")
+        # Real columns win over blob values
+        if row.get("faction"):   profile_data["faction"]   = row["faction"]
+        if row.get("employer") is not None: profile_data["employer"] = row["employer"] or ""
+        if row.get("tier"):      profile_data["tier"]      = row["tier"]
+        if row.get("reputation") is not None: profile_data["points"] = row["reputation"]
         if row.get("formed_at"):
-            profile_data.setdefault("created_at", row["formed_at"].isoformat() if hasattr(row["formed_at"], 'isoformat') else str(row["formed_at"]))
+            profile_data.setdefault(
+                "created_at",
+                row["formed_at"].isoformat() if hasattr(row["formed_at"], "isoformat") else str(row["formed_at"])
+            )
         return profile_data
     except Exception as e:
         logger.error(f"party_profiles load error for {name}: {e}")
         return None
 
 
+def _hist_party(profile: dict, body: str) -> None:
+    """Write a party history event to party_history table and keep in-memory list."""
+    name = profile.get("name", "unknown")
+    party_id = profile.get("_db_id") or profile.get("id")
+    if not party_id:
+        row = raw_query("SELECT id FROM party_profiles WHERE party_name = %s LIMIT 1", (name,))
+        if row:
+            party_id = row[0]["id"]
+    if party_id:
+        add_party_history_event(int(party_id), body)
+    profile.setdefault("history", []).append(body)
+
+
 def save_profile(profile: dict) -> None:
-    """Save party profile to database."""
+    """Save party profile to database (writes both columns for compatibility)."""
     name = profile.get("name", "unknown")
     try:
-        # Store full profile in members_json
-        profile_json = json.dumps(profile, ensure_ascii=False, default=str)
-        
+        # history now lives in party_history table — strip from blob
+        profile_copy = {k: v for k, v in profile.items() if k != "history"}
+        blob = json.dumps(profile_copy, ensure_ascii=False, default=str)
         existing = raw_query(
             "SELECT id FROM party_profiles WHERE party_name = %s LIMIT 1",
             (name,)
         )
-        
+        employer = profile.get("employer") or None
+        tier     = profile.get("tier") or None
         if existing:
             raw_execute(
-                "UPDATE party_profiles SET members_json = %s WHERE party_name = %s",
-                (profile_json, name)
+                "UPDATE party_profiles SET members_json=%s, profile_json=%s, reputation=%s, employer=%s, tier=%s WHERE party_name=%s",
+                (blob, blob, profile.get("points", 0), employer, tier, name)
             )
         else:
             db.insert("party_profiles", {
-                "party_name": name,
-                "members_json": profile_json,
-                "reputation": profile.get("points", 0),
-                "status": "active"
+                "party_name":   name,
+                "members_json": blob,
+                "profile_json": blob,
+                "reputation":   profile.get("points", 0),
+                "status":       "active",
+                "employer":     employer,
+                "tier":         tier,
             })
+            # Write founding event now that we have an id
+            row = raw_query("SELECT id FROM party_profiles WHERE party_name = %s LIMIT 1", (name,))
+            if row:
+                founding = profile.get("history", [])
+                for entry in (founding if isinstance(founding, list) else []):
+                    add_party_history_event(row[0]["id"], entry)
     except Exception as e:
         logger.error(f"party_profiles save error for {name}: {e}")
 
 
 def _init_profile(name: str) -> dict:
-    """Return a minimal blank profile (used before generation completes)."""
+    """Return a blank profile with all required keys."""
     return {
-        "name":              name,
-        "affiliation":       "No Affiliation",
-        "specialty":         "General contracts",
-        "members":           [],
-        "visual":            "",
-        "reputation_note":   "",
-        "history":           [f"[{datetime.now().strftime('%Y-%m-%d')}] Party first logged."],
+        "name":               name,
+        "affiliation":        "No Affiliation",
+        "sponsor":            None,
+        "specialty":          "General contracts",
+        "aligned_objective":  "",
+        "faction_loves":      [],
+        "faction_hates":      [],
+        "members":            [],
+        "visual":             "",
+        "reputation_note":    "",
+        "history":            [f"[{datetime.now().strftime('%Y-%m-%d')}] Party first logged."],
         "missions_completed": 0,
         "missions_failed":    0,
-        "tier":              PARTY_DEFAULT_TIER,
-        "points":            0,
-        "generated":         False,
+        "tier":               PARTY_DEFAULT_TIER,
+        "points":             0,
+        "generated":          False,
     }
 
 
@@ -228,53 +278,66 @@ async def _generate(prompt: str) -> Optional[str]:
 async def generate_profile(name: str, force: bool = False) -> dict:
     """
     Generate a full party profile for the given name.
-    Returns the saved profile dict. If generation fails, returns a stub.
-    If force=False and a profile already exists, returns it unchanged.
+    Parties have 4-8 members with balanced roles, aligned objectives,
+    a sponsor, and explicit faction love/hate relationships.
     """
     existing = load_profile(name)
     if existing and existing.get("generated") and not force:
         return existing
 
-    affiliation = random.choice(AFFILIATIONS)
-    member_count = random.randint(2, 4)
+    # Always start from a complete defaults dict, then layer existing data on top.
+    # This prevents KeyError when old profiles are missing keys.
+    profile = _init_profile(name)
+    if existing:
+        profile.update(existing)
+
+    affiliation   = profile.get("affiliation") if (existing and existing.get("generated")) else random.choice(AFFILIATIONS)
+    member_count  = random.randint(4, 8)
+    other_factions = [f for f in [
+        "Iron Fang Consortium", "Argent Blades", "Wardens of Ash", "Serpent Choir",
+        "Obsidian Lotus", "Glass Sigil", "Patchwork Saints", "Adventurers Guild",
+        "Guild of Ashen Scrolls", "Tower Authority",
+    ] if f != affiliation]
 
     prompt = f"""{_LORE}
 
-Generate a full adventurer party profile for a party named "{name}" operating in the Undercity.
-They are a working professional crew — not legendary heroes, not comic relief.
+Generate a full adventurer party profile for "{name}" operating in the Undercity.
+Working professionals — gritty, specific, not heroes.
 
-Required affiliation: {affiliation}
-Required member count: {member_count}
+Affiliation: {affiliation}
+Member count: exactly {member_count}
 
-Output ONLY a JSON object with these exact keys, nothing else:
+Output ONLY a valid JSON object — no markdown, no code fences:
 
 {{
-  "specialty": "1 sentence — what kind of work they take, what sets them apart technically",
+  "aligned_objective": "1 sentence — the specific shared goal, debt, or circumstance that formed this party and keeps them together",
+  "specialty": "1 sentence — the type of contracts they take and what makes them technically distinct",
+  "sponsor": "A faction name OR a specific patron NPC name that backs them, or null if truly independent",
+  "faction_loves": ["up to 2 faction names from the factions list that trust or regularly hire this party"],
+  "faction_hates": ["up to 2 faction names from the factions list that are hostile to or avoid this party"],
   "members": [
     {{
       "name": "Full name",
-      "role": "their function in the group (e.g. Leader, Tracker, Arcanist, Muscle, Face, Medic)",
-      "species": "species from: Human Half-Elf Dwarf Tiefling Halfling Gnome Orc Half-Orc Dragonborn Elf Tabaxi Warforged Goblin Aasimar",
-      "note": "1 sentence — something specific about them, a scar, a habit, a history, a tension"
+      "role": "Leader | Tracker | Arcanist | Muscle | Face | Medic | Thief | Scout | Support",
+      "species": "Human | Half-Elf | Dwarf | Tiefling | Halfling | Gnome | Orc | Half-Orc | Dragonborn | Elf | Tabaxi | Warforged | Goblin | Aasimar",
+      "note": "1 sentence — something specific: a scar, a habit, a personal history, or a tension with another member"
     }}
   ],
-  "visual": "2 sentences — how they look as a group. Specific clothing, gear, identifying mark, how they carry themselves in public.",
-  "reputation_note": "1-2 sentences — what the Undercity says about them. Rumour, reputation, warning."
+  "visual": "2 sentences — how they look as a group: clothing, gear, identifying marks, how they carry themselves",
+  "reputation_note": "1-2 sentences — what people in the Undercity say about this party"
 }}
 
 RULES:
-- Be specific. Invent real names, real details.
-- The party name "{name}" should feel like it fits these people.
-- Affiliation "{affiliation}" means they work with or for that group — or are genuinely unaligned if No Affiliation.
-- Do NOT output anything except the JSON object.
-- Do NOT use markdown code fences."""
+- Exactly {member_count} members. No more, no less.
+- Roles must be balanced — include at least one support/healer and one ranged/caster type.
+- No more than 2 members may share the same role.
+- faction_loves and faction_hates must not include the party's own affiliation and must not overlap each other.
+- sponsor can be null, a faction name, or an invented NPC patron name.
+- aligned_objective must explain WHY these specific people formed THIS party."""
 
     text = await _generate(prompt)
-    profile = existing or _init_profile(name)
-    profile["affiliation"] = affiliation
 
     if text:
-        import re
         text = re.sub(r"```(?:json)?", "", text).strip().rstrip("`").strip()
         try:
             data = json.loads(text)
@@ -288,12 +351,19 @@ RULES:
                     pass
 
         if data:
-            profile["specialty"]       = data.get("specialty", profile["specialty"])
-            profile["members"]         = data.get("members", [])
-            profile["visual"]          = data.get("visual", "")
-            profile["reputation_note"] = data.get("reputation_note", "")
-            profile["generated"]       = True
-            logger.info(f"🎖️ Party profile generated: {name} ({affiliation}, {len(profile['members'])} members)")
+            profile["affiliation"]       = affiliation
+            profile["aligned_objective"] = data.get("aligned_objective", "")
+            profile["specialty"]         = data.get("specialty", profile["specialty"])
+            profile["sponsor"]           = data.get("sponsor")
+            profile["faction_loves"]     = data.get("faction_loves", [])
+            profile["faction_hates"]     = data.get("faction_hates", [])
+            profile["members"]           = data.get("members", [])
+            profile["visual"]            = data.get("visual", "")
+            profile["reputation_note"]   = data.get("reputation_note", "")
+            profile["generated"]         = True
+            logger.info(
+                f"🎖️ Party profile generated: {name} ({affiliation}, {len(profile['members'])} members)"
+            )
         else:
             logger.warning(f"🎖️ Party profile generation failed for {name} — saving stub")
     else:
@@ -317,7 +387,7 @@ async def ensure_profile(name: str) -> dict:
 
 async def generate_all_party_profiles(force: bool = False) -> dict:
     """
-    Iterate over all party names from used_parties.json + existing DB profiles.
+    Iterate over all party names from adventurer_parties table + existing DB profiles.
     Generate profiles for any that don't have one (or all if force=True).
     Returns {total, done, skipped, failed}.
     """
@@ -411,12 +481,11 @@ def apply_party_outcome(name: str, mission_tier: str, success: bool) -> dict:
     profile["tier"] = new_tier
     today = datetime.now().strftime("%Y-%m-%d")
     verb  = "completed" if success else "failed"
-    profile.setdefault("history", []).append(
+    _hist_party(
+        profile,
         f"[{today}] {verb.capitalize()} a {mission_tier}-tier contract. "
         f"Rank: {old_tier}{' → ' + new_tier if shifted else ''} ({profile['points']:+d}/{PARTY_POINTS_TO_SHIFT})"
     )
-    # Keep history trimmed to last 20 entries
-    profile["history"] = profile["history"][-20:]
     save_profile(profile)
 
     return {
@@ -456,23 +525,35 @@ def profile_summary(name: str) -> str:
     if not profile or not profile.get("generated"):
         return f"Party: {name} (no profile on file)"
 
-    affil   = profile.get("affiliation", "No Affiliation")
-    spec    = profile.get("specialty", "")
-    visual  = profile.get("visual", "")
-    rep     = profile.get("reputation_note", "")
-    tier    = profile.get("tier", "Unknown")
-    emoji   = PARTY_TIER_EMOJI.get(tier, "")
-    members = profile.get("members", [])
+    affil     = profile.get("affiliation", "No Affiliation")
+    sponsor   = profile.get("sponsor")
+    spec      = profile.get("specialty", "")
+    objective = profile.get("aligned_objective", "")
+    visual    = profile.get("visual", "")
+    rep       = profile.get("reputation_note", "")
+    tier      = profile.get("tier", "Unknown")
+    emoji     = PARTY_TIER_EMOJI.get(tier, "")
+    loves     = profile.get("faction_loves", [])
+    hates     = profile.get("faction_hates", [])
+    members   = profile.get("members", [])
     member_lines = " | ".join(
-        f"{m['name']} ({m['role']})" for m in members
+        f"{m['name']} ({m.get('role','?')})" for m in members
     ) if members else "unknown roster"
 
     lines = [
         f"PARTY: {name}",
         f"Rank: {emoji} {tier} | Affiliation: {affil}",
-        f"Specialty: {spec}",
-        f"Members: {member_lines}",
     ]
+    if sponsor:
+        lines.append(f"Sponsor: {sponsor}")
+    lines.append(f"Specialty: {spec}")
+    if objective:
+        lines.append(f"Bond: {objective}")
+    lines.append(f"Members ({len(members)}): {member_lines}")
+    if loves:
+        lines.append(f"Trusted by: {', '.join(loves)}")
+    if hates:
+        lines.append(f"Hostile with: {', '.join(hates)}")
     if visual:
         lines.append(f"Appearance: {visual}")
     if rep:
@@ -517,15 +598,19 @@ def _rank_bar(pts: int) -> str:
 def format_all_party_ranks() -> str:
     """Formatted string for a /partyranks command embed."""
     try:
-        rows = raw_query("SELECT party_name, members_json FROM party_profiles")
+        rows = raw_query("SELECT party_name, tier, reputation, members_json FROM party_profiles")
         profiles = []
         for row in rows:
             try:
                 data = row.get("members_json", {})
                 if isinstance(data, str):
                     data = json.loads(data)
-                if data.get("name") or row.get("party_name"):
-                    data["name"] = data.get("name") or row.get("party_name")
+                if not isinstance(data, dict):
+                    data = {}
+                data["name"]   = row.get("party_name") or data.get("name", "")
+                data["tier"]   = row.get("tier") or data.get("tier", "Unknown")
+                data["points"] = row.get("reputation") or data.get("points", 0)
+                if data["name"]:
                     profiles.append(data)
             except Exception:
                 pass
@@ -552,7 +637,7 @@ def format_all_party_ranks() -> str:
         bar     = _rank_bar(pts)
         lines.append(
             f"{emoji} **{p['name']}** — {tier} {bar}\n"
-            f"  ✅ {done}  💥 {fail}  │  {affil}"
+            f"  ✅ {done}  💥 {fail}  |  {affil}"
         )
 
     return "\n".join(lines)

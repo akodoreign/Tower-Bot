@@ -9,6 +9,54 @@ This skill governs how the bot generates D&D 5e 2024 mission module documents. I
 
 ---
 
+## THE DRAGONLANCE PIPELINE — Two Products, One Story
+
+Every mission generates **two separate documents** for two separate audiences. Confusing them is the #1 source of bad output.
+
+### THE NOVEL (BobAgent — 5-10 chapters)
+- **Audience:** DM only. Players NEVER see it.
+- **Purpose:** Fixed-protagonist story that establishes NPCs, locations, dialogue hooks, and plot beats.
+- **Format:** Prose chapters with named characters and fixed outcomes.
+- **Analogy:** The Dragonlance Chronicles novels — Tanis, Flint, and Raistlin have fixed roles. The DM reads them for source material.
+- **Length:** 5-10 chapters. NOT 20. 20 chapters = a campaign arc, not a session.
+
+### THE MODULE (BookToModuleAgent — 5 scenes)
+- **Audience:** Party of 4-6 players. This is the actual game product.
+- **Purpose:** Same story events, but the party plays through them their own way.
+- **Format:** 5 numbered areas (WotC format). Generic 4-6 players. CR pulled from party level.
+- **NOT character-specific.** Boxxo may appear as an NPC in the novel — the module doesn't stat out Boxxo's abilities. It stats the enemies.
+- **Analogy:** DL1 Dragons of Despair — canonical events, but how the PCs interact is open.
+- **Reference:** https://en.wikipedia.org/wiki/List_of_Dragonlance_modules_and_sourcebooks
+
+### Dynamic Scene Count (beat analysis first, THEN write)
+
+Scene count is determined by the story, not by convention. Before writing anything:
+
+1. **List every distinct story beat** in the novel source: approach, investigation locations, complications, climax(es), moral pivots, resolution.
+2. **Count the beats. That is your scene count.** If two beats can share a scene without rushing, merge them.
+3. **Label each scene** before writing it: `[Approach]` `[Intel]` `[Investigation]` `[Complication]` `[Pivot]` `[Climax]` `[Choice]` `[Resolution]`
+
+| Beat count | Scenes | Runtime | Story type |
+|-----------|--------|---------|------------|
+| 3 | 3 | ~2 hrs | Linear — heist, rescue, delivery |
+| 4 | 4 | ~2.5 hrs | One mid-story complication |
+| 5 | 5 | ~3-4 hrs | Two climax beats (fight + moral choice) |
+| 6 | 6 | ~4-5 hrs | Multi-faction, competing agendas |
+| 7 | 7 | 5+ hrs | Campaign-weight — use sparingly |
+
+**If two scenes share the same label → merge them. If a beat has no scene → cut the beat.**
+
+Common beat sequence (not mandatory):
+- Hook/Approach — party learns situation, first NPC contact
+- Investigation — main puzzle or discovery location
+- Complication — reveal, ambush, something changes
+- Climax — main confrontation or decision point
+- Resolution — consequences, rewards, next hook
+
+**One session = one module. If you have 8+ scenes, you have two sessions.**
+
+---
+
 ## CRITICAL ISSUES TO FIX (from analysis of generated modules)
 
 ### 1. READ-ALOUD Abuse
@@ -132,30 +180,40 @@ CR [value] ([XP])
 
 ## SCENE FORMAT TEMPLATE
 
+**CRITICAL: Header format is `N - LOCATION NAME` (ALL CAPS). NEVER "Scene N:" or "### Scene N:".**
+
 ```
-### Scene [N]: [Name]
+N - LOCATION NAME
 
-📖 READ ALOUD:
-[3-4 atmospheric sentences. Sensory details: sight, sound, smell. End with something that invites player action.]
+Read this:
+  [Italicized. 2-4 atmospheric sentences — sight, sound, smell.
+   MUST end with something requiring player response. Not a statement — a hook.]
 
-📝 DM NOTES:
-- What's really going on in this scene
-- What information is available here
-- How this connects to the next scene
+NPC NAME — role
+- Wants: [specific to this scene, concrete]
+- Knows: [plot-relevant facts they will share]
+- Hides: [what they conceal and why]
 
-👤 NPCs PRESENT:
-- [Name] — [1-line description + what they want]
+If players ask about [X]: [response + DC]
+  On success DC N Skill: [exact info revealed]
+  On failure: [consequence — never a dead end]
+If players do nothing: [scene advances anyway — world is not on pause]
 
-🎲 MECHANICS:
-- [Skill] DC [X]: [What it reveals]
-- [Skill] DC [X]: [What it reveals]
-- Combat: [Brief enemy summary with stat block reference]
+[Clue A / Clue B / Clue C structure — three independent paths to the critical conclusion]
 
-⚡ WHAT HAPPENS:
-[2-3 bullet points describing the flow of the scene — what triggers what]
+[STAT BLOCK INLINE HERE — never in an appendix]
+[Tactics: Round 1 behavior, when bloodied, when they flee/surrender]
+[If players lose: escape route / capture / mercy clause]
 
-➡️ TRANSITION:
-[1 sentence explaining what leads to the next scene]
+TRANSITION: [Pulls players forward with a mystery or threat. NEVER "the party proceeds."]
+```
+
+**Examples:**
+```
+CORRECT: 3 - THE GILDED FANG
+WRONG:   Scene 3: The Gilded Fang
+WRONG:   ### Scene 3: The Gilded Fang
+WRONG:   Act 2, Scene 3: The Gilded Fang
 ```
 
 ---
@@ -205,6 +263,10 @@ Investigation modules MUST include a reason the players can't take forever:
 
 ## WHAT NOT TO DO (common LLM failures)
 
+0. **Do NOT use "Scene N:" as a header.** The correct format is `N - LOCATION NAME` (ALL CAPS, number-dash-name). "Scene 1: The Ruined Market" is WRONG. "1 - THE RUINED MARKET" is CORRECT. This error is CRITICAL — it signals the entire module is formatted wrong.
+0. **Do NOT put stat blocks in an appendix.** Inline, immediately after the scene where the creature appears.
+0. **Do NOT write a 20-chapter novel and call it a module.** The module is 5 numbered areas. The novel can be 5-10 chapters and is separate — DM-only source material.
+0. **Do NOT stat out player characters in the module.** The module is for generic 4-6 players. CR comes from party level. Boxxo/party members are NPCs in the story, not stat blocks in the module.
 1. Do NOT have every NPC speak in the same dramatic, portentous tone. Vary speech patterns. A dwarf blacksmith talks differently than an Aasimar priestess.
 2. Do NOT write "the city watches" or "whispers ripple through the streets" — these are empty filler.
 3. Do NOT create false leads that waste player time. In a 2-hour session, every scene must advance the plot.
@@ -215,3 +277,1517 @@ Investigation modules MUST include a reason the players can't take forever:
 8. Do NOT use "Eir Velan" as every quest-giver. Different factions have different contacts.
 9. Do NOT write lore contradictions — check the NPC roster and faction data before assigning roles.
 10. Do NOT give the boss more than 2 lair actions. One memorable ability > five forgettable ones.
+
+
+---
+
+## Self-Evaluation — 2026-04-26 01:20
+
+**Module evaluated:** Heart_of_the_First_Flame_20260425_191859
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 4 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 4 (need ≥1 per combat scene)
+- Skill checks / branches: 15 (need ≥5)
+- GM NOTE boxes: 4 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 0 NPC truth element(s) — NPCs lack Wants/Knows/Hides structure
+
+**Content gaps (LLM critique):**
+- "The generated content is entirely CSS code with no actual scene text." - The entire module is CSS formatting, not gameplay content.
+- "The CSS code contains no numbered location sections ("N - Area Name")" - Missing required numbered area headers.
+- "The CSS code lacks any interaction mechanics or clue reveals." - No skill checks, NPC dialogue, or plot progression exists.
+
+
+---
+
+## Self-Evaluation — 2026-04-27 01:12
+
+**Module evaluated:** Codex_in_the_Bone_Market_20260426_154710
+**LLM quality score:** 1/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 6 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 4 (need ≥1 per combat scene)
+- Skill checks / branches: 30 (need ≥5)
+- GM NOTE boxes: 6 (need ≥3)
+- Transitions: 8 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 2 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 1 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." - CSS code instead of numbered areas
+- ".cover { background: linear-gradient(160deg, #1a1208 0%, #2e2010 60%, #1a1208 100%); color: #e8d9b4; padding: 72px 64px 56px; text-align: center; border-bottom: 8px solid var(--gold); position: relative; }" - Missing read-aloud blocks and scene numbering
+- "/* ── Typography ────────────────────── */" - No conversation branches, stat blocks, or playable content
+
+
+---
+
+## Self-Evaluation — 2026-04-28 01:16
+
+**Module evaluated:** The_Relics_Shadow_20260427_072950
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 6 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 4 (need ≥1 per combat scene)
+- Skill checks / branches: 59 (need ≥5)
+- GM NOTE boxes: 6 (need ≥3)
+- Transitions: 8 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: 17 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 2 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- Missing numbered areas (entire content is CSS code instead of module content)
+- No read-aloud blocks (CSS code lacks narrative scenes)
+- No stat blocks (CSS code has no inline monster/NPC stats)
+
+
+---
+
+## Self-Evaluation — 2026-04-29 01:05
+
+**Module evaluated:** The_Plows_Shadow_20260428_103010
+**LLM quality score:** 2/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 6 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 4 (need ≥1 per combat scene)
+- Skill checks / branches: 56 (need ≥5)
+- GM NOTE boxes: 6 (need ≥3)
+- Transitions: 8 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: 17 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- [READ_ALOUD_FORMAT] - "At the front desk, a smiling young woman welcomes the party." (missing sensory details and player response demand)
+- [NUMBERED_AREAS] - "Scene 1 - Front Desk" (incorrect format; should be "1 - Front Desk")
+- [INLINE_STAT_BLOCKS] - No stat blocks for combat encounters (required for playability)
+
+
+---
+
+## Self-Evaluation — 2026-04-30 01:08
+
+**Module evaluated:** Purification_of_the_Hollow_Vein_20260429_190721
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 13 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 4 (need ≥5)
+- GM NOTE boxes: 13 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 4 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 4 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 1 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- Missing numbered areas - "── Cover ──" format instead of "1 - Area Name"
+- No read-aloud blocks - "Cover { ... }" section lacks 2-4 sensory sentences
+- No conversation branches - "Cover { ... }" has no NPC dialogue or player responses
+
+
+---
+
+## Self-Evaluation — 2026-05-01 01:19
+
+**Module evaluated:** Three_Reagents_for_the_Hollow_Spire_20260430_104107
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 34 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 33 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- Missing module content (the entire generated text is CSS code, not adventure text)
+- No numbered areas (the CSS code lacks any scene numbering format)
+- No NPC dialogue or stat blocks (no playable elements exist in the generated text)
+
+
+---
+
+## Self-Evaluation — 2026-05-02 01:14
+
+**Module evaluated:** Three_Reagents_for_the_Hollow_Spire_20260430_104107
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 34 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 33 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "Three Reagents for the Hollow Spire /* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." — The entire module is CSS code, not a D&D module with scenes, NPCs, or gameplay elements
+- ".page { max-width: 900px; margin: 0 auto; background: var(--parchment); padding: 0 0 64px; box-shadow: 0 4px 24px rgba(0,0,0,
+- 1); ..." — CSS styling code lacks any narrative or gameplay content
+
+
+---
+
+## Self-Evaluation — 2026-05-03 01:09
+
+**Module evaluated:** Rescue_of_the_Shattered_Oath_20260502_183253
+**LLM quality score:** 1/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 0 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- Missing read-aloud format: "The party enters the tower, its stone walls cold and damp..." (no sensory details or player action)
+- Incorrect area numbering: "1 - Front Desk" (should be "1 - Front Desk" without the hyphen)
+- No conversation branches: "Mayeda offers them a full stay..." (no "If players ask about X" branches)
+
+
+---
+
+## Self-Evaluation — 2026-05-04 01:15
+
+**Module evaluated:** The_Plows_Shadow_20260503_152646
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "The Plow's Shadow /* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208;..." - The entire file is CSS code with no actual module content
+- ".cover { background: linear-gradient(160deg, #1a1208 0%, #2e2010 60%, #1a1208 100%); color: #e8d9b4; padding: 72px 64px 56px; text-align: center; border-bottom: 8px solid var(--gold); position: relative; }" - No scene content exists in the CSS
+- ".chapter-first-para::first-letter { float: left; font-size: 64px; line-height:
+
+
+---
+
+## Self-Evaluation — 2026-05-05 01:12
+
+**Module evaluated:** The_Plows_Echo_20260504_124705
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 6 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 6 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." - Missing numbered areas and scene structure
+- ".cover { background: ..." - No conversation branches or player response triggers
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." - No inline stat blocks or GM notes
+
+
+---
+
+## Self-Evaluation — 2026-05-06 01:25
+
+**Module evaluated:** Blight_in_the_Scrap_Yards_20260505_102008
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 7 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 4 (need ≥5)
+- GM NOTE boxes: 7 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 4 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 4 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 1 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208;..." - Missing numbered scenes and narrative content entirely
+- ".cover { background: linear-gradient(160deg, #1a1208 0%, #2e2010 60%, #1a1208 100%); color: #e8d9b4; padding: 72px 64px 56px; text-align: center; border-bottom: 8px solid var(--gold);" - CSS code instead of scene setup
+- "hr { border: none; background: linear-gradient(to right, transparent, var(--gold) 20%, var(--gold) 80%, transparent); height: 2px; margin: 36px 0; }" - CSS code instead of skill check mechanics
+
+
+---
+
+## Self-Evaluation — 2026-05-07 01:19
+
+**Module evaluated:** Relic_Retrieval_from_the_Warrens_20260506_094311
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 32 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 32 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 1 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." - The entire content is CSS code instead of module text
+- ".page { max-width: 900px; margin: 0 auto; background: var(--parchment); padding: 0 0 64px; box-shadow: 0 4px 24px rgba(0,0,0,
+- 25); border: 1px solid var(--rule); }" - No actual module content exists
+
+
+---
+
+## Self-Evaluation — 2026-05-08 01:22
+
+**Module evaluated:** Cult_Stronghold_Infiltration_20260507_132149
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 7 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 6 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "Cult Stronghold Infiltration /* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208; ..." - The entire file is CSS code with no gameplay content
+- ".page { max-width: 900px; margin: 0 auto; background: var(--parchment); padding: 0 0 64px; box-shadow: 0 4px 24px rgba(0,0,0,
+- 25); border: 1px solid var(--rule); }" - CSS styling code with no gameplay content
+
+
+---
+
+## Self-Evaluation — 2026-05-09 01:14
+
+**Module evaluated:** Iron_Pits_Cache_Raid_20260508_170246
+**LLM quality score:** 0/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root { --ink: #1a1208;" - The entire module is CSS code with no narrative content
+- ".page { max-width: 900px; margin: 0 auto; background: var(--parchment); padding: 0 0 64px; box-shadow: 0 4px 24px rgba(0,0,0,
+- 25); border: 1px solid var(--rule); }" - CSS styling without any adventure content
+
+
+---
+
+## Self-Evaluation — 2026-05-09 01:14
+
+**Module evaluated:** Iron_Pits_Cache_Raid_20260508_170246
+**LLM quality score:** 1/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "/* ── Tower of Last Chance — Mission Module Stylesheet ────────────────────── */ :root {" - Missing actual module content entirely
+- ".cover { background: linear-gradient(160deg, #1a1208 0%, #2e2010 60%, #1a1208 100%); color: #e8d9b4; padding: 72px 64px 56px; text-align: center; border-bottom: 8px solid var(--gold); position: relative; }" - CSS styling without narrative content
+- "table { width: 100%; border-collapse: collapse; margin: 24px 0 28px; font-size: 15px; box-shadow: 0 1px 4px rgba(0,0,0,
+
+
+---
+
+## Self-Evaluation — 2026-05-10 01:18
+
+**Module evaluated:** Defense_of_the_Veiled_Path_20260509_165105
+**LLM quality score:** 2/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 11 (need ≥5)
+- GM NOTE boxes: 1 (need ≥3)
+- Transitions: 3 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 GM NOTE(s) — need ≥3 for a 3-scene module
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 11 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 2 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- "The CSS code lacks any narrative or scene descriptions" — the entire content is CSS styling with no module text
+- "The CSS code uses 'N - Name' format but contains no actual area descriptions or content" — the numbered areas are empty
+- "The CSS code ends with a table tag" — the incomplete HTML tag indicates missing content
+
+
+---
+
+## Self-Evaluation — 2026-05-11 01:13
+
+**Module evaluated:** Defense_of_the_Veiled_Path_20260509_165105
+**LLM quality score:** 4/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 0 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 1 (need ≥4)
+- Inline stat blocks: 2 (need ≥1 per combat scene)
+- Skill checks / branches: 11 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No READ ALOUD blocks — players have no atmospheric immersion text
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: 1 stat block(s) placed in appendix — must be INLINE immediately after NPC/monster introduction in the scene
+- LOW: 11 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 2 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- **READ_ALOUD_FORMAT** - "Location: The underground meeting hall is a vast chamber..." lacks sensory descriptions and player response cues (fails 1-2 criteria)
+- **INLINE_STAT_BLOCKS** - "Lurking Snakes Attackers entering this area..." has no monster stats (fails 4 criteria)
+- **FAILURE_CONSEQUENCES** - "DC 14 Nature check" lacks failure consequences (fails 8 criteria)
+
+
+---
+
+## Self-Evaluation — 2026-05-12 01:20
+
+**Module evaluated:** The_Leaden_Crowns_Corruption_20260511_091657
+**LLM quality score:** 3/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 14 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 16 (need ≥1 per combat scene)
+- Skill checks / branches: 0 (need ≥5)
+- GM NOTE boxes: 14 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 0 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: 1 stat block(s) placed in appendix — must be INLINE immediately after NPC/monster introduction in the scene
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 1 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- Missing conversation branches for NPCs ("If players ask about X" branches absent in all rooms)
+- Stat blocks not inline ("Carrion Crawler Hatchling" stat block is in an appendix, not after monster description)
+- No failure consequences for DCs ("DC 14 Persuasion" has no failure clause)
+
+
+---
+
+## Self-Evaluation — 2026-05-13 01:20
+
+**Module evaluated:** Codex_Smoke_Infestation_20260507_105406_20260507_105406
+**LLM quality score:** 3/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 10 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 10 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- [NUMBERED_AREAS] "R01 Pump Room Entry" — should be "1 - Pump Room Entry" (incorrect format)
+- [INLINE_STAT_BLOCKS] "Monster Roster Variants (weakest → strongest)" — stat blocks must be inline with monster appearances, not in a separate section
+- [CONVERSATION_BRANCHES] "Monsters light: 1 rot grub" — no NPC dialogue branches or player interaction mechanics
+
+
+---
+
+## Self-Evaluation — 2026-05-14 01:09
+
+**Module evaluated:** Codex_Smoke_Infestation_20260507_105406_20260507_105406
+**LLM quality score:** 3/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 10 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 10 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- [NUMBERED_AREAS] "R01 Pump Room Entry" uses incorrect format - should be "1 - Pump Room Entry"
+- [INLINE_STAT_BLOCKS] Monster stat blocks are in separate section - should be inline with room descriptions
+- [CONVERSATION_BRANCHES] No NPC dialogue branches - missing "If players ask about X" handling
+
+
+---
+
+## Self-Evaluation — 2026-05-15 01:20
+
+**Module evaluated:** Codex_Smoke_Infestation_20260507_105406_20260507_105406
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 10 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 10 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-18 01:18
+
+**Module evaluated:** The_Shattered_Oath_20260517_135331
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 0 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 0 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No READ ALOUD blocks — players have no atmospheric immersion text
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 0 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-19 01:12
+
+**Module evaluated:** The_Shattered_Oath_20260517_135331
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 0 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 0 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No READ ALOUD blocks — players have no atmospheric immersion text
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 0 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-21 01:16
+
+**Module evaluated:** The_Weight_of_the_Crown_20260520_071045
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 0 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 34 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No READ ALOUD blocks — players have no atmospheric immersion text
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 33 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-22 01:14
+
+**Module evaluated:** The_Iron_Scar_Contract_20260521_062218
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 7 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 3 (need ≥5)
+- GM NOTE boxes: 6 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 3 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: 1 stat block(s) placed in appendix — must be INLINE immediately after NPC/monster introduction in the scene
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-24 01:10
+
+**Module evaluated:** The_Iron_Scar_Contract_20260521_062218
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 7 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 8 (need ≥1 per combat scene)
+- Skill checks / branches: 3 (need ≥5)
+- GM NOTE boxes: 6 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- LOW: Only 3 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- CRITICAL: 1 stat block(s) placed in appendix — must be INLINE immediately after NPC/monster introduction in the scene
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-25 01:10
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-26 01:11
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-27 01:18
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-28 01:18
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-29 01:17
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-30 01:16
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-05-31 01:17
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-01 01:16
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-02 01:16
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-03 01:16
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-04 01:16
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-05 01:15
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-06 01:15
+
+**Module evaluated:** Shattered_Sigil_Reckoning_id1157_20260524_192638_198
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 3 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 6 (need ≥1 per combat scene)
+- Skill checks / branches: 1 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 3 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- LOW: Only 1 skill check/conversation branch(es) — need ≥5 (min 2 per NPC)
+- LOW: Only 0 'If players ask' conversation branch(es) — NPCs need ≥2 branches each. DMs cannot improvise social encounters without them.
+- LOW: 1 skill check DC(s) but NO failure consequences specified — every DC must say what happens when players fail
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Only 0 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-07 01:14
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-08 01:15
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-09 01:15
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-09 03:35
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-10 01:15
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-11 01:17
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-11 01:24
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-12 01:19
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-12 01:21
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-06-12 01:24
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified

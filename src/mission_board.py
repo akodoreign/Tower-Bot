@@ -6,7 +6,7 @@ Each mission has a tiered expiry (1-190 days based on type).
 Expired missions get a resolution post. State persists across restarts.
 
 Channel: MISSION_BOARD_CHANNEL_ID (set in .env)
-Storage: campaign_docs/mission_memory.json
+Storage: missions table (MySQL)
 """
 
 from __future__ import annotations
@@ -22,15 +22,9 @@ from pathlib import Path
 from typing import List, Optional
 
 from src.log import logger
-from src.db_api import raw_query, raw_execute, db
+from src.db_api import raw_query, raw_execute, db, get_global_state
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
-MISSION_MEMORY_FILE    = DOCS_DIR / "mission_memory.json"
-CHARACTER_MEMORY_FILE  = DOCS_DIR / "character_memory.txt"
-PERSONAL_MISSION_TRACKER = DOCS_DIR / "personal_mission_tracker.json"
-PARTY_LIST_FILE        = DOCS_DIR / "adventurer_parties.txt"
-USED_PARTIES_FILE      = DOCS_DIR / "used_parties.json"
-MISSION_TYPES_FILE     = DOCS_DIR / "generated_mission_types.json"
 
 # Per-party claim probability per hourly check during the claim window.
 # Each party in the sample rolls independently — first success claims the mission.
@@ -42,15 +36,45 @@ CLAIM_PARTIES_PER_CHECK = 4
 # Claim window: missions become eligible for NPC claims after CLAIM_DAYS_MIN days,
 # and the window closes after CLAIM_DAYS_MAX days (then it just expires or gets swept).
 CLAIM_DAYS_MIN     = 1
-CLAIM_DAYS_MAX     = 3
+CLAIM_DAYS_MAX     = 4   # extended: board sweep is at day 5, keep the window open to day 4
+
+# Urgency window — missions older than this (days) get a boosted claim probability.
+# Simulates parties taking notice of contracts sitting unclaimed for too long.
+CLAIM_URGENCY_THRESHOLD_DAYS = 2.0
+CLAIM_URGENCY_MULTIPLIER     = 2.5   # probability × this for stale missions
 
 # Non-personal unclaimed missions older than this are swept from the board
 # Must be > CLAIM_DAYS_MAX so claim-scheduled missions aren't swept before they fire
 BOARD_MAX_AGE_DAYS = 5
 
-# Board caps — bot will not post new missions if active count meets these
-MAX_ACTIVE_NORMAL   = 30   # non-personal, unresolved missions
+# Personal mission rescission — old unclaimed personal missions get withdrawn with a story reason
+PERSONAL_RESCIND_AGE_DAYS = 4     # eligible after this many days sitting unclaimed
+PERSONAL_RESCIND_CHANCE   = 0.12  # per hourly check (~3 rolls/day ≈ 32% daily chance)
+
+# Board caps — bot will not post new missions if active count meets these.
+# Normal cap is env-configurable so the board can stay busier while NPC parties
+# keep rotating claimed jobs through the story.
+MAX_ACTIVE_NORMAL   = int(os.getenv("MISSION_BOARD_MAX_ACTIVE_NORMAL", "45"))   # non-personal, unresolved missions
 MAX_ACTIVE_PERSONAL = 3    # per-character personal missions active at once
+
+PUBLIC_HEALTH_ARC_STATE_KEY = "public_health_arcs"
+PUBLIC_HEALTH_MISSION_FACTIONS = [
+    "Patchwork Saints",
+    "Glass Sigil",
+    "Wardens of Ash",
+    "Adventurers Guild",
+    "Tower Authority / FTA",
+]
+PUBLIC_HEALTH_MISSION_TYPES = [
+    "Investigation",
+    "Rescue",
+    "Escort",
+    "Recovery",
+    "Gather",
+    "Defense",
+    "Negotiation",
+    "Strange Occurrences",
+]
 
 # Reaction emojis for player/DM interaction
 EMOJI_CLAIM    = "⚔️"   # any player reacts to claim a mission
@@ -64,7 +88,7 @@ def _get_results_channel_id() -> int:
     results_id = int(os.getenv("MISSION_RESULTS_CHANNEL_ID", "0"))
     if results_id:
         return results_id
-    
+
     board_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", "0"))
     if not board_id:
         logger.warning("❌ MISSION_RESULTS_CHANNEL_ID and MISSION_BOARD_CHANNEL_ID both unset")
@@ -119,19 +143,55 @@ async def _get_results_channel(client, fallback_channel=None):
             logger.info(f"📋 Using provided fallback channel")
         else:
             logger.error(f"❌ No valid channel available for mission results")
-    
+
     return ch
 
 # ---------------------------------------------------------------------------
 # Tier expiry ranges (days)
 # ---------------------------------------------------------------------------
 
+# Numeric difficulty 1-10 → (min_days, max_days) expiry window.
+# Difficulty 5 is the standard baseline (party CR +4).
+# Lower difficulty = shorter contract window (routine work).
+# Higher difficulty = longer window (epic undertakings linger on the board).
+DIFFICULTY_EXPIRY = {
+    1:  (1,   7),    # Trivial
+    2:  (1,   7),    # Easy
+    3:  (3,  14),    # Moderate
+    4:  (7,  30),    # Standard
+    5:  (7,  30),    # Challenging (baseline)
+    6:  (14, 45),    # Hard
+    7:  (30, 90),    # Severe
+    8:  (45, 120),   # Deadly
+    9:  (60, 150),   # Extreme
+    10: (90, 190),   # Legendary
+}
+
+DEFAULT_EXPIRY = (7, 30)
+
+# Personal mission expiry — longer to account for real-life scheduling
+PERSONAL_DIFFICULTY_EXPIRY = {
+    1:  (14,  30),
+    2:  (14,  30),
+    3:  (21,  45),
+    4:  (30,  60),
+    5:  (30,  60),
+    6:  (45,  90),
+    7:  (60,  90),
+    8:  (60, 120),
+    9:  (75, 150),
+    10: (90, 190),
+}
+PERSONAL_DEFAULT_EXPIRY = (30, 60)
+
+# Legacy string-keyed expiry — kept so old DB missions loaded without a numeric
+# difficulty field still get reasonable expiry values.
 TIER_EXPIRY = {
     "local":        (1,   7),
     "patrol":       (1,   7),
     "escort":       (7,  30),
     "standard":     (7,  30),
-    "investigation":(7, 30),
+    "investigation":(7,  30),
     "rift":         (30, 90),
     "dungeon":      (30, 90),
     "dungeon-delve":(30, 90),
@@ -142,10 +202,6 @@ TIER_EXPIRY = {
     "tower":        (90, 190),
     "high-stakes":  (60, 120),
 }
-
-DEFAULT_EXPIRY = (7, 30)
-
-# Personal mission expiry — longer to account for real-life scheduling
 PERSONAL_TIER_EXPIRY = {
     "local":        (14,  30),
     "patrol":       (14,  30),
@@ -162,7 +218,6 @@ PERSONAL_TIER_EXPIRY = {
     "tower":        (90, 190),
     "high-stakes":  (60, 120),
 }
-PERSONAL_DEFAULT_EXPIRY = (30, 60)
 
 # How long between personal mission cycles (seconds) — 1 to 3 days per character
 PERSONAL_MISSION_MIN = 1 * 24 * 60 * 60
@@ -185,15 +240,40 @@ SETTING: The Undercity — a sealed city under a Dome around the Tower of Last C
 Rifts tear reality constantly. Adventurers are a recognised economic class: ranked, taxed, watched.
 
 CURRENCY: Essence Coins (EC), Kharma (faith energy), Legend Points (LP = heroic fame).
-KHARMA REWARDS: Kharma is rare and meaningful. Local/patrol missions: 20-50 Kharma. Standard/escort/investigation: 50-150 Kharma. Rift/dungeon/major: 150-500 Kharma. Epic/divine/tower: 500-2000 Kharma. Never award less than 20 Kharma on any mission that includes Kharma as a reward.
+
+REWARD FORMULA: base 150 EC × 1.1^CR × 1.2^diff_level  (CR = party level + encounter modifier)
+  Difficulty levels:  🟢 green = ×0.83  |  🟡 yellow = ×1.0  |  🟠 orange = ×1.2  |  🔴 red = ×1.44  |  🟣 purple = ×1.73
+
+TYPICAL REWARD RANGES (at standard party CR for each tier):
+  EC (Essence Coins — the main reward):
+    local/patrol       (🟢 CR 2):  105—195 EC
+    standard/escort    (🟡 CR 4):  155—285 EC
+    investigation      (🟡 CR 4):  155—285 EC
+    dungeon/rift/major (🟠 CR 6):  225—415 EC
+    inter-guild        (🔴 CR 9):  430—800 EC
+    high-stakes        (🔴 CR 11): 570—1050 EC
+    epic               (🟣 CR 15): 1010—1880 EC
+    divine/tower       (🟣 CR 19): 1490—2760 EC
+
+  Kharma (faith energy — rare, most missions omit it entirely):
+    local/patrol: none (do NOT award Kharma for small jobs)
+    standard/escort: 15—38 Kharma (optional)
+    investigation/dungeon/rift: 20—52 Kharma (optional)
+    inter-guild/high-stakes: 57—106 Kharma
+    epic/divine/tower: 135—280 Kharma
+    HARD CEILING: 1200 Kharma maximum, ever.
+
+  Legend Points (LP): epic/divine/tower only — 1—5 LP maximum.
 
 FACTIONS (use ONLY these — do not invent new factions under any circumstances):
-Iron Fang Consortium (relics/smuggling, Serrik Dhal), Argent Blades (glory/arena, Lady Cerys Valemont),
+Iron Fang Consortium (orthodox relics + infrastructure, Serrik Dhal -- amenable, deals straight),
+Iron Fang Syndicate (protection rackets, loan-sharking, TowerBay stock manipulation, Sera Voss -- Serrik's breakaway rival; the two Iron Fang factions are at open civil war), Argent Blades (glory/arena, Lady Cerys Valemont),
 Wardens of Ash (city defence, Captain Havel Korin), Serpent Choir (divine contracts, High Apostle Yzura),
 Obsidian Lotus (black market, The Widow), Glass Sigil (arcane archivists, Senior Archivist Pell),
 Patchwork Saints (Warrens protectors), Adventurers Guild (quest hub, Mari Fen),
-Guild of Ashen Scrolls (fate archivists, Eir Velan), Tower Authority/FTA (oversight, Director Myra Kess),
-Wizards Tower (arcane academy, Archmage Yaulderna Silverstreak).
+Guild of Ashen Scrolls (fate archivists, Eir Velan), Tower Authority / FTA (oversight, Director Myra Kess),
+Wizards Tower (arcane academy, Archmage Yaulderna Silverstreak — research, containment, spellcraft),
+Brother Thane's Cult (doomsday cult, deep Warrens — hires through proxies only; never appears as open sponsor; use only for covert/infiltration/strange occurrences missions where the employer is deliberately obscured).
 FORBIDDEN: Never reference the Culinary Council, Hollow Waiter, or any faction not listed above. If you invent a faction name, you have failed.
 
 DISTRICTS: Markets Infinite, Sanctum Quarter, Grand Forum, Guild Spires, The Warrens, Outer Wall.
@@ -233,6 +313,8 @@ def _load_missions() -> List[dict]:
                 _msg_id = int(_raw_mid) if _raw_mid is not None else None
             except (ValueError, TypeError):
                 _msg_id = _raw_mid
+            _created_at = row.get("created_at")
+            _posted_at  = row.get("posted_at") or mission_data.get("posted_at")
             mission = {
                 **mission_data,
                 "id": row.get("id"),
@@ -241,17 +323,65 @@ def _load_missions() -> List[dict]:
                 "tier": row.get("tier") or mission_data.get("tier", "standard"),
                 "status": row.get("status") or "active",
                 "message_id": _msg_id,
+                "player_claimer": row.get("claimed_by") or mission_data.get("player_claimer", ""),
+                "created_at": str(_created_at) if _created_at else mission_data.get("created_at"),
+                "posted_at":  str(_posted_at)  if _posted_at  else mission_data.get("posted_at"),
             }
             # Map DB status to legacy flags
             status = row.get("status", "active")
             mission["resolved"] = status in ("resolved", "completed", "failed", "expired")
             mission["completed"] = status == "completed"
             mission["failed"] = status == "failed"
+            mission["claimed"] = status == "claimed" or bool(mission.get("claimed"))
+            mission["npc_claimed"] = status == "claimed" and bool(mission.get("npc_claimed"))
             missions.append(mission)
         return missions
     except Exception as e:
         logger.error(f"Mission load error: {e}")
         return []
+
+
+def _load_mission_by_id(mission_id: int) -> Optional[dict]:
+    """Load one mission by DB id without scanning the whole mission table."""
+    try:
+        rows = raw_query("SELECT * FROM missions WHERE id=%s LIMIT 1", (int(mission_id),)) or []
+        if not rows:
+            return None
+        row = rows[0]
+        mission_data = row.get("mission_json")
+        if mission_data is None:
+            mission_data = {}
+        elif isinstance(mission_data, str):
+            mission_data = json.loads(mission_data) if mission_data else {}
+        _raw_mid = row.get("message_id") or mission_data.get("message_id")
+        try:
+            _msg_id = int(_raw_mid) if _raw_mid is not None else None
+        except (ValueError, TypeError):
+            _msg_id = _raw_mid
+        _created_at = row.get("created_at")
+        _posted_at = row.get("posted_at") or mission_data.get("posted_at")
+        mission = {
+            **mission_data,
+            "id": row.get("id"),
+            "title": row.get("title") or mission_data.get("title", "Unknown"),
+            "faction": row.get("faction") or mission_data.get("faction", ""),
+            "tier": row.get("tier") or mission_data.get("tier", "standard"),
+            "status": row.get("status") or "active",
+            "message_id": _msg_id,
+            "player_claimer": row.get("claimed_by") or mission_data.get("player_claimer", ""),
+            "created_at": str(_created_at) if _created_at else mission_data.get("created_at"),
+            "posted_at": str(_posted_at) if _posted_at else mission_data.get("posted_at"),
+        }
+        status = row.get("status", "active")
+        mission["resolved"] = status in ("resolved", "completed", "failed", "expired")
+        mission["completed"] = status == "completed"
+        mission["failed"] = status == "failed"
+        mission["claimed"] = status == "claimed" or bool(mission.get("claimed"))
+        mission["npc_claimed"] = status == "claimed" and bool(mission.get("npc_claimed"))
+        return mission
+    except Exception as e:
+        logger.error(f"Mission load error for id {mission_id}: {e}")
+        return None
 
 
 def _save_missions(missions: List[dict]) -> None:
@@ -266,27 +396,38 @@ def _save_missions(missions: List[dict]) -> None:
 def _save_mission(mission: dict) -> None:
     """Save a single mission to database."""
     try:
+        _bake_assassination_target(mission)  # idempotent: bakes the target once
+        _bake_strange_occurrence_subject(mission)  # idempotent: ties an illegal return + hints
         mission_id = mission.get("id")
         title = mission.get("title", "Unknown Contract")
         faction = mission.get("faction", "")
         tier = mission.get("tier", "standard")
         message_id = mission.get("message_id")
-        
+        try:
+            difficulty = int(mission.get("difficulty") or _parse_difficulty(str(mission)))
+        except (TypeError, ValueError):
+            difficulty = 5
+
         # Determine status from legacy flags
         if mission.get("completed"):
             status = "completed"
         elif mission.get("failed"):
             status = "failed"
         elif mission.get("resolved"):
-            status = "resolved"
-        elif mission.get("claimed") or mission.get("npc_claimed"):
+            # Claimed then resolved without explicit result = failure (withdrew)
+            # Never claimed = expired (rescinded, timed out, board sweep)
+            if mission.get("claimed") or mission.get("npc_claimed") or mission.get("pc_sim_claimed"):
+                status = "failed"
+            else:
+                status = "expired"
+        elif mission.get("claimed") or mission.get("npc_claimed") or mission.get("pc_sim_claimed"):
             status = "claimed"
         else:
             status = "active"
-        
+
         # Prepare mission_json (full mission data)
         mission_json = json.dumps(mission, ensure_ascii=False, default=str)
-        
+
         # Parse dates for DB columns
         posted_at = None
         expires_at = None
@@ -300,32 +441,145 @@ def _save_mission(mission: dict) -> None:
                 expires_at = datetime.fromisoformat(mission["expires_at"]).strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
                 expires_at = None
-        
+
+        claimed_by = mission.get("player_claimer", "") or mission.get("claim_party", "") or ""
+
         if mission_id:
             # Check if exists
             existing = raw_query("SELECT id FROM missions WHERE id = %s", (mission_id,))
             if existing:
                 raw_execute(
-                    "UPDATE missions SET title = %s, faction = %s, tier = %s, status = %s, "
-                    "message_id = %s, mission_json = %s, posted_at = %s, expires_at = %s WHERE id = %s",
-                    (title, faction, tier, status, message_id, mission_json, posted_at, expires_at, mission_id)
+                    "UPDATE missions SET title = %s, faction = %s, tier = %s, difficulty = %s, "
+                    "status = %s, claimed_by = %s, message_id = %s, mission_json = %s, "
+                    "posted_at = %s, expires_at = %s WHERE id = %s",
+                    (title, faction, tier, difficulty, status, claimed_by or None,
+                     message_id, mission_json, posted_at, expires_at, mission_id)
                 )
                 return
-        
+
         # Insert new
         new_id = db.insert("missions", {
-            "title": title,
-            "faction": faction,
-            "tier": tier,
-            "status": status,
-            "message_id": message_id,
+            "title":        title,
+            "faction":      faction,
+            "tier":         tier,
+            "difficulty":   difficulty,
+            "status":       status,
+            "claimed_by":   claimed_by or None,
+            "message_id":   message_id,
             "mission_json": mission_json,
-            "posted_at": posted_at,
-            "expires_at": expires_at,
+            "posted_at":    posted_at,
+            "expires_at":   expires_at,
         })
         mission["id"] = new_id
     except Exception as e:
         logger.error(f"Mission save error for {mission.get('title', '?')}: {e}")
+
+
+_TARGET_FIRST = ["Veran", "Sela", "Doran", "Mira", "Kasimir", "Tovin", "Yara", "Bren", "Lysa", "Orrin", "Hessa", "Cael", "Nira", "Varro", "Sable", "Dax", "Ophira", "Renn"]
+_TARGET_LAST  = ["Solt", "Vance", "Mercer", "Dray", "Holt", "Kell", "Ashforth", "Vexley", "Crane", "Dunmore", "Falk", "Reye", "Thorne", "Galt", "Wickham", "Marlo", "Quist"]
+
+
+def _random_target_name() -> str:
+    return f"{random.choice(_TARGET_FIRST)} {random.choice(_TARGET_LAST)}"
+
+
+def _bake_assassination_target(mission: dict) -> None:
+    """Bake an opposed NPC target into an assassination mission at generation time.
+    Prefers a real NPC from the targeted faction (which lets a successful hit injure
+    them via the lifecycle); otherwise invents a name. If the target is a faction
+    LEADER, difficulty jumps to 10 and NPC parties succeed only ~1% of the time."""
+    mtype = str(mission.get("type") or mission.get("mission_type") or "").lower()
+    if not any(k in mtype for k in ("assassin", "eliminate", "wet work", "contract kill")):
+        return
+    if mission.get("target_npc_name"):
+        return  # already baked
+    npc = None
+    try:
+        opp = mission.get("opposing_faction") or ""
+        if opp:
+            rows = raw_query(
+                "SELECT name FROM npcs WHERE status IN ('alive','injured') AND faction LIKE %s ORDER BY RAND() LIMIT 1",
+                (f"%{opp}%",),
+            )
+            npc = rows[0] if rows else None
+        if not npc:
+            rows = raw_query("SELECT name FROM npcs WHERE status IN ('alive','injured') ORDER BY RAND() LIMIT 1")
+            npc = rows[0] if rows else None
+    except Exception as e:
+        logger.debug(f"assassination target lookup skipped: {e}")
+        npc = None
+
+    if npc and npc.get("name"):
+        name = npc["name"]
+        mission["target_npc_name"] = name
+        mission["target_is_real"] = True
+        is_leader = False
+        try:
+            from src.npc_lifecycle import is_faction_leader
+            is_leader = bool(is_faction_leader(name))
+        except Exception:
+            is_leader = False
+        mission["target_is_leader"] = is_leader
+        if is_leader:
+            mission["difficulty"] = 10
+            mission["tier"] = mission.get("tier") or "high-stakes"
+            logger.info(f"🎯 Assassination target is faction LEADER {name!r} -- difficulty 10, NPC success ~1%")
+    else:
+        mission["target_npc_name"] = _random_target_name()
+        mission["target_is_real"] = False
+        mission["target_is_leader"] = False
+
+
+def _bake_strange_occurrence_subject(mission: dict) -> None:
+    """Tie a Strange Occurrence to a real NPC who has returned ILLEGALLY from the
+    graveyard (status undead/doppelganger). The party must work out who it is, so
+    the card only HINTS (faction, bearing, look) -- the name is a DM secret stored
+    in mission_json. On completion (PC or NPC party) the resolve hook lays them back
+    to rest. No status change here; these NPCs are already 'out'."""
+    if not _is_strange_occurrence_mission(mission):
+        return
+    if mission.get("returned_npc_name"):
+        return  # already baked
+    try:
+        rows = raw_query(
+            "SELECT name, faction, role, species, status, deceased_at, data_json "
+            "FROM npcs WHERE status IN ('undead','doppelganger') ORDER BY RAND() LIMIT 1"
+        )
+    except Exception as e:
+        logger.debug(f"strange occurrence subject lookup skipped: {e}")
+        rows = []
+    if not rows:
+        return  # no illegal return available -> leave as a generic occurrence
+    r = rows[0]
+    name = r.get("name")
+    status = (r.get("status") or "undead").strip()
+    mission["returned_npc_name"] = name        # DM secret -> resolve hook
+    mission["returned_npc_status"] = status
+    # Build clues that point at them WITHOUT naming them.
+    faction = (r.get("faction") or "").strip()
+    role = (r.get("role") or "").strip()
+    look = ""
+    dj = r.get("data_json")
+    if isinstance(dj, str):
+        try:
+            dj = json.loads(dj)
+        except Exception:
+            dj = {}
+    if isinstance(dj, dict):
+        look = str(dj.get("appearance") or "").split(".")[0].strip()
+    hints = []
+    if look:
+        hints.append(look + ".")
+    if role:
+        hints.append(f"They carry themselves like {role}.")
+    if faction:
+        hints.append(f"Faded {faction} colors still cling to them.")
+    if status == "doppelganger":
+        hints.append("Those who knew them swear the face is almost -- but not quite -- right.")
+    else:
+        hints.append("Parish records are adamant: this one was buried already.")
+    mission["returned_npc_hints"] = hints
+    mission["body"] = (mission.get("body") or "").rstrip() + "\n\n**Strange signs (who walks again?):** " + " ".join(hints)
 
 
 def _add_mission(mission: dict) -> None:
@@ -340,6 +594,19 @@ def _count_active_normal() -> int:
     NPC and player claimed missions are off the board visually — don't let them
     eat into the cap and starve new postings.
     """
+    try:
+        rows = raw_query(
+            """
+            SELECT COUNT(*) AS n
+            FROM missions
+            WHERE status='active'
+              AND JSON_EXTRACT(mission_json, '$.personal_for') IS NULL
+              AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(mission_json, '$.is_hostile')), 'false') <> 'true'
+            """
+        ) or []
+        return int(rows[0].get("n") or 0) if rows else 0
+    except Exception:
+        pass
     return sum(
         1 for m in _load_missions()
         if not m.get("resolved")
@@ -351,6 +618,19 @@ def _count_active_normal() -> int:
 
 def _count_active_personal(character_name: str) -> int:
     """Count unresolved personal missions for a specific character."""
+    try:
+        rows = raw_query(
+            """
+            SELECT COUNT(*) AS n
+            FROM missions
+            WHERE status='active'
+              AND LOWER(JSON_UNQUOTE(JSON_EXTRACT(mission_json, '$.personal_for'))) = LOWER(%s)
+            """,
+            (character_name,),
+        ) or []
+        return int(rows[0].get("n") or 0) if rows else 0
+    except Exception:
+        pass
     return sum(
         1 for m in _load_missions()
         if not m.get("resolved")
@@ -365,37 +645,76 @@ def _update_mission(message_id: int, updates: dict) -> None:
         rows = raw_query("SELECT id, mission_json FROM missions WHERE message_id = %s", (message_id,))
         if not rows:
             return
-        
+
         row = rows[0]
         mission_id = row.get("id")
         mission_data = row.get("mission_json", {})
         if isinstance(mission_data, str):
             mission_data = json.loads(mission_data) if mission_data else {}
-        
+
         # Apply updates
         mission_data.update(updates)
         mission_data["id"] = mission_id
         mission_data["message_id"] = message_id
-        
+
         # Save back
         _save_mission(mission_data)
     except Exception as e:
         logger.error(f"Mission update error for message_id {message_id}: {e}")
 
 
+def _claim_mission_atomically(mission_id: int, claimer: str) -> bool:
+    """DB claim lock. Only one claimant should win active -> claimed."""
+    if not mission_id:
+        return False
+    try:
+        affected = raw_execute(
+            "UPDATE missions SET status='claimed', claimed_by=%s "
+            "WHERE id=%s AND status='active'",
+            (claimer, int(mission_id)),
+        )
+        return bool(affected)
+    except Exception as e:
+        logger.warning(f"Mission atomic claim failed for {mission_id}: {e}")
+        return False
+
+
+def _queue_module_generation(mission: dict, claimer: str) -> int:
+    """Persist module generation work for the bot worker instead of spawning ad hoc tasks."""
+    try:
+        from src.db_api import enqueue_module_generation_job
+        return enqueue_module_generation_job(int(mission.get("id") or 0), claimer)
+    except Exception as e:
+        logger.warning(f"Could not enqueue module generation for {mission.get('title', '?')}: {e}")
+        return 0
+
+
 # ---------------------------------------------------------------------------
 # Expiry helpers
 # ---------------------------------------------------------------------------
 
-def _expiry_for_tier(tier: str) -> datetime:
-    tier_key = tier.lower().strip()
-    lo, hi = TIER_EXPIRY.get(tier_key, DEFAULT_EXPIRY)
+def _expiry_for_tier(tier_or_difficulty) -> datetime:
+    """Return expiry datetime. Accepts numeric difficulty (1-10) or legacy tier string."""
+    try:
+        d = int(tier_or_difficulty)
+        lo, hi = DIFFICULTY_EXPIRY.get(max(1, min(10, d)), DEFAULT_EXPIRY)
+    except (TypeError, ValueError):
+        tier_key = str(tier_or_difficulty).lower().strip()
+        lo, hi = TIER_EXPIRY.get(tier_key, DEFAULT_EXPIRY)
     days = random.randint(lo, hi)
     return datetime.utcnow() + timedelta(days=days)
 
 
 def _parse_tier(text: str) -> str:
-    """Extract the tier label from generated mission text."""
+    """Extract the difficulty tier label from generated mission text.
+    Looks in the Tier: field first to avoid matching type names (e.g. 'Investigation')."""
+    # Try to match explicitly after "Tier:" label
+    tier_match = re.search(r"[Tt]ier:\s*([a-z\-]+)", text)
+    if tier_match:
+        candidate = tier_match.group(1).strip().lower()
+        if candidate in TIER_EXPIRY:
+            return candidate
+    # Fallback: scan full text (legacy missions without Type: line)
     text_lower = text.lower()
     for key in TIER_EXPIRY:
         if key in text_lower:
@@ -403,31 +722,769 @@ def _parse_tier(text: str) -> str:
     return "standard"
 
 
+_DIFF_SHORT: dict = {
+    1: "Trivial", 2: "Easy", 3: "Moderate", 4: "Standard", 5: "Hard",
+    6: "Dangerous", 7: "Deadly", 8: "Extreme", 9: "Legendary", 10: "Mythic",
+}
+
+
+def _diff_word(mission: dict) -> str:
+    """Return a short human-readable difficulty label for Discord embeds."""
+    try:
+        return _DIFF_SHORT.get(max(1, min(10, int(mission.get("difficulty", 0)))), "")
+    except (TypeError, ValueError):
+        pass
+    return str(mission.get("tier", "standard")).title()
+
+
+def _parse_difficulty(text: str) -> int:
+    """Extract numeric difficulty (1-10) from LLM-generated mission text.
+
+    Looks for 'Difficulty: 7' or 'Diff: 3' in the header line.
+    Falls back to mapping legacy tier strings to the numeric scale.
+    Returns 5 (Challenging/baseline) if nothing is found.
+    """
+    # Primary: explicit numeric field
+    m = re.search(r"[Dd]iff(?:iculty)?:\s*(\d{1,2})", text)
+    if m:
+        return max(1, min(10, int(m.group(1))))
+
+    # Fallback: map legacy tier string to numeric
+    _TIER_TO_DIFF = {
+        "trivial": 1, "tutorial": 1,
+        "easy": 2,
+        "local": 2, "patrol": 2,
+        "moderate": 3,
+        "standard": 4, "escort": 4, "investigation": 4, "social": 4, "bounty": 4, "courier": 4, "negotiation": 4,
+        "challenging": 5,
+        "hard": 6, "rift": 6, "dungeon": 6, "dungeon-delve": 6, "major": 6, "combat": 6, "heist": 6, "seasoned": 6,
+        "severe": 7, "inter-guild": 7, "elite": 7,
+        "deadly": 8, "high-stakes": 8,
+        "extreme": 9, "legend": 9, "epic": 9,
+        "legendary": 10, "divine": 10, "tower": 10,
+    }
+    tier_str = _parse_tier(text)
+    return _TIER_TO_DIFF.get(tier_str, 5)
+
+
+def _difficulty_circle(difficulty) -> str:
+    """Return a colored circle + label for numeric difficulty 1–10.
+
+    Difficulty 5 is baseline (party CR +4). Each step below subtracts 1 CR,
+    each step above adds 1 CR. Display uses descriptive words, not numbers.
+
+      1  🟢 Trivial      6  🟠 Hard
+      2  🟢 Easy         7  🔴 Severe
+      3  🟡 Moderate     8  🔴 Deadly
+      4  🟡 Standard     9  🟣 Extreme
+      5  🟠 Challenging  10 🟣 Legendary
+    """
+    _MAP = {
+        1:  "🟢 Trivial",
+        2:  "🟢 Easy",
+        3:  "🟡 Moderate",
+        4:  "🟡 Standard",
+        5:  "🟠 Challenging",
+        6:  "🟠 Hard",
+        7:  "🔴 Severe",
+        8:  "🔴 Deadly",
+        9:  "🟣 Extreme",
+        10: "🟣 Legendary",
+    }
+    try:
+        d = int(difficulty)
+        return _MAP.get(max(1, min(10, d)), "⚪ Unknown")
+    except (TypeError, ValueError):
+        return "⚪ Unknown"
+
+
+def _format_mission_type(tier: str) -> str:
+    """Return a human-readable mission type label from tier."""
+    labels = {
+        "local": "Local Contract", "patrol": "Patrol",
+        "escort": "Escort", "standard": "Contract",
+        "investigation": "Investigation", "social": "Diplomatic",
+        "bounty": "Bounty Hunt", "combat": "Combat",
+        "heist": "Heist", "rift": "Rift Response",
+        "dungeon": "Dungeon Delve", "dungeon-delve": "Dungeon Delve",
+        "major": "Major Operation", "inter-guild": "Inter-Guild",
+        "high-stakes": "High Stakes", "epic": "Epic",
+        "divine": "Divine", "tower": "Tower Crisis",
+    }
+    return labels.get(tier.lower().strip(), tier.title())
+
+
+def _build_mission_embed(
+    mission: dict,
+    embed_color: int,
+    tier_label: str,
+    days_left: int,
+    personal_for: str = "",
+) -> "discord.Embed":
+    """
+    Build a clean, screen-reader-friendly Discord embed for a mission bulletin.
+
+    Layout:
+      Title:       Mission Title
+      Author:      Faction Name
+      Description: Pure story paragraph — no metadata, no pipes, no asterisks
+      Fields:      Type | Tier | Reward  (inline)
+                   Contact (if present)
+                   Opposes (if present)
+      Footer:      difficulty circle · standing · expires · claim prompt
+    """
+    import discord as _d
+
+    title       = mission.get("title", "Unknown Mission")
+    faction     = mission.get("faction", "")
+    mtype       = mission.get("type") or _format_mission_type(mission.get("tier", "standard"))
+    reward      = mission.get("reward", "See posting")
+    opposing    = mission.get("opposing_faction", "")
+    contact     = mission.get("contact", "")
+    story_text  = mission.get("public_text", "") or mission.get("story_text", "") or mission.get("body", "")
+    _diff_num   = mission.get("difficulty") or mission.get("diff") or 5
+    _circle     = _difficulty_circle(_diff_num)
+    # Display the descriptive word without the circle (circle is already in footer)
+    _diff_label = _circle.split(" ", 1)[1] if " " in _circle else _circle
+
+    # Clean story text of any residual markdown asterisks/pipes
+    story_clean = re.sub(r'\*+', '', story_text).strip()
+    story_clean = _public_story_from_text(story_clean)
+    if len(story_clean) > 700:
+        story_clean = story_clean[:697].rsplit(" ", 1)[0] + "..."
+
+    embed = _d.Embed(
+        title=title,
+        description=story_clean,
+        color=embed_color,
+    )
+    embed.set_author(name=faction)
+
+    # Inline metadata: Type | Difficulty | Reward
+    embed.add_field(name="Type",       value=mtype,        inline=True)
+    embed.add_field(name="Difficulty", value=_diff_label,  inline=True)
+    embed.add_field(name="Reward",     value=reward,       inline=True)
+
+    if contact:
+        embed.add_field(name="Contact", value=contact, inline=False)
+
+    if opposing:
+        embed.add_field(name="⚠️ Opposes", value=opposing, inline=False)
+
+    footer_parts = []
+    if personal_for:
+        footer_parts.append(f"📌 Personal for {personal_for}")
+    footer_parts += [
+        f"{_circle} {mtype}",
+        f"Standing: {tier_label}",
+        f"Expires in {days_left}d",
+        "React ⚔️ to claim",
+    ]
+    if opposing:
+        footer_parts.append(f"Opposes: {opposing}")
+    embed.set_footer(text="  •  ".join(footer_parts))
+
+    return embed
+
+
 # ---------------------------------------------------------------------------
 # Mission generation prompt
 # ---------------------------------------------------------------------------
 
 _MISSION_TYPES = [
-    # Common — weighted heavily toward street-level and faction work
-    "a local neighbourhood job (courier gone missing, minor theft, debt collection)",
-    "a local neighbourhood job (courier gone missing, minor theft, debt collection)",
-    "a local neighbourhood job (courier gone missing, minor theft, debt collection)",
-    "a patrol contract (Warden-adjacent, district sweep, check on a suspicious location)",
-    "a patrol contract (Warden-adjacent, district sweep, check on a suspicious location)",
-    "an escort mission (protect a person or cargo through dangerous territory)",
-    "an escort mission (protect a person or cargo through dangerous territory)",
-    "an investigation (track corruption, missing person, unexplained event)",
-    "an investigation (track corruption, missing person, unexplained event)",
-    "an inter-guild conflict job (mediate, spy, or sabotage on behalf of a faction)",
-    "an inter-guild conflict job (mediate, spy, or sabotage on behalf of a faction)",
-    "a high-stakes contract (assassination, political black op, relic retrieval)",
-    # Uncommon — dungeon work
-    "a dungeon delve into an abandoned structure or sealed vault in the Warrens or Outer Wall",
-    # Rare — Rifts are rare emergencies, NOT routine postings
-    "a Rift clearance ONLY in the Warrens or near the Outer Wall — a tear that has grown for days. CRITICAL: location must be in the Warrens or Outer Wall, nowhere else",
-    # Very rare — epic/divine events
-    "an epic or divine-tier mission (Tower floor, god involvement, city-scale consequences)",
+    # Legacy fallback list. Actual random selection uses _weighted_mission_types()
+    # so finished standalone pipelines show up much more often than unfinished
+    # generic types.
+    "Escort",
+    "Investigation",
+    "Ambush",
+    "Rescue",
+    "Sabotage",
+    "Infiltration",
+    "Defense",
+    "Puzzle",
+    "Gathering",
+    "Assault",
+    "Heist",
+    "Infestation",
+    "Recovery",
+    "Battle",
+    "Negotiation",
+    "First Contact",
+    "Theft",
+    "Exploration",
+    "Discovery",
+    "Delivery",
+    "Assassination",
+    "Political",
+    "Strange Occurrences",
 ]
+
+# Keep this list in step with src/mission_builder/*_pipeline.py. When a new
+# pipeline is built, move its public board label here and give it a heavy
+# weight. Anything not built stays in _UNBUILT_LOW_WEIGHT_TYPES.
+_PIPELINE_MISSION_TYPE_WEIGHTS = {
+    "Escort": 12,
+    "Investigation": 12,
+    "Ambush": 12,
+    "Rescue": 12,
+    "Sabotage": 12,
+    "Infiltration": 12,
+    "Defense": 12,
+    "Puzzle": 12,
+    "Gathering": 12,
+    "Assault": 12,
+    "Heist": 12,
+    "Infestation": 12,
+    "Negotiation": 12,
+    "Exploration": 12,
+    "Discovery": 12,
+    "First Contact": 12,
+    "Strange Occurrences": 12,
+    "Recovery": 12,
+    "Battle": 12,
+    "Assassination": 12,
+}
+
+_UNBUILT_LOW_WEIGHT_TYPES = {
+    "Theft": 1,
+    "Delivery": 1,
+    "Political": 1,
+}
+
+
+def _weighted_mission_types() -> List[str]:
+    """Return board type labels weighted toward completed standalone pipelines."""
+    weighted: List[str] = []
+    for label, weight in _PIPELINE_MISSION_TYPE_WEIGHTS.items():
+        weighted.extend([label] * max(1, int(weight)))
+    for label, weight in _UNBUILT_LOW_WEIGHT_TYPES.items():
+        weighted.extend([label] * max(1, int(weight)))
+    for label in _load_generated_mission_types():
+        # AI-generated/unimplemented labels are allowed as rare spice only.
+        weighted.append(label)
+    return weighted or list(_MISSION_TYPES)
+
+# ---------------------------------------------------------------------------
+# Mission type narrative templates (DB-backed)
+# ---------------------------------------------------------------------------
+
+_MISSION_TYPE_TEMPLATES = [
+    {"slug": "neighbourhood", "display_name": "Neighbourhood Job",
+     "who": "A local small-time employer — a shopkeeper, gang lieutenant, worried parent, or minor faction contact",
+     "what": "A street-level task: deliver a package, collect a debt, track down a missing person, or deal with a local nuisance",
+     "when_hint": "Urgency is personal and immediate — someone needs this done before nightfall or before things escalate further",
+     "why": "The employer can't do it themselves — they lack muscle, connections, or the nerve to handle it",
+     "where_hint": "The streets, back alleys, tenements, and markets of a specific district — grounded and concrete",
+     "story_frame": "This is a neighbourhood story about ordinary people in desperate circumstances, a small wrong that needs righting, and the price of getting involved in someone else's trouble — themes of community, survival, and the cost of looking away.",
+     "keywords": "neighbourhood,neighborhood,local,courier,debt,missing,street,district",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You made a scene in someone's home district. Word spread through the streets. The community talks, and the faction that hired you has to manage the fallout. Quiet neighbourhood jobs stop coming your way."},
+    {"slug": "patrol", "display_name": "Patrol Contract",
+     "who": "A Warden-adjacent employer, district council, merchant guild, or faction with territorial interests",
+     "what": "Sweep a district, investigate a suspicious location, or maintain visible presence to deter threats",
+     "when_hint": "Scheduled or responding to a recent incident that has spooked the locals",
+     "why": "The regular Wardens are stretched thin, compromised, or absent — someone needs boots on the ground",
+     "where_hint": "A specific district with defined patrol routes, chokepoints, and known trouble spots",
+     "story_frame": "This is a patrol story about authority's limits, a district holding its breath, and hired hands standing between order and chaos — themes of duty, tension, and what it costs to keep the peace.",
+     "keywords": "patrol,warden,district,sweep,suspicious,check",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "escort", "display_name": "Escort Mission",
+     "who": "A vulnerable principal — merchant, diplomat, witness, refugee, or valuable cargo — and a faction with reason to protect them",
+     "what": "Move a person or cargo safely from one point to another through dangerous territory",
+     "when_hint": "The window is specific — a departure time, a tide, or a rendezvous that cannot slip",
+     "why": "The route is contested — enemies, rival factions, or environmental hazards make it deadly to travel alone",
+     "where_hint": "The journey passes through at least one genuinely dangerous location — a contested district, the Outer Wall, Warrens tunnels",
+     "story_frame": "This is a protection story about a vulnerable charge, a dangerous road, and whether hired loyalty holds when things go wrong — themes of trust, danger, and the weight of responsibility.",
+     "keywords": "escort,protect,cargo,convoy,guard,safe passage",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "investigation", "display_name": "Investigation",
+     "who": "A client who can't go to the Wardens — a faction, a grieving family, a frightened official, or someone with something to hide",
+     "what": "Uncover the truth about a disappearance, an unexplained death, a pattern of corruption, or a secret powerful people want buried",
+     "when_hint": "Evidence is fading — witnesses go quiet, scenes get cleaned up, trails go cold fast",
+     "why": "The official channels are compromised, uninterested, or in on it",
+     "where_hint": "Multiple locations across the city — witnesses to interview, sites to search, records to pull",
+     "story_frame": "This is a mystery story about hidden truth, powerful people with things to hide, and investigators who have to decide how far they're willing to dig — themes of corruption, secrets, and the cost of knowing.",
+     "keywords": "investigation,investigate,missing,corruption,track,unexplained,mystery",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "Going loud means witnesses scatter and leads go cold. You finished the job but the truth stays buried. Glass Sigil stops calling."},
+    {"slug": "inter-guild", "display_name": "Inter-Guild Conflict",
+     "who": "A faction with a rival and a job that needs deniability — spy on them, sabotage their operation, or broker an uneasy peace",
+     "what": "Work on behalf of one faction to gain advantage over, neutralize, or negotiate with another",
+     "when_hint": "A power struggle at a critical moment — an election, a territory dispute, a contract up for renewal",
+     "why": "Factions can't be seen handling this themselves — deniability is the entire point",
+     "where_hint": "The rival faction's operations — their turf, their buildings, their key people",
+     "story_frame": "This is a political story about faction power, deniable operations, and hired hands caught between organizations that will sacrifice them without hesitation — themes of loyalty, betrayal, and the game of power.",
+     "keywords": "guild,faction,rival,inter-guild,conflict,mediate,spy,sabotage",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "The deniability the faction paid for is gone. Both factions know who did it. The faction that hired you takes heat publicly and stops calling. You're flagged as a liability for sensitive work."},
+    {"slug": "high-stakes", "display_name": "High-Stakes Contract",
+     "who": "A powerful employer — a major faction leader, a Tower Authority figure, or a mysterious patron with deep pockets and deeper secrets",
+     "what": "An assassination, a political black operation, the recovery of a critical relic, or an act that will reshape faction dynamics",
+     "when_hint": "The moment is now — delay means someone else gets there first, or the window closes permanently",
+     "why": "The stakes are too high for hesitation: this changes things at the city level",
+     "where_hint": "A heavily secured or politically sensitive location — a faction headquarters, a Tower floor, a noble estate",
+     "story_frame": "This is a high-stakes thriller about power, consequence, and the kind of job that changes everyone involved — themes of ambition, risk, and the point of no return.",
+     "keywords": "high-stakes,assassination,political,relic,black op",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "dungeon", "display_name": "Dungeon Delve",
+     "who": "A faction or scholar with interest in what's below — or a desperate crew chasing rumored riches",
+     "what": "Enter an abandoned structure, sealed vault, or underground complex and bring back what's inside — or clear out what's living there",
+     "when_hint": "Something has changed — a collapse opened a new passage, something started coming out, or a deadline makes waiting impossible",
+     "why": "What's inside is valuable, dangerous, or both — and no one else is willing to go in after it",
+     "where_hint": "Below the Warrens or within the Outer Wall — decayed infrastructure, sealed chambers, forgotten places",
+     "story_frame": "This is a delve story about what was left behind, what's survived down there, and what a crew is willing to risk for what's buried in the dark — themes of greed, danger, and the weight of history.",
+     "keywords": "dungeon,delve,abandoned,vault,warrens,underground,sealed",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "rift", "display_name": "Rift Clearance",
+     "who": "The Wardens, the Tower Authority, or a faction whose territory is being consumed — whoever is desperate enough to hire outsiders",
+     "what": "Enter the area affected by the Rift, clear or contain what's come through, and report on its current state",
+     "when_hint": "The Rift has grown for days — it is now too large to ignore and too dangerous for standard Warden response",
+     "why": "Standard forces have already failed or won't go in — this is a last resort",
+     "where_hint": "The Warrens or the Outer Wall ONLY — remote, industrial, or abandoned enough that a Rift went unnoticed until it became a crisis",
+     "story_frame": "This is a survival story about the thin line between the city and what lies beyond it, a tear in the world that shouldn't exist, and people who go in anyway — themes of horror, sacrifice, and the fragility of order.",
+     "keywords": "rift,clearance,anomaly,containment,tear",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "epic", "display_name": "Epic / Divine Mission",
+     "who": "A divine patron, the Tower Authority at its highest levels, or a faction whose very existence is at stake",
+     "what": "An act of city-scale consequence — a ritual that must be completed or stopped, a divine compact violated, a Tower floor gone silent",
+     "when_hint": "The crisis is already unfolding — every hour of delay makes it worse",
+     "why": "Normal channels have failed completely; the stakes are existential",
+     "where_hint": "The upper floors of the Tower, a site of divine significance, or anywhere the fabric of the city is at risk",
+     "story_frame": "This is an epic story about power at its absolute limit, divine or arcane forces bleeding into city life, and who is willing to act when everything is on the line — themes of sacrifice, destiny, and consequence.",
+     "keywords": "epic,divine,tower floor,god,city-scale,ritual",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You forced a city-scale resolution through violence. Everyone watching remembers it. Subtle operations and diplomatic missions stop coming. Whatever compact you broke through force may not be repairable."},
+    {"slug": "theft", "display_name": "Theft / Heist",
+     "who": "A faction or private patron who wants something that belongs to someone else — or a crew with a tip on a score",
+     "what": "Break in, take the target (object, documents, person, or information), and get out without being caught",
+     "when_hint": "A window of opportunity that will close — a guard rotation, a transfer, or an event that creates cover",
+     "why": "The target cannot be acquired through any legitimate means; someone with power has it locked away",
+     "where_hint": "A secured location — a vault, a guarded warehouse, a private compound, a faction strongroom",
+     "story_frame": "This is a heist story about a prize that's locked away, a crew that has to be better than the security protecting it, and the moment everything goes sideways — themes of planning, risk, greed, and improvisation.",
+     "keywords": "theft,heist,steal,break in,vault,rob,score",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "Word got out the job was loud. Next score comes with a lower cut — the fence doesn't trust you with delicate work anymore. The mark's faction now knows what you look like."},
+    {"slug": "heist", "display_name": "Heist",
+     "who": "A shady sponsor — Obsidian Lotus, Iron Fang Consortium, Iron Fang Syndicate, Glass Sigil, Argent Blades, Serpent Choir, or Brother Thane's Cult — with a score that needs deniable hands",
+     "what": "Acquire, swap, plant, copy, recover, or destroy a valuable target through planning, security bypass, controlled chaos, and escape",
+     "when_hint": "A public event, guard rhythm, transfer, train schedule, auction, gallery opening, or vault window gives the crew a chance",
+     "why": "The score cannot be bought cleanly and the sponsor cannot be seen reaching for it",
+     "where_hint": "A secured but public-facing site — bank, underground vault, museum, auction house, casino, archive, train, hotel, or private gallery",
+     "story_frame": "This is a caper story about casing the joint, moving the score, keeping heat manageable, and escaping before anyone can prove who did it — themes of style, pressure, greed, misdirection, and double-crosses.",
+     "keywords": "heist,robbery,rob,score,bank,vault,museum,auction,jewel,train,caper",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "The job still pays if the score lands, but loud crews get worse cuts, more heat, and fewer delicate invitations. The target owner starts watching the party."},
+    {"slug": "assassination", "display_name": "Assassination",
+     "who": "A faction, a patron, or a wronged party with both the motivation and resources to pay for a kill",
+     "what": "Locate and eliminate a specific target — cleanly, quietly, or with a deliberate message",
+     "when_hint": "The target is vulnerable now, or soon — delay loses the window entirely",
+     "why": "The target is too well-protected for a direct approach; precision and deniability are required",
+     "where_hint": "The target's own territory — wherever they feel safest, which is exactly the problem",
+     "story_frame": "This is a contract story about a target with powerful enemies, hired hands with a job to do, and the question of what it costs to take a life for money — themes of morality, precision, and consequence.",
+     "keywords": "assassination,assassinate,eliminate,kill,target,contract killing",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "rescue", "display_name": "Rescue Operation",
+     "who": "A desperate employer — a family, a faction, a partner — whose person is in someone else's hands",
+     "what": "Locate a captive and extract them safely from a faction holding cell, a criminal operation, or somewhere worse",
+     "when_hint": "Time is the enemy — the window before the captive is moved, harmed, or beyond reach is closing",
+     "why": "Official channels are impossible — they're compromised, too slow, or the captors are the officials",
+     "where_hint": "A location controlled by hostile forces — a rival faction's territory, a gang compound, a hidden site",
+     "story_frame": "This is a rescue story about someone in danger, a crew racing against the clock, and what it means to bring someone home — themes of loyalty, urgency, and the cost of leaving no one behind.",
+     "keywords": "rescue,captive,hostage,extract,save,prisoner",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "delivery", "display_name": "Courier / Delivery",
+     "who": "A faction, merchant, or private client with something that absolutely must arrive — intact and unexamined",
+     "what": "Transport a package, message, or cargo from one point to another without losing it, opening it, or being intercepted",
+     "when_hint": "The recipient is waiting — there is a specific handoff window that cannot slip",
+     "why": "The contents are too sensitive for normal channels; the route is known to be watched",
+     "where_hint": "Across district boundaries through territory where interception is likely",
+     "story_frame": "This is a courier story about cargo no one is supposed to know about, a route with eyes on it, and runners deciding how much they want to know about what they're carrying — themes of secrecy, trust, and the trouble that finds you anyway.",
+     "keywords": "delivery,courier,transport,package,cargo,message",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You fought your way through. The package arrived but word got out it existed. Someone else now knows what was being moved — and who moved it."},
+    {"slug": "bounty", "display_name": "Bounty Hunt",
+     "who": "A faction, Warden office, or private party with a target and a price on their head",
+     "what": "Track, locate, and bring in — alive or dead, as specified — a fugitive, deserter, or wanted criminal",
+     "when_hint": "The target has a head start but hasn't vanished completely — the trail is cold but not dead",
+     "why": "The Wardens are compromised, outmatched, or politically unable to pursue",
+     "where_hint": "Wherever the target has gone to ground — often the outer districts, the Warrens, or beyond the Wall",
+     "story_frame": "This is a manhunt story about a target who doesn't want to be found, trackers who have to think like their quarry, and the fine line between justice and hired violence — themes of pursuit, desperation, and what it means to be hunted.",
+     "keywords": "bounty,bounty hunt,track,fugitive,wanted,manhunt",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "espionage", "display_name": "Faction Espionage",
+     "who": "A faction that needs to know what its rivals are planning — or to plant something without being detected",
+     "what": "Infiltrate a rival faction's operation, steal intelligence, observe key meetings, or insert false information",
+     "when_hint": "A decision is being made or finalized — the intelligence is only valuable if it arrives in time",
+     "why": "The faction can't risk exposing its own operatives; deniable outside contractors are safer",
+     "where_hint": "Inside the rival faction's sphere — their offices, meeting rooms, warehouses, communication channels",
+     "story_frame": "This is a spy story about information as a weapon, deniable operatives inside enemy territory, and the paranoia that comes from not knowing who knows what — themes of deception, loyalty, and the cost of getting caught.",
+     "keywords": "espionage,spy,infiltrat,intelligence,observe,plant,mole",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You got the intel but left bodies. The faction that hired you wanted deniability — they'll pay but they'll hire someone else next time. The rival faction now knows an outside crew was used against them."},
+    {"slug": "sabotage", "display_name": "Sabotage",
+     "who": "A faction trying to hurt a rival's operations — economically, logistically, or politically",
+     "what": "Destroy or disable a key asset: a shipment, a machine, a supply line, or an operation's critical infrastructure",
+     "when_hint": "The target is at its most vulnerable — during a transfer, a major operation, or a moment of distraction",
+     "why": "The faction wants to hurt its rival without open conflict; sabotage provides deniability",
+     "where_hint": "The rival's operational territory — warehouses, work sites, transit points, key infrastructure",
+     "story_frame": "This is a sabotage story about a faction's point of weakness, the precise moment to strike it, and hired hands who have to get out before the damage is discovered — themes of disruption, deniability, and the collateral cost of faction war.",
+     "keywords": "sabotage,destroy,disable,disrupt,supply line,infrastructure",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You left a trail. The deniability the faction paid for is gone — they distance themselves from you publicly, and other factions won't use you for sensitive work. The target's faction knows it was a hired job."},
+    {"slug": "smuggling", "display_name": "Smuggling Run",
+     "who": "A black market operator, desperate merchant, or faction that needs goods to move outside official channels",
+     "what": "Move contraband through Warden-controlled territory — forbidden goods, unregistered magic, illegal weapons, restricted substances",
+     "when_hint": "A shipment is ready, a contact is waiting, and the inspection cordon is about to tighten",
+     "why": "The cargo is illegal, taxed into impossibility, or politically toxic — legitimate channels aren't available",
+     "where_hint": "Checkpoints, patrol routes, and the spaces between — places the law thinks nothing can move through",
+     "story_frame": "This is a smuggling story about contraband powerful people want moved, corridors the law thinks it controls, and the fine art of being somewhere you're not supposed to be — themes of risk, profit, and the economics of the underground.",
+     "keywords": "smuggl,contraband,black market,illegal,forbidden",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "The cargo got moved but the route is burned. The black market contact won't use you for quiet work again — you're too loud, too flagged. Warden attention on the area increases."},
+    {"slug": "political", "display_name": "Political Intrigue",
+     "who": "A faction official, a candidate for power, or a patron who plays the long game",
+     "what": "Gather compromising information, broker an arrangement, discredit a rival, or protect a political asset",
+     "when_hint": "A vote is coming, a position is being contested, or an alliance is forming — timing is everything",
+     "why": "Faction politics require deniability; the principals cannot be seen handling this themselves",
+     "where_hint": "The corridors of faction power — council rooms, private dinners, the events where decisions actually get made",
+     "story_frame": "This is a political story about power disguised as procedure, deals made in back rooms, and hired hands who know too much to be fully trusted — themes of ambition, compromise, and the machinery of control.",
+     "keywords": "political,politics,council,election,alliance,blackmail,discredit",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You solved it with violence. The council seat is secured but your patron's opponents know they can't trust the arrangement. Politics gets harder — your patron's leverage weakens, and the party becomes known as muscle, not strategy."},
+    {"slug": "recovery", "display_name": "Recovery",
+     "who": "A faction, guild, civic office, family, pet owner, scholar, or patron who lost a non-person target and needs it returned",
+     "what": "Recover evidence, relics, lost expedition gear, memory or identity packets, data records, misplaced cargo, or missing pets — not living-person extraction",
+     "when_hint": "The window is closing because the target is being moved, sold, altered, destroyed, misfiled, eaten, or claimed by someone else",
+     "why": "The target has practical, legal, emotional, archival, sacred, or contractual value; payment is for return to the sponsor",
+     "where_hint": "Wherever the target ended up — archives, alleys, warehouses, rooftops, vaults, markets, changed rooms, cargo depots, or failed expedition sites",
+     "story_frame": "This is a recovery story about finding the thing, proving it is the right thing, learning what happened to it, and getting it back under strict contract terms — themes of custody, loss, evidence, sentimental value, and the price of return.",
+     "keywords": "recovery,relic,artifact,retrieve,stolen,recover,evidence,lost gear,memory,identity,data,record,misdelivered,misplaced cargo,missing pet,lost pet",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "strange-occurrences", "display_name": "Strange Occurrences",
+     "who": "Usually the coroner's office, death registry, morgue, cemetery authority, or a frightened civic contact — rarely a sketchy faction trying to keep the weird quiet",
+     "what": "Handle a civic weird case: returned dead, ghosts, revenants, doppelgangers, haunted records, memory bleed, Tower glitches, or something everyone is misreading",
+     "when_hint": "The report is fresh and getting stranger by the hour; witnesses, records, and public rumor are already disagreeing",
+     "why": "Someone has to learn whether this is a threat, victim, witness, guardian, scam, or faction play before panic turns it into violence",
+     "where_hint": "Morgues, graveyards, family homes, death registry offices, alleys, shrines, markets, or anywhere ordinary life has started contradicting itself",
+     "story_frame": "This is a strange civic case about the city deciding what counts as dead, alive, copied, haunted, guilty, or protected — themes of identity, grief, paperwork, fear, and choosing the right answer over the paid answer.",
+     "keywords": "strange occurrence,strange occurrences,returned dead,ghost,revenant,doppelganger,doppleganger,haunting,graveyard,coroner,morgue,impostor,duplicate,memory bleed,tower glitch",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You treated the weird thing as a monster before proving it was one. The coroner's office, families, and vulnerable witnesses remember. Payment may vanish even if the scene is quiet."},
+    {"slug": "protection", "display_name": "Protection Detail",
+     "who": "A vulnerable principal who has made enemies — a merchant, a witness, a dissident, or a faction asset that cannot be hidden",
+     "what": "Maintain active security for a person or location over a defined period — sustained protection, not a single journey",
+     "when_hint": "A threat has been identified; attacks are expected; the principal cannot go underground",
+     "why": "The principal's visibility is necessary — they can't hide, so they need guards who can keep them alive",
+     "where_hint": "The principal's regular environment — their home, their workplace, the events they cannot avoid attending",
+     "story_frame": "This is a bodyguard story about a principal with enemies, hired security that has to stay sharp, and the moment a threat becomes real — themes of vigilance, loyalty, and what it costs to keep someone alive.",
+     "keywords": "protection,protect,guard,bodyguard,security,detail",
+     "combat_posture": "PERMITTED",
+     "combat_rep_cost": ""},
+    {"slug": "battle", "display_name": "Battle",
+     "who": "A faction, Warden unit, or desperate employer who needs fighters — not investigators",
+     "what": "Engage a known enemy force directly: clear a position, break a siege, destroy a supply cache, or end a standoff through force",
+     "when_hint": "The fight is imminent or already begun — there is no time for subtlety",
+     "why": "The threat is armed, organised, and too large for the faction's own forces to handle alone",
+     "where_hint": "A contested location — a district border, an occupied building, a critical chokepoint the enemy holds",
+     "story_frame": "This is a combat story about a force that has to be broken, the cost of taking a defended position, and whether the hired crew is still standing when the dust settles — themes of courage, violence, and the ugly arithmetic of war.",
+     "keywords": "battle,combat,fight,assault,attack,engage,clear,break,destroy",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "assault", "display_name": "Assault",
+     "who": "A faction that needs a fixed position taken and gives the party faction-appropriate troops to lead",
+     "what": "Lead one offensive push against a defended position, manage friendly morale, break defender morale, reach the objective, or neutralize the commander",
+     "when_hint": "The assault window is open now — delay lets defenders reinforce, relocate, or harden the position",
+     "why": "The sponsor cannot take the position without outside leadership and the defenders have home-field advantage",
+     "where_hint": "A fixed position: gate, stronghold, checkpoint, warehouse, office, shrine, vault, safehouse, plaza, or defended building",
+     "story_frame": "This is an offensive command story about leading people into danger, keeping them from breaking, and deciding whether to keep fighting when the faction force fails — themes of morale, pressure, leadership, and the cost of taking ground.",
+     "keywords": "assault,attack,storm,breach,seize,capture,offensive,take position",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "infestation", "display_name": "Infestation",
+     "who": "A faction, district contact, owner, or desperate local group with a place overrun by things that should not be nesting there",
+     "what": "Identify, contain, clear, burn out, relocate, or seal an infestation before it spreads through a site or district",
+     "when_hint": "The problem is spreading — eggs hatch, tunnels open, vermin migrate, rift-things multiply, or civilians start disappearing",
+     "why": "Ordinary cleanup failed, the source is dangerous, and waiting lets the infestation claim more ground",
+     "where_hint": "A contained but worsening site: cellar, sewer, warehouse, tenement, shrine crawlspace, market basement, tunnel, clinic, or sealed ruin",
+     "story_frame": "This is a containment story about something multiplying in the dark, the source that keeps feeding it, and the difference between clearing symptoms and ending the nest — themes of disgust, urgency, containment, and collateral risk.",
+     "keywords": "infestation,infested,nest,swarm,vermin,eggs,hive,plague,spawn",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "ambush", "display_name": "Ambush",
+     "who": "A faction or desperate employer who needs a specific target stopped — or a crew that walked into something they didn't expect",
+     "what": "Either set and spring a trap against a moving target, or respond to an ambush that has already been triggered",
+     "when_hint": "Timing is everything — the target moves on a specific route, at a specific time, and the window is narrow",
+     "why": "A direct confrontation is impossible; the target is too dangerous or too well-guarded except in transit",
+     "where_hint": "A chokepoint — an alley, a bridge, a market crossing, a loading dock — somewhere that boxes a target in",
+     "story_frame": "This is a tactical story about controlling the ground before the fight, the moment a plan meets reality, and who survives when a trap snaps shut — themes of preparation, surprise, and the chaos when everything goes wrong.",
+     "keywords": "ambush,trap,intercept,waylay,chokepoint,transit",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "negotiation", "display_name": "Negotiation",
+     "who": "A faction that needs an agreement — or a desperate party trying to stop a conflict before it starts",
+     "what": "Broker a deal, secure a ceasefire, extract a concession, or represent one side in a high-stakes arrangement that cannot fail",
+     "when_hint": "Both parties are at the table — or about to be — and the window for a deal is closing fast",
+     "why": "The alternative to agreement is violence, and the people paying for this negotiation cannot afford what comes next",
+     "where_hint": "A neutral space, or one side's territory if trust is already broken — a meeting room, a restaurant, a faction hall",
+     "story_frame": "This is a social story about competing interests, what each side is willing to give up, and the fine art of making both parties feel like they won something — themes of diplomacy, leverage, and the thin line between a deal and a disaster.",
+     "keywords": "negotiation,negotiate,broker,ceasefire,agreement,deal,mediation,diplomacy",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You used force at the table. The deal got done — maybe — but both factions now know you're muscle, not a mediator. Negotiation jobs dry up. Combat jobs start appearing in their place."},
+    {"slug": "first-contact", "display_name": "First Contact",
+     "who": "A newly arrived people, scout group, refugee pocket, envoy, or community recycled into the Tower from somewhere that has never seen it",
+     "what": "Prevent panic, establish communication, teach the basics of the Tower, protect them from exploitation, and learn what they need before factions close in",
+     "when_hint": "The first hours matter — fear, rumor, TNN coverage, or faction curiosity can turn confusion into disaster",
+     "why": "They do not understand EC, Kharma, factions, adventurers, the Dome, or why everyone wants to claim their story",
+     "where_hint": "A new generated area, rift-replaced street, gate exit, Warrens pocket, shelter, or social venue if contact has already moved somewhere safe",
+     "story_frame": "This is a first-contact story about culture shock, protection, language, and the responsibility of being the first people to explain the Tower to someone who never asked to arrive — themes of empathy, fear, teaching, and exploitation.",
+     "keywords": "first contact,tower contact,new arrivals,new race,unknown people,refugees,recycled world",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "You turned first contact into violence. The new arrivals learn fear before trust, and every faction now frames the party as part of the threat."},
+    {"slug": "exploration", "display_name": "Exploration",
+     "who": "A faction, Warden contact, map office, scholar, survivor group, or neighborhood that needs an area understood before anyone else walks into it",
+     "what": "Map, survey, mark gates/exits, verify stability, recover signs of what was lost, and report what the Tower replaced it with",
+     "when_hint": "A rift collapse, sewer shift, gate opening, forgotten area, or newly generated district feature has made old maps unreliable",
+     "why": "The Tower's recycling function has changed the city; the old place may now be historical, replaced, or unsafe for normal mission targeting",
+     "where_hint": "Warrens sectors, shifted sewers, gate mouths, forgotten areas, rift-collapsed replacement zones, and newly generated places from the area system",
+     "story_frame": "This is an exploration story about a city that rewrites itself, the people trying to map the rewrite, and what happens when the new terrain looks back — themes of curiosity, danger, memory, and survival.",
+     "keywords": "exploration,explore,map,survey,unmapped,sealed,unknown,venture,warrens,sewer,gate,rift collapse,replaced",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You made enough noise that whatever was in there knows someone found it. The area is now alert. Future exploration jobs into unmapped zones come with a warning attached to your name."},
+    {"slug": "discovery", "display_name": "Discovery",
+     "who": "Someone who found something they don't fully understand — a faction, local, scholar, survivor, or terrified witness who needs it identified before people panic",
+     "what": "Identify, contain, test, transport, decide custody, and understand the implication of an object, anomaly, signal, biology, memory, machine, or impossible material",
+     "when_hint": "The discovery is fresh — before anyone else hears about it, before the faction that would claim it arrives",
+     "why": "The finder lacks the expertise, nerve, containment tools, or political protection to handle it alone",
+     "where_hint": "Where the find was made — a shop backroom, construction site, cracked-open vault, replacement zone, generated area, lab, shrine, or sewer pocket",
+     "story_frame": "This is a discovery story about something that should not exist yet does, the factions racing to name or own it, and whether the truth should be preserved, hidden, returned, or destroyed — themes of knowledge, custody, wonder, and public risk.",
+     "keywords": "discovery,discover,found,anomaly,phenomenon,artifact,unknown,identify,contain,signal,specimen",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You were loud enough that word got out something was found. Now everyone wants to know what it was. The finder is compromised. Quiet discovery work stops coming your way."},
+    {"slug": "defense", "display_name": "Defense",
+     "who": "A faction, merchant, or community that cannot abandon a position — and needs fighters to hold it",
+     "what": "Hold a location against incoming threat — a building, a district boundary, a safe house, a route — and keep it standing when the attack ends",
+     "when_hint": "The attack is expected and coming — the question is when, not if",
+     "why": "The location cannot be evacuated, abandoned, or surrendered — something or someone inside is worth dying for",
+     "where_hint": "The site itself — a building with fortifiable entries, a narrow street, a roof, a room with one door",
+     "story_frame": "This is a siege story about a position that must not fall, a force coming to take it, and defenders who have to be smarter than the numbers — themes of sacrifice, fortitude, and what it means to hold the line.",
+     "keywords": "defense,defend,hold,protect location,siege,fortify,stand",
+     "combat_posture": "EXPECTED",
+     "combat_rep_cost": ""},
+    {"slug": "puzzle", "display_name": "Puzzle",
+     "who": "Someone who needs a problem solved that can't be answered with a sword — a scholar, an official, a faction with a locked mechanism",
+     "what": "Decode a cipher, bypass an arcane lock, reconstruct a broken sequence, or solve a logical trap that stands between the party and the objective",
+     "when_hint": "Usually long-standing, not artificially urgent — the party may take the time they need, but the world keeps turning while they work",
+     "why": "The answer exists but is hidden behind fair clues, research, symbols, history, art, faith, language, or mechanism logic — no cheap gotcha wording",
+     "where_hint": "A specific puzzle source — ancient ruin, sealed shrine, locked mechanism, archive, public mural, scattered graffiti sequence, or hard-to-read art piece",
+     "story_frame": "This is a puzzle story about a hard problem that scholars, patrons, or factions cannot crack alone, research that takes time, and the prestige of solving what has resisted everyone else — themes of patience, recognition, buried truths, and the satisfaction of a fair answer.",
+     "keywords": "puzzle,cipher,decode,lock,mechanism,arcane,logic,solve,shrine,graffiti,mural,sequence,art",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "Smashing through the mechanism costs extra time and voids the elegant solution. The patron pays less. The mechanism's secrets may be lost. Puzzle-based contracts stop coming — you're flagged as 'breaks things'."},
+    {"slug": "gathering", "display_name": "Gathering",
+     "who": "A faction, a merchant, or a researcher who needs materials, information, or witnesses — and can't collect them alone",
+     "what": "Acquire a specific set of items, testimonies, ingredients, or data points from multiple scattered sources and bring them back intact",
+     "when_hint": "The components are available now — but they won't be for long; sources are moving, drying up, or being claimed by others",
+     "why": "The required items are spread across dangerous or contested territory; collecting them all requires persistence and protection",
+     "where_hint": "Multiple locations across the city — markets, faction holdings, independent contacts, locations only the party can access",
+     "story_frame": "This is a logistics story about what it takes to get all the pieces in one place, who doesn't want that to happen, and the complications that emerge between the first collection and the last — themes of persistence, resource management, and the cost of acquisition.",
+     "keywords": "gathering,gather,collect,acquire,harvest,retrieve,materials,components,sources",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You burned a source. One of the contacts you needed won't deal with hired crews anymore — and their network hears about it. Gathering contracts dry up as word spreads you can't be subtle."},
+    {"slug": "infiltration", "display_name": "Infiltration",
+     "who": "A faction that needs to know what its rivals are planning — or needs to insert something without being detected",
+     "what": "Enter a rival faction's operation under false pretense — observe, steal intelligence, plant evidence, or make contact with a hidden asset",
+     "when_hint": "A decision is being made or finalized — the intelligence is only valuable if it arrives in time",
+     "why": "The faction can't risk exposing its own operatives; deniable outside contractors are safer and more expendable",
+     "where_hint": "Inside the rival faction's sphere — their offices, meeting rooms, warehouses, communication channels",
+     "story_frame": "This is a spy story about information as a weapon, maintaining cover under pressure, and the paranoia that comes from not knowing who knows what — themes of deception, loyalty, and the cost of getting caught.",
+     "keywords": "infiltration,infiltrate,spy,espionage,intelligence,observe,plant,undercover,false identity",
+     "combat_posture": "CONSEQUENCE",
+     "combat_rep_cost": "Your cover is blown. The job might still get done but everyone in that faction now has your face. You lose the quiet option — and every future infiltration job costs more, because the veil is thinner."},
+    {"slug": "strange-occurrences", "display_name": "Strange Occurrences",
+     "who": "A witness, a grieving faction contact, or a terrified community reporting something the Wardens refuse to log: a dead person is walking around again — and it isn't right",
+     "what": "Track and deal with a dead NPC who has returned — either as a doppelganger wearing their face, or as an undead form still carrying their memories. The return was not a legitimate resurrection.",
+     "when_hint": "Sightings started recently — the entity is newly active, still finding its footing, and has not yet gone fully dark",
+     "why": "The Wardens don't believe the reports, or do and are covering it up. Someone who knew the original needs it handled quietly before it does more damage",
+     "where_hint": "The returned entity gravitates to places the original person cared about — their faction hall, their home district, someone they loved or wronged",
+     "story_frame": "This is a horror-adjacent story about something wearing a familiar face, the grief of people who knew the original, and the question of how much of the person survived the process — themes of identity, loss, the wrongness of return, and who gets to decide what happens to what came back.",
+     "keywords": "strange,occurrences,doppelganger,undead,returned,dead,wrong,face,impostor,reanimated",
+     "combat_posture": "RISKY",
+     "combat_rep_cost": "You drew attention to something the Wardens were pretending didn't exist. Whatever was watching now knows someone is looking. The situation escalates — and you're attached to it."},
+]
+
+_templates_initialized = False
+
+
+def _init_mission_type_templates() -> None:
+    """Create mission_type_templates table and seed it if empty."""
+    global _templates_initialized
+    if _templates_initialized:
+        return
+    _templates_initialized = True
+    try:
+        raw_execute("""
+            CREATE TABLE IF NOT EXISTS mission_type_templates (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                slug VARCHAR(64) UNIQUE NOT NULL,
+                display_name VARCHAR(128) NOT NULL,
+                who TEXT NOT NULL,
+                what TEXT NOT NULL,
+                when_hint TEXT NOT NULL,
+                why TEXT NOT NULL,
+                where_hint TEXT NOT NULL,
+                story_frame TEXT NOT NULL,
+                keywords VARCHAR(512) DEFAULT '',
+                combat_posture VARCHAR(16) DEFAULT 'PERMITTED',
+                combat_rep_cost TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        # Add columns if table already existed without them (migration)
+        for col, defn in [
+            ("combat_posture", "VARCHAR(16) DEFAULT 'PERMITTED'"),
+            ("combat_rep_cost", "TEXT"),
+        ]:
+            try:
+                exists = raw_query("SHOW COLUMNS FROM mission_type_templates LIKE %s", (col,))
+                if not exists:
+                    raw_execute(f"ALTER TABLE mission_type_templates ADD COLUMN {col} {defn}")
+            except Exception:
+                pass  # column already exists
+
+        for t in _MISSION_TYPE_TEMPLATES:
+            raw_execute(
+                "INSERT INTO mission_type_templates "
+                "(slug, display_name, who, what, when_hint, why, where_hint, story_frame, keywords, combat_posture, combat_rep_cost) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                "ON DUPLICATE KEY UPDATE "
+                "display_name=VALUES(display_name), who=VALUES(who), what=VALUES(what), "
+                "when_hint=VALUES(when_hint), why=VALUES(why), where_hint=VALUES(where_hint), "
+                "story_frame=VALUES(story_frame), keywords=VALUES(keywords), "
+                "combat_posture=VALUES(combat_posture), combat_rep_cost=VALUES(combat_rep_cost)",
+                (t["slug"], t["display_name"], t["who"], t["what"],
+                 t["when_hint"], t["why"], t["where_hint"], t["story_frame"], t["keywords"],
+                 t.get("combat_posture", "PERMITTED"), t.get("combat_rep_cost", "")),
+            )
+        logger.info(f"📋 Mission type templates synced ({len(_MISSION_TYPE_TEMPLATES)} types)")
+    except Exception as e:
+        logger.warning(f"mission_type_templates init failed: {e}")
+
+
+def _load_mission_type_template(slug: str) -> Optional[dict]:
+    """Load a narrative template from DB by slug."""
+    try:
+        rows = raw_query(
+            "SELECT * FROM mission_type_templates WHERE slug = %s LIMIT 1", (slug,)
+        )
+        return rows[0] if rows else None
+    except Exception:
+        return None
+
+
+def _match_template_slug(mission_type_string: str) -> str:
+    """Map a mission type name to the nearest template slug."""
+    s = mission_type_string.lower().strip()
+    checks = [
+        # Exact new type names first
+        ("strange-occurrences", ["strange occurrences", "strange occurrence", "doppelganger", "undead return"]),
+        ("battle",        ["battle"]),
+        ("ambush",        ["ambush"]),
+        ("negotiation",   ["negotiation", "negotiate"]),
+        ("first-contact", ["first contact", "tower contact", "new arrivals", "new race", "unknown race"]),
+        ("exploration",   ["exploration", "explore"]),
+        ("discovery",     ["discovery", "discover"]),
+        ("defense",       ["defense", "defence"]),
+        ("puzzle",        ["puzzle"]),
+        ("gathering",     ["gathering", "gather"]),
+        ("infiltration",  ["infiltration", "infiltrate", "espionage", "spy", "undercover"]),
+        ("assault",       ["assault", "attack", "storm", "breach", "seize", "capture position"]),
+        ("infestation",   ["infestation", "infested", "nest", "swarm", "vermin", "hive"]),
+        ("heist",         ["heist", "robbery", "bank job", "vault heist", "museum heist", "score"]),
+        # Existing types
+        ("rift",          ["rift"]),
+        ("epic",          ["epic", "divine", "tower floor", "city-scale"]),
+        ("dungeon",       ["dungeon", "delve", "sealed vault", "abandoned structure"]),
+        ("assassination", ["assassination", "assassinate", "eliminate"]),
+        ("theft",         ["theft", "steal", "break in"]),
+        ("rescue",        ["rescue", "captive", "hostage", "extract"]),
+        ("sabotage",      ["sabotage", "destroy", "disable"]),
+        ("smuggling",     ["smuggl", "contraband", "black market"]),
+        ("bounty",        ["bounty", "fugitive", "wanted", "manhunt"]),
+        ("delivery",      ["delivery", "courier", "transport", "package"]),
+        ("recovery",      ["recovery", "relic retrieval", "artifact", "relic recover"]),
+        ("political",     ["political", "blackmail", "council", "election"]),
+        ("protection",    ["protection detail", "bodyguard", "protection"]),
+        ("inter-guild",   ["inter-guild", "guild conflict", "mediate"]),
+        ("investigation", ["investigation", "investigate", "missing person", "corruption", "unexplained"]),
+        ("escort",        ["escort", "convoy"]),
+        ("patrol",        ["patrol", "district sweep", "warden-adjacent"]),
+        ("neighbourhood", ["neighbourhood", "neighborhood", "local", "street-level", "debt collection"]),
+    ]
+    for slug, keywords in checks:
+        if any(kw in s for kw in keywords):
+            return slug
+    return "neighbourhood"
+
+
+_POSTURE_RULES = {
+    "EXPECTED": (
+        "COMBAT POSTURE — EXPECTED: Violence is the point. "
+        "This is a combat job. Terrain, tactics, and force of arms are the primary tools. "
+        "Make the fight feel earned — describe the ground, the odds, the moment it tips."
+    ),
+    "PERMITTED": (
+        "COMBAT POSTURE — PERMITTED: Combat is acceptable but not required. "
+        "Skills and finesse are preferred. Force gets the job done with no reputation cost. "
+        "Write the posting so both paths feel viable."
+    ),
+    "RISKY": (
+        "COMBAT POSTURE — RISKY: Violence carries a reputation cost. "
+        "Going loud gets the job done but word gets around. "
+        "The posting should make clear that subtlety pays better — hint at what discretion is worth."
+    ),
+    "CONSEQUENCE": (
+        "COMBAT POSTURE — CONSEQUENCE: Violence is a last resort that changes the story. "
+        "The primary path is non-combat. Make the quiet approach obvious and rewarding. "
+        "If violence happens anyway — it works, but the named reputation cost follows."
+    ),
+}
+
+
+def _build_template_block(mission_type_string: str) -> str:
+    """Return a narrative framework + combat posture block for injection into a mission prompt."""
+    _init_mission_type_templates()
+    slug = _match_template_slug(mission_type_string)
+    tmpl = _load_mission_type_template(slug)
+    if not tmpl:
+        return ""
+
+    posture = (tmpl.get("combat_posture") or "PERMITTED").upper()
+    rep_cost = tmpl.get("combat_rep_cost") or ""
+    posture_line = _POSTURE_RULES.get(posture, _POSTURE_RULES["PERMITTED"])
+    if rep_cost:
+        posture_line += f"\n  REP COST IF VIOLENT: {rep_cost}"
+
+    return (
+        f"\nNARRATIVE FRAMEWORK — use this as a skeleton, invent all the specifics yourself:\n"
+        f"  Who:   {tmpl['who']}\n"
+        f"  What:  {tmpl['what']}\n"
+        f"  When:  {tmpl['when_hint']}\n"
+        f"  Why:   {tmpl['why']}\n"
+        f"  Where: {tmpl['where_hint']}\n"
+        f"  Story: {tmpl['story_frame']}\n\n"
+        f"{posture_line}"
+    )
+
 
 # ---------------------------------------------------------------------------
 # Dynamic mission type generation (runs daily)
@@ -529,45 +1586,447 @@ RULES:
     logger.info(f"📋 Generated {len(new_types)} new mission types for {today}")
 
 
-def _build_mission_prompt(recent_missions: List[dict]) -> str:
+def _build_npc_context() -> str:
+    """Pull active NPCs from DB with rich detail — motivation, hidden allegiances, and role text.
+
+    Always seeds one NPC from Wizards Tower and one from Brother Thane's Cult so those
+    factions surface regularly in mission generation even though their rosters are smaller.
+    """
+    try:
+        # Seed slots: 1 Wizards Tower, 1 Brother Thane's Cult, 6 random from the rest
+        seeded = raw_query(
+            "SELECT name, faction, role, location, status, motivation FROM npcs "
+            "WHERE status NOT IN ('dead', 'missing', 'removed') "
+            "AND faction IN ('Wizards Tower', \"Brother Thane's Cult\") "
+            "ORDER BY RAND() LIMIT 2"
+        ) or []
+        seeded_names = tuple(r["name"] for r in seeded) or ("__none__",)
+        placeholders = ",".join(["%s"] * len(seeded_names))
+        rest = raw_query(
+            f"SELECT name, faction, role, location, status, motivation FROM npcs "
+            f"WHERE status NOT IN ('dead', 'missing', 'removed') "
+            f"AND name NOT IN ({placeholders}) "
+            f"ORDER BY RAND() LIMIT 6",
+            seeded_names,
+        ) or []
+        rows = seeded + rest
+        if not rows:
+            return ""
+        lines = ["ACTIVE NPCS — pick ONE as contact or antagonist. Give them the role description below as their voice:"]
+        for r in rows:
+            name       = r["name"]
+            faction    = r.get("faction") or "Independent"
+            role_raw   = (r.get("role") or "")[:200]
+            location   = (r.get("location") or "")[:120]
+            motivation = (r.get("motivation") or "")[:100]
+
+            # Extract hidden allegiance hints from role text ("secretly X")
+            import re as _re
+            secret_match = _re.search(r'secret(?:ly)?\s+([^\;\.\,\)]{5,60})', role_raw, _re.IGNORECASE)
+            secret_hint = secret_match.group(0).strip() if secret_match else ""
+
+            entry = f"• {name} ({faction})"
+            if location:
+                entry += f"\n  Location: {location}"
+            if role_raw:
+                # Trim to the meaningful part — first sentence
+                role_short = role_raw.split(".")[0].strip()[:150]
+                entry += f"\n  Role: {role_short}"
+            if secret_hint:
+                entry += f"\n  Hidden: {secret_hint}"
+            if motivation:
+                entry += f"\n  Wants: {motivation}"
+            lines.append(entry)
+        return "\n".join(lines)
+    except Exception:
+        return ""
+
+
+def _load_strange_npc() -> str:
+    """Pull a doppelganger or undead NPC from DB for Strange Occurrences missions."""
+    try:
+        rows = raw_query(
+            "SELECT name, faction, role, location FROM npcs "
+            "WHERE status IN ('doppelganger', 'undead', 'returned') "
+            "ORDER BY RAND() LIMIT 1"
+        ) or []
+        if rows:
+            r = rows[0]
+            return (
+                f"\nSTRANGE OCCURRENCES SUBJECT — this NPC has returned in altered form:\n"
+                f"• {r['name']} — {r.get('role','')} ({r.get('faction','')}) — last known location: {r.get('location','unknown')}\n"
+                f"Build the mission around THIS specific NPC. They are the anomaly."
+            )
+    except Exception:
+        pass
+    # Fallback: pick any dead NPC
+    try:
+        rows = raw_query(
+            "SELECT name, faction, role, location FROM npcs "
+            "WHERE status = 'dead' ORDER BY RAND() LIMIT 1"
+        ) or []
+        if rows:
+            r = rows[0]
+            return (
+                f"\nSTRANGE OCCURRENCES SUBJECT — this NPC was confirmed dead but has been sighted:\n"
+                f"• {r['name']} — {r.get('role','')} ({r.get('faction','')}) — last known location: {r.get('location','unknown')}\n"
+                f"Build the mission around THIS specific NPC."
+            )
+    except Exception:
+        pass
+    return ""
+
+
+def _load_area_context_block() -> str:
+    """Pull 1-2 random district profiles from DB and format as mission setting lore."""
+    try:
+        from src.area_generator import get_all_district_names, get_area_profile
+        districts = get_all_district_names()
+        if not districts:
+            return ""
+        sampled = random.sample(districts, min(2, len(districts)))
+        lines = ["\nKNOWN AREA PROFILES (use these to ground your mission's setting):"]
+        for dist in sampled:
+            p = get_area_profile(dist)
+            if not p:
+                continue
+            atm = p.get("atmosphere", "")[:200]
+            threats = p.get("active_threats", [])[:2]
+            hooks = p.get("dm_hooks", [])[:2]
+            threat_str = "; ".join(threats)
+            hook_str = "; ".join(hooks)
+            lines.append(
+                f"\n[{dist}]\n"
+                f"  Atmosphere: {atm}\n"
+                + (f"  Active threats: {threat_str}\n" if threat_str else "")
+                + (f"  Open hooks: {hook_str}\n" if hook_str else "")
+                + "  If you set your mission here, introduce something NEW — don't repeat what's already listed."
+            )
+        return "\n".join(lines) if len(lines) > 1 else ""
+    except Exception:
+        return ""
+
+
+_ROTATION_FACTIONS = [
+    "Iron Fang Consortium",
+    "Iron Fang Syndicate",
+    "Argent Blades",
+    "Wardens of Ash",
+    "Serpent Choir",
+    "Obsidian Lotus",
+    "Glass Sigil",
+    "Patchwork Saints",
+    "Adventurers Guild",
+    "Guild of Ashen Scrolls",
+    "Tower Authority / FTA",
+    "Wizards Tower",
+]
+
+
+def _normalise_rotation_faction(faction: str) -> str:
+    """Normalize generated faction labels so rotation counts stay honest."""
+    clean = re.sub(r"^[\[\(]\s*|\s*[\]\)]$", "", (faction or "").strip())
+    aliases = {
+        "Tower Authority": "Tower Authority / FTA",
+        "FTA": "Tower Authority / FTA",
+        "Tower Authority/FTA": "Tower Authority / FTA",
+        "Ashen Scrolls": "Guild of Ashen Scrolls",
+    }
+    return aliases.get(clean, clean)
+
+
+def _pick_rotation_faction(recent_missions: List[dict]) -> str:
+    """
+    Pick which faction should post the next autonomous mission.
+
+    Counts faction appearances in the last 80 missions, excludes the two most
+    recent posters, then picks randomly from the bottom third by count.
+    This guarantees rotation without being perfectly round-robin.
+    """
+    recent_factions = []
+    for m in recent_missions[-80:]:
+        f = _normalise_rotation_faction(m.get("faction") or "")
+        if f in _ROTATION_FACTIONS:
+            recent_factions.append(f)
+
+    counts = {f: 0 for f in _ROTATION_FACTIONS}
+    for f in recent_factions:
+        counts[f] += 1
+
+    # Never repeat the last 2 factions immediately
+    last_two = set(recent_factions[-2:]) if len(recent_factions) >= 2 else set()
+    candidates = [(f, c) for f, c in counts.items() if f not in last_two]
+    if not candidates:
+        candidates = list(counts.items())
+
+    # Sort by count ascending; pick randomly from the bottom third
+    candidates.sort(key=lambda x: x[1])
+    bottom_n = max(1, len(candidates) // 3)
+    return random.choice(candidates[:bottom_n])[0]
+
+
+def _dt_from_iso(value: object) -> Optional[datetime]:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except Exception:
+        return None
+
+
+def _active_public_health_arcs() -> List[dict]:
+    raw = get_global_state(PUBLIC_HEALTH_ARC_STATE_KEY)
+    if isinstance(raw, dict):
+        arcs = raw.get("arcs", [])
+    elif isinstance(raw, list):
+        arcs = raw
+    else:
+        arcs = []
+
+    now = datetime.utcnow()
+    active = []
+    for arc in arcs:
+        if not isinstance(arc, dict):
+            continue
+        expires = _dt_from_iso(arc.get("expires_at"))
+        if not expires or expires >= now:
+            active.append(arc)
+    return active
+
+
+def _public_health_mission_context() -> tuple[str, Optional[dict], bool]:
+    arcs = _active_public_health_arcs()
+    if not arcs:
+        return "", None, False
+
+    arc = random.choice(arcs[:3])
+    urgent = random.random() < 0.45
+    districts = ", ".join(arc.get("affected_districts") or ["the lower city"])
+    populace = ", ".join((arc.get("affected_populace") or ["sick families", "clinic volunteers"])[:4])
+    care_factions = ", ".join((arc.get("care_factions") or PUBLIC_HEALTH_MISSION_FACTIONS)[:5])
+    pressures = "; ".join((arc.get("mission_pressure") or [])[:5])
+    mode = "STRONG MISSION PRESSURE" if urgent else "BACKGROUND MISSION PRESSURE"
+
+    block = f"""
+ONGOING PUBLIC-HEALTH ARC ({mode}):
+- Crisis: {arc.get('name', 'public-health outbreak')} in {districts}.
+- Affected clients: {populace}; postings may come from ordinary residents, exhausted clinics, families, or care factions.
+- Care factions: {care_factions}.
+- Useful mission frames: {pressures or 'sample recovery, clinic defense, quarantine escort, supply runs, investigation of failed cures'}.
+- Magic-resistant rule: ordinary curatives and healing magic are unreliable here. Do not resolve the crisis with a simple spell.
+"""
+    if urgent:
+        block += (
+            "For this generation, strongly consider making the contract a response to this outbreak. "
+            "It can still use the selected mission type, but the client pressure should come from the affected populace or a faction that cares. "
+            "If a formal faction is required, have that faction file the posting on behalf of residents, clinics, or caretakers.\n"
+        )
+
+    raw_phs = get_global_state(PUBLIC_HEALTH_ARC_STATE_KEY)
+    false_cures = raw_phs.get("false_cures", []) if isinstance(raw_phs, dict) else []
+    if false_cures:
+        fc = false_cures[0]
+        block += (
+            f"- Snake-oil cure in play (PLOT LEAD): {fc.get('name', 'a fake cure')} is being sold as a cure but is a fraud "
+            f"({fc.get('truth', 'it does not work')}). Do NOT treat it as a real remedy. "
+            f"Strong contract hook: {fc.get('lead', 'expose the people profiting from the fake cure.')}\n"
+        )
+
+    return block, arc, urgent
+
+def _board_anchors_block() -> str:
+    """Real specific places + items so board missions are built around actual
+    Undercity venues and real loot, not invented filler ('the Plow', 'the Hound',
+    'Feathers', 'the Axe'). NPCs and factions are already supplied by
+    _build_npc_context / rep_summary_block, so this adds only the missing anchors."""
+    lines: List[str] = []
+    try:
+        places = raw_query("SELECT name, district FROM gazetteer_places ORDER BY RAND() LIMIT 6") or []
+        if places:
+            lines.append(
+                "REAL NAMED PLACES (set the mission at a specific one -- exact names): "
+                + "; ".join(f"{p['name']} ({p['district']})" for p in places)
+            )
+    except Exception as e:
+        logger.debug(f"board anchor places skipped: {e}")
+    try:
+        items = raw_query("SELECT name FROM epic_gear_pool WHERE enabled = 1 ORDER BY RAND() LIMIT 5") or []
+        if items:
+            lines.append(
+                "REAL ITEMS (if the job centers on an object, use a real one): "
+                + ", ".join(i["name"] for i in items)
+            )
+    except Exception as e:
+        logger.debug(f"board anchor items skipped: {e}")
+    if not lines:
+        return ""
+    return "\nREAL CAMPAIGN ANCHORS -- build the mission from these, not invented filler:\n" + "\n".join(lines)
+
+
+def _recent_outcomes_block() -> str:
+    """The world remembers: fresh mission outcomes with loose threads, so new
+    board contracts can pick up what the last crew left dangling (butterfly
+    effect -- outcomes are an INPUT to generation, not just an archive)."""
+    try:
+        rows = raw_query(
+            "SELECT mission_title, faction, opposing_faction, result, loose_threads, notable_moments "
+            "FROM mission_outcomes ORDER BY id DESC LIMIT 8") or []
+    except Exception as e:
+        logger.debug(f"recent outcomes block skipped: {e}")
+        return ""
+    lines: List[str] = []
+    for r in rows:
+        title = (r.get("mission_title") or "").strip()
+        detail = (r.get("loose_threads") or "").strip() or (r.get("notable_moments") or "").strip()
+        if not title or not detail:
+            continue
+        seg = f"- '{title}' ({(r.get('result') or 'resolved').strip()}; {(r.get('faction') or '').strip()}"
+        opp = (r.get("opposing_faction") or "").strip()
+        if opp and opp.lower() not in ("none", "n/a", "unknown", "null", "tbd"):
+            seg += f" vs {opp}"
+        seg += f"): {detail[:220]}"
+        lines.append(seg)
+        if len(lines) >= 5:
+            break
+    if not lines:
+        return ""
+    return (
+        "\nRECENT MISSION OUTCOMES (the world remembers -- you MAY, not must, build this new "
+        "contract on one of these loose threads or aftermaths; if you do, reference it concretely):\n"
+        + "\n".join(lines)
+    )
+
+
+def _build_mission_prompt(recent_missions: List[dict]) -> tuple[str, str]:
     from src.faction_reputation import rep_summary_block, is_hostile
-    # Combine hardcoded types with today's AI-generated types
-    all_types = _MISSION_TYPES + _load_generated_mission_types()
+    # Prefer completed standalone pipelines. Unbuilt/generated types are rare.
+    all_types = _weighted_mission_types()
     mission_type = random.choice(all_types)
+    public_health_block, _public_health_arc, public_health_urgent = _public_health_mission_context()
+    if public_health_urgent:
+        mission_type = random.choice(PUBLIC_HEALTH_MISSION_TYPES)
+
+    # Rotation — pick the faction explicitly so the LLM can't default to Serpent Choir
+    rotation_faction = _pick_rotation_faction(recent_missions)
+    if public_health_urgent:
+        rotation_faction = random.choice(PUBLIC_HEALTH_MISSION_FACTIONS)
+
+    # Iron Fang civil war -- periodically force a mission across the schism so the
+    # Serrik Dhal (Consortium) vs Sera Voss (Syndicate) war keeps surfacing on the board.
+    iron_fang_war_block = ""
+    if not public_health_urgent:
+        try:
+            from src.db_api import get_global_state as _ggs
+            _war = _ggs("iron_fang_civil_war") or {}
+            if _war.get("active") and random.random() < 0.25:
+                _sides = ["Iron Fang Consortium", "Iron Fang Syndicate"]
+                random.shuffle(_sides)
+                rotation_faction, _war_target = _sides[0], _sides[1]
+                mission_type = random.choice(
+                    ["Sabotage", "Assault", "Heist", "Ambush", "Investigation", "Assassination"])
+                iron_fang_war_block = (
+                    "\n=== IRON FANG CIVIL WAR (ACTIVE) ===\n"
+                    f"The Iron Fang has split and is at open war. {rotation_faction} is moving AGAINST "
+                    f"{_war_target}. This mission MUST be sponsored by {rotation_faction} and work directly "
+                    f"against {_war_target} -- set 'Opposes: {_war_target}'.\n"
+                    "Iron Fang Consortium = Serrik Dhal's orthodox old guard (relics + infrastructure; "
+                    "morally grey but builds; amenable to adventurers).\n"
+                    "Iron Fang Syndicate = Sera Voss's wing (protection rackets, loan-sharking, "
+                    "TowerBay stock and auction manipulation)."
+                )
+        except Exception:
+            pass
 
     recent_block = ""
     if recent_missions:
         summaries = [m.get("title", "unknown") + " — " + m.get("faction", "") for m in recent_missions[-5:]]
         recent_block = "\nRECENT MISSIONS POSTED (avoid repeating these):\n" + "\n".join(summaries)
 
+    outcomes_block = _recent_outcomes_block()
     rep_block = "\n" + rep_summary_block()
+    npc_block = "\n" + _build_npc_context()
+    template_block = _build_template_block(mission_type)
+    area_block = _load_area_context_block()
+    anchors_block = _board_anchors_block()
 
-    return f"""{_LORE}
+    # Strange Occurrences: inject a doppelganger/undead NPC from the DB
+    strange_block = ""
+    if mission_type == "Strange Occurrences":
+        strange_block = _load_strange_npc()
+
+    prompt = f"""{_LORE}
 {rep_block}
+{npc_block}
+{area_block}
+{anchors_block}
+{public_health_block}
+{iron_fang_war_block}
 {recent_block}
+{outcomes_block}
+{strange_block}
 
 ---
 You are the Undercity mission board. Generate ONE new mission contract posting.
-When selecting which faction posts this mission, prefer factions at Friendly or above standing.
-Avoid generating contracts from Detested or Hated factions — those factions are enemies, not employers.
+
+SPONSORING FACTION FOR THIS MISSION: {rotation_faction}
+This mission MUST be posted by {rotation_faction}. Use a named NPC from that faction as the contact.
+Do not substitute a different faction — the board is balancing its posting rotation.
+Even for covert work such as Heist, Infiltration, Sabotage, or Espionage, the public posting entity MUST remain {rotation_faction}.
 
 REQUIRED FORMAT — output exactly this structure, nothing else:
 
-**[FACTION NAME] — MISSION TITLE**
-*Tier: [tier label] | Expires: TBD | Reward: [X EC + any extras]*
+**FACTION NAME — MISSION TITLE**
+*Type: {mission_type} | Difficulty: [1-10] | Expires: TBD | Reward: [X EC + any extras]*
 *Opposes: [faction name if this mission works AGAINST another faction, or "None"]*
 
-[2-3 sentences describing the job. Specific location, named NPC contact, clear objective. Atmospheric but practical.]
+CRITICAL: Type must be ONE SHORT LABEL — e.g. "Recovery", "Dungeon Delve", "Investigation", "Escort".
+NEVER write a sentence or description in the Type field. One to three words maximum.
 
-*Contact: [named NPC], [location]*
+Public Post: [1-2 sentences for players. Name the faction, objective, specific place, and known contact.
+Do NOT include sensory read-aloud, hidden stakes, secret motives, twists, clues, solution steps, answer keys, puzzle mechanics, or "what really happened" here.
+Bulletins are surface-level public contract notices only.]
 
-RULES:
-- Mission type to generate: {mission_type}
-- Use exactly one tier label from: local, patrol, escort, standard, investigation, rift, dungeon, major, inter-guild, high-stakes, epic, divine, tower
-- If you use tier "rift", the location MUST be in the Warrens or Outer Wall. No exceptions.
-- Invent specific details — named NPCs, exact EC rewards, precise locations
-- No preamble, no explanation, no sign-off. Output the mission post only.
-- If your response contains anything other than the mission post, you have failed."""
+GM Notes: [2-4 short private notes for the module builder only:
+- sensory anchor for the first scene
+- personal stakes if unresolved
+- one odd clue or contradiction
+- what the contact is hiding, if any
+- for Puzzle missions, only note the public-facing puzzle type/source; never include the solution, answer key, solve path, or hidden truth in the bulletin]
+
+*Contact: [named NPC from the list above], [their specific location]*
+
+=== TITLE RULES (mandatory) ===
+- Maximum 5 words. Must name the specific THING at stake: a person, object, place, action.
+- GOOD: "Dust Market Strangler", "Warden's Forge Missing Three", "Bones in the Clockwork Spire"
+- BANNED endings: Reckoning, Unraveling, Corruption, Awakening, Legacy, Revelation, Convergence, Resonance, Shadows, Darkness — too abstract
+- Never "The" + abstract noun
+- NO INVENTED FILLER OBJECTS: never build the title or mission around made-up props like "The Plow", "The Hound", "Feathers", "The Axe", "The Crown". Name the REAL NPC, faction, named place, or item from the lists above.
+
+=== PROSE RULES (mandatory) ===
+Write like a noir dispatch from inside the city. Every word earns its place.
+- Name SPECIFIC streets, rooms, people, objects. Never "a warehouse" or "some guards."
+- SENSORY BEAT IS MANDATORY in GM Notes, not in the Public Post. Examples:
+    GOOD: "The clinic still smells of iodine — someone left the instruments soaking."
+    GOOD: "Somewhere in the Forge district, a door has been nailed shut from the inside."
+    GOOD: "The counting room floor is sticky. No one will say with what."
+    BAD: "The ominous shadows of the ancient tunnels..." (no tunnels exist — this is a CITY)
+    BAD: "A dark presence fills the air..." (banned — this is not fantasy flavour text)
+- CONTACT notes can include personality in GM Notes, but the Contact field should stay public and practical.
+    GOOD: -- doesn't make eye contact when she mentions the Forge"
+    GOOD: -- has been asking questions she doesn't want answered"
+    GOOD: -- hasn't slept in four days and it shows"
+
+=== RULES ===
+- Mission type is already set to: {mission_type}{template_block}
+- Difficulty: a number 1–10. 1=Trivial, 2=Easy, 3=Moderate, 4=Standard, 5=Challenging, 6=Hard, 7=Severe, 8=Deadly, 9=Extreme, 10=Legendary. Most contracts are 4–6. Rift/dungeon/major = 6–7. Tower-level = 9–10.
+- If Mission type is Heist, make the target, handler, fence, or hidden beneficiary shady if needed; do not change the posting faction away from {rotation_faction}.
+- Rift missions ONLY in the Warrens or Outer Wall — never elsewhere
+- Contact must be one of the listed NPCs — do not invent new faction leaders
+- ANCHOR IN REAL DATA: set the mission at one of the REAL NAMED PLACES above; if it centers on an object, use a REAL ITEM above. Use exact names — do not invent generic venues or props when real ones are provided.
+- Rewards within hard limits. Never over 1200 Kharma.
+- Mission board bulletins must stay brief and surface-level. Detailed mechanics, map plans, puzzle answers, hidden truths, and full module content belong only in generated modules after claim.
+- No preamble. No sign-off. Output the mission post only. Nothing else."""
+    return prompt, rotation_faction
 
 
 # ---------------------------------------------------------------------------
@@ -640,7 +2099,7 @@ Hostile action type: {hostile_type}
 REQUIRED FORMAT — output exactly this, nothing else:
 
 ⚠️ **[{faction.upper()}] — HOSTILE NOTICE TITLE**
-*Tier: [tier label] | Threat Level: [low/medium/high/critical]*
+*Difficulty: [1-10] | Threat Level: [low/medium/high/critical]*
 
 [2-3 sentences. Specific threat, named NPC issuing it, what the faction intends to do. Menacing but grounded.]
 
@@ -648,7 +2107,7 @@ REQUIRED FORMAT — output exactly this, nothing else:
 
 RULES:
 - Tone is threatening, not a job offer
-- Use exactly one tier label: local, patrol, standard, investigation, major, high-stakes, epic
+- Use a number 1-10 for difficulty (1=Trivial, 5=Hard, 8=Deadly, 10=Legendary)
 - Invent a named NPC issuing the threat
 - No preamble, no sign-off. Output the hostile notice only.
 - If your response contains anything other than the notice, you have failed."""
@@ -670,17 +2129,14 @@ async def post_hostile_mission(channel, faction: str) -> None:
     mission["hostile_faction"] = faction
     mission["is_hostile"]      = True
 
-    expires_dt = _expiry_for_tier(mission["tier"])
+    expires_dt = _expiry_for_tier(mission.get("difficulty") or mission.get("tier", "standard"))
     mission["expires_at"] = expires_dt.isoformat()
     days_left = (expires_dt - datetime.utcnow()).days
 
-    # Hostile missions always use red
-    embed = discord.Embed(
-        description=text,
-        color=0xCC0000,  # dark red — hostile faction
-    )
+    # Hostile missions — use same clean embed structure, red color
+    embed = _build_mission_embed(mission, 0xCC0000, "⚠️ Hostile", days_left)
     embed.set_footer(
-        text=f"⚠️ HOSTILE • {faction} • Active for {days_left} day{'s' if days_left != 1 else ''}"
+        text=f"⚠️ HOSTILE NOTICE  •  {faction}  •  Active for {days_left} day{'s' if days_left != 1 else ''}"
     )
     msg = await channel.send(embed=embed)
     mission["message_id"] = msg.id
@@ -695,18 +2151,294 @@ async def post_hostile_mission(channel, faction: str) -> None:
 async def _generate(prompt: str) -> Optional[str]:
     """
     Generate mission content using KimiAgent.
-    
+
     REFACTORED: Now uses src.agents.generate_mission_text helper.
     """
     from src.agents import generate_mission_text
-    import logging
-    
+    import logging, time
+    _log = logging.getLogger(__name__)
+
+    _log.info(f"📋 [GENERATE] Sending {len(prompt.split())}w prompt to LLM ...")
+    _t0 = time.monotonic()
     try:
         text = await generate_mission_text(prompt, temperature=0.9)
+        _elapsed = time.monotonic() - _t0
+        if text:
+            _log.info(
+                f"📋 [GENERATE] ✓ {len(text.split())}w / {len(text)} chars received "
+                f"in {_elapsed:.1f}s | preview: {text[:100].replace(chr(10),' ')!r}"
+            )
+        else:
+            _log.warning(f"📋 [GENERATE] LLM returned empty/None after {_elapsed:.1f}s")
         return text
     except Exception as e:
-        logging.getLogger(__name__).error(f"mission_board _generate error: {e}")
+        _log.error(f"📋 [GENERATE] Error after {time.monotonic()-_t0:.1f}s: {e!r}")
         return None
+
+
+# ---------------------------------------------------------------------------
+# Type label normalisation
+# ---------------------------------------------------------------------------
+
+# Known short labels — what we want displayed
+_TYPE_LABELS = {
+    "neighbourhood job": "Neighbourhood Job",
+    "neighbourhood": "Neighbourhood Job",
+    "patrol": "Patrol",
+    "patrol contract": "Patrol",
+    "escort": "Escort",
+    "investigation": "Investigation",
+    "inter-guild": "Inter-Guild Conflict",
+    "inter guild": "Inter-Guild Conflict",
+    "high-stakes": "High-Stakes Contract",
+    "high stakes": "High-Stakes Contract",
+    "dungeon": "Dungeon Delve",
+    "dungeon delve": "Dungeon Delve",
+    "rift": "Rift Clearance",
+    "rift clearance": "Rift Clearance",
+    "epic": "Epic Mission",
+    "divine": "Epic Mission",
+    "theft": "Theft / Heist",
+    "heist": "Heist",
+    "robbery": "Heist",
+    "bank job": "Heist",
+    "vault heist": "Heist",
+    "museum heist": "Heist",
+    "assassination": "Assassination",
+    "assault": "Assault",
+    "attack": "Assault",
+    "infestation": "Infestation",
+    "infested": "Infestation",
+    "rescue": "Rescue Operation",
+    "delivery": "Courier / Delivery",
+    "courier": "Courier / Delivery",
+    "bounty": "Bounty Hunt",
+    "bounty hunt": "Bounty Hunt",
+    "espionage": "Faction Espionage",
+    "sabotage": "Sabotage",
+    "smuggling": "Smuggling Run",
+    "political": "Political Intrigue",
+    "recovery": "Recovery",
+    "relic recovery": "Recovery",
+    "artifact recovery": "Recovery",
+    "evidence recovery": "Recovery",
+    "data recovery": "Recovery",
+    "record recovery": "Recovery",
+    "memory recovery": "Recovery",
+    "identity recovery": "Recovery",
+    "missing pet": "Recovery",
+    "lost pet": "Recovery",
+    "protection": "Protection Detail",
+    "battle": "Battle",
+    "ambush": "Ambush",
+    "negotiation": "Negotiation",
+    "first contact": "First Contact",
+    "tower contact": "First Contact",
+    "exploration": "Exploration",
+    "discovery": "Discovery",
+    "defense": "Defense",
+    "defence": "Defense",
+    "puzzle": "Puzzle",
+    "gathering": "Gathering",
+    "infiltration": "Infiltration",
+    "strange occurrences": "Strange Occurrences",
+    "strange occurrence": "Strange Occurrences",
+    "strange": "Strange Occurrences",
+    "returned dead": "Strange Occurrences",
+    "revenant": "Strange Occurrences",
+    "ghost": "Strange Occurrences",
+    "doppelganger": "Strange Occurrences",
+    "doppleganger": "Strange Occurrences",
+    "standard": "Contract",
+    "contract": "Contract",
+    "social": "Diplomatic",
+    "combat": "Combat Contract",
+}
+
+# Keyword fragments that identify type when model writes a description
+_TYPE_KEYWORDS: list[tuple[str, str]] = [
+    ("dungeon", "Dungeon Delve"),
+    ("missing pet", "Recovery"),
+    ("lost pet", "Recovery"),
+    ("misdelivered", "Recovery"),
+    ("misplaced cargo", "Recovery"),
+    ("data recovery", "Recovery"),
+    ("record recovery", "Recovery"),
+    ("memory recovery", "Recovery"),
+    ("identity recovery", "Recovery"),
+    ("relic", "Recovery"),
+    ("cursed", "Recovery"),
+    ("artifact", "Recovery"),
+    ("retrieve", "Recovery"),
+    ("smuggl", "Smuggling Run"),
+    ("contraband", "Smuggling Run"),
+    ("assassin", "Assassination"),
+    ("eliminate", "Assassination"),
+    ("infiltrat", "Infiltration"),
+    ("espionage", "Faction Espionage"),
+    ("sabotage", "Sabotage"),
+    ("rescue", "Rescue Operation"),
+    ("hostage", "Rescue Operation"),
+    ("captive", "Rescue Operation"),
+    ("negotiat", "Negotiation"),
+    ("diplomat", "Negotiation"),
+    ("first contact", "First Contact"),
+    ("tower contact", "First Contact"),
+    ("new arrivals", "First Contact"),
+    ("unknown race", "First Contact"),
+    ("strange occurrence", "Strange Occurrences"),
+    ("returned dead", "Strange Occurrences"),
+    ("revenant", "Strange Occurrences"),
+    ("doppelganger", "Strange Occurrences"),
+    ("doppleganger", "Strange Occurrences"),
+    ("impostor", "Strange Occurrences"),
+    ("imposter", "Strange Occurrences"),
+    ("haunting", "Strange Occurrences"),
+    ("graveyard", "Strange Occurrences"),
+    ("coroner", "Strange Occurrences"),
+    ("morgue", "Strange Occurrences"),
+    ("heist", "Heist"),
+    ("robbery", "Heist"),
+    ("bank job", "Heist"),
+    ("vault heist", "Heist"),
+    ("museum heist", "Heist"),
+    ("steal", "Theft / Heist"),
+    ("bounty", "Bounty Hunt"),
+    ("fugitive", "Bounty Hunt"),
+    ("escort", "Escort"),
+    ("convoy", "Escort"),
+    ("courier", "Courier / Delivery"),
+    ("deliver", "Courier / Delivery"),
+    ("patrol", "Patrol"),
+    ("investigation", "Investigation"),
+    ("mystery", "Investigation"),
+    ("disappear", "Investigation"),
+    ("rift", "Rift Clearance"),
+    ("ambush", "Ambush"),
+    ("defense", "Defense"),
+    ("defend", "Defense"),
+    ("battle", "Battle"),
+    ("combat", "Battle"),
+    ("assault", "Assault"),
+    ("storm", "Assault"),
+    ("breach", "Assault"),
+    ("infestation", "Infestation"),
+    ("infested", "Infestation"),
+    ("swarm", "Infestation"),
+    ("exploration", "Exploration"),
+    ("survey", "Exploration"),
+    ("gathering", "Gathering"),
+    ("collect", "Gathering"),
+    ("puzzle", "Puzzle"),
+    ("protection", "Protection Detail"),
+    ("bodyguard", "Protection Detail"),
+    ("political", "Political Intrigue"),
+    ("strange", "Strange Occurrences"),
+]
+
+
+def _snap_mission_type(raw: str) -> str:
+    """
+    Take whatever the AI wrote in the Type: field and snap it to a clean short label.
+    If the AI wrote a full description sentence, extract the type from keywords.
+    """
+    if not raw:
+        return ""
+    # Strip markdown
+    raw = re.sub(r'[*_`]', '', raw).strip()
+
+    # Exact/prefix match against known labels first
+    key = raw.lower()
+    if key in _TYPE_LABELS:
+        return _TYPE_LABELS[key]
+
+    # Prefix match (e.g. "Investigation/Mystery" → "Investigation")
+    for slug, label in _TYPE_LABELS.items():
+        if key.startswith(slug):
+            return label
+
+    # Scan keyword fragments before falling back. This catches short phrases like
+    # "storm the gate" or "infested cellar", not just long model rambles.
+    key_lower = raw.lower()
+    for fragment, label in _TYPE_KEYWORDS:
+        if fragment in key_lower:
+            return label
+
+    # Too long — AI wrote a description. Truncate as a best-effort label.
+    if len(raw) > 30:
+        # Absolute fallback — truncate to first 3 words as a best-effort label
+        words = raw.split()
+        return " ".join(words[:3]).rstrip(".,;:").title()
+
+    # Short enough — return title-cased as-is
+    return raw.title()
+
+
+def _public_story_from_text(text: str, max_sentences: int = 2) -> str:
+    """
+    Return the short player-facing mission pitch.
+
+    Mission generation may include private GM/module-builder notes in the same
+    stored body. Those are valuable for module generation but should not leak
+    onto the public board.
+    """
+    if not text:
+        return ""
+
+    explicit_public = bool(re.match(r'(?is)^\s*(?:public\s+post|public\s+pitch|posting)\s*:', text))
+    clean = re.sub(r'(?im)^\s*(?:public\s+post|public\s+pitch|posting)\s*:\s*', '', text).strip()
+    clean = re.split(
+        r'(?im)^\s*(?:gm\s+notes?|private\s+notes?|module\s+notes?|backend\s+notes?)\s*:',
+        clean,
+        maxsplit=1,
+    )[0]
+    clean = re.sub(r'\s+', ' ', clean).strip()
+
+    sentence_limit = max_sentences if explicit_public else 1
+    sentences = re.findall(r'[^.!?]+[.!?]', clean)
+    if sentences:
+        return " ".join(s.strip() for s in sentences[:sentence_limit]).strip()
+
+    words = clean.split()
+    if len(words) > 55:
+        return " ".join(words[:55]).rstrip(" ,;:") + "."
+    return clean
+
+
+def _extract_story_contact_and_notes(body: str) -> tuple[str, str, str]:
+    """Split the generated post into public pitch, contact line, and private notes."""
+    contact = ""
+    contact_match = re.search(r'\*?Contact:\s*([^\n]+)', body, re.IGNORECASE)
+    if contact_match:
+        contact = re.sub(r'[*_]', '', contact_match.group(1)).strip()
+
+    private_notes = ""
+    notes_match = re.search(
+        r'(?is)(?:\*?\s*)?(?:GM\s+Notes?|Private\s+Notes?|Module\s+Notes?|Backend\s+Notes?)\s*:\s*(.+?)(?=\n\s*\*?Contact:|\Z)',
+        body,
+    )
+    if notes_match:
+        private_notes = re.sub(r'[*_]', '', notes_match.group(1)).strip()
+
+    # Story is everything between the header metadata line and the Contact line
+    # Strip the metadata line (*Type: ... | Tier: ... | ...*)
+    story = re.sub(r'\*[^\n]*Type:[^\n]*\n?', '', body)
+    story = re.sub(r'\*[^\n]*Opposes:[^\n]*\n?', '', story, flags=re.IGNORECASE)
+    story = re.sub(
+        r'(?is)(?:\*?\s*)?(?:GM\s+Notes?|Private\s+Notes?|Module\s+Notes?|Backend\s+Notes?)\s*:.+?(?=\n\s*\*?Contact:|\Z)',
+        '',
+        story,
+    )
+    story = re.sub(r'\*?Contact:[^\n]+', '', story, flags=re.IGNORECASE)
+    # Strip the bold title line
+    story = re.sub(r'\*\*[^\n]+\*\*\n?', '', story)
+    # Strip legacy/plain title lines like "Glass Sigil - Codex in the Bone Market"
+    story = re.sub(r'^\s*[^\n:]{2,80}\s+(?:-|--|""|—)\s+[^\n:]{2,120}\s*\n?', '', story)
+    # Clean up remaining markdown asterisks and extra whitespace
+    story = re.sub(r'\*+', '', story)
+    story = re.sub(r'\n{3,}', '\n\n', story).strip()
+
+    return _public_story_from_text(story), contact, private_notes
 
 
 # ---------------------------------------------------------------------------
@@ -718,20 +2450,59 @@ def _parse_mission(text: str) -> dict:
     title = "Unknown Contract"
     faction = "Unknown"
     title_match = re.search(r"\*\*(.+?)\*\*", text)
-    if title_match:
-        raw = title_match.group(1)
-        if " — " in raw:
-            parts = raw.split(" — ", 1)
-            faction = parts[0].strip()
-            title = parts[1].strip()
+    raw = title_match.group(1).strip() if title_match else ""
+    if not raw:
+        for line in text.splitlines():
+            candidate = re.sub(r'[*_`]', '', line).strip()
+            if candidate:
+                raw = candidate
+                break
+    if raw:
+        header_match = re.match(r'\s*(.*?)\s+(?:-|--|""|—)\s+(.*?)\s*$', raw)
+        if header_match:
+            faction = re.sub(r"^[\[\(]\s*|\s*[\]\)]$", "", header_match.group(1).strip())
+            title = header_match.group(2).strip()
         else:
             title = raw.strip()
 
-    tier = _parse_tier(text)
+    # The generator sometimes emits an em-dash inside a title/faction as two
+    # straight double-quotes (a known artifact); restore it so titles do not
+    # render as 'A "" B'. — keeps this source file ASCII-clean.
+    title = title.replace(' "" ', " — ").replace('""', "—").strip()
+    faction = faction.replace(' "" ', " — ").replace('""', "—").strip()
 
-    # Extract reward
+    # Extract mission type and snap to a clean short label
+    mission_type = ""
+    type_match = re.search(r"[Tt]ype:\s*([^\|\n\*]+)", text)
+    if type_match:
+        mission_type = _snap_mission_type(type_match.group(1).strip().rstrip("|").strip())
+
+    tier = _parse_tier(text)
+    difficulty = _parse_difficulty(text)   # numeric 1-10
+
+    # Extract reward and clamp any runaway Kharma values
     reward_match = re.search(r"[Rr]eward:\s*([^\n\|*]+)", text)
     reward = reward_match.group(1).strip() if reward_match else "See posting"
+    _kharma_hit = re.search(r"(\d[\d,]*)\s*Kharma", reward, re.IGNORECASE)
+    if _kharma_hit:
+        _kval = int(_kharma_hit.group(1).replace(",", ""))
+        # Kharma caps indexed by numeric difficulty 1-10
+        _diff_kharma_caps = {
+            1: 0, 2: 0,          # Trivial/Easy — no Kharma
+            3: 40, 4: 40,        # Moderate/Standard — optional small
+            5: 55, 6: 55,        # Challenging/Hard
+            7: 110, 8: 110,      # Severe/Deadly
+            9: 285, 10: 285,     # Extreme/Legendary
+        }
+        _cap = _diff_kharma_caps.get(difficulty, 600)
+        if _kval > _cap:
+            reward = re.sub(
+                r"\d[\d,]*\s*Kharma",
+                f"{_cap} Kharma",
+                reward,
+                flags=re.IGNORECASE,
+            )
+            logger.warning(f"⚠️ Reward clamped: {_kval} Kharma → {_cap} Kharma (difficulty={difficulty})")
 
     # Extract opposing faction
     opposing_faction = ""
@@ -741,15 +2512,38 @@ def _parse_mission(text: str) -> dict:
         if raw_opposes.lower() not in ("none", "n/a", "", "none."):
             opposing_faction = raw_opposes
 
+    # Strip beat labels the model might echo back ("BEAT 1 — SITUATION:", "HOOK """, etc.)
+    clean_text = re.sub(
+        r'\bBEAT\s+\d+\s*[""—-]\s*(?:SITUATION|SENSORY ANCHOR|STAKES|HOOK)?[:\s]*',
+        '',
+        text,
+        flags=re.IGNORECASE,
+    )
+    clean_text = re.sub(r'\bHOOK\s*[""—-]\s*', '', clean_text, flags=re.IGNORECASE)
+    clean_text = re.sub(r'\n{3,}', '\n\n', clean_text).strip()
+
+    # Extract clean story paragraph and contact line for embed display
+    public_text, contact, private_notes = _extract_story_contact_and_notes(clean_text)
+    if "public post:" not in clean_text.lower() and "public pitch:" not in clean_text.lower():
+        contact_name = contact.split(",", 1)[0].split('"', 1)[0].split("-", 1)[0].strip()
+        contact_suffix = f" Speak with {contact_name} for public details." if contact_name else ""
+        public_text = f"{faction} is seeking a crew for **{title}**.{contact_suffix}"
+
     return {
         "title": title,
         "faction": faction,
+        "type": mission_type,
         "tier": tier,
+        "difficulty": difficulty,    # numeric 1-10
         "reward": reward,
         "opposing_faction": opposing_faction,
-        "body": text,
+        "body": clean_text,
+        "public_text": public_text,
+        "story_text": public_text,
+        "private_notes": private_notes,
+        "contact": contact,
         "posted_at": datetime.utcnow().isoformat(),
-        "expires_at": _expiry_for_tier(tier).isoformat(),
+        "expires_at": _expiry_for_tier(difficulty or tier).isoformat(),
         "resolved": False,
         "message_id": None,
     }
@@ -784,32 +2578,18 @@ def _load_characters() -> List[dict]:
         if characters:
             return characters
     except Exception as e:
-        logger.warning(f"_load_characters: DB query failed ({e}), falling back to file")
-    # Fallback to txt file
-    if not CHARACTER_MEMORY_FILE.exists():
-        return []
+        logger.warning(f"_load_characters: DB query failed: {e}")
+    return []
+
+
+def _personal_expiry_for_tier(tier_or_difficulty) -> datetime:
+    """Return personal mission expiry. Accepts numeric difficulty (1-10) or legacy tier string."""
     try:
-        text = CHARACTER_MEMORY_FILE.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return []
-    characters = []
-    for block in re.split(r"---CHARACTER---", text):
-        block = block.strip()
-        if not block or block.startswith("#") or "---END" in block:
-            continue
-        char = {}
-        for line in block.splitlines():
-            if ":" in line:
-                key, _, value = line.partition(":")
-                char[key.strip()] = value.strip()
-        if "NAME" in char:
-            characters.append(char)
-    return characters
-
-
-def _personal_expiry_for_tier(tier: str) -> datetime:
-    tier_key = tier.lower().strip()
-    lo, hi = PERSONAL_TIER_EXPIRY.get(tier_key, PERSONAL_DEFAULT_EXPIRY)
+        d = int(tier_or_difficulty)
+        lo, hi = PERSONAL_DIFFICULTY_EXPIRY.get(max(1, min(10, d)), PERSONAL_DEFAULT_EXPIRY)
+    except (TypeError, ValueError):
+        tier_key = str(tier_or_difficulty).lower().strip()
+        lo, hi = PERSONAL_TIER_EXPIRY.get(tier_key, PERSONAL_DEFAULT_EXPIRY)
     days = random.randint(lo, hi)
     return datetime.utcnow() + timedelta(days=days)
 
@@ -871,6 +2651,54 @@ _PERSONAL_MISSION_ANGLES = [
 ]
 
 
+def _real_anchors_block(character: dict) -> str:
+    """Pull REAL campaign nouns (NPCs, factions, locations, items) so personal
+    missions are built from actual people and places instead of invented filler
+    ('the Plow', 'the Hound', 'Feathers', 'the Axe')."""
+    org = (character.get("ORGANIZATIONS", "") or "").split(",")[0].strip()
+    lines: List[str] = []
+    npcs: List[dict] = []
+    try:
+        if org:
+            npcs = raw_query(
+                "SELECT name, role, faction FROM npcs WHERE status IN ('alive','injured','undead') "
+                "AND faction LIKE %s ORDER BY RAND() LIMIT 4", (f"%{org}%",)) or []
+        seen = {n["name"] for n in npcs}
+        for n in (raw_query("SELECT name, role, faction FROM npcs WHERE status IN ('alive','injured') ORDER BY RAND() LIMIT 8") or []):
+            if n["name"] not in seen:
+                npcs.append(n); seen.add(n["name"])
+            if len(npcs) >= 6:
+                break
+    except Exception as e:
+        logger.debug(f"anchor npcs skipped: {e}")
+    if npcs:
+        lines.append("REAL NPCs (use one as the named contact; others as targets, rivals, or leads -- exact names):")
+        for n in npcs[:6]:
+            extra = " - ".join(x for x in [(n.get("role") or "").strip(), (n.get("faction") or "").strip()] if x)
+            lines.append(f"  - {n['name']}" + (f" ({extra})" if extra else ""))
+    try:
+        facs = raw_query("SELECT faction_name FROM faction_reputation ORDER BY RAND() LIMIT 5") or []
+        if facs:
+            lines.append("REAL FACTIONS (exact names): " + ", ".join(f["faction_name"] for f in facs))
+    except Exception as e:
+        logger.debug(f"anchor factions skipped: {e}")
+    try:
+        locs = raw_query("SELECT name, district FROM gazetteer_places ORDER BY RAND() LIMIT 6") or []
+        if locs:
+            lines.append("REAL LOCATIONS (exact names): " + "; ".join(f"{l['name']} ({l['district']})" for l in locs))
+    except Exception as e:
+        logger.debug(f"anchor locations skipped: {e}")
+    try:
+        items = raw_query("SELECT name FROM epic_gear_pool WHERE enabled = 1 ORDER BY RAND() LIMIT 5") or []
+        if items:
+            lines.append("REAL ITEMS (if the job centers on an object, use a real one): " + ", ".join(i["name"] for i in items))
+    except Exception as e:
+        logger.debug(f"anchor items skipped: {e}")
+    if not lines:
+        return ""
+    return "REAL CAMPAIGN ANCHORS -- build the mission from these, not invented filler:\n" + "\n".join(lines)
+
+
 def _build_personal_mission_prompt(character: dict, recent_missions: List[dict]) -> str:
     name = character.get("NAME", "Unknown")
     species = character.get("SPECIES", "Unknown")
@@ -882,6 +2710,9 @@ def _build_personal_mission_prompt(character: dict, recent_missions: List[dict])
     notable_gear = character.get("NOTABLE GEAR", "")
     currency = character.get("CURRENCY", "")
     angle = random.choice(_PERSONAL_MISSION_ANGLES)
+    # Pick a mission type — exclude Strange Occurrences for personal missions
+    _personal_types = [t for t in _MISSION_TYPES if t != "Strange Occurrences"]
+    personal_type = random.choice(_personal_types)
 
     recent_block = ""
     personal_past = [m for m in recent_missions
@@ -889,6 +2720,8 @@ def _build_personal_mission_prompt(character: dict, recent_missions: List[dict])
     if personal_past:
         recent_block = "\nRECENT PERSONAL MISSIONS FOR THIS CHARACTER (do not repeat):\n" + \
                        "\n".join(m.get("title", "") for m in personal_past[-3:])
+
+    anchors_block = _real_anchors_block(character)
 
     return f"""{_LORE}
 
@@ -904,32 +2737,47 @@ Personality: {personality}
 Oracle Notes: {oracle_notes}
 {recent_block}
 
+{anchors_block}
+
 ---
 You are the Undercity mission board. Generate ONE personal mission contract specifically for {name}.
 Mission angle: {angle}
 
 REQUIRED FORMAT — output exactly this, nothing else:
 
-**[FACTION NAME] — MISSION TITLE**
-*Tier: [tier label] | Expires: TBD | Reward: [X EC + any extras]*
+**FACTION NAME — MISSION TITLE**
+*Type: {personal_type} | Difficulty: [1-10] | Expires: TBD | Reward: [X EC + any extras]*
 *Opposes: [faction name if this mission works AGAINST another faction, or "None"]*
 
-[2-3 sentences. Name {name} as the requested contractor. Specific NPC contact, location, clear objective. Make it feel personal to who they are.]
+CRITICAL: Type must be ONE SHORT LABEL — e.g. "Recovery", "Dungeon Delve", "Investigation".
+NEVER write a sentence in the Type field. One to three words maximum.
+
+[1-2 public sentences. Name {name} as the requested contractor. Include specific NPC contact, location, and clear objective. Do not reveal hidden twists.]
+
+GM Notes: [1-3 private notes for the module builder: why this is personal, what the contact is hiding, and one complication.]
 
 *Contact: [named NPC], [location]*
 
 RULES:
-- Use exactly one tier label: local, patrol, escort, standard, investigation, dungeon, major, inter-guild, high-stakes, epic, divine, tower
-- Do NOT use tier "rift" for personal missions — Rifts are city-wide emergencies, not personal contracts
+- Mission type is already set to: {personal_type}
+- For [difficulty] use exactly one label: local, patrol, standard, investigation, dungeon, major, inter-guild, high-stakes, epic, divine, tower
+- Do NOT use difficulty "rift" for personal missions — Rifts are city-wide emergencies, not personal contracts
+- Rewards MUST stay within the REWARD HARD LIMITS in the lore block above. Never write Kharma over 1200.
 - Weave {name}'s identity, class, species, or history into why they are specifically being asked
-- Invent fresh named NPCs, exact EC rewards, precise locations
+- ANCHOR IN REAL DATA: the contact MUST be one of the REAL NPCs listed above, set at a REAL LOCATION listed above, and (if a faction is involved) a REAL FACTION listed above. Use the exact names. Do NOT invent new NPCs, factions, or places when real ones are provided.
+- NO GENERIC FILLER TITLES OR THEMES: never build the mission around invented objects like "The Plow", "The Hound", "Feathers", "The Axe", "The Crown", or similar. The title should reference the real NPC, faction, place, or item actually involved.
+- Set exact EC rewards within the limits above
 - Do NOT put {name} in the bold header line — save it for the body text
 - No preamble, no sign-off. Output the mission post only.
 - If your response contains anything other than the mission post, you have failed."""
 
 
-async def post_personal_mission(channel, character: dict) -> None:
-    """Generate and post a personal mission for one character."""
+async def post_personal_mission(channel, character: dict) -> bool:
+    """Generate and post a personal mission for one character.
+
+    Returns True if the mission was posted or skipped for a non-error reason
+    (cap reached, etc.), False if generation failed and the caller should retry soon.
+    """
     import logging
     logger = logging.getLogger(__name__)
 
@@ -938,7 +2786,7 @@ async def post_personal_mission(channel, character: dict) -> None:
     active = _count_active_personal(name)
     if active >= MAX_ACTIVE_PERSONAL:
         logger.info(f"📌 Personal cap reached for {name} ({active}/{MAX_ACTIVE_PERSONAL}) — skipping")
-        return
+        return True  # not a failure — use normal long timer
 
     recent = _load_missions()
     prompt = _build_personal_mission_prompt(character, recent)
@@ -946,11 +2794,11 @@ async def post_personal_mission(channel, character: dict) -> None:
 
     if not text:
         logger.warning(f"📋 personal mission: generation returned None for {name}")
-        return
+        return False  # generation failed — caller should retry soon
 
     mission = _parse_mission(text)
     mission["personal_for"] = name
-    expires_dt = _personal_expiry_for_tier(mission["tier"])
+    expires_dt = _personal_expiry_for_tier(mission.get("difficulty") or mission["tier"])
     mission["expires_at"] = expires_dt.isoformat()
     days_left = (expires_dt - datetime.utcnow()).days
 
@@ -960,15 +2808,8 @@ async def post_personal_mission(channel, character: dict) -> None:
     embed_color = get_faction_color(faction) if faction else 0xE6C300
     tier_label = get_faction_tier_label(faction) if faction else "😐 Neutral"
 
-    embed = discord.Embed(
-        description=text,
-        color=embed_color,
-    )
-    opposing = mission.get("opposing_faction", "")
-    pfooter = [f"📌 Personal for {name}", f"Standing: {tier_label}", f"Expires in {days_left}d", "React ⚔️ to claim"]
-    if opposing:
-        pfooter.insert(2, f"⚠️ Opposes: {opposing}")
-    embed.set_footer(text="  •  ".join(pfooter))
+    embed = _build_mission_embed(mission, embed_color, tier_label, days_left,
+                                 personal_for=name)
 
     msg = await channel.send(embed=embed)
     mission["message_id"] = msg.id
@@ -985,6 +2826,7 @@ async def post_personal_mission(channel, character: dict) -> None:
     _save_personal_tracker(tracker)
 
     logger.info(f"📋 Personal mission posted for {name}: {mission['title']} ({days_left}d expiry)")
+    return True
 
 
 def next_personal_mission_seconds() -> int:
@@ -997,18 +2839,14 @@ def next_personal_mission_seconds() -> int:
 # ---------------------------------------------------------------------------
 
 def _load_party_list() -> List[str]:
-    """Load named parties from MySQL (falls back to adventurer_parties.txt)."""
+    """Load named parties from MySQL adventurer_parties table."""
     try:
         rows = raw_query("SELECT party_name FROM adventurer_parties ORDER BY party_name") or []
         if rows:
             return [r["party_name"] for r in rows]
     except Exception as e:
         logger.warning(f"_load_party_list DB error: {e}")
-    # Fallback to file
-    if not PARTY_LIST_FILE.exists():
-        return []
-    lines = PARTY_LIST_FILE.read_text(encoding="utf-8", errors="ignore").splitlines()
-    return [l.strip() for l in lines if l.strip() and not l.strip().startswith("#")]
+    return []
 
 
 def _load_used_parties() -> List[str]:
@@ -1073,15 +2911,6 @@ async def _get_party_name() -> str:
                         )
             except Exception as _e:
                 logger.warning(f"_get_party_name DB insert error: {_e}")
-            # Also append to file for fallback
-            try:
-                existing_text = PARTY_LIST_FILE.read_text(encoding="utf-8") if PARTY_LIST_FILE.exists() else ""
-                with open(PARTY_LIST_FILE, "a", encoding="utf-8") as f:
-                    for name in new_names:
-                        if name not in existing_text:
-                            f.write(f"\n{name}")
-            except Exception:
-                pass
             # Reset used list so the full expanded list is available
             used_parties = []
             _save_used_parties([])
@@ -1101,11 +2930,11 @@ async def _get_party_name() -> str:
 async def _generate_party_names(count: int = 20) -> List[str]:
     """Ask the AI to generate fresh adventurer party names."""
     prompt = f"""You are naming adventurer parties for a dark urban fantasy city called the Undercity.
-Parties are gritty, professional, mercenary in tone. Names should feel like real guild or company names —
+Parties are gritty, professional, mercenary in tone. Names should feel like real guild or company names ""
 not heroic fantasy stereotypes. Think noir, worn, specific.
 
 Generate exactly {count} unique adventurer party names.
-Output ONLY the names, one per line, no numbers, no explanations, no punctuation except what’s part of the name.
+Output ONLY the names, one per line, no numbers, no explanations, no punctuation except what's part of the name.
 If your response contains anything other than the list of names, you have failed."""
     text = await _generate(prompt)
     if not text:
@@ -1138,12 +2967,174 @@ Claiming party: {party_name}{party_block}
 Write a SHORT claim notice (2-3 lines) in the voice of the mission board.
 Format:
 ✅ **CONTRACT CLAIMED — {title}**
-*Taken by {party_name}. [1-2 sentences about what the party is known for or what they’re walking into.]*
+*Taken by {party_name}. [1-2 sentences about what the party is known for or what they're walking into.]*
 
 RULES:
 - Stay in-character, gritty, matter-of-fact
 - Invent a brief flavour detail about the party (reputation, rumour, one known fact)
 - No preamble, no sign-off. Output only the claim notice."""
+
+
+def _load_recent_news(max_chars: int = 600) -> str:
+    """Return a short snippet of recent news facts for injecting into prompts."""
+    try:
+        rows = raw_query("SELECT facts FROM news_memory ORDER BY id DESC LIMIT 5") or []
+        return " | ".join(r.get("facts", "") for r in rows if r.get("facts"))[:max_chars]
+    except Exception:
+        return ""
+
+
+def _build_urgent_claim_prompt(mission: dict, party_name: str, news_snippet: str) -> str:
+    """Claim notice for missions that sat unclaimed long enough to trigger urgency pickup.
+
+    The party is stepping up *now* because of something happening in the world ""
+    a news event, faction tension, or the job being too important to let lapse.
+    """
+    title   = mission.get("title",   "Unknown Contract")
+    faction = mission.get("faction", "Unknown Faction")
+    tier    = mission.get("tier",    "standard")
+    body    = mission.get("body",    "")
+    try:
+        from src.party_profiles import profile_summary
+        party_block = "\n" + profile_summary(party_name)
+    except Exception:
+        party_block = f"\nParty: {party_name}"
+
+    news_line = f"\nRECENT UNDERCITY EVENTS:\n{news_snippet}" if news_snippet else ""
+
+    return f"""You are the Undercity mission board posting a late claim notice.
+
+This contract has been sitting on the board unclaimed for several days. An adventurer party
+has now stepped forward — motivated by recent events or faction pressure — to finally take it.
+
+Mission: {title}
+Faction: {faction}
+Tier: {tier}
+Details: {body}
+Claiming party: {party_name}{party_block}{news_line}
+
+Write a SHORT claim notice (2-3 lines) in the voice of the mission board.
+Format:
+⚡ **CONTRACT CLAIMED (LATE) — {title}**
+*Taken by {party_name}. [1 sentence: WHY they're taking it NOW — tie it to a recent event, faction
+pressure, or the job's stakes becoming too urgent to ignore. Then 1 sentence about the party.]*
+
+RULES:
+- The reason they're taking it now must feel earned — connect to news, faction tension, or world events
+- Stay in-character, gritty, matter-of-fact
+- No preamble, no sign-off. Output only the claim notice."""
+
+
+def _build_rescission_prompt(mission: dict, news_snippet: str) -> str:
+    """Generate a story-driven withdrawal notice for an old personal mission."""
+    title     = mission.get("title",      "Unknown Contract")
+    faction   = mission.get("faction",    "Unknown Faction")
+    character = mission.get("personal_for", "the intended recipient")
+    body      = mission.get("body",       "")
+    news_line = f"\nRECENT UNDERCITY EVENTS:\n{news_snippet}" if news_snippet else ""
+
+    return f"""{_LORE}
+
+A personal mission contract has been withdrawn. It was posted for {character} but never claimed.
+The faction that posted it — {faction} — has pulled the offer.
+
+Mission: {title}
+Details: {body}{news_line}
+
+Write a SHORT withdrawal notice (2-3 lines) in the voice of the mission board.
+
+The withdrawal should have a STORY REASON tied to recent events, faction priorities shifting,
+the opportunity closing, or the situation resolving itself without help.
+Examples of reasons:
+- The faction's circumstances changed because of [recent event]
+- The contact went silent or was dealt with by other means
+- The window of opportunity closed — the target moved, the evidence was destroyed, etc.
+- A rival faction already handled it (in their own way)
+- The original posting was recalled after [news event] changed priorities
+
+Format:
+🚫 **CONTRACT WITHDRAWN — {title}**
+*Originally posted for {character}. [1-2 sentences: the specific story reason the offer was pulled,
+tied to something real happening in the Undercity right now.]*
+
+RULES:
+- The reason must feel like a consequence of world events — not just "offer expired"
+- Specific over generic. Name a faction, an event, a location if possible
+- No preamble, no sign-off. Output only the withdrawal notice."""
+
+
+def _is_strange_occurrence_mission(mission: dict) -> bool:
+    """Return True when a mission should trigger returned-NPC cleanup."""
+    haystack = " ".join(
+        str(mission.get(key, ""))
+        for key in ("type", "mission_type", "title", "body", "public_text", "story_text")
+    ).lower()
+    return "strange occurrence" in haystack or "strange occurrences" in haystack
+
+
+def _extract_returned_npc_name(mission: dict) -> str:
+    """Find the named returned NPC from mission fields if one is present."""
+    baked = (mission.get("returned_npc_name") or "").strip()
+    if baked:
+        return baked
+    for key in ("npc_giver", "contact"):
+        raw = (mission.get(key) or "").strip()
+        if raw:
+            return raw.split(",", 1)[0].split('"', 1)[0].split("-", 1)[0].strip()
+
+    body = str(mission.get("body") or "")
+    for match in re.finditer(r'•\s*([^"\n]+)\s*', body):
+        name = match.group(1).strip()
+        if name:
+            return name
+    return ""
+
+
+async def _resolve_strange_occurrence_subject(
+    mission: dict,
+    results_channel=None,
+    consequences: Optional[list[str]] = None,
+) -> Optional[str]:
+    """
+    If a Strange Occurrences mission involved a returned NPC, mark them dead again.
+
+    This is used by both player and NPC-party completion paths so civic weird
+    cases resolve consistently no matter who took the contract.
+    """
+    if not _is_strange_occurrence_mission(mission):
+        return None
+
+    returned_name = _extract_returned_npc_name(mission)
+    if not returned_name:
+        return None
+
+    try:
+        rows = raw_query(
+            "SELECT name, status FROM npcs WHERE name = %s "
+            "AND status IN ('undead', 'doppelganger', 'returned') LIMIT 1",
+            (returned_name,),
+        ) or []
+        if not rows:
+            return None
+
+        prev_status = rows[0]["status"]
+        raw_execute(
+            "UPDATE npcs SET status='dead', deceased_at=NOW() WHERE name=%s",
+            (returned_name,),
+        )
+        note = f"⚰️ {returned_name} returned to the graveyard (was {prev_status})"
+        if consequences is not None:
+            consequences.append(note)
+        logger.info(f"Strange Occurrence resolved: {returned_name} ({prev_status} → dead)")
+        if results_channel:
+            await results_channel.send(
+                f"☠️ **{returned_name}** has been returned to the grave.\n"
+                f"The {prev_status} walks no more. May they rest this time."
+            )
+        return note
+    except Exception as exc:
+        logger.warning(f"Strange Occurrence graveyard update failed: {exc}")
+        return None
 
 
 # _schedule_claim removed — claims are now handled per-party in check_claims.
@@ -1154,7 +3145,7 @@ RULES:
 async def check_claims(channel, client=None) -> None:
     """
     Called every hour alongside check_expirations.
-    For each unclaimed mission in the claim window (CLAIM_DAYS_MIN–CLAIM_DAYS_MAX days old),
+    For each unclaimed mission in the claim window (CLAIM_DAYS_MIN—CLAIM_DAYS_MAX days old),
     a sample of NPC parties each independently roll to claim it.
     First party to succeed takes the contract.
     """
@@ -1190,6 +3181,13 @@ async def check_claims(channel, client=None) -> None:
         if age_days > CLAIM_DAYS_MAX:
             continue  # claim window closed — board sweep / expiry handles it
 
+        # Urgency boost: missions sitting unclaimed past the threshold get a higher
+        # claim probability and more parties evaluating them each cycle.
+        is_urgent = age_days >= CLAIM_URGENCY_THRESHOLD_DAYS
+        prob = CLAIM_PROBABILITY_PER_PARTY * (CLAIM_URGENCY_MULTIPLIER if is_urgent else 1.0)
+        # Urgent missions draw more attention — give them an extra party slot
+        parties_this_check = CLAIM_PARTIES_PER_CHECK + (2 if is_urgent else 0)
+
         # Each party in the sample rolls independently.
         # Sample a random subset of the full party list each cycle so different
         # parties get a shot across multiple cycles if no one claims immediately.
@@ -1197,11 +3195,11 @@ async def check_claims(channel, client=None) -> None:
         if not all_parties:
             continue
         random.shuffle(all_parties)
-        sample = all_parties[:CLAIM_PARTIES_PER_CHECK]
+        sample = all_parties[:parties_this_check]
 
         winning_party = None
         for candidate in sample:
-            if random.random() < CLAIM_PROBABILITY_PER_PARTY:
+            if random.random() < prob:
                 winning_party = candidate
                 break
 
@@ -1215,6 +3213,9 @@ async def check_claims(channel, client=None) -> None:
             _save_used_parties(used)
 
         party_name = winning_party
+        if not _claim_mission_atomically(int(mission.get("id") or 0), party_name):
+            logger.info(f"NPC claim lost race for mission: {mission.get('title', '?')}")
+            continue
 
         # Ensure profile exists before building the claim prompt
         try:
@@ -1226,12 +3227,18 @@ async def check_claims(channel, client=None) -> None:
             msg = await channel.fetch_message(mission["message_id"])
             await msg.delete()
         except Exception:
-            pass  # message already gone, that’s fine
+            pass  # message already gone, that's fine
 
-        prompt = _build_claim_prompt(mission, party_name)
+        if is_urgent:
+            news = _load_recent_news()
+            prompt = _build_urgent_claim_prompt(mission, party_name, news)
+            fallback_emoji = "⚡"
+        else:
+            prompt = _build_claim_prompt(mission, party_name)
+            fallback_emoji = "✅"
         notice = await _generate(prompt)
         if not notice:
-            notice = f"✅ **CONTRACT CLAIMED — {mission['title']}**\n*Taken by {party_name}. Contract is no longer available.*"
+            notice = f"{fallback_emoji} **CONTRACT CLAIMED — {mission['title']}**\n*Taken by {party_name}. Contract is no longer available.*"
 
         # Post NPC claim notice to results channel (falls back to board if no access)
         results_ch = await _get_results_channel(client, fallback_channel=channel) if client else channel
@@ -1241,17 +3248,20 @@ async def check_claims(channel, client=None) -> None:
         complete_dt = datetime.utcnow() + timedelta(
             seconds=random.randint(1 * 24 * 3600, 3 * 24 * 3600)
         )
-        # 80% chance they succeed, 20% they fail
-        npc_outcome = "complete" if random.random() < 0.80 else "fail"
+        # 80% baseline success; a faction-leader assassination is near-impossible (~1%).
+        _success_chance = 0.01 if mission.get("target_is_leader") else 0.80
+        npc_outcome = "complete" if random.random() < _success_chance else "fail"
 
         mission["claimed"]              = True
         mission["resolved"]             = False   # NOT resolved yet — waiting for completion
         mission["npc_claimed"]          = True
+        mission["claim_party"]          = party_name   # who actually claimed it
         mission["claim_message_id"]     = new_msg.id
         mission["npc_complete_at"]      = complete_dt.isoformat()
         mission["npc_outcome"]          = npc_outcome
         updated = True
-        logger.info(f"🎟️ Mission claimed: {mission['title']} by {party_name} → {npc_outcome} at {complete_dt.strftime('%Y-%m-%d %H:%M')}")
+        urgency_tag = " [URGENT PICKUP]" if is_urgent else ""
+        logger.info(f"🎟️ Mission claimed{urgency_tag}: {mission['title']} by {party_name} → {npc_outcome} at {complete_dt.strftime('%Y-%m-%d %H:%M')}")
 
         # Notify DM
         if client:
@@ -1261,7 +3271,7 @@ async def check_claims(channel, client=None) -> None:
                 client,
                 f"🎟️ NPC Party Claimed Mission — {mission['title']}",
                 f"**Claimed by:** {party_name}\n"
-                f"**Faction:** {faction} | **Tier:** {tier}\n"
+                f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}\n"
                 f"*Expected outcome: {npc_outcome} in ~{(complete_dt - datetime.utcnow()).days + 1} day(s)*\n\n"
                 f"{mission.get('body', '').strip()}"
             )
@@ -1291,6 +3301,15 @@ async def check_npc_completions(channel, client=None) -> None:
     now      = datetime.utcnow()
     updated  = False
 
+    # Cap resolutions per hourly pass so a long outage drains as a steady
+    # stream of returning crews instead of one flood of notices, follow-up
+    # spawns, and casualties (26 were overdue after the 2026 summer downtime).
+    try:
+        _max_per_pass = int(os.getenv("NPC_COMPLETIONS_PER_PASS", "3"))
+    except Exception:
+        _max_per_pass = 3
+    _resolved_this_pass = 0
+
     for mission in missions:
         if mission.get("resolved"):
             continue
@@ -1305,6 +3324,9 @@ async def check_npc_completions(channel, client=None) -> None:
             continue
         if now < complete_dt:
             continue
+        if _resolved_this_pass >= _max_per_pass:
+            continue  # cap reached — the rest resolve on later passes
+        _resolved_this_pass += 1
 
         party_name = mission.get("claim_party", "Unknown Party")
         faction    = mission.get("faction", "")
@@ -1343,14 +3365,65 @@ RULES:
             results_ch = await _get_results_channel(client, fallback_channel=channel) if client else channel
             if results_ch:
                 await results_ch.send(notice + rep_footer)
+            await _resolve_strange_occurrence_subject(mission, results_channel=results_ch)
             logger.info(f"🏆 NPC completed: {title} by {party_name}")
+
+            # Record outcome for world memory and website display
+            from src.mission_outcomes import save_outcome
+            save_outcome({
+                "mission_id":       mission.get("id") or None,
+                "mission_title":    title,
+                "faction":          faction,
+                "opposing_faction": mission.get("opposing_faction", ""),
+                "tier":             tier,
+                "completed_by":     party_name,
+                "completed_at":     now.strftime("%Y-%m-%d"),
+                "result":           "completed",
+                "npcs_killed":      "",   # NPC parties do not kill named NPCs
+                "key_decisions":    "",
+                "location_changes": "",
+                "loose_threads":    "",
+                "notable_moments":  notice,
+                "consequences":     [],
+            })
+
+            mission["completed"] = True
+
+            # Track infiltration recon, then spawn the follow-up heist it scouted.
+            try:
+                if "infiltr" in str(mission.get("type") or mission.get("mission_type") or "").lower():
+                    from src.db_api import record_recon_outcome_for_mission
+                    _rid = record_recon_outcome_for_mission(
+                        mission.get("id"), "success", party_name=party_name, details=notice[:480],
+                        host_faction=mission.get("opposing_faction", "") or "", hiring_faction=faction,
+                        target=title,
+                    )
+                    if _rid:
+                        _spawn_followup_heist(mission, _rid, party_name)
+            except Exception as _recon_err:
+                logger.debug(f"recon record/spawn (NPC complete) skipped: {_recon_err}")
+            _record_investigation_recon(mission, "success", party_name, notice)
+
+            # A completed assassination of a REAL NPC injures them; the lifecycle
+            # then decides recovery or a move to the graveyard.
+            try:
+                _mt = str(mission.get("type") or mission.get("mission_type") or "").lower()
+                if (any(k in _mt for k in ("assassin", "eliminate", "wet work", "contract kill"))
+                        and mission.get("target_is_real") and mission.get("target_npc_name")):
+                    from src.npc_lifecycle import injure_npc_by_name
+                    injure_npc_by_name(mission["target_npc_name"], cause=f"contract fulfilled by {party_name}")
+            except Exception as _inj_err:
+                logger.debug(f"assassination injury skipped: {_inj_err}")
+
+            # Butterfly effect: ripple the success into the wider world.
+            _apply_mission_consequences(mission, True, party_name)
 
             if client:
                 party_line   = f"\n{format_party_rank_change(party_rep)}" if party_rep["shifted"] else f"\n📊 {party_name}: {party_rep['new_tier']} ({party_rep['points']:+d}/{PARTY_POINTS_TO_SHIFT})"
                 await _dm_notify(
                     client,
                     f"🏆 NPC Party Completed — {title}",
-                    f"**Party:** {party_name} | **Faction:** {faction} | **Tier:** {tier.upper()}"
+                    f"**Party:** {party_name} | **Faction:** {faction} | **Difficulty:** {_diff_word(mission)}"
                     f"{party_line}\n\n"
                     f"{mission.get('body', '').strip()}"
                 )
@@ -1387,12 +3460,49 @@ RULES:
                 await results_ch.send(notice + rep_footer)
             logger.info(f"💥 NPC failed: {title} by {party_name}")
 
+            # Record outcome for world memory and website display
+            from src.mission_outcomes import save_outcome
+            save_outcome({
+                "mission_id":       mission.get("id") or None,
+                "mission_title":    title,
+                "faction":          faction,
+                "opposing_faction": mission.get("opposing_faction", ""),
+                "tier":             tier,
+                "completed_by":     party_name,
+                "completed_at":     now.strftime("%Y-%m-%d"),
+                "result":           "failed",
+                "npcs_killed":      "",   # NPC parties do not kill named NPCs
+                "key_decisions":    "",
+                "location_changes": "",
+                "loose_threads":    "",
+                "notable_moments":  notice,
+                "consequences":     [],
+            })
+
+            mission["failed"] = True
+
+            # Track infiltration recon (a failed scout still tells follow-up crews something).
+            try:
+                if "infiltr" in str(mission.get("type") or mission.get("mission_type") or "").lower():
+                    from src.db_api import record_recon_outcome_for_mission
+                    record_recon_outcome_for_mission(
+                        mission.get("id"), "failure", party_name=party_name, details=notice[:480],
+                        host_faction=mission.get("opposing_faction", "") or "", hiring_faction=faction,
+                        target=title,
+                    )
+            except Exception as _recon_err:
+                logger.debug(f"recon record (NPC fail) skipped: {_recon_err}")
+
+            # Butterfly effect: ripple the failure into the wider world.
+            _apply_mission_consequences(mission, False, party_name)
+            _record_investigation_recon(mission, "failure", party_name, notice)
+
             if client:
                 party_line   = f"\n{format_party_rank_change(party_rep)}" if party_rep["shifted"] else f"\n📊 {party_name}: {party_rep['new_tier']} ({party_rep['points']:+d}/{PARTY_POINTS_TO_SHIFT})"
                 await _dm_notify(
                     client,
                     f"💥 NPC Party Failed — {title}",
-                    f"**Party:** {party_name} | **Faction:** {faction} | **Tier:** {tier.upper()}"
+                    f"**Party:** {party_name} | **Faction:** {faction} | **Difficulty:** {_diff_word(mission)}"
                     f"{party_line}\n\n"
                     f"{mission.get('body', '').strip()}"
                 )
@@ -1593,6 +3703,7 @@ class _MissionQuestionnaireModal(discord.ui.Modal):
 
         # Build outcome record from questionnaire answers
         outcome = {
+            "mission_id":        mission.get("id") or None,
             "mission_title":     mission.get("title", "Unknown"),
             "faction":           faction,
             "opposing_faction":  mission.get("opposing_faction", ""),
@@ -1614,6 +3725,20 @@ class _MissionQuestionnaireModal(discord.ui.Modal):
 
         # Save to persistent memory
         save_outcome(outcome)
+        _record_investigation_recon(
+            mission,
+            "success",
+            claimer,
+            " | ".join(
+                part for part in (
+                    outcome.get("key_decisions", ""),
+                    outcome.get("location_changes", ""),
+                    outcome.get("loose_threads", ""),
+                    outcome.get("notable_moments", ""),
+                )
+                if part
+            ),
+        )
 
         # Generate completion notice
         prompt = _build_complete_prompt(mission, claimer)
@@ -1622,7 +3747,7 @@ class _MissionQuestionnaireModal(discord.ui.Modal):
             notice = f"🏆 **CONTRACT COMPLETE — {mission['title']}**\n*{claimer} has returned. The contract is fulfilled.*"
 
         # Delete the old claim post from the board
-        board_channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        board_channel_id = int(mission.get("claim_channel_id") or os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
         board_channel = interaction.client.get_channel(board_channel_id)
         if board_channel:
             claim_msg_id = mission.get("claim_message_id")
@@ -1638,10 +3763,25 @@ class _MissionQuestionnaireModal(discord.ui.Modal):
         if results_channel:
             await results_channel.send(notice)
 
+        await _resolve_strange_occurrence_subject(
+            mission,
+            results_channel=results_channel,
+            consequences=consequences,
+        )
+
         mission["completed"] = True
         mission["resolved"]  = True
         _save_missions(missions)
         logger.info(f"✅ Mission completed via debrief: {mission['title']}")
+
+        # Async interview trigger — runs in background, won't block completion flow
+        try:
+            from src.party_interview import maybe_trigger_interview
+            asyncio.get_event_loop().create_task(
+                maybe_trigger_interview(outcome, mission, interaction.client)
+            )
+        except Exception as _ie:
+            logger.warning(f"party_interview trigger failed: {_ie}")
 
         # Faction reputation — gain with posting faction
         rep_result = on_mission_complete(faction) if faction else None
@@ -1660,6 +3800,11 @@ class _MissionQuestionnaireModal(discord.ui.Modal):
         conseq_lines = "\n".join(f"  {c}" for c in consequences) if consequences else "  No world changes."
 
         self.parent_view.stop()
+        if self.parent_view._original_message:
+            try:
+                await self.parent_view._original_message.edit(view=None)
+            except Exception:
+                pass
         await interaction.followup.send(
             f"🏆 **Mission Complete:** {mission['title']}{rep_line}{opposing_line}\n"
             f"\n**World Consequences:**\n{conseq_lines}\n"
@@ -1674,6 +3819,7 @@ class _MissionOutcomeView(discord.ui.View):
     def __init__(self, mission_index: int):
         super().__init__(timeout=None)  # persistent until clicked
         self.mission_index = mission_index
+        self._original_message = None  # set in button callbacks so modals can clear it
         # Unique custom_ids per mission so Discord can route them correctly
         for item in self.children:
             item.custom_id = f"{item.custom_id}_{mission_index}"
@@ -1690,7 +3836,8 @@ class _MissionOutcomeView(discord.ui.View):
             await interaction.response.send_message("Already resolved.", ephemeral=True)
             return
 
-        # Show the questionnaire modal
+        # Store so the modal can clear the buttons after resolving
+        self._original_message = interaction.message
         modal = _MissionQuestionnaireModal(self.mission_index, self)
         await interaction.response.send_modal(modal)
 
@@ -1706,6 +3853,7 @@ class _MissionOutcomeView(discord.ui.View):
             await interaction.response.send_message("Already resolved.", ephemeral=True)
             return
 
+        self._original_message = interaction.message
         modal = _MissionFailModal(self.mission_index, self)
         await interaction.response.send_modal(modal)
 
@@ -1770,6 +3918,7 @@ class _MissionFailModal(discord.ui.Modal):
 
         # Build outcome record
         outcome = {
+            "mission_id":      mission.get("id") or None,
             "mission_title":   mission.get("title", "Unknown"),
             "faction":         faction,
             "tier":            mission.get("tier", "standard"),
@@ -1787,6 +3936,18 @@ class _MissionFailModal(discord.ui.Modal):
         consequences = process_outcome_consequences(outcome)
         outcome["consequences"] = consequences
         save_outcome(outcome)
+        _record_investigation_recon(
+            mission,
+            "failure",
+            claimer,
+            " | ".join(
+                part for part in (
+                    outcome.get("key_decisions", ""),
+                    outcome.get("loose_threads", ""),
+                )
+                if part
+            ),
+        )
 
         # Generate failure notice
         fail_prompt = f"""You are the Undercity mission board posting a failure notice.
@@ -1803,7 +3964,7 @@ RULES: Gritty, terse. No preamble, no sign-off."""
             notice = f"💥 **CONTRACT FAILED — {mission['title']}**\n*{claimer} did not complete the job. The faction is not pleased.*"
 
         # Delete old claim post
-        board_channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        board_channel_id = int(mission.get("claim_channel_id") or os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
         board_channel = interaction.client.get_channel(board_channel_id)
         if board_channel:
             claim_msg_id = mission.get("claim_message_id")
@@ -1829,6 +3990,11 @@ RULES: Gritty, terse. No preamble, no sign-off."""
         conseq_lines = "\n".join(f"  {c}" for c in consequences) if consequences else "  No world changes."
 
         self.parent_view.stop()
+        if self.parent_view._original_message:
+            try:
+                await self.parent_view._original_message.edit(view=None)
+            except Exception:
+                pass
         await interaction.followup.send(
             f"💥 **Mission Failed:** {mission['title']}{rep_line}\n"
             f"\n**World Consequences:**\n{conseq_lines}\n"
@@ -1857,6 +4023,15 @@ async def handle_reaction_claim(reaction, user, dm_id: int, client=None) -> None
         return
 
     player_name = user.display_name
+    if not _claim_mission_atomically(int(mission.get("id") or 0), player_name):
+        logger.info(f"Reaction claim lost race for mission: {mission.get('title', '?')}")
+        return
+
+    # Claim immediately so two fast reactions cannot both generate modules.
+    mission["claimed"]          = True
+    mission["resolved"]         = False
+    mission["player_claimer"]   = player_name
+    _save_missions(missions)
 
     # Delete original post from mission board
     try:
@@ -1876,23 +4051,16 @@ async def handle_reaction_claim(reaction, user, dm_id: int, client=None) -> None
     results_channel = await _get_results_channel(client, fallback_channel=reaction.message.channel) if client else reaction.message.channel
     new_msg = await results_channel.send(notice)
 
-    mission["claimed"]          = True
-    mission["resolved"]         = False  # not resolved until DM marks outcome
-    mission["player_claimer"]   = player_name
     mission["claim_message_id"] = new_msg.id
+    mission["claim_channel_id"] = new_msg.channel.id
     _save_missions(missions)
     logger.info(f"⚔️ Mission claimed by player: {mission['title']} → {player_name}")
 
-    # Auto-generate mission module in background
+    # Auto-generate mission module via durable worker.
     if client:
-        try:
-            from src.cogs.module_gen import generate_and_post_module
-            asyncio.get_event_loop().create_task(
-                generate_and_post_module(mission, player_name, client)
-            )
-            logger.info(f"📖 Module generation queued for '{mission['title']}'")
-        except Exception as e:
-            logger.warning(f"📖 Could not queue module generation: {e}")
+        job_id = _queue_module_generation(mission, player_name)
+        if job_id:
+            logger.info(f"Module generation job #{job_id} queued for '{mission['title']}'")
 
     # Send DM to game master with outcome buttons
     if client:
@@ -1905,12 +4073,132 @@ async def handle_reaction_claim(reaction, user, dm_id: int, client=None) -> None
             await dm_user.send(
                 f"⚔️ **Mission Claimed — {mission['title']}**\n"
                 f"**Claimer:** {player_name}{personal}\n"
-                f"**Faction:** {faction} | **Tier:** {tier}\n"
+                f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}\n"
                 f"*When the mission resolves, press a button below.*",
                 view=view
             )
         except Exception as e:
             logger.warning(f"DM button notify failed: {e}")
+
+
+async def handle_dashboard_claim(mission_id: int, player_name: str = "DM Dashboard", client=None) -> bool:
+    """
+    Claim a mission from the web dashboard using the bot's live Discord client.
+
+    The dashboard cannot safely "press" the Discord reaction itself: bot-authored
+    reactions are ignored by our raw reaction handler and may not behave like a
+    real player reaction. This mirrors handle_reaction_claim directly so the
+    board post, claim notice, DM outcome buttons, and module generation all stay
+    on the normal Discord path.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        from src.db_api import set_global_state as _set_claim_state
+    except Exception:
+        _set_claim_state = None
+
+    def _claim_state(state: str, message: str, **extra) -> None:
+        if not _set_claim_state:
+            return
+        try:
+            _set_claim_state(f"dashboard_claim_status:{int(mission_id)}", {
+                "state": state,
+                "mission_id": int(mission_id),
+                "message": message,
+                "updated_at": datetime.utcnow().isoformat(),
+                **extra,
+            })
+        except Exception as exc:
+            logger.warning(f"Dashboard claim status update failed: {exc}")
+
+    missions = _load_missions()
+    mission_index = next((i for i, m in enumerate(missions) if int(m.get("id") or 0) == int(mission_id)), None)
+    if mission_index is None:
+        logger.warning(f"⚔️ Dashboard claim: mission ID {mission_id} not found")
+        _claim_state("failed", "Mission not found")
+        return False
+
+    mission = missions[mission_index]
+    if mission.get("resolved") or mission.get("claimed") or mission.get("status") == "claimed":
+        logger.info(f"⚔️ Dashboard claim ignored; mission already claimed/resolved: {mission.get('title', '?')}")
+        _claim_state("claimed", "Mission is already claimed", title=mission.get("title", "Unknown Mission"))
+        return False
+
+    _claim_state("claiming", "Bot is claiming the Discord board post", title=mission.get("title", "Unknown Mission"))
+    if not _claim_mission_atomically(int(mission.get("id") or 0), player_name):
+        _claim_state("claimed", "Mission was already claimed by another actor", title=mission.get("title", "Unknown Mission"))
+        return False
+    mission["claimed"] = True
+    mission["resolved"] = False
+    mission["player_claimer"] = player_name
+    _save_missions(missions)
+
+    board_channel = None
+    original_msg = None
+    if client:
+        channel_id = int(os.getenv("MISSION_BOARD_CHANNEL_ID", 0))
+        board_channel = client.get_channel(channel_id) if channel_id else None
+        if board_channel is None and channel_id:
+            try:
+                board_channel = await client.fetch_channel(channel_id)
+            except Exception as e:
+                logger.warning(f"⚔️ Dashboard claim: board channel unavailable: {e}")
+        if board_channel and mission.get("message_id"):
+            try:
+                original_msg = await board_channel.fetch_message(int(mission["message_id"]))
+                await original_msg.delete()
+            except Exception as e:
+                logger.warning(f"⚔️ Dashboard claim: could not delete board post: {e}")
+
+    prompt = _build_player_claim_prompt(mission, player_name)
+    notice = await _generate(prompt)
+    if not notice:
+        notice = (
+            f"⚔️ **CONTRACT TAKEN — {mission['title']}**\n"
+            f"*Claimed by {player_name}. The board has been updated.*"
+        )
+
+    results_channel = await _get_results_channel(client, fallback_channel=board_channel) if client else board_channel
+    if results_channel:
+        try:
+            new_msg = await results_channel.send(notice)
+            mission["claim_message_id"] = new_msg.id
+            mission["claim_channel_id"] = new_msg.channel.id
+            _save_missions(missions)
+        except Exception as e:
+            logger.warning(f"⚔️ Dashboard claim: could not post claim notice: {e}")
+
+    logger.info(f"⚔️ Mission claimed from dashboard: {mission['title']} → {player_name}")
+
+    if client:
+        try:
+            job_id = _queue_module_generation(mission, player_name)
+            _claim_state("module_queued", "Mission claimed; module generation queued", title=mission.get("title", "Unknown Mission"), module_job_id=job_id)
+            logger.info(f"Module generation job #{job_id} queued for dashboard claim '{mission['title']}'")
+        except Exception as e:
+            _claim_state("failed", f"Could not queue module generation: {e}", title=mission.get("title", "Unknown Mission"))
+            logger.warning(f"Could not queue dashboard module generation: {e}")
+
+        dm_id = int(os.getenv("DM_USER_ID", 0))
+        if dm_id:
+            tier = mission.get("tier", "?").upper()
+            faction = mission.get("faction", "Unknown Faction")
+            personal = f" *(personal contract for {mission['personal_for']})*" if mission.get("personal_for") else ""
+            try:
+                dm_user = await client.fetch_user(dm_id)
+                view = _MissionOutcomeView(mission_index=mission_index)
+                await dm_user.send(
+                    f"⚔️ **Mission Claimed — {mission['title']}**\n"
+                    f"**Claimer:** {player_name}{personal}\n"
+                    f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}\n"
+                    f"*When the mission resolves, press a button below.*",
+                    view=view,
+                )
+            except Exception as e:
+                logger.warning(f"Dashboard DM button notify failed: {e}")
+
+    return True
 
 
 async def handle_reaction_complete(reaction, user, dm_id: int, client=None) -> None:
@@ -1970,7 +4258,7 @@ async def handle_reaction_complete(reaction, user, dm_id: int, client=None) -> N
             client,
             f"🏆 Mission Completed — {mission['title']}",
             f"**Completed by:** {claimer}\n"
-            f"**Faction:** {faction} | **Tier:** {tier}"
+            f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}"
             f"{rep_line}\n\n"
             f"{mission.get('body', '').strip()}"
         )
@@ -2051,10 +4339,366 @@ RULES:
             client,
             f"💥 Mission Failed — {mission['title']}",
             f"**Failed by:** {claimer}\n"
-            f"**Faction:** {faction} | **Tier:** {tier}"
+            f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}"
             f"{rep_line}\n\n"
             f"{mission.get('body', '').strip()}"
         )
+
+
+def _spawn_followup_heist(source_mission: dict, dossier_id: int, party_name: str) -> None:
+    """A successful infiltration that cased a steal-able score spawns its follow-up
+    heist as a new active mission, carrying the recon dossier id forward as a hard
+    parent link. The dossier is reserved so no other job grabs it."""
+    try:
+        import json as _json
+        import re as _re
+        from src.db_api import get_recon_by_id, create_mission, mark_recon_consumed
+        rec = get_recon_by_id(dossier_id)
+        if not rec:
+            return
+        dossier = rec.get("dossier") or {}
+        target  = rec.get("target") or dossier.get("target") or ""
+        kind    = (rec.get("target_kind") or dossier.get("target_kind") or "").lower()
+        intel   = f"{target} {dossier.get('target', '')}".lower()
+        # Only scouts that cased a steal-able score spawn a heist (cult vigils etc. don't).
+        heist_worthy = kind == "item" or any(w in intel for w in ("heist", "vault", "floor plan", "prize", "shipment", "ledger", "relic"))
+        if not heist_worthy:
+            return
+        hiring   = rec.get("hiring_faction") or source_mission.get("faction") or "Independent"
+        host     = rec.get("host_faction") or source_mission.get("opposing_faction") or "a private owner"
+        venue    = rec.get("venue") or ""
+        district = rec.get("district") or ""
+        event    = dossier.get("event") or rec.get("event_name") or "the scout"
+        score    = target or "the scouted prize"
+        score_clean = _re.sub(r"^(the|a|an)\s+", "", score, flags=_re.I).strip() or score
+        tier     = source_mission.get("tier") or "standard"
+        title    = f"The {score_clean.title()} Job"
+        body = (
+            f"Recon is in. {party_name or 'A scouting crew'} cased {venue or 'the target'}"
+            + (f" in the {district}" if district else "")
+            + f" during {event}. {hiring} wants {score} lifted from {host} before the window closes."
+        )
+        mj = {
+            "type": "Heist", "title": title, "faction": hiring, "opposing_faction": host,
+            "tier": tier, "difficulty": source_mission.get("difficulty") or 5,
+            "contact": source_mission.get("contact") or "", "body": body,
+            "reward": source_mission.get("reward") or "See posting",
+            "parent_recon_id": dossier_id, "parent_mission_id": source_mission.get("id"),
+            "target": score,
+        }
+        new_id = create_mission({
+            "title": title, "faction": hiring, "difficulty": str(mj["difficulty"]),
+            "tier": tier, "status": "active",
+            "mission_json": _json.dumps(mj, ensure_ascii=False, default=str),
+        })
+        if new_id:
+            mark_recon_consumed(dossier_id, new_id)  # reserve it for this follow-up
+            logger.info(f"🧩 Infiltration success spawned follow-up heist #{new_id}: {title!r} (recon #{dossier_id})")
+    except Exception as e:
+        logger.debug(f"spawn followup heist skipped: {e}")
+
+
+def _record_investigation_recon(source_mission: dict, outcome: str, party_name: str, details: str = "") -> int:
+    """Turn investigation outcomes into durable recon for stealth follow-ups."""
+    try:
+        mtype = str(source_mission.get("type") or source_mission.get("mission_type") or "").lower()
+        if "investig" not in mtype:
+            return 0
+        from src.db_api import record_recon_outcome_for_mission
+        usable_outcome = "partial" if outcome == "success" else "failure"
+        return record_recon_outcome_for_mission(
+            source_mission.get("id"),
+            usable_outcome,
+            party_name=party_name,
+            details=details[:480],
+            host_faction=source_mission.get("opposing_faction", "") or "",
+            hiring_faction=source_mission.get("faction", "") or "",
+            target=source_mission.get("title", ""),
+            target_kind="intel",
+            venue=source_mission.get("location", "") or source_mission.get("primary_location", ""),
+            district=source_mission.get("location", "") or source_mission.get("primary_location", ""),
+            event_name=source_mission.get("title", ""),
+        )
+    except Exception as e:
+        logger.debug(f"investigation recon record skipped: {e}")
+        return 0
+
+
+def _adjust_faction_rep(name: str, delta: int) -> None:
+    """Nudge a faction's reputation score (the world reacting to a mission outcome)."""
+    if not name or not delta:
+        return
+    try:
+        from src.db_api import get_faction_reputation, set_faction_reputation
+        rep = get_faction_reputation(name) or {}
+        score = int(rep.get("reputation_score") or 0) + int(delta)
+        set_faction_reputation(name, score)
+    except Exception as e:
+        logger.debug(f"faction rep adjust skipped ({name}): {e}")
+
+
+def _spawn_followup(source_mission: dict, m_type: str, title: str, faction: str, opposing: str, body: str, **extra) -> int:
+    """Spawn a follow-up mission (a -> b cause/effect). Guarded against board flood."""
+    try:
+        if _count_active_normal() >= MAX_ACTIVE_NORMAL:
+            return 0
+        import json as _json
+        from src.db_api import create_mission
+        mj = {
+            "type": m_type, "title": title, "faction": faction or "Independent",
+            "opposing_faction": opposing or "", "tier": source_mission.get("tier") or "standard",
+            "difficulty": source_mission.get("difficulty") or 5, "body": body,
+            "reward": source_mission.get("reward") or "See posting",
+            "parent_mission_id": source_mission.get("id"),
+        }
+        mj.update(extra or {})
+        new_id = create_mission({
+            "title": title, "faction": mj["faction"], "difficulty": str(mj["difficulty"]),
+            "tier": mj["tier"], "status": "active",
+            "mission_json": _json.dumps(mj, ensure_ascii=False, default=str),
+        })
+        if new_id:
+            logger.info(f"🦋 Butterfly: {source_mission.get('type','?')} outcome spawned {m_type} #{new_id}: {title!r}")
+        return new_id or 0
+    except Exception as e:
+        logger.debug(f"spawn followup skipped: {e}")
+        return 0
+
+
+def _mission_district(mission: dict) -> str:
+    """Best-effort: return a real district name literally mentioned in the mission,
+    matched against the known district list. Empty string if none is confident.
+    Keeps district-wealth ripples from ever writing a garbage district."""
+    try:
+        from src.area_generator import get_all_district_names
+        names = get_all_district_names() or []
+    except Exception:
+        names = []
+    if not names:
+        return ""
+    hay = " ".join(str(mission.get(k) or "") for k in ("title", "body", "public_text", "story_text")).lower()
+    for d in sorted(names, key=len, reverse=True):  # longest first: 'Outer Wall' beats stray 'Wall'
+        if d and d.lower() in hay:
+            return d
+    return ""
+
+
+def _district_wealth(mission: dict, delta: int, reason: str) -> None:
+    """Ripple a territorial/economic outcome into district wealth (a -> world).
+    No-ops silently when the mission's district cannot be confidently resolved."""
+    try:
+        dist = _mission_district(mission)
+        if not dist:
+            return
+        from src.db_api import adjust_district_wealth
+        adjust_district_wealth(dist, int(delta), reason)
+        logger.info(f"🦋 Butterfly: {mission.get('type','?')} shifted {dist} wealth {delta:+d} ({reason})")
+    except Exception as e:
+        logger.debug(f"district wealth ripple skipped: {e}")
+
+
+def _battlefield_casualty(faction: str, label: str, chance: float = 0.40) -> None:
+    """A violent outcome (battle/assault/ambush) may wound a non-leader member of the
+    LOSING faction; the NPC lifecycle then resolves recovery (~90%) or graveyard (~10%).
+    Gated by probability and never targets faction leaders (CLAUDE.md guardrail)."""
+    if not faction or random.random() >= chance:
+        return
+    try:
+        from src.npc_lifecycle import wound_random_faction_member
+        name = wound_random_faction_member(faction, cause=label)
+        if name:
+            logger.info(f"Butterfly: {label} wounded {name} ({faction}) -- lifecycle resolves recovery or death")
+    except Exception as e:
+        logger.debug(f"battlefield casualty skipped: {e}")
+
+
+def _apply_mission_consequences(mission: dict, success: bool, party_name: str) -> None:
+    """Butterfly effect: a resolved mission ripples into faction standing and, sometimes,
+    a spawned follow-up. Infiltration and Assassination are handled at their own hooks;
+    this covers the rest. Faction-rep nudges always apply; spawns are gated."""
+    import random as _r
+    mtype = str(mission.get("type") or mission.get("mission_type") or "").lower()
+    faction = mission.get("faction") or ""        # the employer / actor
+    opp = mission.get("opposing_faction") or ""   # the other side / victim
+
+    # The claiming NPC crew pays a blood price on violent work. party_lifecycle
+    # owns the mutation (gated + guarded there: protected parties skipped, one
+    # wound resolved by the NPC lifecycle, wipeouts rare and fail-only).
+    try:
+        from src.party_lifecycle import mission_party_casualties
+        _pc = mission_party_casualties(party_name, mission, success)
+        if _pc.get("destroyed"):
+            logger.info(f"Butterfly: crew '{party_name}' was destroyed in the field during '{mission.get('title', '')}'")
+            try:
+                from src.news_feed import _write_memory
+                _write_memory(f"The adventuring crew '{party_name}' was destroyed in the field during '{mission.get('title', '')}'. Wounded survivors scattered; the registry struck the crew's charter.")
+            except Exception:
+                pass
+        elif _pc.get("wounded"):
+            logger.info(f"Butterfly: {', '.join(_pc['wounded'])} of '{party_name}' wounded during '{mission.get('title', '')}'")
+    except Exception as _pce:
+        logger.debug(f"party casualty pass skipped: {_pce}")
+
+    try:
+        if "heist" in mtype or "steal" in mtype or "smuggl" in mtype or "theft" in mtype:
+            if success:
+                _adjust_faction_rep(opp, -2); _adjust_faction_rep(faction, +1)
+                if opp and _r.random() < 0.30:
+                    _spawn_followup(mission, "Recovery", "Recover What Was Taken", opp, faction,
+                                    f"{opp} was robbed and wants the score back. Track the crew and recover it before it is fenced.")
+            else:
+                _adjust_faction_rep(faction, -1)
+        elif "defense" in mtype or "defend" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +2)
+            else:
+                _adjust_faction_rep(faction, -2); _adjust_faction_rep(opp, +1)
+                if opp and _r.random() < 0.45:
+                    _spawn_followup(mission, "Assault", "Press the Advantage", opp, faction,
+                                    f"{faction}'s defense buckled; {opp} moves to seize the ground they lost.")
+        elif "sabotage" in mtype:
+            if success:
+                _adjust_faction_rep(opp, -2)
+                if opp and _r.random() < 0.35:
+                    _spawn_followup(mission, "Investigation", "Who Sabotaged Us", opp, faction,
+                                    f"Something of {opp}'s was sabotaged. Find who did it -- the trail may lead back to {faction}.")
+        elif "investigation" in mtype or "investigate" in mtype or "mystery" in mtype:
+            if success and _r.random() < 0.35:
+                _spawn_followup(mission, "Assassination", "Silence the Culprit", faction, opp,
+                                f"The investigation named a culprit. {faction or 'The client'} wants the loose end removed quietly.")
+        elif "negotiation" in mtype or "negotiate" in mtype or "diplomacy" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1); _adjust_faction_rep(opp, +1)
+            else:
+                _adjust_faction_rep(opp, -1)
+                if opp and _r.random() < 0.45:
+                    _spawn_followup(mission, "Defense", "When Talks Failed", faction, opp,
+                                    f"Negotiations between {faction} and {opp} collapsed. It came to force.")
+        elif "infestation" in mtype:
+            if not success and _r.random() < 0.45:
+                _spawn_followup(mission, "Infestation", "The Nest Spread", faction, opp,
+                                "The infestation was not contained and has spread. Clear it before it roots deeper.")
+        elif "ambush" in mtype:
+            if success:
+                _adjust_faction_rep(opp, -2); _adjust_faction_rep(faction, +1)
+                _district_wealth(mission, -2, f"ambush bled trade on the route ({faction} vs {opp})")
+                _battlefield_casualty(opp, "an ambush")
+                if opp and _r.random() < 0.35:
+                    _spawn_followup(mission, "Ambush", "Return the Favor on the Road", opp, faction,
+                                    f"{opp} was bled in an ambush and now knows the road. They lie in wait to repay {faction} in kind.")
+            else:
+                _adjust_faction_rep(faction, -2); _adjust_faction_rep(opp, +1)
+                _battlefield_casualty(faction, "a failed ambush")
+                if opp and _r.random() < 0.30:
+                    _spawn_followup(mission, "Ambush", "Caught in the Open", opp, faction,
+                                    f"{faction}'s ambush failed and gave away the route. {opp} presses the advantage on the same ground.")
+        elif "assault" in mtype:
+            if success:
+                _adjust_faction_rep(opp, -3); _adjust_faction_rep(faction, +1)
+                _district_wealth(mission, +2, f"{faction} seized contested ground from {opp}")
+                _battlefield_casualty(opp, "an assault on their position")
+                if opp and _r.random() < 0.45:
+                    _spawn_followup(mission, "Assault", "Retake the Ground", opp, faction,
+                                    f"{opp} lost ground to {faction}'s assault and masses to take it back before the hold sets in.")
+            else:
+                _adjust_faction_rep(faction, -2); _adjust_faction_rep(opp, +1)
+                _battlefield_casualty(faction, "a repelled assault")
+                if opp and _r.random() < 0.35:
+                    _spawn_followup(mission, "Defense", "Hold After the Failed Storm", faction, opp,
+                                    f"{faction}'s assault broke against {opp}. Now {opp} counterpushes and the line must hold.")
+        elif "battle" in mtype:
+            _district_wealth(mission, -3, "open battle ravaged the district")
+            if success:
+                _adjust_faction_rep(faction, +2); _adjust_faction_rep(opp, -2)
+                _battlefield_casualty(opp, "open battle")
+                if _r.random() < 0.30:
+                    _spawn_followup(mission, "Recovery", "Clear the Field", faction, opp,
+                                    "The battle is won but the field is strewn with wounded and dropped gear. Recover what -- and who -- can still be saved.")
+            else:
+                _adjust_faction_rep(faction, -3); _adjust_faction_rep(opp, +2)
+                _battlefield_casualty(faction, "open battle")
+                if opp and _r.random() < 0.30:
+                    _spawn_followup(mission, "Ambush", "Rout the Survivors", opp, faction,
+                                    f"{faction} lost the battle. {opp} hunts the scattered survivors before they can regroup.")
+        elif "gather" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+                _district_wealth(mission, +2, f"{faction} brought gathered supply to market")
+            else:
+                _adjust_faction_rep(faction, -1)
+                _district_wealth(mission, -2, "the haul failed and stock ran short")
+                if _r.random() < 0.25:
+                    _spawn_followup(mission, "Escort", "Protect the Last Shipment", faction, opp,
+                                    f"With the gather failed, what stock remains is precious. {faction} needs it moved under guard before it is lost too.")
+        elif "recover" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+                if opp:
+                    _adjust_faction_rep(opp, -1)
+                if opp and _r.random() < 0.30:
+                    _spawn_followup(mission, "Heist", "Snatch It Back", opp, faction,
+                                    f"What {faction} recovered, {opp} means to steal again before it is locked away. They are already casing the handoff.")
+            else:
+                _adjust_faction_rep(faction, -1)
+                if opp:
+                    _adjust_faction_rep(opp, +1)
+        elif "puzzle" in mtype:
+            if success and _r.random() < 0.35:
+                _spawn_followup(mission, "Recovery", "Behind the Open Seal", faction, opp,
+                                f"The mechanism yielded. Whatever it guarded is now reachable -- but not for long. {faction or 'The client'} wants it secured.")
+            elif not success:
+                _adjust_faction_rep(faction, -1)
+        elif "discover" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+                if _r.random() < 0.35:
+                    _spawn_followup(mission, "Recovery", "Claim the Discovery", faction, opp,
+                                    f"What {faction} uncovered will not stay unclaimed. Secure it before a rival reaches it first.")
+            else:
+                if opp and _r.random() < 0.20:
+                    _spawn_followup(mission, "Discovery", "A Rival Got There First", opp, faction,
+                                    f"{faction} came up empty -- and word says {opp} is already closing on the same find.")
+        elif "explor" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+                if _r.random() < 0.30:
+                    _spawn_followup(mission, "Discovery", "Beyond the Charted Way", faction, opp,
+                                    f"{faction} charted the route. Now something at the far end of it is worth going back for.")
+            else:
+                _adjust_faction_rep(faction, -1)
+                if _r.random() < 0.25:
+                    _spawn_followup(mission, "Ambush", "Something Followed Them Back", opp or faction, faction,
+                                    f"The expedition stirred up more than it mapped, and it tailed {faction} home.")
+        elif "contact" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+                if opp:
+                    _adjust_faction_rep(opp, +1)
+                if opp and _r.random() < 0.30:
+                    _spawn_followup(mission, "Negotiation", "Seal the Accord", faction, opp,
+                                    f"First contact between {faction} and {opp} went well. Now someone has to sit at the table and make it formal.")
+            else:
+                if opp:
+                    _adjust_faction_rep(opp, -2)
+                if opp and _r.random() < 0.40:
+                    _spawn_followup(mission, "Defense", "When Contact Turned Cold", faction, opp,
+                                    f"First contact with {opp} soured into open hostility. {faction} braces for what comes next.")
+        elif "escort" in mtype or "rescue" in mtype:
+            _adjust_faction_rep(faction, +1 if success else -1)
+        elif "delivery" in mtype or "deliver" in mtype:
+            if success:
+                _adjust_faction_rep(faction, +1)
+            else:
+                _adjust_faction_rep(faction, -1)
+                if _r.random() < 0.25:
+                    _spawn_followup(mission, "Recovery", "The Delivery Never Arrived", faction, opp,
+                                    f"{faction}'s shipment vanished en route. Trace it and recover the cargo before it surfaces on someone else's books.")
+        elif "political" in mtype:
+            _adjust_faction_rep(faction, +1 if success else -1)
+            if opp:
+                _adjust_faction_rep(opp, -1 if success else +1)
+    except Exception as e:
+        logger.debug(f"mission consequences skipped: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -2077,15 +4721,34 @@ async def post_mission(channel) -> None:
         return
 
     recent = _load_missions()
-    prompt = _build_mission_prompt(recent)
+    logger.info(f"📋 [GEN] Building mission prompt ({len(recent)} recent missions in context) ...")
+    prompt, rotation_faction = _build_mission_prompt(recent)
+    logger.info(f"📋 [GEN] Prompt ready ({len(prompt.split())}w) — calling LLM ...")
     text = await _generate(prompt)
     if not text:
-        logger.warning("mission_board: generation returned None")
+        logger.warning("📋 [GEN] Generation returned None — mission skipped")
         return
 
+    logger.info(f"📋 [GEN] LLM returned {len(text.split())}w — parsing mission ...")
     mission = _parse_mission(text)
+    _bake_assassination_target(mission)  # bake target NPC before the embed (leaders -> difficulty 10)
+    _bake_strange_occurrence_subject(mission)  # tie an illegal return + hint at it in the card
+    parsed_faction = _normalise_rotation_faction(mission.get("faction", ""))
+    if parsed_faction != rotation_faction:
+        logger.warning(
+            f"📋 [GEN] Faction override: model returned '{mission.get('faction', '?')}', "
+            f"rotation requires '{rotation_faction}'"
+        )
+        mission["faction"] = rotation_faction
     expires_dt = datetime.fromisoformat(mission["expires_at"])
     days_left = (expires_dt - datetime.utcnow()).days
+
+    logger.info(
+        f"📋 [GEN] Parsed: '{mission.get('title','?')}' | "
+        f"type={mission.get('type','?')} | tier={mission.get('tier','?')} | "
+        f"faction={mission.get('faction','?')} | reward={mission.get('reward','?')} | "
+        f"expires={days_left}d"
+    )
 
     # Build color-coded embed based on faction reputation
     from src.faction_reputation import get_faction_color, get_faction_tier_label
@@ -2093,15 +4756,8 @@ async def post_mission(channel) -> None:
     embed_color = get_faction_color(faction) if faction else 0xE6C300  # yellow default
     tier_label = get_faction_tier_label(faction) if faction else "😐 Neutral"
 
-    embed = discord.Embed(
-        description=text,
-        color=embed_color,
-    )
-    opposing = mission.get("opposing_faction", "")
-    footer_parts = [f"Standing: {tier_label}", f"Expires in {days_left}d", "React ⚔️ to claim"]
-    if opposing:
-        footer_parts.insert(1, f"⚠️ Opposes: {opposing}")
-    embed.set_footer(text="  •  ".join(footer_parts))
+    embed = _build_mission_embed(mission, embed_color, tier_label, days_left)
+    logger.info(f"📋 [GEN] Embed built — posting to channel ...")
 
     msg = await channel.send(embed=embed)
     mission["message_id"] = msg.id
@@ -2113,8 +4769,222 @@ async def post_mission(channel) -> None:
     except Exception:
         pass
 
+    opposing = mission.get("opposing_faction", "")
     opp_log = f", opposes {opposing}" if opposing else ""
     logger.info(f"📋 Mission posted: {mission['title']} (tier: {mission['tier']}, {days_left}d, {tier_label}{opp_log}) — open for party claims in {CLAIM_DAYS_MIN}d")
+
+
+async def post_calendar_triggered_mission(channel, ev: dict) -> bool:
+    """Generate and post a mission triggered by a resolved faction calendar event.
+
+    Uses the event's entry in _EVENT_MISSION_MAP to build a targeted brief, then
+    runs through the standard mission generation pipeline. Returns True if a mission
+    was posted successfully.
+
+    Caller is responsible for calling mark_mission_spawned(ev) on True.
+    """
+    from src.faction_calendar import get_mission_params
+    from src.resource_cop import (
+        wait_for_ollama_turn, start_pipeline, finish_pipeline, append_pipeline_failure,
+    )
+    from src.faction_reputation import get_faction_color, get_faction_tier_label
+
+    mission_type, brief, faction, expires_days = get_mission_params(ev)
+    event_name = ev.get("type", "unknown")
+    label = "calendar_mission_spawn"
+
+    # Resource cop — don't pile onto Ollama
+    decision = await wait_for_ollama_turn(label, track="primary")
+    if not decision.run_now:
+        logger.warning(
+            f"📅 [CAL-MISSION] Deferred by cop for '{event_name}': {decision.reason}"
+        )
+        return False
+
+    # Board cap check — calendar missions still count against the normal cap
+    active = _count_active_normal()
+    if active >= MAX_ACTIVE_NORMAL:
+        logger.info(
+            f"📅 [CAL-MISSION] Board cap reached ({active}/{MAX_ACTIVE_NORMAL}) — "
+            f"deferring '{event_name}' mission"
+        )
+        return False
+
+    run = await start_pipeline(
+        label,
+        mission_title=f"[calendar] {event_name}",
+        mission_type=mission_type,
+        phase="generating",
+    )
+    try:
+        npc_block  = _build_npc_context()
+        area_block = _load_area_context_block()
+
+        prompt = f"""{_LORE}
+
+{npc_block}
+{area_block}
+
+---
+You are the Undercity mission board. Generate ONE mission contract posting.
+
+MISSION PARAMETERS:
+- Faction: {faction}
+- Mission type: {mission_type}
+- Triggered by: {faction} — {event_name} (this event just concluded)
+- Expires in: {expires_days} days (time-sensitive follow-up work)
+
+DM BRIEF — write the mission from this seed:
+{brief}
+
+REQUIRED FORMAT — output exactly this structure, nothing else:
+
+**FACTION NAME — MISSION TITLE**
+*Type: {mission_type} | Difficulty: [1-10] | Expires: TBD | Reward: [X EC + optional Kharma]*
+*Opposes: [faction name, or "None"]*
+
+[1-2 brief surface-level sentences describing the public job. No hidden truths.]
+
+*Contact:[NPC name from the list above], [location] — [one detail: what they lose if this fails]*
+
+TITLE RULES:
+- Maximum 6 words. Must contain at least one proper noun (district, NPC name, faction, object).
+- BANNED patterns: "The [Adjective] [Abstract Noun]" — no "The Silent X", "The Dark X", "The Burning X"
+- BANNED words: Harvest, Shadow, Darkness, Silence, Reckoning, Unraveling, Corruption, Awakening, Legacy, Void, Storm, Forgotten, Ancient, Flame, Crimson
+
+PROSE RULES:
+- Noir city dispatch. Every sentence names a specific place, person, or thing.
+- STAKES must be personal: "Mira Kaelth will lose her position" beats "trade routes disrupted"
+- CONTACT must have skin in the game — what they lose if the party fails
+- Do NOT reveal hidden truths, solutions, or module-only details."""
+
+        text = await _generate(prompt)
+        if not text:
+            logger.warning(f"📅 [CAL-MISSION] Generation empty for '{event_name}'")
+            await finish_pipeline(run.run_id, status="empty")
+            return False
+
+        mission = _parse_mission(text)
+        mission["faction"] = faction
+        mission["type"] = mission_type
+        # Override expiry with event-specific window
+        mission["expires_at"] = (
+            datetime.utcnow() + timedelta(days=expires_days)
+        ).isoformat()
+        mission["calendar_event"] = event_name  # tag for traceability
+
+        expires_dt = datetime.fromisoformat(mission["expires_at"])
+        days_left  = max(1, (expires_dt - datetime.utcnow()).days)
+
+        embed_color = get_faction_color(faction) if faction else 0xE6C300
+        tier_label  = get_faction_tier_label(faction) if faction else "😐 Neutral"
+        embed = _build_mission_embed(mission, embed_color, tier_label, days_left)
+
+        msg = await channel.send(embed=embed)
+        mission["message_id"] = msg.id
+        _add_mission(mission)
+
+        try:
+            await msg.add_reaction(EMOJI_CLAIM)
+        except Exception:
+            pass
+
+        logger.info(
+            f"📅 [CAL-MISSION] Posted '{mission.get('title','?')}' "
+            f"({mission_type}, {faction}, {days_left}d) from event '{event_name}'"
+        )
+        await finish_pipeline(run.run_id, status="finished")
+        return True
+
+    except Exception as exc:
+        await append_pipeline_failure(run.run_id, exc)
+        await finish_pipeline(run.run_id, status="failed")
+        logger.error(f"📅 [CAL-MISSION] Failed for '{event_name}': {exc}", exc_info=True)
+        return False
+
+
+async def check_personal_rescissions(channel, client=None) -> None:
+    """Randomly withdraw old unclaimed personal missions with a story/news reason.
+
+    Called hourly alongside check_expirations. Personal missions older than
+    PERSONAL_RESCIND_AGE_DAYS that are still unclaimed roll a PERSONAL_RESCIND_CHANCE
+    each cycle. On success the offer is withdrawn with a generated narrative reason
+    tied to recent news or faction events — keeps the board fresh and the world alive.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    missions = _load_missions()
+    now      = datetime.utcnow()
+    updated  = False
+    news     = None  # lazy-load once only if we need it
+
+    for mission in missions:
+        # Only target unclaimed personal missions
+        if mission.get("resolved"):
+            continue
+        if not mission.get("personal_for"):
+            continue
+        if mission.get("claimed") or mission.get("npc_claimed") or mission.get("pc_sim_claimed"):
+            continue
+
+        # Check age
+        try:
+            posted_at = datetime.fromisoformat(mission["posted_at"])
+            age_days  = (now - posted_at).total_seconds() / 86400
+        except Exception:
+            continue
+
+        if age_days < PERSONAL_RESCIND_AGE_DAYS:
+            continue  # too fresh — give the player time to pick it up
+
+        # Roll for rescission
+        if random.random() > PERSONAL_RESCIND_CHANCE:
+            continue
+
+        # Lazy-load news once
+        if news is None:
+            news = _load_recent_news()
+
+        character = mission.get("personal_for", "Unknown")
+        title     = mission.get("title", "Unknown Contract")
+
+        prompt  = _build_rescission_prompt(mission, news)
+        notice  = await _generate(prompt)
+        if not notice:
+            notice = (
+                f"🚫 **CONTRACT WITHDRAWN — {title}**\n"
+                f"*Originally posted for {character}. "
+                f"The posting faction has recalled this contract — circumstances have changed.*"
+            )
+
+        results_ch = await _get_results_channel(client, fallback_channel=channel) if client else channel
+        if results_ch:
+            await results_ch.send(notice)
+
+        # Try to clean up the original board message
+        if mission.get("message_id"):
+            try:
+                msg = await channel.fetch_message(mission["message_id"])
+                await msg.delete()
+            except Exception:
+                pass
+
+        mission["resolved"] = True
+        updated = True
+        logger.info(f"🚫 Personal mission rescinded: '{title}' (for {character}, age {age_days:.1f}d)")
+
+        # Notify DM
+        if client:
+            await _dm_notify(
+                client,
+                f"🚫 Personal Mission Withdrawn — {title}",
+                f"**For:** {character} | **Faction:** {mission.get('faction', '?')}\n"
+                f"*Sat unclaimed for {age_days:.1f} days — story reason generated and posted.*"
+            )
+
+    if updated:
+        _save_missions(missions)
 
 
 async def check_expirations(channel, client=None) -> None:
@@ -2125,6 +4995,14 @@ async def check_expirations(channel, client=None) -> None:
     missions = _load_missions()
     now = datetime.utcnow()
     updated = False
+
+    # Cap NOTICED expirations per pass (each costs an LLM call + channel post +
+    # DM). The silent age-sweep below stays uncapped — it posts nothing.
+    try:
+        _max_notices = int(os.getenv("MISSION_EXPIRY_NOTICES_PER_PASS", "5"))
+    except Exception:
+        _max_notices = 5
+    _noticed_this_pass = 0
 
     for mission in missions:
         if mission.get("resolved"):
@@ -2137,8 +5015,12 @@ async def check_expirations(channel, client=None) -> None:
             and not mission.get("npc_claimed")
         ):
             try:
-                posted_at = datetime.fromisoformat(mission["posted_at"])
-                age_days  = (now - posted_at).total_seconds() / 86400
+                ts = mission.get("posted_at") or mission.get("created_at")
+                if ts:
+                    posted_at = datetime.fromisoformat(str(ts).split(".")[0].replace(" ", "T"))
+                    age_days  = (now - posted_at).total_seconds() / 86400
+                else:
+                    age_days = 0
             except Exception:
                 age_days = 0
             if age_days >= BOARD_MAX_AGE_DAYS:
@@ -2156,11 +5038,14 @@ async def check_expirations(channel, client=None) -> None:
                 continue
 
         try:
-            expires_at = datetime.fromisoformat(mission["expires_at"])
+            expires_at = datetime.fromisoformat(str(mission["expires_at"]).split(".")[0].replace(" ", "T"))
         except Exception:
-            continue
+            continue  # no expires_at — age sweep handles it above
 
         if now >= expires_at:
+            if _noticed_this_pass >= _max_notices:
+                continue  # cap reached — remaining expirations notice on later passes
+            _noticed_this_pass += 1
             from src.faction_reputation import on_mission_expired, format_rep_change
             faction = mission.get("faction", "")
 
@@ -2190,7 +5075,7 @@ async def check_expirations(channel, client=None) -> None:
                 await _dm_notify(
                     client,
                     f"❌ Mission Expired — {mission['title']}",
-                    f"**Faction:** {faction} | **Tier:** {tier}\n"
+                    f"**Faction:** {faction} | **Difficulty:** {_diff_word(mission)}\n"
                     f"*No one took this contract in time.*"
                     f"{rep_line}\n\n"
                     f"{mission.get('body', '').strip()}"
@@ -2198,6 +5083,209 @@ async def check_expirations(channel, client=None) -> None:
 
     if updated:
         _save_missions(missions)
+
+
+# ---------------------------------------------------------------------------
+# Sub-contracted Guild Missions
+# ---------------------------------------------------------------------------
+
+# Faction standing tiers that count as "low" — difficulty 1-2 offered
+_LOW_STANDING_TIERS = {"hostile", "disliked", "unfriendly", "unknown"}
+
+# Tier string → numeric difficulty range for subcontracts
+def _subcontract_difficulty(faction_tier: str) -> int:
+    """
+    Return a difficulty for a sub-contracted mission based on faction standing.
+
+    Low standing  (Hostile / Disliked)  → 1-2   (routine, no trust required)
+    Normal standing (Neutral+)          → 6-9   (real work, faction is watching)
+    """
+    if (faction_tier or "").lower() in _LOW_STANDING_TIERS:
+        return random.randint(1, 2)
+    return random.randint(6, 9)
+
+
+def _subcontract_tier_label(difficulty: int) -> str:
+    if difficulty <= 2:
+        return "local"
+    if difficulty <= 4:
+        return "patrol"
+    if difficulty <= 6:
+        return "standard"
+    if difficulty <= 8:
+        return "major"
+    return "high-stakes"
+
+
+async def _generate_subcontract_body(
+    guild: str,
+    faction: str,
+    affiliation_strength: str,
+    affiliation_notes: str,
+    difficulty: int,
+) -> dict:
+    """Ask LLM to generate a sub-contracted mission briefing."""
+    diff_label = _DIFF_SHORT.get(difficulty, "standard")
+    prompt = f"""You are writing a mission posting for the Tower of Last Chance mission board.
+
+CONTEXT
+A guild is sub-contracting work to the party on behalf of one of their faction clients.
+The party never deals with the faction directly — the guild is the face of the contract.
+
+Guild posting: {guild}
+Underlying client faction: {faction}
+Relationship: {affiliation_strength} client — {affiliation_notes}
+Difficulty: {difficulty}/10 ({diff_label})
+
+RULES
+- The mission title must NOT mention the underlying faction by name (the guild is the visible face)
+- The body should hint at who the real client is through the work itself, not a direct statement
+- Tone: professional guild notice, not dramatic prose
+- The work should feel like something a {affiliation_strength} client would actually sub-contract out
+- Difficulty {difficulty} means: {"routine, low-stakes, no special skills required" if difficulty <= 2 else "serious contracted work requiring proven adventurers"}
+
+Return ONLY this format with no extra text:
+TITLE: <mission title, max 8 words>
+TYPE: <escort|recovery|investigation|patrol|gathering|delivery|sabotage|negotiation|defense>
+REWARD: <EC amount as number only, e.g. 450 EC>
+CONTACT: <guild contact name and location, one line>
+BODY: <2-3 sentence mission description, no faction names, hints at real client through the work>
+"""
+    try:
+        from src.ollama_queue import call_ollama
+        data = await call_ollama(
+            {
+                "model": os.getenv("OLLAMA_FAST_MODEL", os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")),
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "options": {"num_predict": 300, "num_ctx": 2048, "temperature": 0.8, "think": False},
+            },
+            timeout=45,
+            caller="subcontract_mission",
+        )
+        text = ((data.get("message") or {}).get("content") or "").strip()
+    except Exception as e:
+        logger.warning(f"📋 Subcontract LLM failed: {e}")
+        return {}
+
+    result = {}
+    for line in text.splitlines():
+        if ":" in line:
+            key, _, val = line.partition(":")
+            result[key.strip().upper()] = val.strip()
+
+    if not result.get("TITLE") or not result.get("BODY"):
+        return {}
+    return result
+
+
+async def post_subcontract_mission(channel) -> bool:
+    """
+    Generate and post one sub-contracted guild mission to the board.
+
+    Picks a random guild-faction client affiliation, checks faction standing
+    to set difficulty (6-9 normal, 1-2 if standing is low), generates the
+    mission body via LLM, posts to Discord, and saves to DB.
+
+    Returns True if a mission was posted.
+    """
+    from src.ollama_busy import is_available, get_busy_reason
+    if not is_available():
+        logger.info("📋 [SUB] Ollama busy — skipping subcontract post")
+        return False
+
+    active = _count_active_normal()
+    if active >= MAX_ACTIVE_NORMAL:
+        logger.info(f"📋 [SUB] Board cap reached ({active}/{MAX_ACTIVE_NORMAL}) — skipping subcontract post")
+        return False
+
+    # Pick a random client affiliation
+    affiliations = raw_query(
+        "SELECT fa.guild_name, fa.faction_name, fa.strength, fa.notes, "
+        "       fr.tier AS faction_tier "
+        "FROM faction_affiliations fa "
+        "LEFT JOIN faction_reputation fr ON fr.faction_name = fa.faction_name "
+        "WHERE fa.affiliation_type = 'client' AND fa.guild_name IS NOT NULL "
+        "ORDER BY RAND() LIMIT 10"
+    ) or []
+
+    if not affiliations:
+        logger.warning("📋 [SUB] No client affiliations found in DB")
+        return False
+
+    aff = random.choice(affiliations)
+    guild         = aff["guild_name"]
+    faction       = aff["faction_name"]
+    strength      = aff.get("strength") or aff.get("affiliation_strength") or "secondary"
+    notes         = aff.get("notes") or ""
+    faction_tier  = aff.get("faction_tier") or "Neutral"
+
+    difficulty = _subcontract_difficulty(faction_tier)
+    tier_str   = _subcontract_tier_label(difficulty)
+
+    logger.info(f"📋 [SUB] Generating subcontract: {guild} <- {faction} [{strength}] diff={difficulty}")
+
+    fields = await _generate_subcontract_body(guild, faction, strength, notes, difficulty)
+    if not fields:
+        logger.warning("📋 [SUB] LLM returned empty fields — skipping")
+        return False
+
+    # Reward scaling by difficulty
+    base_reward = {1: 50, 2: 80, 3: 120, 4: 180, 5: 250,
+                   6: 350, 7: 500, 8: 750, 9: 1100, 10: 1800}
+    reward_ec = base_reward.get(difficulty, 300)
+    reward_str = fields.get("REWARD") or f"{reward_ec} EC"
+
+    now = datetime.utcnow()
+    expires_dt = _expiry_for_tier(difficulty)
+
+    mission = {
+        "title":            fields["TITLE"],
+        "body":             fields["BODY"],
+        "public_text":      fields["BODY"],
+        "faction":          guild,
+        "tier":             tier_str,
+        "difficulty":       difficulty,
+        "type":             (fields.get("TYPE") or "standard").lower(),
+        "reward":           reward_str,
+        "contact":          fields.get("CONTACT", ""),
+        "posted_at":        now.isoformat(),
+        "expires_at":       expires_dt.isoformat(),
+        "resolved":         False,
+        # Sub-contract metadata stored in mission_json
+        "contract_type":    "subcontract",
+        "underlying_faction": faction,
+        "affiliation_strength": strength,
+    }
+
+    from src.faction_reputation import get_faction_color, get_faction_tier_label
+    embed_color = get_faction_color(guild) or 0x6B8E6B
+    # Show guild's standing label, with a note about who the real client is
+    tier_label  = get_faction_tier_label(guild) or "😐 Neutral"
+    days_left   = (expires_dt - now).days
+
+    embed = _build_mission_embed(mission, embed_color, tier_label, days_left)
+    # Add a discreet footer note that this is a guild sub-contract
+    embed.add_field(
+        name="Posted via",
+        value=f"{guild} (sub-contracted work)",
+        inline=False,
+    )
+
+    msg = await channel.send(embed=embed)
+    mission["message_id"] = msg.id
+    _add_mission(mission)
+
+    try:
+        await msg.add_reaction(EMOJI_CLAIM)
+    except Exception:
+        pass
+
+    logger.info(
+        f"📋 [SUB] Posted: '{mission['title']}' | guild={guild} | "
+        f"client={faction} [{faction_tier}] | diff={difficulty} | expires={days_left}d"
+    )
+    return True
 
 
 # ---------------------------------------------------------------------------

@@ -214,6 +214,46 @@ CREATE TABLE IF NOT EXISTS image_refs (
     INDEX idx_entity(entity_type, entity_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- NPC action prompt table for ref_002+ image references
+CREATE TABLE IF NOT EXISTS npc_action_prompts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_name VARCHAR(80) NOT NULL,
+    action_label VARCHAR(80) NOT NULL,
+    action_prompt TEXT NOT NULL,
+    weight INT NOT NULL DEFAULT 1,
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_npc_action_prompt (class_name, action_label),
+    INDEX idx_npc_action_class (class_name, active, weight)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Canonical D&D class/subclass catalog for NPC generation and cleanup
+CREATE TABLE IF NOT EXISTS dnd_classes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_name VARCHAR(80) NOT NULL UNIQUE,
+    primary_ability VARCHAR(120),
+    hit_die INT,
+    save_proficiencies_json JSON,
+    source VARCHAR(160),
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS dnd_subclasses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_name VARCHAR(80) NOT NULL,
+    subclass_name VARCHAR(120) NOT NULL,
+    source_status VARCHAR(40),
+    source VARCHAR(160),
+    active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_dnd_subclass (class_name, subclass_name),
+    INDEX idx_dnd_subclass_class (class_name, active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Personal missions table
 CREATE TABLE IF NOT EXISTS personal_missions (
     id INT AUTO_INCREMENT PRIMARY KEY,

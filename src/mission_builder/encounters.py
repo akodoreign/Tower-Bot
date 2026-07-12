@@ -13,12 +13,9 @@ from __future__ import annotations
 import re
 import random
 import logging
-from pathlib import Path
 from typing import Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
-
-DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "campaign_docs"
 
 # ---------------------------------------------------------------------------
 # CR Scaling — dynamic, based on actual PC levels
@@ -86,48 +83,98 @@ CR_XP = {
 
 
 def get_max_pc_level() -> int:
-    """Parse character_memory.txt and return the highest total class level."""
-    char_file = DOCS_DIR / "character_memory.txt"
-    if not char_file.exists():
-        logger.warning("📖 character_memory.txt not found — returning CR 0")
-        return 0
+    """Return the highest total class level across all active player characters.
+
+    Query order:
+    1. player_characters DB table — profile_json.total_level (most up-to-date)
+    2. character_snapshots DB table — snapshot_json.total_level
+    """
+    # ── 1. player_characters DB ──────────────────────────────────────────────
     try:
-        text = char_file.read_text(encoding="utf-8", errors="ignore")
+        import json as _json
+        from src.db_api import get_all_player_characters as _get_all
+        rows = _get_all() or []
+        max_level = 0
+        for row in rows:
+            pj = row.get("profile_json") or {}
+            if isinstance(pj, str):
+                try:
+                    pj = _json.loads(pj)
+                except Exception:
+                    pj = {}
+            # profile_json may have total_level directly, or a classes dict
+            level = pj.get("total_level") or 0
+            if not level and isinstance(pj.get("classes"), dict):
+                level = sum(pj["classes"].values())
+            if level > max_level:
+                max_level = level
+        if max_level > 0:
+            logger.info(f"📖 Max PC level (player_characters DB): {max_level}")
+            return max_level
     except Exception as e:
-        logger.warning(f"📖 Could not read character_memory.txt: {e}")
-        return 0
+        logger.debug(f"📖 player_characters DB read failed: {e}")
 
-    max_level = 0
-    for line in text.splitlines():
-        line = line.strip()
-        if not line.upper().startswith("CLASS:"):
-            continue
-        class_text = line.split(":", 1)[1].strip()
-        
-        # Parse multi-class like "Fighter/Monk (5/3)" or "Fighter 5/Monk 3" or "Fighter (5)" or "Fighter 5"
-        # Extract all numbers and sum them
-        level_matches = re.findall(r'\((\d+)(?:/(\d+))*\)|\s(\d+)(?:/\s*(\d+))?', class_text)
-        
-        if level_matches:
-            total = 0
-            for match in level_matches:
-                # Each match is a tuple from the regex groups
-                for group in match:
-                    if group:
-                        total += int(group)
-            
-            if total > max_level:
-                max_level = total
-                logger.debug(f"📖 Found character level {total} from: {class_text}")
-        else:
-            logger.debug(f"📖 Could not parse class levels from: {class_text}")
+    # ── 2. character_snapshots DB ─────────────────────────────────────────────
+    try:
+        import json as _json
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT snapshot_json FROM character_snapshots "
+            "WHERE id IN (SELECT MAX(id) FROM character_snapshots GROUP BY char_id)"
+        ) or []
+        max_level = 0
+        for row in rows:
+            sj = row.get("snapshot_json") or {}
+            if isinstance(sj, str):
+                try:
+                    sj = _json.loads(sj)
+                except Exception:
+                    sj = {}
+            level = sj.get("total_level") or 0
+            if not level and isinstance(sj.get("classes"), dict):
+                level = sum(sj["classes"].values())
+            if level > max_level:
+                max_level = level
+        if max_level > 0:
+            logger.info(f"📖 Max PC level (character_snapshots DB): {max_level}")
+            return max_level
+    except Exception as e:
+        logger.debug(f"📖 character_snapshots DB read failed: {e}")
 
-    if max_level <= 0:
-        logger.warning("📖 No valid character levels found in character_memory.txt")
-        return 0
-        
-    logger.info(f"📖 Max PC level detected: {max_level}")
-    return max_level
+    logger.warning("No PC levels found in DB - defaulting to level 0")
+    return 0
+
+
+def get_party_size() -> int:
+    """Return the number of active player characters.
+
+    Query order:
+    1. player_characters DB table (row count)
+    2. character_snapshots DB (distinct char_ids)
+    3. Fallback: 4 (standard party assumption)
+    """
+    try:
+        from src.db_api import get_all_player_characters as _get_all
+        rows = _get_all() or []
+        if rows:
+            count = len(rows)
+            logger.info(f"📖 Party size (player_characters DB): {count}")
+            return count
+    except Exception as e:
+        logger.debug(f"📖 player_characters party size DB read failed: {e}")
+
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq("SELECT COUNT(DISTINCT char_id) AS cnt FROM character_snapshots") or []
+        if rows and rows[0].get("cnt"):
+            count = int(rows[0]["cnt"])
+            logger.info(f"📖 Party size (character_snapshots DB): {count}")
+            return count
+    except Exception as e:
+        logger.debug(f"📖 character_snapshots party size DB read failed: {e}")
+
+    logger.warning("📖 Could not determine party size — defaulting to 4")
+    return 4
 
 
 def get_cr(tier: str) -> int:
@@ -135,7 +182,7 @@ def get_cr(tier: str) -> int:
     Calculate CR dynamically from max PC level + tier offset.
     
     CR = max_pc_level + tier_offset, clamped to [max_pc_level + 1, max_pc_level + 5].
-    Falls back to legacy fixed table if character_memory.txt is unreadable.
+    Falls back to legacy fixed table if DB returns no PC levels.
     
     Returns CR clamped to valid range [1, 30].
     """
@@ -143,7 +190,7 @@ def get_cr(tier: str) -> int:
 
     if max_level <= 0:
         cr = LEGACY_TIER_CR.get(tier.lower(), DEFAULT_CR)
-        logger.warning(f"⚠️ CR FALLBACK: No PC levels found in character_memory.txt. Using legacy tier={tier} → CR {cr}")
+        logger.warning(f"⚠️ CR FALLBACK: No PC levels found in DB. Using legacy tier={tier} → CR {cr}")
         return cr
 
     offset = TIER_OFFSET.get(tier.lower(), DEFAULT_OFFSET)
@@ -286,50 +333,54 @@ def get_terrain_suggestions(location_type: str, count: int = 3) -> List[str]:
 
 
 def format_stat_block_template(cr: int, creature_type: str = "humanoid") -> str:
-    """
-    Generate a stat block template for AI to fill in.
-    
-    Returns a template with appropriate values for the CR.
-    """
-    hp = 15 * cr
-    ac = 13 + (cr // 4)
-    atk = 4 + (cr // 2)
-    save_dc = 8 + 4 + (cr // 2)
-    
+    """Generate a D&D 2024 (5.5e) stat block template for AI to fill in."""
+    hp    = 15 * cr
+    ac    = 13 + (cr // 4)
+    atk   = 4 + (cr // 2)
+    dc    = 8 + 4 + (cr // 2)
+    prof  = 2 + max(0, (cr - 1) // 4)
+    pp    = 10 + (cr // 2)
+
     return f"""**[CREATURE NAME]**
 *Medium {creature_type}, [alignment]*
 
 **Armor Class** {ac} ([armor type])
 **Hit Points** {hp} ({cr * 2}d8 + {cr * 2})
 **Speed** 30 ft.
+**Initiative** +[mod]
 
 | STR | DEX | CON | INT | WIS | CHA |
 |-----|-----|-----|-----|-----|-----|
 | [##] ([+#]) | [##] ([+#]) | [##] ([+#]) | [##] ([+#]) | [##] ([+#]) | [##] ([+#]) |
 
-**Saving Throws** [proficient saves]
-**Skills** [proficient skills with bonuses]
+**Saving Throws** [proficient saves, e.g. CON +{prof + 2}]
+**Skills** [proficient skills, e.g. Perception +{prof + 1}]
 **Damage Resistances** [if any]
 **Damage Immunities** [if any]
 **Condition Immunities** [if any]
-**Senses** darkvision 60 ft., passive Perception {10 + (cr // 2)}
+**Senses** darkvision 60 ft., Passive Perception {pp}
 **Languages** Common, [others]
-**Challenge** {cr} ({get_cr_xp(cr):,} XP)
+**Challenge** {cr} ({get_cr_xp(cr):,} XP)  **Proficiency Bonus** +{prof}
+
+## Traits
 
 **[Trait Name].** [Trait description]
 
-### Actions
-**Multiattack.** [Creature name] makes [number] attacks with its [weapon].
+## Actions
 
-**[Weapon Name].** *Melee Weapon Attack:* +{atk} to hit, reach 5 ft., one target. *Hit:* {cr + 4} ({2 + (cr // 4)}d6 + {(cr // 2) + 1}) [damage type] damage.
+**Multiattack.** [Creature name] makes [number] [Weapon] attacks.
 
-**[Special Action] (Recharge 5-6).** [Description]. DC {save_dc} [ability] save or [effect].
+**[Weapon Name].** *Melee Attack Roll:* +{atk}, Reach 5 ft., one target. *Hit:* {cr + 4} ({2 + (cr // 4)}d6 + {(cr // 2) + 1}) [Damage Type] damage.
 
-### Bonus Actions
-[If applicable]
+**[Special Action] (Recharge 5–6).** [Description]. DC {dc} [Ability] saving throw or [effect].
 
-### Reactions
-**[Reaction Name].** [Description]
+## Bonus Actions
+
+[Omit section if none]
+
+## Reactions
+
+**[Reaction Name].** [Trigger and response]
 """
 
 
@@ -366,9 +417,13 @@ def build_encounter_prompt_block(
         f"  B) 2 lieutenants (CR {max(1, cr - 1)}) + 4-5 minions (CR {max(1, cr - 4)})",
         f"  C) Swarm: 6-8 enemies (CR {max(1, cr - 2)} each)",
         "",
-        "STAT BLOCK REQUIREMENTS:",
-        "  - FULL 5e 2024 stat blocks for each unique enemy type",
-        "  - Include HP, AC, attacks, special abilities",
+        "STAT BLOCK REQUIREMENTS (D&D 2024 / 5.5e format ONLY):",
+        "  - FULL stat blocks for each unique enemy type",
+        "  - Attack format: *Melee Attack Roll:* +X, Reach 5 ft., one target. *Hit:* X (die) Damage Type damage.",
+        "  - Ranged format: *Ranged Attack Roll:* +X, Range 80/320 ft., one target. *Hit:* X (die) Damage Type damage.",
+        "  - Sections: ## Traits / ## Actions / ## Bonus Actions / ## Reactions",
+        "  - Challenge line format: **Challenge** X (XP)  **Proficiency Bonus** +X",
+        "  - Damage types CAPITALISED: Slashing, Piercing, Bludgeoning, Fire, etc.",
         "  - Tactical notes: how they fight, retreat conditions",
         "  - Non-combat resolution option if appropriate",
     ])

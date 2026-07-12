@@ -1,11 +1,11 @@
 """Module generation cog — auto-generates D&D mission modules on player claims,
 and provides /genmodule for manual generation.
 
-NEW ARCHITECTURE (v2):
-  Stage 1: Mission JSON is built from mission board data
-  Stage 2: MissionCompiler uses agents + skills to expand → .docx → Discord
+Default pipeline:
+  claimed mission -> table-first published-adventure module
+  -> DM Guide, Module, Players Guide, Chart Pack, Maps manifest, ZIP.
 
-Posts completed .docx files to channel 1484147249637359769."""
+The older novel-first pipeline remains available with MODULE_PIPELINE=novel."""
 
 import os
 import asyncio
@@ -13,66 +13,46 @@ import discord
 from discord import app_commands
 
 from src.log import logger
-from src.mission_compiler import MissionCompiler, build_mission_json
 
-
-# Channel for posting generated mission modules
-MODULE_CHANNEL_ID = 1484147249637359769
+MODULE_CHANNEL_ID = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "1484147249637359769"))
 
 
 async def generate_and_post_module(mission: dict, player_name: str, client) -> None:
     """
-    Background task: compile a mission into a .docx module and post to Discord.
-    
-    Uses the new MissionCompiler with agent enhancement and skill injection.
+    Background task: compile a mission into a playable module and post to Discord.
     """
+    from src.mission_builder import generate_module, post_module_to_channel
+
     title = mission.get("title", "Unknown Mission")
-    logger.info(f"📖 Mission compilation starting: '{title}' for {player_name}")
-    
-    # Build mission JSON from the mission board dict
-    # The mission_compiler handles busy flag internally
-    mission_json = build_mission_json(
-        title=title,
-        faction=mission.get("faction", "Independent"),
-        tier=mission.get("tier", "standard"),
-        mission_type=mission.get("mission_type", "standard"),
-        cr=mission.get("cr", 6),
-        party_level=mission.get("party_level", 5),
-        player_name=player_name,
-        player_count=mission.get("player_count", 4),
-    )
-    
-    # Add any existing content from the mission board
-    if mission.get("body"):
-        mission_json["content"] = mission_json.get("content", {})
-        mission_json["content"]["board_description"] = mission.get("body")
-    
-    if mission.get("reward"):
-        mission_json["metadata"]["reward"] = mission.get("reward")
-    
-    if mission.get("personal_for"):
-        mission_json["metadata"]["personal_for"] = mission.get("personal_for")
-    
-    # Compile using the new agent-enhanced compiler
-    compiler = MissionCompiler(client)
-    
+    logger.info(f"📖 Module pipeline starting: '{title}' for {player_name}")
+
     try:
-        output_path = await compiler.compile_and_post(mission_json, player_name, client)
-        
+        output_path = await generate_module(mission, player_name)
+
         if output_path:
-            logger.info(f"📖 Module compilation complete: '{title}' → {output_path}")
+            logger.info(f"📖 Module generated: '{title}' → {output_path}")
+            await post_module_to_channel(client, output_path, mission, player_name)
         else:
-            logger.warning(f"📖 Module compilation returned None for '{title}'")
-            
+            logger.warning(f"📖 Module pipeline returned None for '{title}'")
+            try:
+                dm_id = int(os.getenv("DM_USER_ID", 0))
+                if dm_id and client:
+                    dm_user = await client.fetch_user(dm_id)
+                    await dm_user.send(
+                        f"❌ **Module generation failed** for *{title}* (claimed by {player_name}).\n"
+                        f"Pipeline returned no output — check bot logs."
+                    )
+            except Exception:
+                pass
+
     except Exception as e:
-        logger.exception(f"📖 Module compilation failed for '{title}': {e}")
-        # Notify DM
+        logger.exception(f"📖 Module pipeline failed for '{title}': {e}")
         try:
             dm_id = int(os.getenv("DM_USER_ID", 0))
             if dm_id and client:
                 dm_user = await client.fetch_user(dm_id)
                 await dm_user.send(
-                    f"❌ **Module compilation failed** for *{title}* (claimed by {player_name}).\n"
+                    f"❌ **Module generation failed** for *{title}* (claimed by {player_name}).\n"
                     f"Error: `{type(e).__name__}: {e}`"
                 )
         except Exception:
@@ -122,26 +102,21 @@ def setup(client):
         mission = matches[0]
         claimer = mission.get("player_claimer", "Unknown Adventurer")
 
-        # Get CR from mission or estimate from tier
-        from src.mission_compiler import MissionCompiler
-        tier_cr = {
-            "local": 4, "patrol": 4, "escort": 5, "standard": 6,
-            "investigation": 6, "rift": 8, "dungeon": 8, "dungeon-delve": 8,
-            "major": 8, "inter-guild": 10, "high-stakes": 10,
-            "epic": 12, "divine": 12, "tower": 12,
-        }
-        cr = mission.get("cr", tier_cr.get(mission.get("tier", "standard"), 6))
+        # Get CR from mission using the canonical difficulty-aware helper
+        from src.mission_builder.cr_scaling import mission_cr
+        cr = mission.get("cr") or mission_cr(mission)
         mission_type = mission.get("mission_type", "standard")
+        diff = mission.get("difficulty", mission.get("tier", "?"))
 
         await interaction.followup.send(
-            f"📖 **Compiling module for:** *{mission['title']}*\n"
-            f"Claimer: {claimer} | Tier: {mission.get('tier', '?').upper()} | CR: {cr}\n"
-            f"Type: {mission_type} | Using: DNDExpert + DNDVeteran + AICritic agents\n"
-            f"This takes 5-10 minutes. I'll post it to the module channel when done.",
+            f"📖 **Story pipeline starting:** *{mission['title']}*\n"
+            f"Claimer: {claimer} | Difficulty: {diff} | CR: {cr}\n"
+            f"Type: {mission_type} | Published module pipeline\n"
+            f"I'll post the module package to the module channel when done.",
             ephemeral=True,
         )
 
         # Fire background compilation
-        asyncio.get_event_loop().create_task(
+        asyncio.get_running_loop().create_task(
             generate_and_post_module(mission, claimer, client)
         )

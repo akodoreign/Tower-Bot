@@ -84,6 +84,7 @@ def get_faction_tier_label(faction: str) -> str:
 # Known factions (for auto-initialisation)
 KNOWN_FACTIONS = [
     "Iron Fang Consortium",
+    "Iron Fang Syndicate",
     "Argent Blades",
     "Wardens of Ash",
     "Serpent Choir",

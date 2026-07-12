@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 # Global configuration
 _USE_SKILLS = False  # Global flag for skill usage
 _SKILLS_CACHE: Optional[Dict[str, Skill]] = None  # Cache loaded skills
-_CACHE_LOCK = asyncio.Lock()  # Thread-safe caching
+_CACHE_LOCK: Optional[asyncio.Lock] = None  # Initialized on first use inside running loop
 
 # Skill discovery
 SKILLS_DIR = Path(__file__).resolve().parent.parent / "skills"
@@ -408,27 +408,40 @@ async def generate_with_skills(
     )
     system_prompt = build_system_prompt_with_skills(base_system, task, skills)
     
-    # Call Ollama
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-    
+    if not model_name:
+        model_name = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
+
     try:
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            response = await client.post(
-                ollama_url,
-                json={
-                    "model": model_name,
-                    "prompt": prompt,
-                    "system": system_prompt,
-                    "stream": False,
-                    "temperature": 0.8,
-                    "top_p": 0.95,
-                },
+        from src.resource_cop import wait_for_ollama_turn
+        from src.ollama_queue import call_ollama
+
+        decision = await wait_for_ollama_turn(
+            f"skills:{task or 'generation'}",
+            track="primary",
+            max_wait_seconds=60,
+        )
+        if not decision.run_now:
+            logger.warning(
+                "Ollama skills generation deferred: %s (%s)",
+                decision.reason,
+                decision.label,
             )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("response", "").strip()
+            return None
+
+        payload = {
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            "stream": False,
+            "options": {"temperature": 0.8, "top_p": 0.95},
+        }
+        data = await call_ollama(payload, timeout=300.0, caller="skills")
+        msg = data.get("message", {})
+        return (msg.get("content") or "").strip()
     except Exception as e:
-        logger.error(f"Ollama generation error: {e}")
+        logger.error(f"Ollama skills generation error: {e}")
         return None
 
 

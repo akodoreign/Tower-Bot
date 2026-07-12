@@ -48,9 +48,10 @@ class TestFreeProvider:
         models = provider.get_available_models()
         
         assert len(models) > 0
-        # Check for actual models that we know are available
+        # Check for local models exposed by the Pi/OpenClaw provider.
         model_names = [model.name for model in models]
-        assert any(name in model_names for name in ["blackboxai", "gpt-3.5-turbo", "gpt-4"])
+        assert os.getenv("QWEN_MODEL", "qwen3-8b-slim:latest") in model_names
+        assert os.getenv("KIMI_MODEL", "qwen3-8b-slim:latest") in model_names
         # Note: Image generation is disabled for reliability, so don't test for it
     
     def test_supports_image_generation(self):

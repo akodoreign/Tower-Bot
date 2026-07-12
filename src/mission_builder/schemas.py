@@ -47,7 +47,7 @@ class MissionMetadata(TypedDict, total=False):
     player_count: int  # Expected party size
     runtime_minutes: int  # Expected duration
     reward: str  # Reward description
-    difficulty_rating: int  # NEW: Difficulty 1-10 (easy to epic). Use this instead of difficulty.
+    difficulty: int  # Difficulty 1-10 (1=Trivial, 5=Hard, 10=Legendary)
     generated_at: str  # ISO8601 timestamp
     version: str  # Schema version (e.g., "1.0")
 
@@ -103,8 +103,7 @@ class Encounter(TypedDict, total=False):
     id: str  # Unique encounter ID
     name: str
     type: str  # "combat", "social", "exploration", "trap", "skill_challenge"
-    difficulty: str  # DEPRECATED: "easy", "medium", "hard", "deadly" — use difficulty_rating instead
-    difficulty_rating: int  # NEW: Difficulty 1-10 scale (easy to epic)
+    difficulty: int  # Difficulty 1-10 (1=Trivial, 5=Hard, 10=Legendary)
     location: str  # Where it takes place
     description: str  # What happens
     creatures: List[CreatureStats]  # Creatures involved

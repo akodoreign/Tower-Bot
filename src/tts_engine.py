@@ -12,8 +12,101 @@ from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
-# Voice options - Guy is clear/professional, good for news
-TTS_VOICE = "en-US-GuyNeural"
+# Per-bulletin-type voices — different Neural voices for distinct tonal flavors.
+# Keys are short canonical names; _pick_voice() also matches verbose bulletin_type strings
+# (e.g. "human interest piece about a Warrens resident") via keyword scan.
+VOICE_MAP: dict[str, str] = {
+    "news":         "en-US-GuyNeural",         # Clear, authoritative anchor
+    "gossip":       "en-US-AriaNeural",        # Warm, conspiratorial
+    "rumour":       "en-US-AriaNeural",        # Same energy as gossip
+    "sports":       "en-US-SteffanNeural",     # Energetic, arena hype
+    "arena":        "en-US-SteffanNeural",     # Same — arena events
+    "weather":      "en-US-JennyNeural",       # Measured, matter-of-fact
+    "rift":         "en-US-ChristopherNeural", # Deep, ominous
+    "missing":      "en-US-AriaNeural",        # Urgent, concerned
+    "bounty":       "en-US-ChristopherNeural", # Gruff, bounty-board gravitas
+    "crime":        "en-US-ChristopherNeural", # Same gravitas for crime/incident
+    "ad":           "en-US-AndrewNeural",      # Punchy, salesman energy
+    "classified":   "en-US-AndrewNeural",      # Classified ads — same energy
+    "faction_news": "en-US-GuyNeural",         # Official faction dispatch
+    "politics":     "en-US-GuyNeural",         # Council/guild announcements
+    "calendar":     "en-US-RogerNeural",       # Formal, civic announcement
+    "economy":      "en-US-RogerNeural",       # Market/trade reports
+    "human_interest":"en-US-EmmaNeural",       # Warm, personal storytelling
+    "divine":       "en-US-ChristopherNeural", # Deep, reverent
+    "npc":          "en-US-EricNeural",        # Narrator introducing a new face
+    "npc_intro":    "en-US-EricNeural",
+    "tia":          "en-US-BrianNeural",       # Tia's distinctive voice
+    "tia_flash":    "en-US-BrianNeural",
+}
+_DEFAULT_VOICE = "en-US-GuyNeural"
+
+# Keyword → voice: scanned in order against the lowercased verbose bulletin_type string.
+# First match wins. Covers the long descriptive strings news_feed.py produces.
+_KEYWORD_VOICE_RULES: list[tuple[list[str], str]] = [
+    # Tia — check first (very specific)
+    (["tia"],                                                  "en-US-BrianNeural"),
+    # NPC/roster profiles
+    (["npc intro", "npc_intro", "npc profile", "roster", "npc spotlight",
+      "profile of", "introducing"],                           "en-US-EricNeural"),
+    # Arena / combat sports
+    (["arena", "duel", "argent blades", "combat sport",
+      "tournament", "championship"],                          "en-US-SteffanNeural"),
+    # Rift / divine / ominous
+    (["rift", "divine", "serpent choir", "religious", "god ",
+      "void", "eldritch", "planar", "collapse"],              "en-US-ChristopherNeural"),
+    # Missing persons / urgent
+    (["missing person", "missing persons", "last seen",
+      "whereabouts unknown"],                                  "en-US-AriaNeural"),
+    # Bounty / crime / wanted
+    (["bounty", "wanted", "crime", "incident", "theft",
+      "murder", "assault", "heist", "fugitive", "warrant"],   "en-US-ChristopherNeural"),
+    # Gossip / rumour / whisper
+    (["gossip", "rumour", "rumor", "whisper", "overheard",
+      "word on the street", "scuttlebutt"],                    "en-US-AriaNeural"),
+    # Classified ads / commercial
+    (["classified ad", "advertisement", "sponsor",
+      "commercial", "promotion", "ad "],                      "en-US-AndrewNeural"),
+    # Weather / environmental
+    (["weather", "environmental", "hazard", "dome pressure",
+      "atmospheric", "rain", "storm", "forecast"],            "en-US-JennyNeural"),
+    # Economy / trade / market
+    (["trade", "market", "price", "commerce", "black market",
+      "exchange", "tariff", "guild economy"],                  "en-US-RogerNeural"),
+    # Politics / faction / council
+    (["political", "council", "faction", "guild spires",
+      "fta", "authority", "decree", "ordinance"],             "en-US-GuyNeural"),
+    # Human interest — checked after crime/missing to avoid false matches
+    (["human interest", "resident", "heartwarming", "community",
+      "letter to", "street performer", "coming-of-age",
+      "small story", "curiosity", "oddity", "vendor",
+      "craftsperson", "coroner", "registry of the dead",
+      "inquest", "survivor"],                                  "en-US-EmmaNeural"),
+]
+
+
+def _pick_voice(bulletin_type: str) -> str:
+    """
+    Select a TTS voice from a bulletin_type string.
+
+    Handles both short canonical keys ("gossip", "tia") and the verbose
+    strings news_feed.py generates ("human interest piece about a Warrens resident").
+    Exact match on VOICE_MAP first, then keyword scan, then default.
+    """
+    if not bulletin_type:
+        return _DEFAULT_VOICE
+    t = bulletin_type.lower().strip()
+
+    # 1. Exact match on VOICE_MAP (handles canonical short keys)
+    if t in VOICE_MAP:
+        return VOICE_MAP[t]
+
+    # 2. Keyword scan through ordered rules
+    for keywords, voice in _KEYWORD_VOICE_RULES:
+        if any(kw in t for kw in keywords):
+            return voice
+
+    return _DEFAULT_VOICE
 
 
 def _clean_for_speech(text: str) -> str:
@@ -43,10 +136,11 @@ def _clean_for_speech(text: str) -> str:
     return text.strip()
 
 
-async def generate_tts_audio(text: str) -> bytes | None:
+async def generate_tts_audio(text: str, bulletin_type: str = "news") -> bytes | None:
     """
     Generate MP3 audio from text using edge-tts.
-    
+
+    Selects a Neural voice based on bulletin_type (see VOICE_MAP).
     Returns MP3 bytes or None on failure.
     """
     try:
@@ -54,13 +148,15 @@ async def generate_tts_audio(text: str) -> bytes | None:
     except ImportError:
         logger.error("🔊 edge-tts not installed. Run: pip install edge-tts")
         return None
-    
+
     cleaned = _clean_for_speech(text)
     if not cleaned:
         return None
-    
+
+    voice = _pick_voice(bulletin_type)
+
     try:
-        communicate = edge_tts.Communicate(cleaned, TTS_VOICE)
+        communicate = edge_tts.Communicate(cleaned, voice)
         
         # Collect audio chunks into BytesIO
         audio_buffer = BytesIO()
@@ -70,7 +166,7 @@ async def generate_tts_audio(text: str) -> bytes | None:
         
         audio_bytes = audio_buffer.getvalue()
         if audio_bytes:
-            logger.info(f"🔊 TTS generated: {len(audio_bytes) // 1024}KB")
+            logger.info(f"🔊 TTS generated: {len(audio_bytes) // 1024}KB [{voice}]")
             return audio_bytes
         else:
             logger.warning("🔊 TTS returned empty audio")

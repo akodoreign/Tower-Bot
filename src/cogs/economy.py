@@ -1,4 +1,4 @@
-"""Economy commands — /finances, /prices."""
+"""Economy commands — /finances, /prices, /bid, /buynow, /mybids."""
 
 import os
 import discord
@@ -133,6 +133,16 @@ RULES:
 - Output ONLY the answer. No preamble."""
 
         try:
+            from src.resource_cop import wait_for_ollama_turn
+
+            decision = await wait_for_ollama_turn("price_lookup", track="quick", max_wait_seconds=45)
+            if not decision.run_now:
+                await interaction.followup.send(
+                    f"\u23f3 Price lookup is busy right now ({decision.reason}). Try again in a minute.",
+                    ephemeral=True,
+                )
+                return
+
             async with httpx.AsyncClient(timeout=60.0) as http:
                 resp = await http.post(ollama_url, json={
                     "model": ollama_model,
@@ -168,3 +178,265 @@ RULES:
             await interaction.followup.send(
                 f"\u274c Lookup failed: `{type(e).__name__}: {e}`", ephemeral=True
             )
+
+    # ---- /bid ----
+
+    @client.tree.command(
+        name="bid",
+        description="Place a bid on an active TowerBay listing. Use /towerbay-board to see Lot numbers.",
+    )
+    @app_commands.describe(
+        lot="Lot number (shown on the TowerBay board embed footer, e.g. 42)",
+        amount="Your bid in EC (must be ≥5% above current bid)",
+        max_autobid="(Optional) Set a max and the system auto-bids for you up to this amount",
+    )
+    async def bid_command(
+        interaction: discord.Interaction,
+        lot: str,
+        amount: int,
+        max_autobid: int = 0,
+    ):
+        await interaction.response.defer(ephemeral=True)
+
+        from src.tower_economy import place_bid, get_active_listings
+        from src.player_listings import place_bid_on_player_listing
+
+        proxy = max_autobid if max_autobid > amount else None
+        listing_type = "player" if lot.startswith("pl_") else "ai"
+
+        if listing_type == "ai":
+            try:
+                listing_id = int(lot)
+            except ValueError:
+                await interaction.followup.send("❌ Invalid lot number.", ephemeral=True)
+                return
+            result = place_bid(
+                listing_id  = listing_id,
+                bidder_id   = interaction.user.id,
+                bidder_name = interaction.user.display_name,
+                amount      = amount,
+                proxy_max   = proxy,
+            )
+        else:
+            result = place_bid_on_player_listing(
+                listing_id  = lot,
+                bidder_id   = interaction.user.id,
+                bidder_name = interaction.user.display_name,
+                amount      = amount,
+                proxy_max   = proxy,
+            )
+
+        # Notify the outbid player
+        if result.get("success") and result.get("outbid_user"):
+            outbid = result["outbid_user"]
+            try:
+                outbid_member = await interaction.client.fetch_user(int(outbid["id"]))
+                item_name = result.get("item_name", "an item")
+                await outbid_member.send(
+                    f"🔔 **You've been outbid on TowerBay!**\n"
+                    f"*{item_name}* — new high bid: **{result['new_price']:,} EC**\n"
+                    f"Use `/bid` to counter."
+                )
+            except Exception:
+                pass
+
+        color = discord.Color.green() if result["success"] else discord.Color.red()
+        icon  = "✅" if result["success"] else "❌"
+        embed = discord.Embed(
+            title=f"{icon} TowerBay — Bid",
+            description=result["message"],
+            color=color,
+        )
+        if result["success"] and proxy:
+            embed.add_field(
+                name="Auto-bid active",
+                value=f"System will bid for you up to **{proxy:,} EC**.",
+                inline=False,
+            )
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+    @bid_command.autocomplete("lot")
+    async def bid_lot_autocomplete(
+        interaction: discord.Interaction, current: str
+    ):
+        from src.tower_economy import get_active_listings
+        from src.player_listings import _load_active_listings
+
+        choices = []
+        # AI listings
+        for row in get_active_listings()[:15]:
+            lid   = str(row.get("id", ""))
+            name  = row.get("item_name", "?")[:40]
+            bid   = row.get("current_bid", 0)
+            label = f"Lot #{lid} — {name} ({bid:,} EC)"
+            if not current or current.lower() in label.lower():
+                choices.append(app_commands.Choice(name=label[:100], value=lid))
+
+        # Player listings
+        for pl in _load_active_listings():
+            lid   = pl.get("id", "")
+            name  = pl.get("item_name", "?")[:30]
+            bid   = pl.get("current_bid", 0)
+            label = f"{lid} — {name} ({bid:,} EC) [player]"
+            if not current or current.lower() in label.lower():
+                choices.append(app_commands.Choice(name=label[:100], value=str(lid)))
+
+        return choices[:25]
+
+    # ---- /buynow ----
+
+    @client.tree.command(
+        name="buynow",
+        description="Instantly purchase a TowerBay listing at its Buy Now price.",
+    )
+    @app_commands.describe(lot="Lot number or listing ID (shown on the board)")
+    async def buynow_command(interaction: discord.Interaction, lot: str):
+        await interaction.response.defer(ephemeral=True)
+
+        from src.tower_economy import buy_now
+        from src.player_listings import buy_now_player_listing
+
+        listing_type = "player" if lot.startswith("pl_") else "ai"
+
+        if listing_type == "ai":
+            try:
+                listing_id = int(lot)
+            except ValueError:
+                await interaction.followup.send("❌ Invalid lot number.", ephemeral=True)
+                return
+            result = buy_now(
+                listing_id = listing_id,
+                buyer_id   = interaction.user.id,
+                buyer_name = interaction.user.display_name,
+            )
+        else:
+            result = buy_now_player_listing(
+                listing_id = lot,
+                buyer_id   = interaction.user.id,
+                buyer_name = interaction.user.display_name,
+            )
+
+        # Notify outbid player whose bid was ended by buy-now
+        if result.get("success") and result.get("outbid_user"):
+            outbid = result["outbid_user"]
+            try:
+                outbid_member = await interaction.client.fetch_user(int(outbid["id"]))
+                item_name = result.get("item_name", "an item")
+                await outbid_member.send(
+                    f"🔔 **Buy Now on TowerBay** — *{item_name}* was purchased outright before your bid closed.\n"
+                    f"Your bid has been voided. Better luck next time."
+                )
+            except Exception:
+                pass
+
+        color = discord.Color.green() if result["success"] else discord.Color.red()
+        icon  = "🛒" if result["success"] else "❌"
+        embed = discord.Embed(
+            title=f"{icon} TowerBay — Buy Now",
+            description=result["message"],
+            color=color,
+        )
+        if result.get("success"):
+            embed.set_footer(text="All sales final. Collect your item at any registered Exchange kiosk.")
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+    @buynow_command.autocomplete("lot")
+    async def buynow_lot_autocomplete(interaction: discord.Interaction, current: str):
+        from src.tower_economy import get_active_listings
+        from src.player_listings import _load_active_listings
+
+        choices = []
+        for row in get_active_listings():
+            if not row.get("buy_now_price"):
+                continue
+            lid   = str(row.get("id", ""))
+            name  = row.get("item_name", "?")[:35]
+            price = row.get("buy_now_price", 0)
+            label = f"Lot #{lid} — {name} · Buy Now {price:,} EC"
+            if not current or current.lower() in label.lower():
+                choices.append(app_commands.Choice(name=label[:100], value=lid))
+        for pl in _load_active_listings():
+            if not pl.get("buy_now_price"):
+                continue
+            lid   = pl.get("id", "")
+            name  = pl.get("item_name", "?")[:30]
+            price = pl.get("buy_now_price", 0)
+            label = f"{lid} — {name} · Buy Now {price:,} EC [player]"
+            if not current or current.lower() in label.lower():
+                choices.append(app_commands.Choice(name=label[:100], value=str(lid)))
+        return choices[:25]
+
+    # ---- /mybids ----
+
+    @client.tree.command(
+        name="mybids",
+        description="See your active bids on TowerBay — what you're winning, what you've lost.",
+    )
+    async def mybids_command(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        from src.tower_economy import get_active_listings, get_player_bids
+
+        active = {str(r["id"]): r for r in get_active_listings()}
+        bids   = get_player_bids(interaction.user.id)
+
+        if not bids:
+            await interaction.followup.send(
+                "You haven't placed any bids yet. Use `/bid` to get started.",
+                ephemeral=True,
+            )
+            return
+
+        seen = set()
+        winning, losing, closed = [], [], []
+
+        for b in bids:
+            lid = str(b.get("listing_id", ""))
+            if lid in seen:
+                continue
+            seen.add(lid)
+
+            item_name     = b.get("item_name") or "Unknown"
+            status        = b.get("listing_status") or "unknown"
+            current_win   = b.get("current_winner_id")
+            my_bid        = b.get("amount", 0)
+            listing_row   = active.get(lid)
+            current_price = listing_row.get("current_bid", my_bid) if listing_row else my_bid
+
+            if status in ("sold", "unsold", "expired"):
+                won = current_win and int(current_win) == interaction.user.id
+                closed.append((item_name, my_bid, won))
+            elif current_win and int(current_win) == interaction.user.id:
+                winning.append((item_name, current_price, lid))
+            else:
+                losing.append((item_name, current_price, my_bid, lid))
+
+        embed = discord.Embed(
+            title="🏪 My TowerBay Bids",
+            color=discord.Color.gold(),
+        )
+
+        if winning:
+            lines = []
+            for name, price, lid in winning:
+                lines.append(f"🏆 **{name}** — leading at **{price:,} EC** (Lot #{lid})")
+            embed.add_field(name="✅ Currently Winning", value="\n".join(lines), inline=False)
+
+        if losing:
+            lines = []
+            for name, price, my_bid, lid in losing:
+                lines.append(
+                    f"❌ **{name}** — outbid · current **{price:,} EC** · your last bid {my_bid:,} EC "
+                    f"· `/bid {lid} <amount>` to counter"
+                )
+            embed.add_field(name="⚠️ Outbid", value="\n".join(lines), inline=False)
+
+        if closed:
+            lines = []
+            for name, my_bid, won in closed:
+                icon = "✅ Won" if won else "❌ Lost"
+                lines.append(f"{icon} — **{name}** (your bid: {my_bid:,} EC)")
+            embed.add_field(name="📦 Recently Closed", value="\n".join(lines[:8]), inline=False)
+
+        embed.set_footer(text="Use /bid to place or raise a bid. Use /buynow for instant purchase.")
+        await interaction.followup.send(embed=embed, ephemeral=True)

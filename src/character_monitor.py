@@ -54,7 +54,6 @@ DDB_BASE      = "https://character-service.dndbeyond.com/character/v5/character"
 POLL_INTERVAL = 30 * 60   # 30 minutes between full sweeps
 REQUEST_GAP   = 8         # seconds between individual character fetches
 
-# Keep file-based backup for character_memory.txt updates
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 
 # Stat IDs as DDB returns them
@@ -223,6 +222,27 @@ def _parse_snapshot(data: dict) -> dict:
         for sl in spell_slots_raw
         if sl.get("level") and sl.get("max", 0) > 0
     }
+
+    # --- Spells: full list from classSpells ---
+    class_id_to_name = {
+        cls.get("id", 0): (cls.get("definition") or {}).get("name", "")
+        for cls in (data.get("classes") or [])
+        if cls.get("id")
+    }
+    all_spells: list = []
+    for cs in (data.get("classSpells") or []):
+        cls_name = class_id_to_name.get(cs.get("characterClassId", 0), "")
+        for sp in (cs.get("spells") or []):
+            defn = sp.get("definition") or {}
+            spell_name = defn.get("name", "")
+            if spell_name:
+                all_spells.append({
+                    "name":     spell_name,
+                    "level":    defn.get("level", 0),
+                    "class":    cls_name,
+                    "prepared": sp.get("prepared", False),
+                })
+    snap["spells"] = all_spells
 
     # --- Notes (all free-text fields including otherNotes where Kharma lives) ---
     notes_raw = data.get("notes") or {}
@@ -428,6 +448,7 @@ def _update_character_memory(char_name: str, snap: dict) -> bool:
     """
     import json as _json
     # --- MySQL update ---
+    _db_updated = False
     try:
         from src.db_api import raw_query as _rq, raw_execute as _rx
         rows = _rq("SELECT id, profile_json FROM player_characters WHERE name=%s", (char_name,))
@@ -448,6 +469,9 @@ def _update_character_memory(char_name: str, snap: dict) -> bool:
             if snap.get("currencies"):
                 cur_parts = [f"{v}{k.upper()}" for k, v in snap["currencies"].items() if v > 0]
                 profile["CURRENCY"] = ", ".join(cur_parts) if cur_parts else "0GP"
+            if snap.get("inventory"):
+                inv_parts = [f"{name} ({qty})" for name, qty in snap["inventory"].items()]
+                profile["INVENTORY"] = ", ".join(inv_parts) if inv_parts else "empty"
             if snap.get("xp") is not None:
                 profile["XP"] = str(snap["xp"])
             cls_str = profile.get("CLASS", "")
@@ -456,93 +480,11 @@ def _update_character_memory(char_name: str, snap: dict) -> bool:
                 (cls_str, _json.dumps(profile, ensure_ascii=False), rows[0]["id"])
             )
             logger.info(f"📊 {char_name}: player_characters DB updated")
+            _db_updated = True
     except Exception as e:
         logger.warning(f"📊 {char_name}: DB update failed ({e}), falling back to file only")
 
-    # --- txt file update (keep in sync for RAG) ---
-    mem_file = Path(__file__).resolve().parent.parent / "campaign_docs" / "character_memory.txt"
-    if not mem_file.exists():
-        logger.warning(f"📊 character_memory.txt not found")
-        return False
-
-    try:
-        text = mem_file.read_text(encoding="utf-8", errors="ignore")
-    except Exception as e:
-        logger.error(f"📊 Could not read character_memory.txt: {e}")
-        return False
-
-    # Find the character block
-    block_range = _find_character_block(text, char_name)
-    if block_range is None:
-        logger.warning(f"📊 {char_name}: not found in character_memory.txt")
-        return False
-    
-    start_idx, end_idx = block_range
-    char_block = text[start_idx:end_idx]
-    lines = char_block.split("\n")
-    
-    new_lines = []
-    field_updated = {
-        "CLASS": False,
-        "HP": False,
-        "STATS": False,
-        "CURRENCY": False,
-        "XP": False,
-        "INVENTORY": False,
-    }
-    
-    for line in lines:
-        # Extract field name (part before first colon only)
-        if ":" not in line:
-            new_lines.append(line)
-            continue
-        
-        key = line.split(":")[0].strip().upper()
-        
-        # Replace mechanical fields with fresh DDB data
-        if key == "CLASS" and snap.get("classes"):
-            cls_str = " / ".join(f"{c} {l}" for c, l in snap.get("classes", {}).items())
-            new_lines.append(f"CLASS: {cls_str}")
-            field_updated["CLASS"] = True
-        elif key == "HP" and snap.get("max_hp"):
-            new_lines.append(f"HP: {snap.get('max_hp', '?')}")
-            field_updated["HP"] = True
-        elif key == "STATS" and snap.get("stats"):
-            stats = snap.get("stats", {})
-            stat_str = " | ".join(f"{k} {v}" for k, v in stats.items())
-            new_lines.append(f"STATS: {stat_str}")
-            field_updated["STATS"] = True
-        elif key == "CURRENCY" and snap.get("currencies"):
-            cur = snap.get("currencies", {})
-            cur_parts = [f"{v}{k.upper()}" for k, v in cur.items() if v > 0]
-            new_lines.append(f"CURRENCY: {', '.join(cur_parts) if cur_parts else '0GP'}")
-            field_updated["CURRENCY"] = True
-        elif key == "XP" and snap.get("xp") is not None:
-            new_lines.append(f"XP: {snap.get('xp', 0):,}")
-            field_updated["XP"] = True
-        elif key == "INVENTORY" and snap.get("inventory"):
-            # Format: item (qty), item (qty)
-            inv = snap.get("inventory", {})
-            inv_parts = [f"{name} ({qty})" for name, qty in inv.items()]
-            new_lines.append(f"INVENTORY: {', '.join(inv_parts) if inv_parts else 'empty'}")
-            field_updated["INVENTORY"] = True
-        else:
-            # Preserve all other fields (ORACLE NOTES, PERSONALITY, etc)
-            new_lines.append(line)
-    
-    # Reconstruct the file
-    new_block = "\n".join(new_lines)
-    sep = "---CHARACTER---"
-    new_text = text[:start_idx] + new_block + text[end_idx:]
-    
-    try:
-        mem_file.write_text(new_text, encoding="utf-8")
-        updates = [k for k, v in field_updated.items() if v]
-        logger.info(f"✅ {char_name}: character_memory.txt updated ({', '.join(updates)})")
-        return True
-    except Exception as e:
-        logger.error(f"❌ {char_name}: failed to write character_memory.txt: {e}")
-        return False
+    return _db_updated
 
 
 # ---------------------------------------------------------------------------
@@ -626,6 +568,13 @@ async def _check_character(char_info: dict, channel) -> str:
     # Something changed — save new snapshot and post embed
     _save_snapshot(char_id, char_name, player, new_snap)
     logger.info(f"📊 {char_name}: {len(changes)} change(s) detected")
+
+    # Mirror changes to Mimir (fire-and-forget)
+    try:
+        from src.mimir_sync import trigger_pc_mimir_sync
+        trigger_pc_mimir_sync(char_name)
+    except Exception:
+        pass
 
     # Update character_memory.txt so the Oracle has fresh data
     # Use the DDB name (new_snap["name"]) which matches character_memory.txt format

@@ -1,6 +1,7 @@
 """Image generation commands — /draw, /drawscene, /gearrun."""
 
 import os
+import re
 import random
 import asyncio
 import discord
@@ -13,22 +14,55 @@ from src.npc_lookup import get_npc_sd_prompt, extract_and_lookup_npcs
 def setup(client):
     """Register image generation commands on the client's command tree."""
 
+    # Maps a choice value → (checkpoint_name, is_anime, is_furry)
+    # is_furry = True  → e621/Pony tag vocabulary, NSFW-capable, characters always foreground
+    _DRAW_MODELS = {
+        "juggernaut":  ("Juggernaut-XL_v9_RunDiffusionPhoto_v2", False, False),
+        "epicrealism": ("epicrealismXL_pureFix",                  False, False),
+        "aurelium":    ("aureliumPhotorealistic_v10",              False, False),
+        "realvis":     ("RealVisXL_V4.0",                          False, False),
+        "animagine":   ("animagineXLV31_v31",                      True,  False),
+        "wail":        ("wailIlustriousSDXL_v160",                 True,  False),
+        "realismillu": ("realismIllustriousBy_v50FP16",            False, False),
+        "plantmilk":   ("plantMilkModelSuite_walnut",              False, False),
+        "pony":        ("oneFORALLPlusUltra_v3DPOPony",            True,  True),
+        "nova":        ("novaFurryXL_iIV160",                      True,  True),
+    }
+
     @client.tree.command(
         name="draw",
         description="Generate a dark fantasy image. Describe a scene, person, or place in the Undercity."
     )
     @app_commands.describe(
-        prompt="What to render \u2014 e.g. 'a hooded tiefling in a rain-soaked alley, lanterns gleaming'",
-        orientation="Wide cinematic (default) or tall portrait"
+        prompt="What to render — e.g. 'Sera Voss and Corvin argue in the Crimson Alley market at dusk'",
+        orientation="Wide cinematic (default) or tall portrait",
+        model="Which model to use (default: Juggernaut XL v9)",
+        raw="Skip AI enrichment and send your prompt directly to Stable Diffusion",
     )
-    @app_commands.choices(orientation=[
-        app_commands.Choice(name="Wide (default)", value="wide"),
-        app_commands.Choice(name="Portrait",       value="portrait"),
-    ])
+    @app_commands.choices(
+        orientation=[
+            app_commands.Choice(name="Wide (default)", value="wide"),
+            app_commands.Choice(name="Portrait",       value="portrait"),
+        ],
+        model=[
+            app_commands.Choice(name="Juggernaut XL v9 · cinematic photo (default)", value="juggernaut"),
+            app_commands.Choice(name="epicrealism XL · gritty realistic",             value="epicrealism"),
+            app_commands.Choice(name="Aurelium Photorealistic v10",                   value="aurelium"),
+            app_commands.Choice(name="RealVis XL v4 · photorealistic",                value="realvis"),
+            app_commands.Choice(name="AnimagineXL 3.1 · anime",                       value="animagine"),
+            app_commands.Choice(name="Wail Illustrious SDXL · semi-anime",            value="wail"),
+            app_commands.Choice(name="Realism Illustrious v50 · semi-real",           value="realismillu"),
+            app_commands.Choice(name="Plant Milk Walnut · general",                   value="plantmilk"),
+            app_commands.Choice(name="oneFORALL Ultra v3 · pony/NSFW",               value="pony"),
+            app_commands.Choice(name="Nova Furry XL · furry/NSFW",                   value="nova"),
+        ],
+    )
     async def draw(
         interaction: discord.Interaction,
         prompt: str,
         orientation: str = "wide",
+        model: str = "juggernaut",
+        raw: bool = False,
     ):
         import httpx, base64, io
 
@@ -46,40 +80,220 @@ def setup(client):
 
         await interaction.response.defer()
 
-        a1111_url = os.getenv("A1111_URL", "http://127.0.0.1:7860")
-        model     = os.getenv("A1111_MODEL", "")
+        a1111_url    = os.getenv("A1111_URL", "http://127.0.0.1:7860")
+        ollama_model = os.getenv("OLLAMA_MODEL", "qwen3-8b-slim:latest")
+
+        # Resolve model checkpoint and flags from the dropdown selection
+        checkpoint, is_anime, is_furry = _DRAW_MODELS.get(
+            model,
+            (os.getenv("A1111_MODEL", "Juggernaut-XL_v9_RunDiffusionPhoto_v2"), False, False)
+        )
+        model = checkpoint
+        from src.resource_cop import wait_for_a1111_turn
+
+        decision = await wait_for_a1111_turn(
+            "draw_command",
+            model_hint=model,
+            max_wait_seconds=30,
+        )
+        if not decision.run_now:
+            await interaction.followup.send(
+                "\u23f3 A1111 is busy with another image job. Please try again in a minute.",
+                ephemeral=True,
+            )
+            return
+
         width, height = (896, 512) if orientation == "wide" else (512, 896)
 
-        # Check for quoted NPC names and inject their appearance
+        # Detect NPC names and pull their appearance descriptors from DB
+        npc_matches    = extract_and_lookup_npcs(prompt)
+        npc_names      = [m["name"] for m in npc_matches] if npc_matches else []
         npc_appearance = get_npc_sd_prompt(prompt)
-        npc_matches = extract_and_lookup_npcs(prompt)
-        if npc_matches:
-            npc_names = [m['name'] for m in npc_matches]
+        if npc_names:
             logger.info(f"🎨 /draw detected NPCs: {npc_names}")
-        
-        # Build full prompt with NPC appearance injected
-        base_prompt = prompt.rstrip(",. ")
-        if npc_appearance:
-            base_prompt = f"{base_prompt}, {npc_appearance}"
-            logger.info(f"🎨 /draw injected NPC appearance: {npc_appearance[:80]}...")
-        
-        full_prompt = (
-            base_prompt
-            + ", photorealistic, cinematic lighting, highly detailed, 8k, sharp focus, atmospheric"
-        )
-        negative = (
-            "text, watermark, signature, blurry, low quality, ugly, deformed, "
-            "cartoon, anime, painting, illustration, drawing, sketch"
-        )
+
+        full_prompt = prompt.rstrip(",. ")
+
+        if raw:
+            # Raw mode: user controls everything, just append NPC appearance tags
+            if npc_appearance:
+                full_prompt = f"{full_prompt}, {npc_appearance}"
+            full_prompt += ", photorealistic, cinematic lighting, highly detailed, 8k, sharp focus"
+            logger.info("🎨 /draw raw mode — skipping AI enrichment")
+        else:
+            # Enriched mode: run through qwen to build a grounded, environment-first SD prompt
+            from src.news_feed import _get_district_aesthetic
+            district = _get_district_aesthetic(prompt)
+
+            if is_furry:
+                # e621/Pony tag vocabulary — characters always foreground, NSFW enabled
+                sys_prompt = (
+                    "You are an expert Stable Diffusion prompt engineer for furry/anthro models "
+                    "(Nova Furry XL, Pony Diffusion). These models use e621-style tags.\n\n"
+                    "OUTPUT FORMAT: comma-separated e621 tags on ONE line. No prose.\n\n"
+                    "TAG ORDER:\n"
+                    "1. RATING — explicit, mature, or questionable\n"
+                    "2. SPECIES — anthro [species], e.g. anthro wolf, anthro fox, anthro dragon\n"
+                    "3. CHARACTER DETAILS — body type, fur colour, markings, features\n"
+                    "4. ACTION / POSE — what they are doing, position, expression\n"
+                    "5. SCENE — location, lighting, background\n\n"
+                    "For Pony Diffusion add: score_9, score_8_up, score_7_up at the start.\n"
+                    "10–25 tags total. Characters are always the primary subject — foreground, detailed, clear."
+                )
+                pony_prefix = "score_9, score_8_up, score_7_up, " if "pony" in checkpoint.lower() else ""
+                user_msg = (
+                    f"Scene request: {prompt}\n"
+                    f"Output ONLY the e621 tags. Start with: {pony_prefix}explicit (or mature/questionable as appropriate)."
+                )
+            elif is_anime:
+                sys_prompt = (
+                    "You are an expert Stable Diffusion XL prompt engineer for AnimagineXL 3.1.\n"
+                    "Output ONLY comma-separated Danbooru tags — no prose, no sentences.\n"
+                    "Order: character tags → action/pose tags → location tags.\n"
+                    "10–20 tags total on ONE line. No quality or framing tags."
+                )
+                char_hint = (
+                    f"Characters: {', '.join(npc_names)}" if npc_names
+                    else "unnamed figures"
+                )
+                user_msg = (
+                    f"Scene: {prompt}\n"
+                    f"{char_hint}\n"
+                    f"Location aesthetic: {district}\n"
+                    f"Output ONLY the comma-separated Danbooru tags."
+                )
+            else:
+                sys_prompt = (
+                    "You are an expert Stable Diffusion XL prompt engineer for photorealistic models "
+                    "(Juggernaut XL v9, epiCRealism). These models understand natural English short "
+                    "phrases, NOT Danbooru tags.\n\n"
+                    "Your goal: write a prompt where the LOCATION and STORY are the primary subject. "
+                    "Characters appear as secondary figures in the midground — NOT the focus.\n\n"
+                    "OUTPUT FORMAT: comma-separated short English phrases on ONE line.\n\n"
+                    "STRICT ORDERING:\n"
+                    "1. LOCATION — specific place, architecture, surfaces, spatial depth\n"
+                    "2. ATMOSPHERE — lighting, time of day, colour palette, air quality\n"
+                    "3. STORY ACTION — what event is happening (crowd reacting, fire burning, etc.)\n"
+                    "4. CHARACTERS LAST — one brief phrase only: 'two figures in the distance', "
+                    "'silhouetted figure in a doorway'. No face details. No close-up appearance.\n\n"
+                    "12–20 phrases total on ONE line. No quality or framing tags."
+                )
+                char_hint = (
+                    f"Characters (show as distant/secondary): {', '.join(npc_names)}"
+                    if npc_names else "no named characters — use an anonymous crowd or lone figure"
+                )
+                user_msg = (
+                    f"User scene request: {prompt}\n"
+                    f"{char_hint}\n"
+                    f"Location aesthetic: {district}\n\n"
+                    f"Output ONLY the comma-separated phrases in order: "
+                    f"location → atmosphere → story action → characters last."
+                )
+
+            enriched = ""
+            try:
+                from src.ollama_queue import call_ollama, OllamaBusyError
+                data = await call_ollama(
+                    payload={
+                        "model": ollama_model,
+                        "messages": [
+                            {"role": "system", "content": sys_prompt},
+                            {"role": "user",   "content": user_msg},
+                        ],
+                        "stream": False,
+                        "options": {"num_predict": 256, "num_ctx": 16384, "think": True},
+                    },
+                    timeout=45.0,
+                    caller="draw_enrich",
+                )
+                raw_out = ""
+                if isinstance(data, dict):
+                    msg = data.get("message", {})
+                    if isinstance(msg, dict):
+                        raw_out = msg.get("content", "").strip()
+
+                import re as _re
+                # Strip qwen3 thinking blocks and markdown fences
+                raw_out = _re.sub(r"<think>.*?</think>", "", raw_out, flags=_re.DOTALL).strip()
+                raw_out = _re.sub(r"```[a-z]*\n?", "", raw_out).replace("```", "").strip()
+
+                # Pick the line with the most commas — survives preamble and trailing explanations
+                all_lines = [l.strip() for l in raw_out.splitlines() if l.strip()]
+                tag_lines = [l for l in all_lines if l.count(",") >= 3]
+                if tag_lines:
+                    raw_out = max(tag_lines, key=lambda l: l.count(","))
+                elif all_lines:
+                    raw_out = " ".join(all_lines).strip()
+
+                if raw_out.count(",") >= 4:
+                    enriched = raw_out
+                    logger.info(f"🎨 /draw qwen enriched prompt ({raw_out.count(',') + 1} phrases)")
+                else:
+                    logger.warning(f"🎨 /draw qwen short output — using user prompt (sample: {raw_out[:80]!r})")
+
+            except Exception as _qe:
+                logger.warning(f"🎨 /draw qwen unavailable ({_qe}) — using user prompt directly")
+
+            if enriched:
+                full_prompt = enriched
+            else:
+                # Fallback: inject NPC appearance and add style suffix
+                if npc_appearance:
+                    full_prompt = f"{full_prompt}, {npc_appearance}"
+
+            # Style suffix (quality/framing tags added after qwen output)
+            if is_furry:
+                if "pony" not in checkpoint.lower():
+                    full_prompt += ", masterpiece, best quality, detailed fur, highly detailed, sharp focus"
+                # Pony already has score tags prepended — no suffix needed
+            elif is_anime:
+                full_prompt += ", masterpiece, best quality, very aesthetic, absurdres"
+            else:
+                full_prompt += (
+                    ", RAW photo, wide angle lens, 24mm, f/5.6, "
+                    "environmental wide shot, cinematic lighting, highly detailed, sharp focus, 8k"
+                )
+
+        if is_furry:
+            negative = (
+                "human, human only, realistic photo, photograph, "
+                "text, watermark, signature, blurry, low quality, "
+                "poorly drawn, bad anatomy, bad hands, extra limbs, deformed, ugly, "
+                "bad proportions, malformed"
+            )
+        elif is_anime:
+            negative = (
+                "nsfw, text, watermark, signature, blurry, low quality, "
+                "bad anatomy, bad hands, extra limbs, deformed, ugly, "
+                "realistic photo, photograph, 3d render"
+            )
+        else:
+            negative = (
+                "text, watermark, signature, blurry, low quality, ugly, deformed, "
+                "cartoon, anime, painting, illustration, drawing, sketch, "
+                "cgi, render, 3d, plastic, oversaturated, "
+                "portrait, close-up, headshot, face only, cropped, "
+                "shallow depth of field, bokeh, subject isolation"
+            )
+
+        if is_furry:
+            steps, cfg = 30, 7.0
+            sampler = "DPM++ 2M Karras"
+        elif is_anime:
+            steps, cfg = 28, 7.0
+            sampler = "DPM++ 2M SDE Karras"
+        else:
+            steps, cfg = 45, 5.0
+            sampler = "DPM++ 2M SDE Karras"
 
         payload = {
             "prompt":          full_prompt,
             "negative_prompt": negative,
-            "steps":           50,
-            "cfg_scale":       7.5,
+            "steps":           steps,
+            "cfg_scale":       cfg,
             "width":           width,
             "height":          height,
-            "sampler_name":    "Euler a",
+            "sampler_name":    sampler,
             "batch_size":      1,
             "seed":            random.randint(1, 999999),
             "restore_faces":   False,
@@ -96,18 +310,10 @@ def setup(client):
             except Exception:
                 pass
 
-        from src.news_feed import a1111_lock, _a1111_lock
+        from src.news_feed import a1111_lock
         from src.image_ref import (
             get_best_ref_for_scene, to_img2img_payload,
-            detect_and_save_refs,
         )
-
-        if _a1111_lock.locked():
-            await interaction.followup.send(
-                "\u23f3 A1111 is currently generating another image. Please try again in about 5 minutes.",
-                ephemeral=True
-            )
-            return
 
         # Check for reference images to use as img2img base
         ref_bytes, denoise, ref_source = get_best_ref_for_scene(prompt)
@@ -127,9 +333,6 @@ def setup(client):
                     data = resp.json()
 
                 img_bytes = base64.b64decode(data["images"][0])
-
-                # Auto-save as reference for detected NPCs/locations
-                detect_and_save_refs(prompt, img_bytes)
 
                 file = discord.File(io.BytesIO(img_bytes), filename="undercity.png")
 
@@ -159,8 +362,9 @@ def setup(client):
     )
     @app_commands.describe(
         scene="Scene description, e.g. 'Sera Voss and Corvin Thale argue in a dim alley'",
+        layered="Two-pass render: environment first, then characters composited in (~2x time)",
     )
-    async def drawscene_command(interaction: discord.Interaction, scene: str):
+    async def drawscene_command(interaction: discord.Interaction, scene: str, layered: bool = False):
         dm_user_id = int(os.getenv("DM_USER_ID", 0))
         if interaction.user.id != dm_user_id:
             await interaction.response.send_message(
@@ -189,9 +393,22 @@ def setup(client):
         image_style = os.getenv("IMAGE_STYLE", "photorealistic").lower().strip()
         is_anime    = image_style == "anime"
         if is_anime:
-            A1111_MODEL = os.getenv("A1111_ANIME_MODEL", os.getenv("A1111_MODEL", "sd_epicrealismXL_pureFix"))
+            A1111_MODEL = os.getenv("A1111_ANIME_MODEL", os.getenv("A1111_MODEL", "Juggernaut-XL_v9_RunDiffusionPhoto_v2"))
         else:
-            A1111_MODEL = os.getenv("A1111_MODEL", "sd_epicrealismXL_pureFix")
+            A1111_MODEL = os.getenv("A1111_MODEL", "Juggernaut-XL_v9_RunDiffusionPhoto_v2")
+        from src.resource_cop import wait_for_a1111_turn
+
+        decision = await wait_for_a1111_turn(
+            "drawscene_command",
+            model_hint=A1111_MODEL,
+            max_wait_seconds=30,
+        )
+        if not decision.run_now:
+            await interaction.followup.send(
+                "\u23f3 A1111 is busy with another image job. Please try again in a minute.",
+                ephemeral=True,
+            )
+            return
 
         district_aesthetic = _get_district_aesthetic(scene)
         if district_aesthetic is _AESTHETIC_FALLBACK:
@@ -275,6 +492,7 @@ def setup(client):
                 "cartoon, anime, painting, illustration, drawing, sketch, "
                 "cgi, render, 3d, plastic, oversaturated, game screenshot, "
                 "portrait, close-up, headshot, face only, cropped, "
+                "shallow depth of field, bokeh, subject isolation, "
                 "medieval castle, stone dungeon, fantasy castle interior, torch sconces"
             )
 
@@ -291,58 +509,84 @@ def setup(client):
         payload = {
             "prompt": image_prompt,
             "negative_prompt": negative_prompt,
-            "steps": 40, "cfg_scale": 5.0,
+            "steps": 45, "cfg_scale": 5.0,
             "width": 896, "height": 512,
-            "sampler_name": "Euler a",
+            "sampler_name": "DPM++ 2M SDE Karras",
             "batch_size": 1, "n_iter": 1,
             "seed": random.randint(1, 999999),
             "restore_faces": False, "tiling": False,
         }
 
-        # Check for reference images to use as img2img base
         from src.image_ref import (
             get_best_ref_for_scene, to_img2img_payload,
-            detect_and_save_refs, SCENE_DENOISE,
-        )
-        ref_bytes, denoise, ref_source = get_best_ref_for_scene(scene)
-        if ref_bytes:
-            api_payload = to_img2img_payload(payload, ref_bytes, denoise)
-            endpoint = f"{A1111_URL}/sdapi/v1/img2img"
-            ref_note = f" (img2img ref: {ref_source})"
-            logger.info(f"\U0001f3a8 /drawscene using img2img ref: {ref_source} (denoise={denoise})")
-        else:
-            api_payload = payload
-            endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
-            ref_note = ""
-
-        await interaction.followup.send(
-            f"⏳ Generating scene image...{ref_note} (this takes ~30-60s)", ephemeral=True
+            layered_generate,
         )
 
-        async with a1111_lock:
-            try:
-                async with _httpx.AsyncClient(timeout=900.0) as http:
-                    r = await http.post(endpoint, json=api_payload)
-                    r.raise_for_status()
-                    result = r.json()
-                img_bytes = _base64.b64decode(result["images"][0])
+        if layered:
+            # Build background-only prompt (no characters)
+            if is_anime:
+                bg_prompt = f"{quality_header}, {loc_tags}, {district_aesthetic}, wide establishing shot, empty scene, no people, no characters"
+            else:
+                bg_prompt = (
+                    f"{loc_tags}, {district_aesthetic}, "
+                    "wide establishing shot, empty plaza, no people, no characters, "
+                    "RAW photo, wide angle lens, 24mm, f/5.6, cinematic lighting, highly detailed, sharp focus, 8k"
+                )
+            await interaction.followup.send(
+                "⏳ Layered render: pass 1 environment, pass 2 characters (~90-120s)", ephemeral=True
+            )
+            async with a1111_lock:
                 try:
-                    from PIL import Image as _PILImage
-                    import io as _io2
-                    _img = _PILImage.open(_io2.BytesIO(img_bytes))
-                    _w, _h = _img.size
-                    _img = _img.crop((0, 0, _w, _h - 52))
-                    _buf = _io2.BytesIO()
-                    _img.save(_buf, format="PNG")
-                    img_bytes = _buf.getvalue()
-                except Exception:
-                    pass
-            except Exception as _ge:
-                await interaction.followup.send(f"❌ Generation failed: {_ge}", ephemeral=True)
-                return
+                    img_bytes, bg_bytes = await layered_generate(
+                        background_prompt=bg_prompt,
+                        full_prompt=image_prompt,
+                        negative_prompt=negative_prompt,
+                        payload_base=payload,
+                        a1111_url=A1111_URL,
+                        char_denoise=0.60,
+                    )
+                except Exception as _ge:
+                    await interaction.followup.send(f"❌ Layered generation failed: {_ge}", ephemeral=True)
+                    return
+        else:
+            ref_bytes, denoise, ref_source = get_best_ref_for_scene(scene)
+            if ref_bytes:
+                api_payload = to_img2img_payload(payload, ref_bytes, denoise)
+                endpoint = f"{A1111_URL}/sdapi/v1/img2img"
+                ref_note = f" (img2img ref: {ref_source})"
+                logger.info(f"\U0001f3a8 /drawscene using img2img ref: {ref_source} (denoise={denoise})")
+            else:
+                api_payload = payload
+                endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
+                ref_note = ""
 
-        # Auto-save as reference for detected NPCs/locations
-        detect_and_save_refs(scene, img_bytes)
+            await interaction.followup.send(
+                f"⏳ Generating scene image...{ref_note} (this takes ~30-60s)", ephemeral=True
+            )
+
+            async with a1111_lock:
+                try:
+                    async with _httpx.AsyncClient(timeout=900.0) as http:
+                        r = await http.post(endpoint, json=api_payload)
+                        r.raise_for_status()
+                        result = r.json()
+                    img_bytes = _base64.b64decode(result["images"][0])
+                except Exception as _ge:
+                    await interaction.followup.send(f"❌ Generation failed: {_ge}", ephemeral=True)
+                    return
+
+        # Crop A1111 info bar from bottom
+        try:
+            from PIL import Image as _PILImage
+            import io as _io2
+            _img = _PILImage.open(_io2.BytesIO(img_bytes))
+            _w, _h = _img.size
+            _img = _img.crop((0, 0, _w, _h - 52))
+            _buf = _io2.BytesIO()
+            _img.save(_buf, format="PNG")
+            img_bytes = _buf.getvalue()
+        except Exception:
+            pass
 
         channel = client.get_channel(int(channel_id_str))
         if channel:
@@ -357,11 +601,16 @@ def setup(client):
 
     # ---- /gearrun (DM only) ----
 
-    @client.tree.command(
+    gearrun_group = app_commands.Group(
         name="gearrun",
-        description="[DM only] Generate NPC appearance profiles for all roster NPCs.",
+        description="[DM only] Mimir-backed NPC/PC gear population.",
     )
-    async def gearrun_command(interaction: discord.Interaction):
+
+    @gearrun_group.command(
+        name="standard",
+        description="Fill missing NPC profiles, party profiles, and normal Mimir equipment.",
+    )
+    async def gearrun_standard_command(interaction: discord.Interaction):
         dm_user_id = int(os.getenv("DM_USER_ID", 0))
         if interaction.user.id != dm_user_id:
             await interaction.response.send_message(
@@ -371,20 +620,17 @@ def setup(client):
 
         await interaction.response.defer(ephemeral=True)
 
-        from src.npc_appearance import NPC_ROSTER_FILE, _profile_path, generate_all_npc_appearances
+        from src.npc_appearance import generate_all_npc_appearances, get_npc_appearance
         from src.party_profiles import load_profile
         from src.mission_board import _load_party_list, _load_used_parties
         from src.db_api import raw_query as _rq
         import json as _json
 
-        # Load NPC roster from DB
-        try:
-            _npc_rows = _rq("SELECT name FROM npcs WHERE status IN ('alive','injured') ORDER BY name") or []
-            roster = [{"name": r["name"]} for r in _npc_rows]
-        except Exception:
-            roster = _json.loads(NPC_ROSTER_FILE.read_text(encoding="utf-8")) if NPC_ROSTER_FILE.exists() else []
+        # Load NPC roster from DB — count against the same DB source generate_all uses
+        _npc_rows = _rq("SELECT name FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
+        roster = [{"name": r["name"]} for r in _npc_rows]
         npc_total   = len(roster)
-        npc_already = sum(1 for n in roster if _profile_path(n.get("name", "")).exists())
+        npc_already = sum(1 for n in roster if get_npc_appearance(n.get("name", "")) is not None)
         npc_pending = npc_total - npc_already
 
         # Load party names from DB
@@ -402,9 +648,10 @@ def setup(client):
         party_pending = party_total - party_already
 
         await interaction.followup.send(
-            f"\u2699\ufe0f **Gear run starting.**\n"
+            f"\u2699\ufe0f **Standard gear run starting.**\n"
             f"NPCs: **{npc_total}** total \u00b7 {npc_already} already done \u00b7 **{npc_pending} to generate**\n"
             f"Parties: **{party_total}** total \u00b7 {party_already} already done \u00b7 **{party_pending} to generate**\n"
+            f"PC Mimir gear: will fill only characters with no DDB/MySQL inventory.\n"
             f"Runs in background (~2s per NPC via Ollama). I'll DM you when it's done.",
             ephemeral=True,
         )
@@ -421,6 +668,22 @@ def setup(client):
                 except Exception as _pe:
                     p_done = p_total = 0
                     logger.warning(f"\U0001f3c5 Party gear run error: {_pe}")
+                npc_gear_stats = {"total": 0, "done": 0, "skipped": 0, "failed": 0}
+                npc_synced = 0
+                try:
+                    from src.mimir_sync import run_npc_gear_run, get_sync_engine
+                    npc_gear_stats = await run_npc_gear_run(force=False)
+                    npc_synced = await get_sync_engine().sync_all_npcs()
+                except Exception as _nge:
+                    logger.warning(f"\U0001f6e1\ufe0f NPC Mimir gear run error: {_nge}")
+                pc_stats = {"total": 0, "done": 0, "skipped": 0, "failed": 0}
+                pc_synced = 0
+                try:
+                    from src.mimir_sync import run_pc_gear_run, get_sync_engine
+                    pc_stats = await run_pc_gear_run(force=False)
+                    pc_synced = await get_sync_engine().sync_party()
+                except Exception as _pce:
+                    logger.warning(f"\U0001f3d7\ufe0f PC Mimir gear run error: {_pce}")
                 try:
                     dm_user = await client.fetch_user(dm_user_id)
                     p_skipped = party_results.get('skipped', 0) if p_total else 0
@@ -430,22 +693,225 @@ def setup(client):
                         f"{p_skipped} skipped, {p_failed} failed ({p_total} total)."
                     ) if p_total else ""
                     await dm_user.send(
-                        f"\u2705 **Gear run complete.**\n"
+                        f"\u2705 **Standard gear run complete.**\n"
                         f"NPC appearances: **{done}** generated/verified.{party_line}\n"
+                        f"NPC Mimir gear: **{npc_gear_stats['done']}** filled, "
+                        f"{npc_gear_stats['skipped']} skipped, {npc_gear_stats['failed']} failed "
+                        f"({npc_gear_stats['total']} total). Synced: **{npc_synced}**.\n"
+                        f"PC Mimir gear: **{pc_stats['done']}** filled, "
+                        f"{pc_stats['skipped']} skipped, {pc_stats['failed']} failed "
+                        f"({pc_stats['total']} total). Synced: **{pc_synced}**.\n"
                         f"Story images and news bulletins will now reference real party members."
                     )
                 except Exception:
                     pass
-                logger.info(f"\U0001f3a8 Gear run complete: {done} NPC profiles, {p_done} party profiles")
+                logger.info(
+                    f"\U0001f3a8 Standard gear run complete: {done} NPC profiles, "
+                    f"{p_done} party profiles, {npc_gear_stats['done']} NPC gear fills, "
+                    f"{pc_stats['done']} PC gear fills"
+                )
             except Exception as e:
-                logger.error(f"\U0001f3a8 Gear run error: {e}")
+                logger.error(f"\U0001f3a8 Standard gear run error: {e}")
                 try:
                     dm_user = await client.fetch_user(dm_user_id)
-                    await dm_user.send(f"\u274c Gear run failed: {e}")
+                    await dm_user.send(f"\u274c Standard gear run failed: {e}")
                 except Exception:
                     pass
 
         asyncio.get_event_loop().create_task(_run())
+
+    @gearrun_group.command(
+        name="epic",
+        description="Apply real Mimir epic gear to NPCs over level 12.",
+    )
+    @app_commands.describe(
+        min_level="Minimum NPC level to upgrade. Default: 13.",
+        force="Replace mundane/lower-tier weapons and armor with epic versions.",
+        npc_name="Optional exact NPC name, e.g. Captain Havel Korin.",
+    )
+    async def gearrun_epic_command(
+        interaction: discord.Interaction,
+        min_level: int = 13,
+        force: bool = False,
+        npc_name: str = "",
+    ):
+        dm_user_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_user_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        min_level = max(13, min(int(min_level or 13), 20))
+        await interaction.response.defer(ephemeral=True)
+        await interaction.followup.send(
+            f"\u2694\ufe0f **Epic gear run starting.**\n"
+            f"Target: `{npc_name or 'all living NPCs'}` | minimum level: **{min_level}** | force: **{force}**\n"
+            f"Only Mimir catalog-confirmed items will be applied. I’ll DM you when it finishes.",
+            ephemeral=True,
+        )
+
+        async def _run_epic():
+            try:
+                from src.mimir_client import get_mimir
+                from src.mimir_sync import run_epic_npc_gear_run, get_sync_engine
+
+                mimir = get_mimir()
+                connected = mimir.available or await mimir.connect()
+                if not connected:
+                    raise RuntimeError("Mimir MCP unavailable; epic gear requires catalog validation.")
+
+                stats = await run_epic_npc_gear_run(
+                    min_level=min_level,
+                    force=force,
+                    npc_name=npc_name.strip(),
+                )
+                synced = await get_sync_engine().sync_all_npcs()
+                updated = stats.get("updated") or []
+                tail = "\n".join(f"- {line}" for line in updated[:12]) if updated else "- none"
+                if len(updated) > 12:
+                    tail += f"\n- ...and {len(updated) - 12} more"
+                dm_user = await client.fetch_user(dm_user_id)
+                await dm_user.send(
+                    f"\u2705 **Epic gear run complete.**\n"
+                    f"Eligible NPCs: **{stats.get('total', 0)}**\n"
+                    f"Epic upgrades applied: **{stats.get('done', 0)}**\n"
+                    f"Skipped: {stats.get('skipped', 0)} | Failed: {stats.get('failed', 0)} | "
+                    f"Catalog misses: {stats.get('catalog_misses', 0)}\n"
+                    f"Mimir characters synced: **{synced}**\n\n"
+                    f"Updated:\n{tail}"
+                )
+            except Exception as e:
+                logger.error(f"\u2694\ufe0f Epic gear run error: {e}")
+                try:
+                    dm_user = await client.fetch_user(dm_user_id)
+                    await dm_user.send(f"\u274c Epic gear run failed: {e}")
+                except Exception:
+                    pass
+
+        asyncio.get_event_loop().create_task(_run_epic())
+
+    client.tree.add_command(gearrun_group)
+
+    # ---- /generateareas (DM only) ----
+
+    @client.tree.command(
+        name="generateareas",
+        description="[DM only] Generate living area profiles + maps for all Undercity districts.",
+    )
+    @app_commands.describe(
+        district="Leave blank to run all districts. Specify one to regenerate just that district.",
+        force="Re-generate even if a profile already exists (default: skip existing).",
+    )
+    async def generateareas_command(
+        interaction: discord.Interaction,
+        district: str = "",
+        force: bool = False,
+    ):
+        dm_user_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_user_id:
+            await interaction.response.send_message(
+                "❌ This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        from src.area_generator import (
+            generate_area_profile,
+            generate_all_area_profiles,
+            get_all_district_names,
+        )
+        from src.db_api import raw_query as _rq
+
+        if district.strip():
+            # Single-district run
+            known = [r["district"] for r in (_rq("SELECT DISTINCT district FROM gazetteer_places") or [])]
+            if district not in known:
+                await interaction.followup.send(
+                    f"❌ Unknown district: **{district}**\n"
+                    f"Known districts:\n" + "\n".join(f"  • {d}" for d in sorted(known)),
+                    ephemeral=True,
+                )
+                return
+
+            already = bool(_rq("SELECT id FROM area_profiles WHERE district=%s", (district,)))
+            await interaction.followup.send(
+                f"\U0001f5fa️ Generating area profile for **{district}**"
+                + (" (force refresh)" if force else " — already exists, regenerating…" if already else "…"),
+                ephemeral=True,
+            )
+
+            async def _run_one():
+                try:
+                    profile = await generate_area_profile(district, force=True)
+                    try:
+                        dm_user = await client.fetch_user(dm_user_id)
+                        if profile:
+                            atm = profile.get("atmosphere", "")[:200]
+                            hooks = profile.get("dm_hooks", [])
+                            hook_text = "\n".join(f"  • {h}" for h in hooks[:3])
+                            await dm_user.send(
+                                f"✅ **{district}** area profile complete.\n\n"
+                                f"*{atm}*\n\n**DM Hooks:**\n{hook_text}\n\n"
+                                f"Map + sub-locations stored in DB."
+                            )
+                        else:
+                            await dm_user.send(f"❌ Area profile failed for **{district}**.")
+                    except Exception:
+                        pass
+                except Exception as e:
+                    logger.error(f"generateareas single error: {e}")
+
+            asyncio.get_event_loop().create_task(_run_one())
+            return
+
+        # Full run
+        all_districts = [r["district"] for r in (_rq("SELECT DISTINCT district FROM gazetteer_places ORDER BY district") or [])]
+        already_done  = len(get_all_district_names()) if not force else 0
+        pending       = len(all_districts) - already_done if not force else len(all_districts)
+
+        await interaction.followup.send(
+            f"\U0001f5fa️ **Area generation starting.**\n"
+            f"Districts: **{len(all_districts)}** total · {already_done} already done · **{pending} to generate**\n"
+            f"Each district: LLM profile + ASCII grid map via A1111. Runs in background.\n"
+            f"I'll DM you when complete.",
+            ephemeral=True,
+        )
+
+        progress_log: list[str] = []
+
+        async def _progress(dist, done, total, status="done"):
+            icon = "✅" if status == "done" else "⏭️" if status == "skipped" else "❌"
+            progress_log.append(f"{icon} {dist}")
+            logger.info(f"[AreaGen] {icon} {dist} ({done}/{total})")
+
+        async def _run_all():
+            try:
+                stats = await generate_all_area_profiles(force=force, progress_callback=_progress)
+                try:
+                    dm_user = await client.fetch_user(dm_user_id)
+                    summary = "\n".join(progress_log[-10:])
+                    if len(progress_log) > 10:
+                        summary = f"…({len(progress_log)-10} more)…\n" + summary
+                    await dm_user.send(
+                        f"✅ **Area generation complete.**\n"
+                        f"Generated: **{stats['done']}** · Skipped: {stats['skipped']} · Failed: {stats['failed']}\n\n"
+                        f"**Last entries:**\n{summary}\n\n"
+                        f"All profiles + maps stored in DB. Mission generator will now use them."
+                    )
+                except Exception:
+                    pass
+                logger.info(f"\U0001f5fa️ Area generation complete: {stats}")
+            except Exception as e:
+                logger.error(f"\U0001f5fa️ Area generation error: {e}")
+                try:
+                    dm_user = await client.fetch_user(dm_user_id)
+                    await dm_user.send(f"❌ Area generation failed: {e}")
+                except Exception:
+                    pass
+
+        asyncio.get_event_loop().create_task(_run_all())
 
     # ---- /pin (DM only) — pin last generated image as canonical reference ----
 
@@ -583,3 +1049,201 @@ def setup(client):
             text="\U0001f4cc = pinned canonical ref. Use /pin to lock a good generation."
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    # ---- /backfill (DM only) — index historical Discord image embeds ----
+
+    def _clean_backfill_title(title: str) -> tuple[str, bool]:
+        text = re.sub(r"^[^\w'\"-]+", "", title or "").strip()
+        is_alt = "alt universe" in text.lower()
+        text = re.sub(r"\s+(?:[—–-]|\?)\s+Alt Universe\s*$", "", text, flags=re.IGNORECASE).strip()
+        return text, is_alt
+
+    def _strip_backfill_md(text: str) -> str:
+        return re.sub(r"[*_`]", "", text or "").strip()
+
+    def _parse_location_caption(description: str) -> tuple[str, str, str]:
+        text = _strip_backfill_md(description)
+        match = re.match(r"(.+?)\s+(?:[—–-]|\?)\s+([^|]+)(?:\|(.+))?$", text)
+        if not match:
+            return "", "", text
+        return match.group(1).strip(), match.group(2).strip(), (match.group(3) or "").strip()
+
+    def _canonical_npc_names() -> dict[str, str]:
+        names: dict[str, str] = {}
+        try:
+            from src.db_api import raw_query
+            rows = raw_query("SELECT name FROM npcs WHERE COALESCE(status, 'alive') <> 'dead'") or []
+            for row in rows:
+                name = (row.get("name") or "").strip()
+                if name:
+                    names[name.lower()] = name
+        except Exception:
+            pass
+        try:
+            from src.db_api import raw_query
+            rows = raw_query("SELECT name FROM player_characters") or []
+            for row in rows:
+                name = (row.get("name") or "").strip()
+                if name:
+                    names[name.lower()] = name
+        except Exception:
+            pass
+        return names
+
+    async def _message_image_bytes(msg: discord.Message, embed: discord.Embed | None = None) -> bytes | None:
+        for att in msg.attachments:
+            if (att.filename or "").lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                return await att.read()
+        if embed and embed.image and embed.image.url:
+            try:
+                import aiohttp
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(embed.image.url) as resp:
+                        if resp.status == 200:
+                            return await resp.read()
+            except Exception:
+                return None
+        return None
+
+    @client.tree.command(
+        name="backfill",
+        description="[DM only] Backfill NPC/location image refs from historical Discord embeds.",
+    )
+    @app_commands.describe(
+        target="Which historical embeds to backfill.",
+        limit="How many recent messages to scan. Use 3000+ for older images.",
+        dry_run="Preview matches without saving refs.",
+        channel_id="Optional channel ID. Defaults to DISCORD_CHANNEL_ID.",
+    )
+    @app_commands.choices(target=[
+        app_commands.Choice(name="NPC portraits", value="npcs"),
+        app_commands.Choice(name="Location scenes", value="locations"),
+        app_commands.Choice(name="Both", value="both"),
+    ])
+    async def backfill_command(
+        interaction: discord.Interaction,
+        target: str = "both",
+        limit: int = 1000,
+        dry_run: bool = True,
+        channel_id: str = "",
+    ):
+        dm_user_id = int(os.getenv("DM_USER_ID", 0))
+        if interaction.user.id != dm_user_id:
+            await interaction.response.send_message(
+                "\u274c This command is restricted to the DM.", ephemeral=True
+            )
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        scan_limit = max(1, min(int(limit or 1000), 10000))
+        try:
+            default_channel_id = int(os.getenv("DISCORD_CHANNEL_ID") or interaction.channel_id)
+            scan_channel_id = int(channel_id.strip()) if channel_id.strip() else default_channel_id
+        except Exception:
+            await interaction.followup.send("\u274c Invalid channel ID.", ephemeral=True)
+            return
+
+        channel = client.get_channel(scan_channel_id)
+        if channel is None:
+            try:
+                channel = await client.fetch_channel(scan_channel_id)
+            except Exception as e:
+                await interaction.followup.send(f"\u274c Could not find channel `{scan_channel_id}`: {e}", ephemeral=True)
+                return
+
+        from src.image_ref import save_location_ref, save_npc_alt_ref, save_npc_ref
+
+        canonical_npcs = _canonical_npc_names()
+        matches = []
+        scanned = skipped = name_skipped = 0
+        async for msg in channel.history(limit=scan_limit):
+            scanned += 1
+            if not msg.embeds:
+                continue
+            for embed in msg.embeds:
+                title = embed.title or ""
+                footer = embed.footer.text if embed.footer else ""
+
+                if target in ("npcs", "both"):
+                    if "Undercity Roster" in footer or "What If" in footer or "Alt Universe" in title:
+                        name, is_alt = _clean_backfill_title(title)
+                        canonical_name = canonical_npcs.get(name.lower())
+                        if not canonical_name:
+                            name_skipped += 1
+                            skipped += 1
+                            continue
+                        matches.append({
+                            "kind": "npc_alt" if is_alt else "npc",
+                            "name": canonical_name,
+                            "district": "",
+                            "message": msg,
+                            "embed": embed,
+                            "caption": title,
+                        })
+                        continue
+
+                if target in ("locations", "both"):
+                    if "The Undercity" in _strip_backfill_md(title):
+                        place, district, detail = _parse_location_caption(embed.description or "")
+                        if not place:
+                            skipped += 1
+                            continue
+                        matches.append({
+                            "kind": "location",
+                            "name": place,
+                            "district": district,
+                            "message": msg,
+                            "embed": embed,
+                            "caption": embed.description or "",
+                            "detail": detail,
+                        })
+
+        saved = failed = 0
+        samples = []
+        # Save oldest-to-newest so ref_001 remains the latest Discord image.
+        for item in reversed(matches):
+            msg = item["message"]
+            img = await _message_image_bytes(msg, item.get("embed"))
+            if not img:
+                skipped += 1
+                continue
+            label = f"{item['kind']}:{item['name']}"
+            if item.get("district"):
+                label += f" ({item['district']})"
+            samples.append(label)
+            if dry_run:
+                continue
+            try:
+                meta = {
+                    "source": "discord_backfill_command",
+                    "message_id": str(msg.id),
+                    "channel_id": str(scan_channel_id),
+                    "caption": item.get("caption", ""),
+                    "created_at": msg.created_at.isoformat(),
+                }
+                if item["kind"] == "location":
+                    meta["district"] = item.get("district", "")
+                    meta["detail"] = item.get("detail", "")
+                    save_location_ref(item["name"], img, metadata=meta)
+                elif item["kind"] == "npc_alt":
+                    meta["alt_universe"] = True
+                    save_npc_alt_ref(item["name"], img, metadata=meta)
+                else:
+                    meta["alt_universe"] = False
+                    save_npc_ref(item["name"], img, metadata=meta)
+                saved += 1
+            except Exception:
+                failed += 1
+
+        sample_text = "\n".join(f"- {s}" for s in samples[-12:]) if samples else "- none"
+        mode = "DRY RUN" if dry_run else "SAVED"
+        skipped_note = f" (name mismatch: {name_skipped})" if name_skipped else ""
+        await interaction.followup.send(
+            f"Backfill {mode} complete\n"
+            f"Channel: `{getattr(channel, 'name', scan_channel_id)}`\n"
+            f"Target: `{target}` | scanned: **{scanned}** | matched: **{len(matches)}**\n"
+            f"Saved: **{saved}** | skipped: **{skipped}**{skipped_note} | failed: **{failed}**\n\n"
+            f"Recent matches:\n{sample_text}",
+            ephemeral=True,
+        )

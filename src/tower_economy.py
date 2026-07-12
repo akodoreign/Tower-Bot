@@ -14,6 +14,7 @@ Both persist to MySQL via db_api.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import random
@@ -22,7 +23,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 
 from src.log import logger
-from src.db_api import raw_query, raw_execute, db
+from src.db_api import get_global_state, raw_query, raw_execute, set_global_state, db
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 
@@ -197,36 +198,21 @@ _REACTION_COOLDOWN = 30 * 60  # 30 minutes
 def _load_reaction_cooldown() -> Optional[datetime]:
     """Load reaction cooldown from global_state table."""
     try:
-        rows = raw_query(
-            "SELECT state_value FROM global_state WHERE state_key = 'tia_reaction_cooldown'"
-        )
-        if rows and rows[0].get("state_value"):
-            data = rows[0]["state_value"]
-            if isinstance(data, str):
-                data = json.loads(data)
-            return datetime.fromisoformat(data.get("last_reaction_at", ""))
+        data = get_global_state("tia_reaction_cooldown")
+        if isinstance(data, str):
+            data = json.loads(data)
+        if isinstance(data, dict) and data.get("last_reaction_at"):
+            return datetime.fromisoformat(str(data["last_reaction_at"]))
         return None
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Reaction cooldown load error: {e}")
         return None
 
 
 def _save_reaction_cooldown() -> None:
     """Save reaction cooldown to global_state table."""
     try:
-        data = json.dumps({"last_reaction_at": datetime.now().isoformat()})
-        existing = raw_query(
-            "SELECT id FROM global_state WHERE state_key = 'tia_reaction_cooldown'"
-        )
-        if existing:
-            raw_execute(
-                "UPDATE global_state SET state_value = %s WHERE state_key = 'tia_reaction_cooldown'",
-                (data,)
-            )
-        else:
-            db.insert("global_state", {
-                "state_key": "tia_reaction_cooldown",
-                "state_value": data
-            })
+        set_global_state("tia_reaction_cooldown", {"last_reaction_at": datetime.now().isoformat()})
     except Exception as e:
         logger.error(f"Reaction cooldown save error: {e}")
 
@@ -303,7 +289,7 @@ def react_to_bulletin(bulletin_text: str) -> Optional[str]:
     # Build flash bulletin
     now   = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    ts    = f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
     # Determine overall direction from the moved sectors
     net_delta = sum(d for _, d in moved)
@@ -353,7 +339,7 @@ TOWER_YEAR_OFFSET = 10  # mirrors news_feed
 def _dual_ts() -> str:
     now = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    return f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    return f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
 
 def _ec(n: int) -> str:
@@ -573,9 +559,38 @@ def _seed_towerbay() -> List[Dict]:
     return listings
 
 
-def _tick_bids(listings: List[Dict]) -> tuple:
+def _load_npc_bidder_pool() -> List[Dict]:
+    """Load a small pool of named NPCs and adventurer parties for Tower Bay bidding."""
+    pool = []
+    try:
+        npcs = raw_query(
+            "SELECT name, faction FROM npcs "
+            "WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY RAND() LIMIT 20"
+        ) or []
+        for n in npcs:
+            pool.append({"name": n["name"], "faction": n.get("faction",""), "kind": "npc"})
+    except Exception:
+        pass
+    try:
+        parties = raw_query(
+            "SELECT party_name FROM party_profiles WHERE status='active' ORDER BY RAND() LIMIT 8"
+        ) or []
+        for p in parties:
+            pool.append({"name": p["party_name"], "faction": "Adventurers Guild", "kind": "party"})
+    except Exception:
+        pass
+    return pool
+
+
+def _tick_bids(listings: List[Dict], bidder_pool: Optional[List[Dict]] = None) -> tuple:
+    """
+    Advance NPC/party bids. Named bidders from the pool replace anonymous phantom bids.
+    Backs off when a real player is winning.
+    """
     now = datetime.now()
     sold_this_tick = []
+    pool = bidder_pool or []
+
     for item in listings:
         if item.get("sold"):
             continue
@@ -587,11 +602,127 @@ def _tick_bids(listings: List[Dict]) -> tuple:
             item["sold"] = True
             sold_this_tick.append(item)
             continue
-        if random.random() < 0.30:
-            bump = random.uniform(0.03, 0.12)
-            item["current_bid"] = int(item["current_bid"] * (1 + bump))
-            item["bid_count"]  += 1
+
+        has_real_bidder = bool(item.get("highest_bidder_id"))
+        chance  = 0.12 if has_real_bidder else 0.30
+        max_bump = 0.05 if has_real_bidder else 0.12
+
+        if random.random() < chance:
+            bump    = random.uniform(0.02, max_bump)
+            new_bid = int(item["current_bid"] * (1 + bump))
+            proxy   = item.get("proxy_max")
+            if has_real_bidder and proxy and new_bid <= proxy:
+                item["bid_count"] += 1
+            else:
+                item["current_bid"] = new_bid
+                item["bid_count"]  += 1
+                if has_real_bidder:
+                    item["highest_bidder_id"]   = None
+                    item["highest_bidder_name"] = None
+                    item["proxy_max"]           = None
+
+                # Assign a named NPC/party as current bid holder
+                if pool:
+                    bidder = random.choice(pool)
+                    # Use a stable "npc" pseudo-ID so it shows as NPC not player
+                    item["npc_bidder_name"]    = bidder["name"]
+                    item["npc_bidder_faction"] = bidder.get("faction", "")
+                    item["npc_bidder_kind"]    = bidder.get("kind", "npc")
+                    # Store in auction_json for history later
+                    aj = item.get("auction_json_obj") or {}
+                    bids = aj.get("npc_bid_history", [])
+                    bids.append({
+                        "bidder": bidder["name"],
+                        "amount": new_bid,
+                        "at":     now.isoformat(),
+                    })
+                    aj["npc_bid_history"] = bids[-20:]  # keep last 20
+                    item["auction_json_obj"] = aj
+
     return listings, sold_this_tick
+
+
+def _award_sold_items(sold_items: List[Dict]) -> None:
+    """
+    Record Tower Bay wins to the NPC/party acquisition log in global_state.
+    Called after _tick_bids resolves expired listings.
+    """
+    if not sold_items:
+        return
+    try:
+        acquisitions = get_global_state("towerbay_npc_acquisitions") or []
+        if not isinstance(acquisitions, list):
+            acquisitions = []
+        for item in sold_items:
+            winner_name = (
+                item.get("npc_bidder_name")
+                or item.get("highest_bidder_name")
+            )
+            if not winner_name:
+                continue
+            record = {
+                "item":         item.get("name", "Unknown"),
+                "winner":       winner_name,
+                "winner_kind":  item.get("npc_bidder_kind", "npc"),
+                "faction":      item.get("npc_bidder_faction", ""),
+                "final_bid":    item.get("current_bid", 0),
+                "rarity":       item.get("rarity", ""),
+                "mimir_source": item.get("mimir_source", False),
+                "sold_at":      datetime.now().isoformat(),
+            }
+            acquisitions.append(record)
+            logger.info(
+                f"🏆 TowerBay: {item.get('name','?')} sold to "
+                f"{winner_name} for {item.get('current_bid',0):,} EC"
+            )
+        # Keep last 100 acquisition records
+        set_global_state("towerbay_npc_acquisitions", acquisitions[-100:])
+
+        # Push won items to Mimir as NPC documents (best-effort)
+        _push_acquisitions_to_mimir(acquisitions[-len(sold_items):])
+    except Exception as e:
+        logger.warning(f"TowerBay award tracking error: {e}")
+
+
+def _push_acquisitions_to_mimir(records: List[Dict]) -> None:
+    """Best-effort: write acquisition notes to Mimir so NPCs/parties have item history."""
+    try:
+        from src.mimir_client import get_mimir
+        import asyncio as _aio
+        mimir = get_mimir()
+        if not mimir or not mimir._available:
+            return
+
+        async def _write():
+            for rec in records:
+                item_name   = rec.get("item", "Unknown Item")
+                winner      = rec.get("winner", "Unknown")
+                faction     = rec.get("faction", "")
+                final_bid   = rec.get("final_bid", 0)
+                rarity      = rec.get("rarity", "")
+                title = f"TowerBay Acquisition: {item_name} — {winner}"
+                content = (
+                    f"**{winner}** ({faction}) won **{item_name}** "
+                    f"at TowerBay auction.\n"
+                    f"Final bid: {final_bid:,} EC"
+                    + (f"\nRarity: {rarity}" if rarity else "")
+                    + f"\nDate: {rec.get('sold_at','')}"
+                )
+                try:
+                    await mimir.add_document(title=title, doc_type="note", content=content)
+                except Exception:
+                    pass
+
+        try:
+            loop = _aio.get_event_loop()
+            if loop.is_running():
+                loop.create_task(_write())
+            else:
+                loop.run_until_complete(_write())
+        except Exception:
+            pass
+    except Exception:
+        pass
 
 
 async def _generate_new_listing(existing_names: List[str]) -> Optional[Dict]:
@@ -661,20 +792,23 @@ RULES:
         now        = datetime.now()
         start      = int(item.get("starting_bid", min_price))
         expires_at = now + timedelta(days=TOWERBAY_LISTING_DAYS)
+        # Buy Now at 2.5–3.5× starting bid — tempting but premium
+        buy_now    = int(start * random.uniform(2.5, 3.5))
 
         return {
-            "id":           int(datetime.now().timestamp()),
-            "name":         item.get("name", "Unknown Item"),
-            "description":  item.get("description", ""),
-            "category":     item.get("category", category),
-            "condition":    item.get("condition", "Unknown"),
-            "seller":       item.get("seller", "Anonymous"),
-            "starting_bid": start,
-            "current_bid":  start,
-            "bid_count":    0,
-            "listed_at":    now.isoformat(),
-            "expires_at":   expires_at.isoformat(),
-            "sold":         False,
+            "id":             int(datetime.now().timestamp()),
+            "name":           item.get("name", "Unknown Item"),
+            "description":    item.get("description", ""),
+            "category":       item.get("category", category),
+            "condition":      item.get("condition", "Unknown"),
+            "seller":         item.get("seller", "Anonymous"),
+            "starting_bid":   start,
+            "current_bid":    start,
+            "buy_now_price":  buy_now,
+            "bid_count":      0,
+            "listed_at":      now.isoformat(),
+            "expires_at":     expires_at.isoformat(),
+            "sold":           False,
         }
 
     except Exception as e:
@@ -682,41 +816,251 @@ RULES:
         return None
 
 
+# ---------------------------------------------------------------------------
+# Mimir item listings — real D&D magic items pulled from the catalog
+# ---------------------------------------------------------------------------
+
+# Starting bid ≈ 50% of standard D&D 5e value for each rarity tier (in EC)
+# Buy Now = starting_bid × 2  (still below "full" value, encourages bidding)
+_MIMIR_RARITY_EC: Dict[str, tuple] = {
+    "uncommon":  (1_000,   8_000),
+    "rare":      (8_000,   40_000),
+    "very rare": (40_000, 150_000),
+    "very_rare": (40_000, 150_000),
+    "legendary": (150_000, 500_000),
+    "artifact":  (400_000, 1_200_000),
+}
+
+_MIMIR_TYPE_CATEGORY: Dict[str, str] = {
+    "weapon": "Weapons",
+    "sword":  "Weapons",
+    "axe":    "Weapons",
+    "bow":    "Weapons",
+    "armor":  "Armour",
+    "armour": "Armour",
+    "shield": "Armour",
+    "wand":   "Arcane Instruments",
+    "staff":  "Arcane Instruments",
+    "rod":    "Arcane Instruments",
+    "orb":    "Arcane Instruments",
+    "potion": "Consumables",
+    "elixir": "Consumables",
+    "scroll": "Documents & Lore",
+    "ring":   "Utility Gear",
+    "cloak":  "Utility Gear",
+    "boots":  "Utility Gear",
+    "gloves": "Utility Gear",
+    "amulet": "Utility Gear",
+    "necklace": "Utility Gear",
+}
+
+
+def _mimir_item_to_listing(item: dict) -> Optional[Dict]:
+    """Convert a Mimir catalog item dict into a Tower Bay listing dict."""
+    name = (item.get("name") or "").strip()
+    if not name:
+        return None
+
+    rarity_raw = (item.get("rarity") or "rare").lower().strip()
+    lo, hi = _MIMIR_RARITY_EC.get(rarity_raw, (8_000, 40_000))
+    start = random.randint(lo, hi)
+    # Buy Now = 2× starting bid so it's tempting but not a fire sale
+    buy_now = int(start * random.uniform(1.8, 2.4))
+
+    # Category from item type
+    raw_type = (item.get("item_type") or item.get("type") or "").lower()
+    category = "Occult Curiosities"
+    for keyword, cat in _MIMIR_TYPE_CATEGORY.items():
+        if keyword in raw_type or keyword in name.lower():
+            category = cat
+            break
+    if "wondrous" in raw_type:
+        category = "Utility Gear"
+
+    # Description — use Mimir's text or build a short flavor line
+    desc_parts = []
+    mimir_desc = (item.get("description") or item.get("text") or item.get("content") or "").strip()
+    if mimir_desc and len(mimir_desc) > 20:
+        # Trim to 2 sentences max for embed cleanliness
+        sentences = mimir_desc.replace("\n", " ").split(". ")
+        desc_parts.append(". ".join(sentences[:2]).strip().rstrip(".") + ".")
+    attune = item.get("requires_attunement") or item.get("attunement") or False
+    if attune:
+        desc_parts.append("Requires attunement.")
+    desc_parts.append("Source authenticated via Mimir catalog. Provenance verified.")
+    description = " ".join(desc_parts)
+
+    # Seller — flavour based on rarity
+    sellers = [
+        "Obsidian Lotus (undisclosed acquisition)",
+        "Glass Sigil (decommissioned archive stock)",
+        "Iron Fang Consortium (recovered goods)",
+        "Private Collector (anonymous)",
+        "Adventurers Guild (estate liquidation)",
+        "Tower Authority (evidence locker clearance)",
+        "Wardens of Ash (field surplus)",
+        "Serpent Choir (fulfilled contract collateral)",
+    ]
+    seller = random.choice(sellers)
+
+    condition_by_rarity = {
+        "uncommon": "Good",
+        "rare": "Excellent",
+        "very rare": "Mint",
+        "very_rare": "Mint",
+        "legendary": "Mint",
+        "artifact": "Unknown",
+    }
+    condition = condition_by_rarity.get(rarity_raw, "Good")
+
+    now = datetime.now()
+    expires_at = now + timedelta(days=TOWERBAY_LISTING_DAYS)
+
+    return {
+        "id":            int(now.timestamp() * 1000) % 2_000_000_000,
+        "name":          name,
+        "description":   description,
+        "category":      category,
+        "condition":     condition,
+        "seller":        seller,
+        "rarity":        rarity_raw,
+        "mimir_source":  True,
+        "starting_bid":  start,
+        "current_bid":   start,
+        "buy_now_price": buy_now,
+        "bid_count":     0,
+        "listed_at":     now.isoformat(),
+        "expires_at":    expires_at.isoformat(),
+        "sold":          False,
+    }
+
+
+async def _fetch_random_mimir_item(existing_names: List[str]) -> Optional[Dict]:
+    """Pull one random above-rare item from Mimir catalog and build a listing."""
+    try:
+        from src.mimir_client import get_mimir
+        mimir = get_mimir()
+        if not mimir or not mimir._available:
+            return None
+
+        existing_lower = {n.lower() for n in existing_names}
+
+        # Cycle through above-rare rarities with weighted probability.
+        # Lower-rarity catalog items now belong in the web-only TowerBot world shop,
+        # not the Discord auction board.
+        rarities = random.choices(
+            ["very rare", "legendary", "artifact"],
+            weights=[65, 30, 5],
+            k=3,  # try up to 3 rarities to find something not already listed
+        )
+
+        for rarity in rarities:
+            items = await mimir.search_items(rarity=rarity)
+            if not items:
+                continue
+
+            random.shuffle(items)
+            for item in items[:20]:
+                item_name = (item.get("name") or "").strip()
+                if not item_name:
+                    continue
+                if item_name.lower() in existing_lower:
+                    continue
+                listing = _mimir_item_to_listing(item)
+                if listing:
+                    return listing
+
+    except Exception as e:
+        logger.debug(f"🏪 Mimir item fetch failed: {e}")
+    return None
+
+
+async def seed_towerbay_from_mimir(count: int = 5) -> int:
+    """
+    Immediately add `count` real Mimir magic items to Tower Bay.
+    Items are injected as active listings without displacing existing ones.
+    Returns the number of items successfully added.
+    """
+    listings = _load_towerbay()
+    existing_names = [l["name"] for l in listings]
+    added = 0
+
+    for _ in range(count):
+        item = await _fetch_random_mimir_item(existing_names)
+        if not item:
+            logger.warning("🏪 seed_towerbay_from_mimir: no Mimir items returned — stopping early")
+            break
+        _save_towerbay_item(item)
+        existing_names.append(item["name"])
+        added += 1
+        logger.info(f"🏪 Mimir listing added: {item['name']} ({item.get('rarity','?')}) — start {item['starting_bid']:,} EC")
+
+    return added
+
+
 async def tick_towerbay() -> tuple[List[Dict], List[Dict]]:
     """
-    Tick both the AI listing board and player listings.
+    Tick both the listing board and player listings.
+    New slots are filled 100% from the Mimir catalog (real magic items).
+    NPC/party bidders are drawn from the live DB roster.
     Returns (ai_sold, player_sold) — lists of items that sold this tick.
     """
     from src.player_listings import tick_player_listings
+    try:
+        from src.towerbot_world_shop import restock_world_shop
+        await restock_world_shop()
+    except Exception as exc:
+        logger.debug(f"TowerBot world shop restock skipped: {exc}")
 
-    # ── AI listings ────────────────────────────────────────────────────────
+    # Load named NPC/party bidder pool once per tick
+    bidder_pool = _load_npc_bidder_pool()
+
+    # ── Main listings ──────────────────────────────────────────────────────
     listings = _load_towerbay()
 
     if not listings:
-        listings = _seed_towerbay()
+        # First boot — seed with Mimir items; fall back to narrative seed if Mimir unavailable
+        mimir_seeded = []
+        try:
+            existing: List[str] = []
+            for _ in range(TOWERBAY_ITEM_COUNT):
+                item = await _fetch_random_mimir_item(existing)
+                if item:
+                    mimir_seeded.append(item)
+                    existing.append(item["name"])
+        except Exception:
+            pass
+        listings = mimir_seeded if mimir_seeded else _seed_towerbay()
         _save_towerbay(listings)
-        logger.info("🏪 TowerBay seeded with initial 10 listings.")
+        logger.info(f"🏪 TowerBay seeded: {len(listings)} listings ({'Mimir' if mimir_seeded else 'narrative seed'})")
         ai_sold = []
     else:
-        listings, ai_sold = _tick_bids(listings)
+        listings, ai_sold = _tick_bids(listings, bidder_pool=bidder_pool)
+        _award_sold_items(ai_sold)
 
         active         = [l for l in listings if not l.get("sold")]
         existing_names = [l["name"] for l in listings]
 
         while len(active) < TOWERBAY_ITEM_COUNT:
-            new_item = await _generate_new_listing(existing_names)
+            # New slots always come from Mimir — real rare items from the catalog
+            new_item = await _fetch_random_mimir_item(existing_names)
+            if not new_item:
+                # Mimir unavailable — fall back to narrative generation
+                new_item = await _generate_new_listing(existing_names)
             if new_item:
                 listings.append(new_item)
                 active.append(new_item)
                 existing_names.append(new_item["name"])
-                logger.info(f"🏪 New TowerBay listing: {new_item['name']}")
+                src = "Mimir" if new_item.get("mimir_source") else "generated"
+                logger.info(f"🏪 New listing [{src}]: {new_item['name']} — start {new_item.get('starting_bid',0):,} EC")
             else:
                 break
 
         _save_towerbay(listings)
 
     # ── Player listings ────────────────────────────────────────────────────
-    player_sold = tick_player_listings()
+    # Run in a thread so a slow/hung MySQL call can't freeze the event loop
+    player_sold = await asyncio.to_thread(tick_player_listings)
 
     return ai_sold, player_sold
 
@@ -1034,28 +1378,330 @@ def format_towerbay_embeds():
         category = item.get("category", "Utility Gear")
         color    = _CATEGORY_COLORS.get(category, 0x777777)
 
+        buy_now_price = item.get("buy_now_price")
+        buy_now_str   = f"**Buy Now:** {_ec(buy_now_price)}" if buy_now_price else ""
+
+        # Named NPC/party bidder — named trumps anonymous
+        npc_bidder  = item.get("npc_bidder_name")
+        high_bidder = npc_bidder or item.get("highest_bidder_name")
+        bidder_line = (chr(10) + "🏆 *Current high bid: " + high_bidder + "*") if high_bidder else ""
+
+        # Rarity badge for Mimir items
+        _rarity     = (item.get("rarity") or "").lower()
+        _RBADGES    = {
+            "uncommon":  "🟢 Uncommon",
+            "rare":      "🔵 Rare",
+            "very rare": "🟣 Very Rare",
+            "very_rare": "🟣 Very Rare",
+            "legendary": "🟠 Legendary",
+            "artifact":  "🔴 Artifact",
+        }
+        rarity_prefix = ("**" + _RBADGES[_rarity] + "**  ·  ") if _rarity in _RBADGES else ""
+
         desc = (
-            f"{item['description'][:200]}\n\n"
-            f"**Current bid:** {bid_str}  ({bids_str})\n"
-            f"**Condition:** {item.get('condition', '?')}  \u00b7  **Seller:** {item.get('seller', '?')}"
+            f"{item['description'][:180]}" + chr(10) + chr(10)
+            + rarity_prefix
+            + f"**Current bid:** {bid_str}  ({bids_str})" + bidder_line + chr(10)
+            + (f"{buy_now_str}" + chr(10) if buy_now_str else "")
+            + f"**Condition:** {item.get('condition', '?')}  ·  **Seller:** {item.get('seller', '?')}"
         )
 
+        item_id   = item.get("id", "?")
+        mimir_tag = " ❖" if item.get("mimir_source") else ""
         embed = discord.Embed(
-            title=f"{arrow} {item['name']}",
+            title=f"{arrow} Lot #{item_id} — {item['name']}{mimir_tag}",
             description=desc,
             color=color,
         )
-        embed.set_footer(text=f"{category}  \u2022  {time_str}")
+        embed.set_footer(text=f"{category}  •  {time_str}  •  /bid {item_id} <amount>")
         embeds.append(embed)
 
     # Footer embed
     footer_embed = discord.Embed(
         description=(
-            "\U0001f4e6 **Want to sell something?** Use `/towerbay` to list an item \u2014 "
-            "the DM reviews it before it goes live. Use `/myauctions` to check your listings."
+            "**To bid:** `/bid <lot#> <amount>` — or `/buynow <lot#>` to buy instantly.\n"
+            "**To sell:** `/towerbay` — DM reviews before it goes live.\n"
+            "Use `/mybids` to track your active bids. Use `/myauctions` for your listings."
         ),
         color=0x777777,
     )
     embeds.append(footer_embed)
 
     return embeds
+
+
+# ---------------------------------------------------------------------------
+# Real-player bid engine
+# ---------------------------------------------------------------------------
+
+def _ensure_bid_columns() -> None:
+    """Idempotent: ensure towerbay_auctions has real-bidder columns."""
+    try:
+        cols = raw_query(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'towerbay_auctions'"
+        )
+        existing = {r["COLUMN_NAME"] for r in (cols or [])}
+        if "highest_bidder_id" not in existing:
+            raw_execute("ALTER TABLE towerbay_auctions ADD COLUMN highest_bidder_id BIGINT DEFAULT NULL")
+        if "highest_bidder_name" not in existing:
+            raw_execute("ALTER TABLE towerbay_auctions ADD COLUMN highest_bidder_name VARCHAR(100) DEFAULT NULL")
+        if "proxy_max" not in existing:
+            raw_execute("ALTER TABLE towerbay_auctions ADD COLUMN proxy_max BIGINT DEFAULT NULL")
+        raw_execute("""
+            CREATE TABLE IF NOT EXISTS towerbay_bids (
+                id           INT AUTO_INCREMENT PRIMARY KEY,
+                listing_id   VARCHAR(50)            NOT NULL,
+                listing_type ENUM('ai','player')     NOT NULL DEFAULT 'ai',
+                bidder_id    BIGINT                 NOT NULL,
+                bidder_name  VARCHAR(100)           NOT NULL,
+                amount       BIGINT                 NOT NULL,
+                proxy_max    BIGINT                 DEFAULT NULL,
+                successful   TINYINT(1)             NOT NULL DEFAULT 1,
+                bid_at       DATETIME               NOT NULL DEFAULT NOW(),
+                INDEX idx_listing (listing_id, listing_type),
+                INDEX idx_bidder  (bidder_id)
+            )
+        """)
+    except Exception as e:
+        logger.warning(f"TowerBay bid column check: {e}")
+
+
+# Run on import so the columns are always present
+try:
+    _ensure_bid_columns()
+except Exception as _e:
+    logger.warning("TowerBay bid column startup failed: %s", _e)
+
+
+def _log_bid(
+    listing_id: str,
+    listing_type: str,
+    bidder_id: int,
+    bidder_name: str,
+    amount: int,
+    successful: bool,
+    proxy_max: Optional[int] = None,
+) -> None:
+    try:
+        db.insert("towerbay_bids", {
+            "listing_id":   str(listing_id),
+            "listing_type": listing_type,
+            "bidder_id":    bidder_id,
+            "bidder_name":  bidder_name,
+            "amount":       amount,
+            "proxy_max":    proxy_max,
+            "successful":   1 if successful else 0,
+        })
+    except Exception as e:
+        logger.warning(f"towerbay_bids log error: {e}")
+
+
+def place_bid(
+    listing_id: int,
+    bidder_id: int,
+    bidder_name: str,
+    amount: int,
+    proxy_max: Optional[int] = None,
+) -> Dict:
+    """
+    Place a real player bid on an AI-generated TowerBay listing.
+    Returns:
+        success       bool
+        message       str   — shown to the bidder
+        outbid_user   dict  — {id, name} of the player just knocked off top spot, or None
+        new_price     int   — current bid after this action
+        item_name     str
+    """
+    rows = raw_query(
+        "SELECT * FROM towerbay_auctions WHERE id = %s AND status = 'active'", (listing_id,)
+    )
+    if not rows:
+        return {"success": False, "message": "That lot doesn't exist or has already closed.", "outbid_user": None}
+
+    row           = rows[0]
+    current_bid   = int(row.get("current_bid") or 0)
+    buy_now_price = row.get("buy_now_price")
+    seller_id     = row.get("seller_id")
+    curr_holder   = row.get("highest_bidder_id")
+    curr_proxy    = row.get("proxy_max")
+    item_name     = row.get("item_name", "Unknown")
+
+    if seller_id and int(seller_id) == bidder_id:
+        return {"success": False, "message": "You can't bid on your own listing.", "outbid_user": None}
+
+    if curr_holder and int(curr_holder) == bidder_id:
+        if proxy_max and proxy_max > (curr_proxy or 0):
+            # Updating proxy max only
+            raw_execute(
+                "UPDATE towerbay_auctions SET proxy_max = %s WHERE id = %s",
+                (proxy_max, listing_id)
+            )
+            return {
+                "success": True,
+                "message": f"Your max auto-bid updated to **{proxy_max:,} EC**.",
+                "outbid_user": None,
+                "new_price": current_bid,
+                "item_name": item_name,
+            }
+        return {"success": False, "message": "You're already the highest bidder!", "outbid_user": None}
+
+    # Minimum increment: 5% above current bid, at least 500 EC
+    min_bid = max(current_bid + 500, int(current_bid * 1.05))
+    if amount < min_bid:
+        return {
+            "success": False,
+            "message": f"Minimum bid is **{min_bid:,} EC** (5% above current {current_bid:,} EC).",
+            "outbid_user": None,
+        }
+
+    # Existing proxy can counter this bid
+    if curr_holder and curr_proxy and curr_proxy >= amount:
+        counter = min(int(amount * 1.05), curr_proxy)
+        raw_execute(
+            "UPDATE towerbay_auctions SET current_bid = %s WHERE id = %s",
+            (counter, listing_id)
+        )
+        _log_bid(str(listing_id), "ai", bidder_id, bidder_name, amount, False)
+        return {
+            "success": False,
+            "message": (
+                f"A proxy bid held by another buyer countered yours. "
+                f"Current bid is now **{counter:,} EC**."
+            ),
+            "outbid_user": None,
+            "new_price": counter,
+        }
+
+    # Bid succeeds — record who got knocked off
+    outbid_user = None
+    if curr_holder:
+        outbid_user = {
+            "id":   int(curr_holder),
+            "name": row.get("highest_bidder_name") or "Unknown",
+        }
+
+    raw_execute(
+        "UPDATE towerbay_auctions "
+        "SET current_bid = %s, highest_bidder_id = %s, highest_bidder_name = %s, proxy_max = %s "
+        "WHERE id = %s",
+        (amount, bidder_id, bidder_name, proxy_max, listing_id),
+    )
+
+    # Keep bid_count in sync inside auction_json blob
+    try:
+        aj_row = raw_query("SELECT auction_json FROM towerbay_auctions WHERE id = %s", (listing_id,))
+        if aj_row and aj_row[0].get("auction_json"):
+            aj = aj_row[0]["auction_json"]
+            if isinstance(aj, str):
+                aj = json.loads(aj)
+            aj["bid_count"]          = aj.get("bid_count", 0) + 1
+            aj["current_bid"]        = amount
+            aj["highest_bidder_id"]  = bidder_id
+            aj["highest_bidder_name"] = bidder_name
+            raw_execute(
+                "UPDATE towerbay_auctions SET auction_json = %s WHERE id = %s",
+                (json.dumps(aj), listing_id),
+            )
+    except Exception:
+        pass
+
+    _log_bid(str(listing_id), "ai", bidder_id, bidder_name, amount, True, proxy_max)
+    logger.info(f"🏪 Real bid: {bidder_name} → Lot #{listing_id} at {amount:,} EC")
+
+    return {
+        "success":     True,
+        "message":     f"Bid placed: **{amount:,} EC** on *{item_name}*.",
+        "outbid_user": outbid_user,
+        "new_price":   amount,
+        "item_name":   item_name,
+    }
+
+
+def buy_now(listing_id: int, buyer_id: int, buyer_name: str) -> Dict:
+    """
+    Immediately purchase a listing at its buy_now_price.
+    Returns: {success, message, price, item_name}
+    """
+    rows = raw_query(
+        "SELECT * FROM towerbay_auctions WHERE id = %s AND status = 'active'", (listing_id,)
+    )
+    if not rows:
+        return {"success": False, "message": "That lot doesn't exist or has already closed."}
+
+    row           = rows[0]
+    buy_now_price = row.get("buy_now_price")
+    seller_id     = row.get("seller_id")
+    item_name     = row.get("item_name", "Unknown")
+
+    if not buy_now_price:
+        return {"success": False, "message": "This listing doesn't have a Buy Now price."}
+
+    if seller_id and int(seller_id) == buyer_id:
+        return {"success": False, "message": "You can't buy your own listing."}
+
+    # Mark sold immediately
+    raw_execute(
+        "UPDATE towerbay_auctions "
+        "SET status = 'sold', current_bid = %s, winner_id = %s, "
+        "    highest_bidder_id = %s, highest_bidder_name = %s "
+        "WHERE id = %s",
+        (buy_now_price, buyer_id, buyer_id, buyer_name, listing_id),
+    )
+    _log_bid(str(listing_id), "ai", buyer_id, buyer_name, buy_now_price, True)
+    logger.info(f"🏪 Buy Now: {buyer_name} → Lot #{listing_id} *{item_name}* at {buy_now_price:,} EC")
+
+    return {
+        "success":   True,
+        "message":   f"You bought *{item_name}* for **{buy_now_price:,} EC**. Congratulations!",
+        "price":     buy_now_price,
+        "item_name": item_name,
+        # Previous highest bidder needs a refund notification — caller handles it
+        "outbid_user": {
+            "id":   int(row["highest_bidder_id"]),
+            "name": row.get("highest_bidder_name") or "Unknown",
+        } if row.get("highest_bidder_id") else None,
+    }
+
+
+def get_active_listings() -> List[Dict]:
+    """Return active AI listings — used for autocomplete and /mybids."""
+    try:
+        rows = raw_query(
+            "SELECT id, item_name, current_bid, buy_now_price, "
+            "highest_bidder_id, highest_bidder_name, expires_at "
+            "FROM towerbay_auctions WHERE status = 'active' ORDER BY current_bid DESC"
+        )
+        return rows or []
+    except Exception as e:
+        logger.error(f"get_active_listings error: {e}")
+        return []
+
+
+def get_player_bids(player_id: int) -> List[Dict]:
+    """Return all recent bids by a player across AI and player listings."""
+    try:
+        rows = raw_query(
+            "SELECT tb.*, "
+            "  CASE tb.listing_type "
+            "    WHEN 'ai' THEN ta.item_name "
+            "    ELSE pl.item_name END AS item_name, "
+            "  CASE tb.listing_type "
+            "    WHEN 'ai' THEN ta.status "
+            "    ELSE pl.status END AS listing_status, "
+            "  CASE tb.listing_type "
+            "    WHEN 'ai' THEN ta.highest_bidder_id "
+            "    ELSE pl.highest_bidder_id END AS current_winner_id "
+            "FROM towerbay_bids tb "
+            "LEFT JOIN towerbay_auctions ta ON tb.listing_type = 'ai' "
+            "  AND CAST(tb.listing_id AS UNSIGNED) = ta.id "
+            "LEFT JOIN player_listings pl ON tb.listing_type = 'player' "
+            "  AND tb.listing_id = CONCAT('pl_', pl.id) "
+            "WHERE tb.bidder_id = %s AND tb.successful = 1 "
+            "ORDER BY tb.bid_at DESC LIMIT 20",
+            (player_id,)
+        )
+        return rows or []
+    except Exception as e:
+        logger.error(f"get_player_bids error: {e}")
+        return []

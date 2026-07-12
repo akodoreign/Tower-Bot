@@ -38,7 +38,7 @@ TOWER_YEAR_OFFSET = 10
 def _dual_ts() -> str:
     now = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    return f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    return f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
 
 def _load() -> dict:
@@ -135,8 +135,8 @@ def format_exchange_line() -> str:
     rate = get_rate()
     return (
         f"💱 **EC/Kharma Rate:** `1 Kharma = {rate:.2f} EC`  "
-        f"│  `10 Kharma = {rate*10:.1f} EC`  "
-        f"│  `100 Kharma = {rate*100:.0f} EC`"
+        f"|  `10 Kharma = {rate*10:.1f} EC`  "
+        f"|  `100 Kharma = {rate*100:.0f} EC`"
     )
 
 

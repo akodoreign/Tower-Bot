@@ -13,6 +13,7 @@ Exported:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from pathlib import Path
 from typing import Optional, Dict, Tuple
@@ -33,8 +34,7 @@ def generate_mission(
     reward: str = "",
     mission_type: str = "",
     personal_for: str = "",
-    difficulty: Optional[str] = None,
-    difficulty_rating: Optional[int] = None,
+    difficulty: Optional[int] = None,
 ) -> Optional[Dict]:
     """
     Generate a mission module synchronously.
@@ -51,8 +51,7 @@ def generate_mission(
         reward: Reward description
         mission_type: Mission type (escort, recovery, investigation, battle, etc.)
         personal_for: Character name if personal mission
-        difficulty: DEPRECATED - use difficulty_rating instead
-        difficulty_rating: Difficulty 1-10 (easy to epic). Default: 5 (Challenging)
+        difficulty: Difficulty 1-10 (1=Trivial, 5=Hard, 10=Legendary). Default: 5
     
     Returns:
         Dict with mission module data, or None on failure
@@ -66,7 +65,7 @@ def generate_mission(
         ...     mission_type="theft",
         ...     player_name="Party of Shadows",
         ...     reward="1000 EC + faction favor",
-        ...     difficulty_rating=7,
+        ...     difficulty=7,
         ... )
         >>> module["metadata"]["title"]
         'Theft: The Silent Vault'
@@ -89,7 +88,6 @@ def generate_mission(
                 mission_type=mission_type,
                 personal_for=personal_for,
                 difficulty=difficulty,
-                difficulty_rating=difficulty_rating,
             )
         )
     except Exception as e:
@@ -106,8 +104,7 @@ async def generate_mission_async(
     reward: str = "",
     mission_type: str = "",
     personal_for: str = "",
-    difficulty: Optional[str] = None,
-    difficulty_rating: Optional[int] = None,
+    difficulty: Optional[int] = None,
 ) -> Optional[Dict]:
     """
     Generate a mission module asynchronously.
@@ -121,8 +118,7 @@ async def generate_mission_async(
         reward: Reward description
         mission_type: Mission type (escort, recovery, investigation, etc.)
         personal_for: Character name if personal mission
-        difficulty: DEPRECATED - use difficulty_rating
-        difficulty_rating: Difficulty 1-10 scale (easy to epic)
+        difficulty: Difficulty 1-10 (1=Trivial, 5=Hard, 10=Legendary)
     
     Returns:
         Dict with mission module data, or None on failure
@@ -142,14 +138,14 @@ async def generate_mission_async(
     }
     
     # Add difficulty rating if provided
-    if difficulty_rating is not None:
-        mission["difficulty_rating"] = max(1, min(10, difficulty_rating))  # Clamp to 1-10
+    if difficulty is not None:
+        mission["difficulty"] = max(1, min(10, difficulty))  # Clamp to 1-10
     else:
-        mission["difficulty_rating"] = 5  # Default: Challenging
+        mission["difficulty"] = 5  # Default: Challenging
     
     logger.info(f"🎲 Generating mission: {title}")
     if mission_type:
-        logger.info(f"   Type: {mission_type} | Difficulty: {mission['difficulty_rating']}/10")
+        logger.info(f"   Type: {mission_type} | Difficulty: {mission['difficulty']}/10")
     
     try:
         module = await generate_module_json(mission, player_name=player_name)
@@ -408,11 +404,25 @@ async def generate_dungeon_delve_mission(
     Returns:
         Path to mission output directory, or None if dungeon_delve not available
     """
+    from src.resource_cop import (
+        wait_for_ollama_turn, start_pipeline, finish_pipeline, append_pipeline_failure,
+    )
+
+    decision = await wait_for_ollama_turn("dungeon_delve", track="primary")
+    if not decision.run_now:
+        logger.warning(f"🏰 Dungeon delve deferred by cop: {decision.reason}")
+        return None
+
+    run = await start_pipeline(
+        "dungeon_delve",
+        mission_type="dungeon-delve",
+        phase="generating",
+    )
     try:
         from .dungeon_delve import generate_dungeon_delve, save_dungeon_delve
-        
-        logger.info(f"🏰 Generating dungeon delve mission...")
-        
+
+        logger.info("🏰 Generating dungeon delve mission...")
+
         result = await generate_dungeon_delve(
             location_name=location_name,
             faction=faction,
@@ -420,18 +430,21 @@ async def generate_dungeon_delve_mission(
             player_name=player_name,
             reward=reward,
         )
-        
-        # Save to disk
-        mission_dir = save_dungeon_delve(result)
-        
+
+        mission_dir = await save_dungeon_delve(result)
         if mission_dir:
             logger.info(f"🏰 Dungeon delve saved: {mission_dir}")
-        
+
+        await finish_pipeline(run.run_id, status="finished")
         return mission_dir
+
     except ImportError:
+        await finish_pipeline(run.run_id, status="failed")
         logger.warning("⚠️ Dungeon delve module not available")
         return None
     except Exception as e:
+        await append_pipeline_failure(run.run_id, e)
+        await finish_pipeline(run.run_id, status="failed")
         logger.error(f"❌ Dungeon delve generation failed: {e}", exc_info=True)
         return None
 

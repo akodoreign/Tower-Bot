@@ -6,11 +6,11 @@ KimiAgent is optimized for complex, multi-step reasoning tasks:
     - Mission generation (multiple interconnected elements)
     - Multi-step analysis
 
-Uses a larger local model (e.g., qwen3-8b-slim:latest, qwen:32b, llama3:70b) via Ollama.
+Uses the configured local Qwen model via Ollama.
 Runs 100% locally — no cloud required.
 
 Configuration via environment variables:
-    KIMI_MODEL: Model name (default: "qwen:32b")
+    KIMI_MODEL: Model name (default: "qwen3-8b-slim:latest")
     OLLAMA_URL: Base URL (default: "http://localhost:11434")
     KIMI_ENABLE_SUBAGENTS: Enable subagent orchestration (default: "false")
 """
@@ -30,10 +30,10 @@ class KimiAgent(BaseAgent):
     """
     Complex reasoning agent using a larger local model via Ollama.
     
-    Uses a larger local model for tasks requiring more reasoning depth
+    Uses the configured local model for tasks requiring more reasoning depth
     than QwenAgent. Runs 100% locally — no cloud required.
     
-    Recommended models: qwen3-8b-slim:latest, qwen:32b, llama3:70b
+    Recommended model: qwen3-8b-slim:latest
     
     Best for:
         - News bulletin generation
@@ -50,25 +50,18 @@ class KimiAgent(BaseAgent):
     
     def _get_config(self) -> AgentConfig:
         """Return Kimi-specific configuration."""
-        model = os.getenv("KIMI_MODEL", "qwen3-8b-slim:latest")  # Local model default
-        base_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
-        enable_subagents = os.getenv("KIMI_ENABLE_SUBAGENTS", "false").lower() == "true"  # Disabled by default
-        
-        # Ensure we're using the v1 API endpoint
-        if not base_url.endswith("/v1"):
-            if base_url.endswith("/api/chat"):
-                base_url = base_url.replace("/api/chat", "/v1")
-            else:
-                base_url = f"{base_url.rstrip('/')}/v1"
+        model = os.getenv("KIMI_MODEL", "qwen3-8b-slim:latest")
+        base_url = os.getenv("OLLAMA_URL", "http://localhost:11434").split("/api")[0].split("/v1")[0].rstrip("/")
+        enable_subagents = os.getenv("KIMI_ENABLE_SUBAGENTS", "false").lower() == "true"
         
         return AgentConfig(
             model_name=model,
-            model_type=ModelType.LOCAL,  # Local model
+            model_type=ModelType.LOCAL,
             base_url=base_url,
-            timeout=300.0,           # Larger local models need more time
-            max_retries=2,           # Retry on transient failures
-            temperature=0.8,         # Higher for creative tasks
-            max_tokens=4096,         # Complex tasks need more output
+            timeout=300.0,
+            max_retries=2,
+            temperature=0.8,
+            max_tokens=4096,
             enable_subagents=enable_subagents,
             max_concurrent_subagents=4,
         )
@@ -140,66 +133,16 @@ RULES:
         prompt = f"""Generate a {news_type} bulletin for the Undercity.
 
 REQUIREMENTS:
-- 3-5 lines. Punchy, specific, grounded.
+- Aim for 4-6 lines. Up to 10 if the story is rich — a Read More button handles the overflow.
+- Be specific and generous with detail: names, locations, factions, consequences.
 - Reference real locations, factions, and NPCs where appropriate.
-- If this follows from recent events in the memory, build on them.
+- If this follows from recent events in the memory, build on them — continuity matters.
 - Discord markdown: **bold** key terms, *italics* for rumour attribution.
 - Output ONLY the bulletin. No meta-commentary."""
         
         return await self.complete(
             prompt=prompt,
             context="\n\n".join(context_parts) if context_parts else None,
-        )
-    
-    async def generate_mission(
-        self,
-        difficulty: str = "C",
-        faction: str = "",
-        location: str = "",
-        mission_type: str = "",
-        context: str = "",
-    ) -> AgentResponse:
-        """
-        Generate a mission/quest for the mission board.
-        
-        Args:
-            difficulty: Mission difficulty (S/A/B/C/D/E)
-            faction: Requesting faction
-            location: Mission location
-            mission_type: Type of mission (investigation, combat, etc.)
-            context: Additional world context
-            
-        Returns:
-            AgentResponse with mission JSON
-        """
-        prompt = f"""Generate a mission for the Undercity mission board.
-
-PARAMETERS:
-- Difficulty: {difficulty} rank
-- Faction: {faction or "any"}
-- Location: {location or "any Undercity district"}
-- Type: {mission_type or "any"}
-
-OUTPUT FORMAT (JSON):
-{{
-    "title": "Short punchy title",
-    "description": "2-3 sentences. What needs doing and why.",
-    "objectives": ["Primary objective", "Optional secondary"],
-    "rewards": {{
-        "ec": 100,  // Essence Coins
-        "reputation": "faction_name"
-    }},
-    "complications": ["One twist or complication"],
-    "npc_contact": "NPC name and brief descriptor"
-}}
-
-Generate a mission that fits the Undercity setting. Be specific.
-Output ONLY the JSON, no markdown code fences."""
-        
-        return await self.complete(
-            prompt=prompt,
-            context=context if context else None,
-            temperature=0.9,  # Higher for mission variety
         )
     
     async def orchestrate(

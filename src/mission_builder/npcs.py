@@ -16,8 +16,6 @@ import random
 from pathlib import Path
 from typing import List, Dict, Optional
 
-DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "campaign_docs"
-
 # Canonical faction leader names — used as fallback if not in roster
 FACTION_LEADERS = {
     "iron fang consortium": "Serrik Dhal",
@@ -57,12 +55,12 @@ LEADER_RANKS = [
 
 
 def load_npc_roster() -> List[dict]:
-    """Load the NPC roster from MySQL (falls back to npc_roster.json)."""
+    """Load the NPC roster from MySQL. Returns empty list on failure."""
     try:
         from src.db_api import raw_query as _rq
         rows = _rq(
             "SELECT name, faction, role, location, status, data_json FROM npcs "
-            "WHERE status IN ('alive','injured') ORDER BY name"
+            "WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name"
         ) or []
         if rows:
             npcs = []
@@ -76,14 +74,6 @@ def load_npc_roster() -> List[dict]:
                 npc.update(dj)
                 npcs.append(npc)
             return npcs
-    except Exception:
-        pass
-    # Fallback
-    roster_file = DOCS_DIR / "npc_roster.json"
-    if not roster_file.exists():
-        return []
-    try:
-        return json.loads(roster_file.read_text(encoding="utf-8"))
     except Exception:
         return []
 
@@ -122,6 +112,8 @@ def get_faction_leader(faction: str) -> Optional[dict]:
                 return npc
     
     # Second: look for leadership rank keywords
+    # NOTE: rank-based detection only works when `rank` is present in data_json;
+    # it is not in the SELECT list directly, so this relies on data_json expansion.
     for npc in faction_npcs:
         rank = npc.get("rank", "").lower()
         for keyword in LEADER_RANKS:

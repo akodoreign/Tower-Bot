@@ -12,6 +12,7 @@ the system prompt.
 """
 
 import re
+import time
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, field
@@ -91,7 +92,6 @@ def _parse_skill_text(text: str, filename: str) -> Optional[Skill]:
 def load_skills(force: bool = False) -> List[Skill]:
     """Load all skills from MySQL, falling back to campaign_docs/skills/ files."""
     global _skills_cache, _cache_ts
-    import time
 
     if not force and _skills_cache is not None and (time.time() - _cache_ts) < 300:
         return _skills_cache
@@ -125,7 +125,7 @@ def load_skills(force: bool = False) -> List[Skill]:
             logger.warning(f"skill_loader: cannot read {filepath.name}: {e}")
 
     _skills_cache = skills
-    import time as _t; _cache_ts = _t.time()
+    _cache_ts = time.time()
     logger.info(f"🧠 skill_loader: loaded {len(skills)} skills from files (DB unavailable)")
     return skills
 
@@ -151,14 +151,7 @@ def save_skill_to_db(skill_text: str, filename: str) -> bool:
              skill.title, ",".join(skill.keywords), skill.category,
              skill.version, skill.source, skill_text)
         )
-        # Invalidate cache
         global _skills_cache; _skills_cache = None
-        # Write-through to file
-        try:
-            SKILLS_DIR.mkdir(parents=True, exist_ok=True)
-            (SKILLS_DIR / filename).write_text(skill_text, encoding="utf-8")
-        except Exception:
-            pass
         return True
     except Exception as e:
         logger.error(f"skill_loader: save_skill_to_db error: {e}")

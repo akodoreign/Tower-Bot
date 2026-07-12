@@ -45,7 +45,7 @@ async def build_docx(
         title = module_data.get("title", "mission")
         safe_title = "".join(c for c in title if c.isalnum() or c in " -_").strip()
         safe_title = safe_title.replace(" ", "_")[:50]
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         filename = f"{safe_title}_{timestamp}"
     
     filename = filename.rsplit(".", 1)[0]
@@ -111,10 +111,16 @@ async def build_docx(
 def format_module_for_docx(
     title: str,
     overview: str,
-    acts_1_2: str,
-    acts_3_4: str,
-    act_5_rewards: str,
+    acts_1_2: str = "",
+    acts_3_4: str = "",
+    act_5_rewards: str = "",
     metadata: Optional[dict] = None,
+    # 5-chapter novel pipeline
+    chapter_1: str = "",
+    chapter_2: str = "",
+    chapter_3: str = "",
+    chapter_4: str = "",
+    chapter_5: str = "",
 ) -> dict:
     """
     Format module sections into the structure expected by build_module_docx.js.
@@ -132,23 +138,54 @@ def format_module_for_docx(
     """
     if metadata is None:
         metadata = {}
-    
+
+    faction     = metadata.get("faction", "Unknown")
+    tier        = metadata.get("tier", "Standard")
+    cr          = metadata.get("cr", 5)
+    party_level = metadata.get("party_level", metadata.get("player_level", 5))
+    player_name = metadata.get("player_name", "Unclaimed")
+    player_count = metadata.get("player_count", "4–6")
+    reward      = metadata.get("reward", "See mission posting")
+    generated_at = metadata.get("generated_at", datetime.now().isoformat())
+
     return {
+        # Top-level fields read directly by build_module_docx.js
         "title": title,
+        "faction": faction,
+        "tier": tier,
+        "cr": cr,
+        "player_level": party_level,
+        "player_name": player_name,
+        "player_count": player_count,
+        "reward": reward,
+        "generated_at": generated_at,
+        # Nested metadata kept for any consumers that read it
         "metadata": {
-            "faction": metadata.get("faction", "Unknown"),
-            "tier": metadata.get("tier", "Standard"),
-            "cr": metadata.get("cr", 5),
-            "generated": datetime.now().isoformat(),
+            "faction": faction,
+            "tier": tier,
+            "cr": cr,
+            "party_level": party_level,
+            "player_count": player_count,
+            "generated": generated_at,
             "version": "2.0",
         },
         "sections": {
-            "overview": overview,
-            "acts_1_2": acts_1_2,
-            "acts_3_4": acts_3_4,
+            "overview":      overview,
+            # Legacy keys kept so old sidecar JSONs still render
+            "acts_1_2":      acts_1_2,
+            "acts_3_4":      acts_3_4,
             "act_5_rewards": act_5_rewards,
+            # 5-chapter novel pipeline
+            "chapter_1": chapter_1 or acts_1_2,
+            "chapter_2": chapter_2,
+            "chapter_3": chapter_3,
+            "chapter_4": chapter_4 or acts_3_4,
+            "chapter_5": chapter_5 or act_5_rewards,
         },
-        "raw_content": f"{overview}\n\n{acts_1_2}\n\n{acts_3_4}\n\n{act_5_rewards}",
+        "raw_content": "\n\n".join(filter(None, [
+            overview, chapter_1 or acts_1_2, chapter_2,
+            chapter_3, chapter_4 or acts_3_4, chapter_5 or act_5_rewards,
+        ])),
     }
 
 
@@ -158,12 +195,17 @@ def validate_module_data(module_data: dict) -> bool:
     
     Returns True if valid, False otherwise.
     """
-    required_sections = ["overview", "acts_1_2", "acts_3_4", "act_5_rewards"]
-    
+    required_sections = ["overview", "chapter_1", "chapter_4", "chapter_5"]
+
     sections = module_data.get("sections", {})
-    
+
     for section in required_sections:
-        if section not in sections or not sections[section]:
+        # chapter_1 may be satisfied by the JSON pipeline's acts_1_2 key
+        if section == "chapter_1":
+            if not sections.get("chapter_1") and not sections.get("acts_1_2"):
+                logger.warning(f"⚠️ Missing or empty section: {section}")
+                return False
+        elif section not in sections or not sections[section]:
             logger.warning(f"⚠️ Missing or empty section: {section}")
             return False
     

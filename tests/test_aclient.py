@@ -56,6 +56,6 @@ class TestDiscordClientLogic:
         assert "standard" in personas
         assert "creative" in personas
         
-        # Test jailbreak detection
-        assert is_jailbreak_persona("jailbreak-v1") is True
+        # Jailbreak personas removed — function always returns False
+        assert is_jailbreak_persona("jailbreak-v1") is False
         assert is_jailbreak_persona("standard") is False

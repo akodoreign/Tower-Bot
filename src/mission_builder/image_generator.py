@@ -27,7 +27,9 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import inspect
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -37,10 +39,16 @@ import httpx
 
 from src.log import logger
 from src.image_ref import get_npc_ref, save_npc_ref
+
+
+async def _maybe_await(value: Any) -> Any:
+    if inspect.isawaitable(value):
+        return await value
+    return value
 from .schemas import ImageAsset, MissionModule, DungeonRoom
 
 # Configuration
-A1111_URL = "http://127.0.0.1:7860"
+A1111_URL = os.getenv("A1111_URL", "http://127.0.0.1:7860")
 MISSION_IMAGES_DIR = Path(__file__).resolve().parent.parent.parent / "generated_modules" / "images"
 MISSION_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -95,6 +103,15 @@ async def generate_single_tile(params: TileGenerationParams) -> Optional[Image.I
         PIL Image object, or None if generation fails
     """
     try:
+        from src.resource_cop import wait_for_a1111_turn
+        decision = await wait_for_a1111_turn(
+            "image_generator_tile",
+            max_wait_seconds=60,
+        )
+        if not decision.run_now:
+            logger.info(f"image_generator: A1111 deferred tile generation: {decision.reason}")
+            return None
+
         if params.use_reference and params.reference_base64:
             # Use img2img for consistency with reference
             payload = {
@@ -129,9 +146,9 @@ async def generate_single_tile(params: TileGenerationParams) -> Optional[Image.I
         async with httpx.AsyncClient(timeout=60.0) as client:
             logger.debug(f"Generating tile via A1111: {params.prompt[:50]}...")
             response = await client.post(endpoint, json=payload)
-            response.raise_for_status()
+            await _maybe_await(response.raise_for_status())
 
-            data = await response.json()
+            data = await _maybe_await(response.json())
             if "images" not in data or not data["images"]:
                 logger.error(f"A1111 returned no images")
                 return None
@@ -447,3 +464,272 @@ def craft_location_prompt(location_name: str, location_desc: str) -> str:
         f"tabletop RPG style, detailed environment, tavern interior, "
         f"high quality, clear lighting, strategic positioning visible"
     )
+
+
+# ---------------------------------------------------------------------------
+# Single-cell location map — no stitching, uses DD_Table_RPG LoRA
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# ASCII grid → init_image renderer
+# ---------------------------------------------------------------------------
+
+# Character → RGB color mapping for grid rendering
+_GRID_COLORS: dict[str, tuple[int, int, int]] = {
+    "#":  (55,  55,  65),   # stone wall
+    "█":  (40,  40,  50),   # solid wall
+    "|":  (55,  55,  65),   # vertical wall
+    "-":  (55,  55,  65),   # horizontal wall
+    "+":  (130, 120, 110),  # pillar / crossroads
+    ".":  (200, 185, 158),  # floor / path
+    " ":  (18,  18,  22),   # void / outside
+    "~":  (75,  125, 175),  # water
+    "W":  (75,  125, 175),  # water (alt)
+    "T":  (38,  88,  38),   # tree
+    "G":  (95,  155, 75),   # grass
+    "R":  (165, 130, 90),   # road / cobblestone
+    "D":  (125, 88,  55),   # door
+    "S":  (155, 75,  175),  # stairs
+    ">":  (155, 75,  175),  # stairs down
+    "<":  (155, 75,  175),  # stairs up
+    "o":  (215, 175, 55),   # light / torch
+    "X":  (175, 45,  45),   # trap / hazard
+    "^":  (75,  95,  75),   # high terrain / mountain
+    "=":  (145, 115, 78),   # bridge
+    "C":  (200, 185, 158),  # chamber (same as floor)
+    "V":  (120, 90,  50),   # vent / crawlspace
+    "v":  (120, 90,  50),   # vent / crawlspace (lowercase)
+}
+_GRID_DEFAULT = (100, 95, 88)  # fallback for unknown chars
+
+
+def render_ascii_grid_to_png(ascii_grid: str, cell_size: int = 24) -> bytes:
+    """
+    Render an ASCII grid string to a PNG image (bytes).
+
+    Each character becomes a cell_size × cell_size colored square.
+    Rows are split on newlines; all rows padded to the same width.
+    """
+    lines = ascii_grid.splitlines()
+    if not lines:
+        lines = [" "]
+    # Pad all rows to the same width
+    max_w = max(len(line) for line in lines)
+    rows = [line.ljust(max_w) for line in lines]
+
+    img_w = max_w * cell_size
+    img_h = len(rows) * cell_size
+    img = Image.new("RGB", (img_w, img_h), color=(18, 18, 22))
+
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    for row_idx, row in enumerate(rows):
+        for col_idx, ch in enumerate(row):
+            color = _GRID_COLORS.get(ch, _GRID_DEFAULT)
+            x0 = col_idx * cell_size
+            y0 = row_idx * cell_size
+            draw.rectangle([x0, y0, x0 + cell_size - 1, y0 + cell_size - 1], fill=color)
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+async def generate_location_map(
+    location_name: str,
+    map_prompt: str,
+    map_type: str = "interior",
+    size: int = 768,
+    ascii_grid: Optional[str] = None,
+    init_image_bytes: Optional[bytes] = None,
+    update_denoising: float = 0.42,
+) -> Optional[bytes]:
+    """
+    Generate a single top-down battle map for a mission location.
+
+    Priority order for init image:
+      1. init_image_bytes — existing map from DB (lowest denoising: adds to it)
+      2. ascii_grid       — rendered schematic layout (medium denoising: styles it)
+      3. txt2img          — generate from scratch
+
+    Args:
+        location_name:    Human-readable name (for logging)
+        map_prompt:       A1111 prompt describing the map contents
+        map_type:         "interior", "dungeon", "outdoor", "village", "cave"
+        size:             Square image size (512 or 768 recommended)
+        ascii_grid:       Optional ASCII layout string (# walls, . floor, ~ water, etc.)
+        init_image_bytes: Optional existing map PNG bytes to paint over (very low denoising)
+        update_denoising: Denoising strength for init_image_bytes mode (default 0.42)
+    """
+    a1111_url   = os.getenv("A1111_URL", "http://127.0.0.1:7860")
+    lora_name   = os.getenv("A1111_MAP_LORA", "DD_Table_RPG")
+    lora_weight = float(os.getenv("A1111_MAP_LORA_WEIGHT", "0.85"))
+
+    _type_prefix = {
+        # Original types
+        "dungeon":              "top-down dungeon map, stone walls, torch-lit rooms, grid overlay,",
+        "interior":             "top-down floor plan, interior room layout, furniture and cover objects visible, grid overlay,",
+        "outdoor":              "top-down outdoor map, terrain features, paths, foliage, grid overlay,",
+        "village":              "top-down village map, buildings, roads, wells, market stalls, grid overlay,",
+        "cave":                 "top-down cave map, natural rock walls, winding passages, underground pools, grid overlay,",
+        "vent_tunnels":         "top-down building cross-section, ventilation shafts and crawlspaces as narrow passages inside walls, main rooms visible, grid overlay,",
+        # Mission-type-specific map environments
+        "multi_level_building": (
+            "top-down multi-storey building interior, floors shown as layered rooms, "
+            "service ladders between levels, freight elevator shaft with open cage, "
+            "ventilation crawlspace corridors, security guard post, maintenance corridors, "
+            "utility conduit runs along walls, rooftop access hatch, stairwell shaft, grid overlay,"
+        ),
+        "city_street":          (
+            "top-down city street map, wide cobblestone road centre, building facades as solid border, "
+            "side alley branching off mid-block, market stalls and awnings along kerb, "
+            "choke-point underpass or bridge, lantern posts at corners, sewer grate access, "
+            "crates and barrels as street-level cover, grid overlay,"
+        ),
+        "urban_combat":         (
+            "top-down urban combat zone, wide central clearing, rubble pile barricades, "
+            "collapsed wall section creating breach, flanking alley on each side, "
+            "elevated catwalk or balcony, blown-out doorways, scattered debris cover, grid overlay,"
+        ),
+        "fortified_interior":   (
+            "top-down fortified holdout, barricade line with sandbag firing positions, "
+            "choke-point corridor leading to killzone, fallback chamber at the rear, "
+            "breach hole in exterior wall showing outside ground, overlook balcony, "
+            "supply cache alcove, collapsed ceiling rubble, grid overlay,"
+        ),
+        "vault_interior":       (
+            "top-down secure facility interior, heavy vault door at the far end, "
+            "guard station with desk and sight-line corridor, laser-grid floor section, "
+            "air-duct entry point in ceiling shown as ceiling hatch, "
+            "server or display room, service corridor bypass route, "
+            "lobby with reception desk, grid overlay,"
+        ),
+        "rooftop":              (
+            "top-down rooftop chase map, flat tar or stone roof surface, "
+            "chimney stacks as cover obstacles, skybridge to adjacent building, "
+            "rooftop garden or antenna cluster, fire-escape ladder head, "
+            "water tower, maintenance shack, low parapet walls at edges, "
+            "drop-off point with short ledge, grid overlay,"
+        ),
+        "private_interior":     (
+            "top-down private room interior, meeting or dining table as centrepiece obstacle, "
+            "hidden alcove behind tapestry or panel, servant entrance at the back wall, "
+            "window with external ledge, bodyguard standing positions, "
+            "locked secondary exit, decorative columns as cover, grid overlay,"
+        ),
+        "alley":                (
+            "top-down narrow alley ambush map, constricted passage with blind corner, "
+            "doorway alcoves as hiding spots, overhead catwalk position, "
+            "barrel and crate barricade mid-alley, dumpster cover, "
+            "multiple exit routes at both ends, grid overlay,"
+        ),
+        "sewer":                (
+            "top-down sewer tunnel map, brick tunnel walls with arched ceiling implied, "
+            "central water channel running through, iron grate covers, "
+            "maintenance walkway along one side, ladder access points, junction room, "
+            "pipe clusters as cover, grid overlay,"
+        ),
+        "arcane_chamber":       (
+            "top-down arcane ritual chamber, glowing rift fissure crack across floor centre, "
+            "warped stone tiles around rift, containment rune circles, "
+            "collapsed pillar cover, floating debris fragments as obstacles, "
+            "unstable floor sections near rift edges, altar or containment device, grid overlay,"
+        ),
+    }.get(map_type, "top-down battle map, grid overlay,")
+
+    full_prompt = (
+        f"{_type_prefix} {map_prompt}, "
+        f"tabletop RPG battle map, D&D VTT style, top-down view, "
+        f"high fantasy cyberpunk fusion, wealth-stratified technology, "
+        f"ancient stone beside neon and circuit panels, arcane runes on machine surfaces, "
+        f"poor districts show wagons and cobblestone, rich districts show hovercars and glass towers, "
+        f"magic and machine coexist, detailed, clean lines, <lora:{lora_name}:{lora_weight}>"
+    )
+    negative = (
+        "isometric, perspective, 3D, portrait, characters, people, text, "
+        "watermark, blurry, low quality, photorealistic faces"
+    )
+
+    def _to_b64(png_bytes: bytes) -> str:
+        img = Image.open(io.BytesIO(png_bytes)).resize((size, size), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode()
+
+    try:
+        from src.resource_cop import wait_for_a1111_turn
+        decision = await wait_for_a1111_turn(
+            "location_map_generator",
+            max_wait_seconds=60,
+        )
+        if not decision.run_now:
+            logger.info(f"🗺️ A1111 deferred map generation for {location_name}: {decision.reason}")
+            return None
+
+        timeout = float(os.getenv("A1111_MAP_TIMEOUT", "900"))
+        async with httpx.AsyncClient(timeout=timeout) as http:
+            if init_image_bytes:
+                # Existing map from DB — paint new story details on top with low denoising
+                payload = {
+                    "prompt":             full_prompt,
+                    "negative_prompt":    negative,
+                    "init_images":        [_to_b64(init_image_bytes)],
+                    "denoising_strength": update_denoising,
+                    "steps":              28,
+                    "cfg_scale":          7.5,
+                    "width":              size,
+                    "height":             size,
+                    "sampler_name":       "DPM++ 2M SDE Karras",
+                    "seed":               -1,
+                    "batch_size":         1,
+                    "n_iter":             1,
+                }
+                endpoint = f"{a1111_url}/sdapi/v1/img2img"
+                logger.info(f"🗺️ Updating existing map: {location_name} (denoising={update_denoising})")
+
+            elif ascii_grid and ascii_grid.strip():
+                # ASCII schematic — render to pixel grid and style with LoRA
+                grid_png = render_ascii_grid_to_png(ascii_grid.strip())
+                payload = {
+                    "prompt":             full_prompt,
+                    "negative_prompt":    negative,
+                    "init_images":        [_to_b64(grid_png)],
+                    "denoising_strength": 0.65,
+                    "steps":              30,
+                    "cfg_scale":          7.5,
+                    "width":              size,
+                    "height":             size,
+                    "sampler_name":       "DPM++ 2M SDE Karras",
+                    "seed":               -1,
+                    "batch_size":         1,
+                    "n_iter":             1,
+                }
+                endpoint = f"{a1111_url}/sdapi/v1/img2img"
+                logger.info(f"🗺️ Grid-guided map: {location_name}")
+
+            else:
+                # No reference — pure txt2img
+                payload = {
+                    "prompt":          full_prompt,
+                    "negative_prompt": negative,
+                    "steps":           28,
+                    "cfg_scale":       7.0,
+                    "width":           size,
+                    "height":          size,
+                    "sampler_name":    "DPM++ 2M SDE Karras",
+                    "seed":            -1,
+                    "batch_size":      1,
+                    "n_iter":          1,
+                }
+                endpoint = f"{a1111_url}/sdapi/v1/txt2img"
+
+            resp = await http.post(endpoint, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("images"):
+                img_bytes = base64.b64decode(data["images"][0])
+                logger.info(f"🗺️ Map generated: {location_name} ({len(img_bytes)//1024}KB)")
+                return img_bytes
+    except Exception as e:
+        logger.warning(f"🗺️ Map generation failed for {location_name}: {e}")
+    return None

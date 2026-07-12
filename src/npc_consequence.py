@@ -2,7 +2,7 @@
 
 After every news bulletin is generated, this module scans the text for
 roster NPC names appearing near death/injury language. If detected:
-- Death → NPC is moved to the graveyard (npc_roster.json → npc_graveyard.json)
+- Death → NPC status set to "dead" in npcs table, queued in resurrection_queue
 - Injury → NPC status set to "injured" in roster
 - Major NPCs get queued for resurrection (2-7 day delay)
 
@@ -15,18 +15,30 @@ from __future__ import annotations
 
 import re
 import json
+import random
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 
 from src.log import logger
-from src.db_api import raw_query as _rq, raw_execute as _rx
+from src.db_api import raw_query as _rq, raw_execute as _rx, add_npc_history_event, get_npc_history_count, has_revealed_secrets
 
 DOCS_DIR       = Path(__file__).resolve().parent.parent / "campaign_docs"
-NPC_JSON_FILE  = DOCS_DIR / "npc_roster.json"
-GRAVEYARD_FILE = DOCS_DIR / "npc_graveyard.json"
-NPC_TXT_FILE   = DOCS_DIR / "npc_roster.txt"
-RESURRECTION_QUEUE_FILE = DOCS_DIR / "resurrection_queue.json"
+
+UNKNOWN_PARTY_MEMBERS = {
+    "The Ward": {"true_faction": "Tower Authority", "designation": "WARD", "cover": "Independent enforcer"},
+    "Carrion": {"true_faction": "Iron Fang Consortium", "designation": "CARRION", "cover": "Independent scavenger"},
+    "Sable": {"true_faction": "Glass Sigil", "designation": "SABLE", "cover": "Serpent Choir (disputed)"},
+    "Locket": {"true_faction": "Obsidian Lotus", "designation": "LOCKET", "cover": "Independent"},
+    "The Mute": {"true_faction": "Wardens of Ash", "designation": "VIGIL", "cover": "Independent"},
+}
+
+UNKNOWN_PARTY_REPLACEMENT_DESIGNATIONS = [
+    "LANTERN", "CIPHER", "SUTURE", "HUSH", "VEIL", "MOTH", "GRAVITY",
+    "LOCKSTEP", "CANDLE", "THRESHOLD", "MARROW", "STATIC",
+]
+
+MAJOR_RAISE_DEAD_LOST_TO_TOWER_CHANCE = 0.10
 
 # ── Detection patterns ─────────────────────────────────────────────────
 
@@ -67,14 +79,21 @@ _INJURY_RE = [re.compile(p, re.IGNORECASE) for p in _INJURY_PATTERNS]
 _CONTEXT_WINDOW = 200
 
 
+def _hist(npc: dict, body: str) -> None:
+    npc_id = npc.get("_db_id") or npc.get("id")
+    if npc_id:
+        add_npc_history_event(int(npc_id), body)
+    npc.setdefault("history", []).append(body)
+
+
 # ── Roster helpers ─────────────────────────────────────────────────────
 
 def _load_roster() -> List[Dict]:
     """Load alive/injured NPCs from MySQL."""
     try:
         rows = _rq(
-            "SELECT name, faction, role, location, status, data_json FROM npcs "
-            "WHERE status IN ('alive', 'injured') ORDER BY name"
+            "SELECT id, name, faction, role, location, status, data_json FROM npcs "
+            "WHERE status IN ('alive', 'injured', 'undead', 'doppelganger') ORDER BY name"
         ) or []
         npcs = []
         for row in rows:
@@ -91,12 +110,6 @@ def _load_roster() -> List[Dict]:
         return npcs
     except Exception as e:
         logger.error(f"npc_consequence: roster load error: {e}")
-        # Fallback to JSON file
-        if NPC_JSON_FILE.exists():
-            try:
-                return json.loads(NPC_JSON_FILE.read_text(encoding="utf-8"))
-            except Exception:
-                pass
         return []
 
 
@@ -115,7 +128,7 @@ def _load_graveyard() -> List[Dict]:
     """Load dead NPCs from MySQL."""
     try:
         rows = _rq(
-            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "SELECT id, name, faction, role, location, status, data_json FROM npcs "
             "WHERE status = 'dead' ORDER BY name"
         ) or []
         graveyard = []
@@ -133,11 +146,6 @@ def _load_graveyard() -> List[Dict]:
         return graveyard
     except Exception as e:
         logger.error(f"npc_consequence: graveyard load error: {e}")
-        if GRAVEYARD_FILE.exists():
-            try:
-                return json.loads(GRAVEYARD_FILE.read_text(encoding="utf-8"))
-            except Exception:
-                pass
         return []
 
 
@@ -162,11 +170,6 @@ def _load_resurrection_queue() -> List[Dict]:
         return [dict(r) for r in rows]
     except Exception as e:
         logger.error(f"npc_consequence: resurrection queue load error: {e}")
-        if RESURRECTION_QUEUE_FILE.exists():
-            try:
-                return json.loads(RESURRECTION_QUEUE_FILE.read_text(encoding="utf-8"))
-            except Exception:
-                pass
         return []
 
 
@@ -180,6 +183,10 @@ def _save_resurrection_queue(queue: List[Dict]) -> None:
             status = entry.get("status", "pending")
             if not npc_name:
                 continue
+            if not resurrect_at:
+                resurrect_at = entry.get("scheduled_for")
+            if not died_at:
+                died_at = entry.get("death_date") or entry.get("queued_at") or datetime.now()
             existing = _rq(
                 "SELECT id FROM resurrection_queue WHERE npc_name=%s AND status='pending'",
                 (npc_name,)
@@ -203,6 +210,13 @@ def _save_resurrection_queue(queue: List[Dict]) -> None:
 
 def _is_major_npc(npc: Dict) -> bool:
     """Determine if an NPC is 'major' enough to warrant resurrection."""
+    if npc.get("name") in UNKNOWN_PARTY_MEMBERS:
+        return True
+
+    secret_text = " ".join(str(npc.get(k, "")) for k in ("secret", "oracle_notes", "role", "rank")).lower()
+    if any(token in secret_text for token in ("designation", "code name", "codename", "classified", "black-cell")):
+        return True
+
     # Faction leaders (high rank)
     rank = npc.get("rank", "").lower()
     leader_ranks = [
@@ -216,9 +230,9 @@ def _is_major_npc(npc: Dict) -> bool:
     # NPCs with secrets or rich history
     if npc.get("secret") and len(npc.get("secret", "")) > 20:
         return True
-    if len(npc.get("history", [])) >= 5:
+    if get_npc_history_count(npc.get("_db_id") or 0) >= 5:
         return True
-    if npc.get("revealed_secrets"):
+    if has_revealed_secrets(npc.get("_db_id") or 0):
         return True
 
     # NPCs with oracle notes (DM has marked them as important)
@@ -242,7 +256,7 @@ def scan_bulletin_for_consequences(bulletin_text: str) -> List[Dict]:
         return []
 
     roster = _load_roster()
-    alive_npcs = [n for n in roster if n.get("status") in ("alive", "injured")]
+    alive_npcs = [n for n in roster if n.get("status") in ("alive", "injured", "undead", "doppelganger")]
 
     if not alive_npcs:
         return []
@@ -250,9 +264,19 @@ def scan_bulletin_for_consequences(bulletin_text: str) -> List[Dict]:
     text_lower = bulletin_text.lower()
     consequences = []
 
+    # Unknown Party members have their own death protocol (npc_lifecycle.py).
+    # Their short alias names ("ward", "carrion", "sable", etc.) appear in normal
+    # Undercity prose constantly and cause false-positive deaths here. Skip them.
+    try:
+        from src.npc_lifecycle import is_unknown_party_member as _is_up
+    except Exception:
+        _is_up = lambda _: False
+
     for npc in alive_npcs:
         name = npc.get("name", "")
         if not name or len(name) < 3:
+            continue
+        if _is_up(name):
             continue
 
         # Check if the NPC name appears in the bulletin
@@ -345,12 +369,13 @@ def apply_consequences(consequences: List[Dict]) -> List[str]:
 
             # Add death to history
             ts = datetime.now().strftime("%Y-%m-%d %H:%M")
-            npc.setdefault("history", []).append(
-                f"[{ts}] DIED — narrated in news bulletin"
-            )
+            _hist(npc, f"[{ts}] DIED — narrated in news bulletin")
             npc["status"] = "dead"
             npc["death_date"] = ts
             npc["death_cause"] = f"News bulletin: {context[:200]}"
+            npc_id = npc.get("_db_id") or npc.get("id")
+            if npc_id:
+                _rx("UPDATE npcs SET death_cause=%s WHERE id=%s", (npc["death_cause"], npc_id))
 
             # Move to graveyard
             graveyard.append(npc)
@@ -365,28 +390,29 @@ def apply_consequences(consequences: List[Dict]) -> List[str]:
             # Queue resurrection for major NPCs
             if is_major:
                 import random
-                res_days = random.randint(2, 7)
+                res_days = random.randint(1, 3)
                 res_date = (datetime.now() + timedelta(days=res_days)).isoformat()
                 res_queue.append({
                     "name": name,
+                    "npc_name": name,
                     "faction": npc.get("faction", "Unknown"),
                     "rank": npc.get("rank", "Unknown"),
                     "species": npc.get("species", "Unknown"),
-                    "scheduled_for": res_date,
-                    "death_date": ts,
+                    "resurrect_at": res_date,
+                    "died_at": ts,
                     "death_cause": context[:200],
                     "queued_at": datetime.now().isoformat(),
                 })
                 queue_changed = True
                 res_msg = f"✨ {name} queued for resurrection in {res_days} days (major NPC)"
+                if "resurrection" in res_msg:
+                    res_msg = f"Raise dead funded for {name}; expected return in {res_days} days, unless the Tower claims them."
                 logger.info(f"npc_consequence: {res_msg}")
                 changes.append(res_msg)
 
         elif ctype == "injury":
             ts = datetime.now().strftime("%Y-%m-%d %H:%M")
-            npc.setdefault("history", []).append(
-                f"[{ts}] INJURED — narrated in news bulletin"
-            )
+            _hist(npc, f"[{ts}] INJURED — narrated in news bulletin")
             npc["status"] = "injured"
             roster_changed = True
 
@@ -408,34 +434,80 @@ def apply_consequences(consequences: List[Dict]) -> List[str]:
 # ── Resurrection check ─────────────────────────────────────────────────
 
 def check_resurrection_queue() -> List[Dict]:
-    """
-    Check if any resurrection is due. Returns list of NPCs to resurrect.
-    Called from npc_lifecycle daily loop.
-
-    Each returned dict has the NPC's old data for re-creation.
-    """
+    """Check pending raise dead rows and mark due entries as resolving."""
     queue = _load_resurrection_queue()
     if not queue:
         return []
 
     now = datetime.now()
     due = []
-    remaining = []
-
     for entry in queue:
         try:
-            scheduled = datetime.fromisoformat(entry["scheduled_for"])
-            if now >= scheduled:
-                due.append(entry)
-            else:
-                remaining.append(entry)
+            scheduled_raw = entry.get("resurrect_at") or entry.get("scheduled_for")
+            scheduled = datetime.fromisoformat(str(scheduled_raw))
         except Exception:
-            remaining.append(entry)  # malformed → keep for retry
+            continue
+        if now >= scheduled:
+            due.append(entry)
 
-    if due:
-        _save_resurrection_queue(remaining)
-
+    for entry in due:
+        entry_id = entry.get("id")
+        if entry_id:
+            _rx("UPDATE resurrection_queue SET status='resolving' WHERE id=%s", (entry_id,))
     return due
+
+
+def _mark_queue_resolved(entry: Dict, status: str) -> None:
+    entry_id = entry.get("id")
+    name = entry.get("npc_name") or entry.get("name")
+    if entry_id:
+        _rx("UPDATE resurrection_queue SET status=%s WHERE id=%s", (status, entry_id))
+    elif name:
+        _rx(
+            "UPDATE resurrection_queue SET status=%s WHERE npc_name=%s AND status IN ('pending','resolving')",
+            (status, name),
+        )
+
+
+def _unknown_party_data(name: str) -> Optional[Dict]:
+    return UNKNOWN_PARTY_MEMBERS.get(name)
+
+
+def _make_unknown_party_replacement(lost_npc: Dict) -> Dict:
+    # _load_roster() merges data_json into the flat NPC dict, so designation
+    # is already a top-level key rather than nested under data_json.
+    used = {n.get("designation") for n in _load_roster() if n.get("designation")}
+    designation = next(
+        (d for d in UNKNOWN_PARTY_REPLACEMENT_DESIGNATIONS if d not in used),
+        random.choice(UNKNOWN_PARTY_REPLACEMENT_DESIGNATIONS),
+    )
+    codename = f"The {designation.title()}"
+    faction = lost_npc.get("faction") or "Independent"
+    true_faction = _unknown_party_data(lost_npc.get("name", "")) or {}
+    true_faction_name = true_faction.get("true_faction", faction)
+    today = datetime.now().strftime("%Y-%m-%d %H:%M")
+    return {
+        "name": codename,
+        "faction": "Independent",
+        "role": "Replacement covert operative",
+        "rank": "Unfiled",
+        "species": "Unknown",
+        "location": "Unknown Party dead-drop circuit",
+        "status": "alive",
+        "designation": designation,
+        "secret": (
+            f"TRUE FACTION: {true_faction_name}. Replacement asset activated after "
+            f"{lost_npc.get('name', 'a prior member')} was lost to the Tower. "
+            "Uses a secret code name only; public identity intentionally absent."
+        ),
+        "oracle_notes": (
+            f"Unknown Party replacement for {lost_npc.get('name', 'unknown')}. "
+            "Major player. Treat as a full operative, not filler."
+        ),
+        "history": [
+            f"[{today}] Activated as replacement designation {designation} after Tower-loss protocol."
+        ],
+    }
 
 
 def resurrect_npc(entry: Dict) -> Optional[Dict]:
@@ -443,7 +515,7 @@ def resurrect_npc(entry: Dict) -> Optional[Dict]:
     Resurrect an NPC from the graveyard back into the active roster.
     Returns the resurrected NPC dict, or None if not found in graveyard.
     """
-    name = entry.get("name", "")
+    name = entry.get("npc_name") or entry.get("name", "")
     graveyard = _load_graveyard()
     roster = _load_roster()
 
@@ -456,20 +528,54 @@ def resurrect_npc(entry: Dict) -> Optional[Dict]:
 
     if npc is None:
         logger.warning(f"npc_consequence: {name} not found in graveyard for resurrection")
+        _mark_queue_resolved(entry, "missing_body")
         return None
+
+    if random.random() < MAJOR_RAISE_DEAD_LOST_TO_TOWER_CHANCE:
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+        _hist(npc, f"[{ts}] LOST TO THE TOWER - raise dead failed; soul unavailable.")
+        npc["tower_absorbed"] = True
+        npc["lost_to_tower"] = True
+        npc["status"] = "dead"
+        npc_id = npc.get("_db_id") or npc.get("id")
+        if npc_id:
+            _rx("UPDATE npcs SET tower_absorbed=1 WHERE id=%s", (npc_id,))
+        npc["oracle_notes"] = (
+            npc.get("oracle_notes", "") +
+            " Raise dead was funded, diamond secured, spell cast. The Tower kept them anyway."
+        ).strip()
+        graveyard.append(npc)
+
+        replacement = None
+        if name in UNKNOWN_PARTY_MEMBERS:
+            replacement = _make_unknown_party_replacement(npc)
+            roster.append(replacement)
+            logger.info(
+                f"npc_consequence: {name} lost to Tower; replacement {replacement['name']} "
+                f"({replacement['designation']}) activated"
+            )
+
+        _save_roster(roster)
+        _save_graveyard(graveyard)
+        _mark_queue_resolved(entry, "lost_to_tower")
+        return {
+            "name": name,
+            "faction": npc.get("faction", "Unknown"),
+            "status": "lost_to_tower",
+            "replacement": replacement,
+        }
 
     # Resurrect
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     npc["status"] = "alive"
-    npc.setdefault("history", []).append(
-        f"[{ts}] RESURRECTED — returned from death via divine/arcane intervention"
-    )
+    _hist(npc, f"[{ts}] RESURRECTED — returned from death via divine/arcane intervention")
     npc["resurrected_at"] = ts
 
     # Add to roster
     roster.append(npc)
     _save_roster(roster)
     _save_graveyard(graveyard)
+    _mark_queue_resolved(entry, "raised")
 
     logger.info(f"npc_consequence: ✨ {name} resurrected and returned to active roster")
     return npc
@@ -489,16 +595,27 @@ def get_recently_deceased_block(days: int = 7) -> str:
 
     cutoff = datetime.now() - timedelta(days=days)
     recent = []
+
+    def _parse_any_date(npc: dict) -> Optional[datetime]:
+        """Try every date field an NPC might have, return datetime or None."""
+        for field in ("death_date", "moved_to_graveyard_at", "deceased_at"):
+            raw = npc.get(field)
+            if not raw:
+                continue
+            for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
+                try:
+                    # Handle datetime objects from DB
+                    if hasattr(raw, 'strftime'):
+                        return raw
+                    return datetime.strptime(str(raw)[:19], fmt[:len(fmt)])
+                except Exception:
+                    continue
+        return None
+
     for npc in graveyard:
-        death_date_str = npc.get("death_date", "")
-        if not death_date_str:
-            continue
-        try:
-            death_date = datetime.strptime(death_date_str, "%Y-%m-%d %H:%M")
-            if death_date >= cutoff:
-                recent.append(npc)
-        except Exception:
-            continue
+        death_date = _parse_any_date(npc)
+        if death_date and death_date >= cutoff:
+            recent.append(npc)
 
     if not recent:
         return ""
@@ -515,7 +632,7 @@ def get_recently_deceased_block(days: int = 7) -> str:
 
     # Check resurrection queue
     queue = _load_resurrection_queue()
-    pending = [q["name"] for q in queue]
+    pending = [q.get("npc_name") or q.get("name", "") for q in queue]
     for npc in recent:
         if npc.get("name") in pending:
             lines.append(

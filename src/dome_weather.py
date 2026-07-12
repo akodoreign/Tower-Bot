@@ -25,7 +25,7 @@ TOWER_YEAR_OFFSET = 10
 def _dual_ts() -> str:
     now   = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    return f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    return f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
 
 # ---------------------------------------------------------------------------

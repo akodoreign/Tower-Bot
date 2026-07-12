@@ -84,6 +84,7 @@ src/aclient.py: DiscordClient
 | `/archive` | cogs/admin.py | Archive old channel messages | DM only |
 | `/riftlist` | cogs/admin.py | Show active rifts & stages | No |
 | `/sealrift` | cogs/admin.py | Close/resolve a rift | DM only |
+| `/clearboard` | cogs/admin.py | Delete all active missions from Discord + DB (they regenerate fresh) | DM only |
 | `/genmodule` | cogs/module_gen.py | Generate D&D mission module (.docx + maps) | DM only |
 | `/skills` | cogs/skills.py | List/view/reload skill files | DM only |
 
@@ -211,7 +212,7 @@ aclient.py
 | [__init__.py](src/mission_builder/__init__.py) | Orchestrator. Exports `generate_mission_module()` |
 | [json_generator.py](src/mission_builder/json_generator.py) | 4-pass Ollama generation (overview → acts 1-2 → acts 3-4 → act 5) |
 | [schemas.py](src/mission_builder/schemas.py) | MissionModule, DungeonRoom, NPC, Encounter pydantic schemas |
-| [locations.py](src/mission_builder/locations.py) | Gazetteer integration (city_gazetteer.json) |
+| [locations.py](src/mission_builder/locations.py) | Gazetteer integration (reads from `gazetteer` DB table) |
 | [leads.py](src/mission_builder/leads.py) | Investigation leads, clues, red herrings |
 | [encounters.py](src/mission_builder/encounters.py) | CR calculation, encounter budgets, stat blocks |
 | [npcs.py](src/mission_builder/npcs.py) | NPC dialogue, secrets, faction hooks |
@@ -287,25 +288,30 @@ aclient.py
 
 ## Campaign Data (`campaign_docs/`)
 
-### Core State Files
+### Core State — MySQL is Authoritative
 
-| File | Format | What It Tracks |
-|------|--------|----------------|
-| `npc_roster.json` | JSON | All alive/injured NPCs — faction, role, location, secrets |
-| `npc_graveyard.json` | JSON | Dead NPCs (moved here on death) |
-| `city_gazetteer.json` | JSON | Districts, establishments, transport, ring structure |
-| `character_memory.txt` | Text | Player chars (NAME/CLASS/SPECIES/PLAYER blocks) |
-| `faction_reputation.json` | JSON | Faction rep scores and event history |
-| `news_memory.txt` | Text | Cleaned factual bulletin log (max 40 entries) |
-| `mission_memory.json` | JSON | All missions: active + resolved |
-| `rift_state.json` | JSON | Active rift state machine data |
-| `arena_season.json` | JSON | Current arena season standings |
-| `dome_weather.json` | JSON | Current weather state |
-| `ec_exchange.json` | JSON | Current EC/Kharma exchange rate |
-| `tia.json` | JSON | TIA stock market sector values |
-| `faction_calendar.json` | JSON | Upcoming faction events |
-| `missing_persons.json` | JSON | Active missing persons cases |
-| `bounty_board.json` | JSON | Active bounties |
+All campaign state lives in MySQL `tower_bot`. Use `src/db_api.py` helpers. Do NOT read campaign_docs JSON files — they are archived.
+
+| DB Table | What It Tracks |
+|----------|----------------|
+| `npcs` | All NPCs — faction, role, location, status, secrets, oracle_notes |
+| `npc_appearances` | NPC appearance profiles and SD prompts |
+| `gazetteer` / `gazetteer_places` / `area_profiles` | City districts, establishments, transport, ring structure |
+| `player_characters` | Player chars with profile_json, oracle_notes, raw_block |
+| `character_snapshots` | DDB character snapshots (levels, HP, stats, inventory) |
+| `faction_reputation` | Faction rep scores, leader, location, motto, alignment |
+| `news_memory` / `bulletin_cache` | Factual bulletin log (1600+ entries) |
+| `missions` | All missions: active + resolved, with mission_json |
+| `mission_outcomes` | Completed mission consequences and story memory |
+| `rift_state` | Active rift singleton; `global_state.rift_history` for resolved rifts |
+| `arena_seasons` | Current arena season; `global_state.arena_venues` for venue catalog |
+| `weather_state` | Current dome weather |
+| `economy_state` | EC/Kharma exchange rate |
+| `tia_market` | TIA stock market sector values |
+| `faction_events` | Upcoming faction events |
+| `missing_persons` | Active missing persons cases (with body TEXT) |
+| `bounties` | Active bounties (with body TEXT, issuer, expires_at) |
+| `global_state` | Key/value store: used_parties, council_rulings, generated types, public_health_arcs |
 | `player_listings.json` | JSON | Player TowerBay auction items |
 | `economy_cadence.json` | JSON | Last-post timestamps for TowerBay/TIA/exchange |
 | `generated_news_types.json` | JSON | AI-generated daily bulletin type seeds |
@@ -360,6 +366,56 @@ MODULE_OUTPUT_CHANNEL_ID   — Where /genmodule posts the .docx
 
 ---
 
+## Module Generation Pipeline — Novel vs Module
+
+Every mission produces **two separate documents**. Getting this wrong is the #1 source of unusable output.
+
+### THE NOVEL (BobAgent, 5-10 chapters)
+- Fixed-protagonist story. DM reads. Players never see it.
+- Source material: NPCs, locations, plot beats, dialogue hooks.
+- Analogous to the Dragonlance Chronicles novels — Tanis/Flint have fixed roles.
+- **5-10 chapters MAX.** 20 chapters = a full campaign arc, not a session prep.
+
+### THE MODULE (BookToModuleAgent, 5 numbered areas)
+- Same story events. Party plays through them their own way.
+- **Generic 4-6 players. CR from party level. NOT character-specific.**
+- Boxxo is an NPC in the story — the module doesn't stat Boxxo. It stats the enemies.
+- Analogous to DL1 Dragons of Despair — canonical events, party decides the approach.
+- **One session = one module = 5 scenes.**
+
+### WotC Area Format (mandatory)
+```
+N - LOCATION NAME    ← number-dash-name, ALL CAPS. NEVER "Scene N:" or "### Scene N:"
+
+Read this:
+  Italicized, 2-4 sentences, ends with something requiring player response.
+
+NPC NAME — role
+- Wants: specific to this scene
+- Knows: plot-relevant facts
+- Hides: what and why
+
+If players ask about X: [response + DC]
+  On success DC N Skill: [exact info]
+  On failure: [consequence — never a dead end]
+If players do nothing: [scene advances anyway]
+
+[Stat block INLINE — never appendix]
+[Tactics section]
+[If players lose clause]
+
+TRANSITION: pulls players forward. NEVER "the party proceeds."
+```
+
+### Files per Mission
+- `module.html` — 5-area DM guide (THE GAME PRODUCT)
+- `dm_guide.html` — full NPC truth sheets, faction lore, deep background
+- `players_guide.html` — what the party knows going in
+- `chart_pack.html` — stat blocks, encounter tables, rumor chart, loot
+- Novel chapters — DM reference only, never shown to players
+
+---
+
 ## Self-Learning System
 
 Runs nightly **1-4 AM** in `src/self_learning.py`. Produces files in `campaign_docs/skills/`:
@@ -379,14 +435,40 @@ Check `logs/journal.txt` for `[DM QUESTION]` flags raised during learning.
 
 ---
 
+## Undercity World-Building (Critical for Image Prompts and Narrative)
+
+The Undercity is NOT underground tunnels, sewers, or caves. This is a common and damaging mistake.
+
+**What the Undercity actually is:**
+- A massive **disk-shaped city** containing billions of people
+- Built **under a dome** with a **sealed, contained atmosphere** — like a city-sized biodome
+- Has an **artificial sky** that cycles through day/night, but it is manufactured, not real
+- Has **real weather** — rain, fog, wind, thunder — controlled or emergent within the dome
+- The **Tower of Last Chance** pierces through the center of the disk like a top/axle — visible from everywhere, pointing both up into the dome canopy and down through the floor of the disk
+- The city is **vibrant and thriving** — not a dystopian ruin. Billions of people live here. Markets, festivals, factions, politics, crime, hope
+- The Undercity is called "Undercity" because it sits **beneath the Tower** — not because it is underground
+
+**What scenes look like:**
+- Crowded market streets under an artificial amber or grey sky
+- Architecture from many devoured worlds — mixed styles, eclectic
+- The Tower spire visible in the background piercing the dome canopy
+- Dome walls sometimes visible at the edges (curved, faintly glowing infrastructure)
+- Weather — rain slick streets, fog rolling through alleys, overcast artificial sky
+- Vibrant faction colours — market stalls, gang graffiti, militia patrols
+- **NOT:** sewers, tunnels, stone caves, underground passages, subway systems, medieval dungeons
+
+**BANNED vocabulary for scene image prompts:** underground, tunnel, sewer, cave, mine, subterranean, cavern, dungeon (except literal dungeon delve missions).
+
+---
+
 ## Critical Conventions
 
 1. **setup_hook for command sync** — not on_ready. Never revert.
 2. **Mission results → `MISSION_RESULTS_CHANNEL_ID`** / New missions → `MISSION_BOARD_CHANNEL_ID` — different channels.
 3. **A1111 lock** — all image generation must acquire `a1111_lock` from `news_feed.py`. Check `_a1111_lock.locked()` first.
-4. **`_write_memory()` auto-strips** — `memory_strip.py` removes emojis/fluff before saving to `news_memory.txt`.
-5. **Module CR is dynamic** — parsed from `character_memory.txt` max PC level + tier offset. Falls back to legacy table if file unreadable.
-6. **NPC consequence scanner** runs after every bulletin. Scans for roster NPC names near death/injury language, updates `npc_roster.json` + `npc_graveyard.json`, queues major NPCs in `resurrection_queue.json`.
+4. **`_write_memory()` auto-strips** — `memory_strip.py` removes emojis/fluff before saving to `news_memory` DB table.
+5. **Module CR is dynamic** — reads max PC level from `player_characters` DB. Falls back to legacy tier table if DB returns nothing.
+6. **NPC consequence scanner** runs after every bulletin. Scans for roster NPC names near death/injury language, updates `npcs` table status, queues major NPCs in `resurrection_queue` table.
 7. **Image prompt forbidden terms:** "fate", "stay night", "type-moon", "ufotable", "official art", "anime screencap", "dark fantasy". Quality header: `masterpiece, best quality, very aesthetic, absurdres`.
 8. **Self-learned skills:** max 50 files in `campaign_docs/skills/`.
 9. **Backups:** go to `backups/` with descriptive date-stamped names.

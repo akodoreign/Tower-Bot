@@ -50,7 +50,7 @@ Once approved, patches should be added to:
 **"Include vivid sensory details (smells, sounds, textures) for each location to immerse players."**
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -58,7 +58,7 @@ Once approved, patches should be added to:
 **"Use present-tense, evocative descriptions for key scenes (e.g., 'the air smells of brine and rot') to enhance read-aloud engagement."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -66,7 +66,7 @@ Once approved, patches should be added to:
 **"Specify encounter mechanics (e.g., trap triggers, enemy morale, ritual progression) to ensure clarity for DMs."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -89,7 +89,7 @@ Once approved, patches should be added to:
 **"Include exact CR values, specific abilities, and numerical quantities for all enemies and loot."**
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -97,7 +97,7 @@ Once approved, patches should be added to:
 **"Add sensory details like smells, textures, and sounds to every location to immerse players."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -105,7 +105,7 @@ Once approved, patches should be added to:
 **"Define encounter mechanics with terrain interactions, morale rules, and loot tables for each challenge."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -128,7 +128,7 @@ Once approved, patches should be added to:
 **"Include concrete loot details (e.g., specific items, gold amounts, and unique descriptions) to mirror the reference’s specificity."**
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -136,7 +136,7 @@ Once approved, patches should be added to:
 **"Add sensory details like sounds, textures, and specific environmental interactions (e.g., 'the mist hisses as it touches skin') to enhance immersion."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -144,7 +144,7 @@ Once approved, patches should be added to:
 **"Define encounter mechanics, including terrain effects, enemy morale, and loot distribution, to ensure playability without additional prep."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -167,7 +167,7 @@ Once approved, patches should be added to:
 "Include vivid sensory details (smells, sounds, textures) to immerse players in key locations."
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -175,7 +175,7 @@ Once approved, patches should be added to:
 "Give NPCs unique voices, secrets, and motivations that tie into the mission’s themes."
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -183,7 +183,7 @@ Once approved, patches should be added to:
 "Specify exact mechanics for puzzles, traps, and loot to ensure clarity and playability."
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -206,7 +206,7 @@ Once approved, patches should be added to:
 **"Include vivid sensory details (smell, sound, texture) for key locations to immerse players."**
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -214,7 +214,7 @@ Once approved, patches should be added to:
 **"Specify trap mechanics with clear rules (e.g., duration, saving throws, visual cues) to ensure playability."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -222,7 +222,7 @@ Once approved, patches should be added to:
 **"Depth NPC motivations with personal stakes (e.g., 'Dr. Lysara Venn's obsession stems from a past failure to save her daughter').**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -245,7 +245,7 @@ Once approved, patches should be added to:
 **"Include granular mechanical details for traps, loot placement, and terrain interactions (e.g., 'pressure-sensitive trapdoor mechanics')."**
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -253,7 +253,7 @@ Once approved, patches should be added to:
 **"Add vivid sensory descriptions for key locations (e.g., 'smell of aged parchment,' 'hum of ancient magic'). "**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -261,7 +261,7 @@ Once approved, patches should be added to:
 **"Avoid flowery language; use concise, action-driven phrasing for stakes and consequences."**
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 
 ---
@@ -284,7 +284,7 @@ Once approved, patches should be added to:
 "Include numerical specifics like population counts, exact locations, and timeframes to ground the world in tangible data."
 ```
 
-**Status:** ❌ REJECTED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 2
 
@@ -292,7 +292,7 @@ Once approved, patches should be added to:
 "Add layered sensory details (e.g., textures, sounds, smells) to create immersive environmental descriptions."
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 
 ### Patch 3
 
@@ -300,5 +300,551 @@ Once approved, patches should be added to:
 "Define structured encounters with clear setup, terrain features, and loot tables to provide concrete challenges for the party."
 ```
 
-**Status:** ✅ APPROVED (2026-04-11 05:11)
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-12 01:37
+
+**Test Mission:** The Ashen Vaults of the Blighted King
+**Quality Score:** 7/10
+
+**Gaps Identified:**
+- **Unique Location Descriptors**: Replace generic terms like "Cursed Crypt" with more evocative names (e.g., "The Maw of the Fallen King") and add sensory details (e.g., "slippery obsidian floors").
+- **NPC Motivation & Secrets**: Flesh out Kaelen’s fear of the king’s return and Veythas’ obsession with divine right, creating more compelling stakes.
+- **Structured Encounters**: Add terrain-based challenges (e.g., "collapsing archways") and moral choices (e.g., "spectral wraiths retreat if the party shows mercy") to enhance replayability.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include unique, memorable names for key locations and add sensory details like textures, sounds, and smells to immerse players."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Develop NPCs with distinct motivations and secrets, such as a scholar fearing the king’s return or a necromancer obsessed with divine right."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Structure encounters with terrain-based challenges, morale systems, and specific mechanics (e.g., trap triggers, corruption spread rules) to aid DMs."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-13 01:33
+
+**Test Mission:** The Crimson Reckoning of the Silver Veil
+**Quality Score:** 5/10
+
+**Gaps Identified:**
+- **Lack of Specific Numerical Details** – The generated content lacks concrete numbers (e.g., "70 Tiefling" from the reference) that define the world. Example: The Marrow Estate’s staff count, the number of encrypted records in the Obsidian Spire, or the exact number of bandits in the reference’s encounter.
+- **Insufficient Sensory Detail** – Scenes need more grounding in senses. Example: Describe the smell of old parchment in the Silver Veil archives, the sound of clinking glasses in the Hollow Lantern Tavern, or the texture of marble in the Marrow Estate.
+- **Missing Encounter Mechanics** – Encounters lack terrain, morale, and loot details. Example: Specify the layout of the Obsidian Spire’s traps, the types of monsters in the temple’s garden, or the exact loot from defeating bandits.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include specific numerical details like '70 Tiefling' or '45 Goblin' to ground the world in concrete data."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Add sensory details for each location—smells, sounds, textures—to immerse players in the setting."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Define encounter mechanics with terrain, morale rules, and loot tables to ensure playability without DM improvisation."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-14 01:29
+
+**Test Mission:** Shattered Covenant: The Patchwork Saints' Sundered Sanctum
+**Quality Score:** 7/10
+
+**Gaps Identified:**
+- **Numerical Specificity Gap**: Missing treasure values and encounter difficulty metrics (e.g., "1,200 gp in to" is incomplete). Example: The generated content ends mid-sentence, suggesting incomplete formatting.
+- **Sensory Detail Gap**: Insufficient sensory immersion. Example: The "Hollow Veins" could include sounds (e.g., dripping water) or textures (e.g., slimy moss).
+- **Encounter Setup Gap**: Lack of detailed encounter mechanics. Example: The "Hollow Veins" traps are described but lack specific trap types or loot.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**Add treasure values and encounter metrics**: "Include precise treasure values (e.g., 1,200 gp) and encounter difficulty ratings (e.g., 'Tiefling 70')."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**Enhance sensory descriptions**: "Use vivid sensory details (smells, sounds, textures) to ground scenes in the environment."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**Detail encounter mechanics**: "Specify trap types, loot, and encounter setup (terrain, morale, loot) for each combat scenario."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-15 01:20
+
+**Test Mission:** Shattered Coils: Confronting the Serpent Choir's Venomous Sanctum
+**Quality Score:** 6/10
+
+**Gaps Identified:**
+- **Sensory Detail Gap**: The mission lacks visceral textures (e.g., "the damp, mossy floor") and contrast (e.g., "the acrid tang of venom vs. the metallic scent of blood").
+- **NPC Motivation Gap**: Guard Captain Kaelen's ambiguity is underdeveloped. Add a specific secret (e.g., "he’s secretly poisoning the city’s water supply").
+- **Encounter Design Gap**: Combat encounters lack terrain integration. Specify how the Venom Pits’ layout (e.g., "iron chains form a spiderweb, forcing enemies into narrow corridors") affects combat.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+"Include vivid sensory details contrasting environments (e.g., 'the acrid tang of venom vs. the metallic scent of blood')."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+"Develop NPCs with clear secrets and motivations (e.g., 'a cultist secretly poisoning the city’s water supply')."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+"Detail how environmental hazards and terrain shape encounters (e.g., 'iron chains form a spiderweb, forcing enemies into narrow corridors')."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-16 01:27
+
+**Test Mission:** The Noble's Shadow and the Argent Blades' Trial
+**Quality Score:** 7/10
+
+**Gaps Identified:**
+- **Sensory Detail Gap** - The manor's description mentions "smell of old parchment" but lacks visceral details like the "rotting wood" from the reference. Add tactile/olfactory elements (e.g., "the air reeks of damp stone and mildew").
+- **NPC Motivation Gap** - Lady Elara's motivation is clear but lacks the layered secrets seen in the reference (e.g., Neses's hidden identity as a medusa). Expand her backstory with a hidden secret (e.g., her family's pact with a shadowy patron).
+- **Encounter Design Gap** - The Veiled Quarters lack specific trap types and loot. Add concrete mechanics (e.g., "pressure plates triggering collapsing ceilings" and "sigils that glow when touched").
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include vivid sensory details like smells, textures, and sounds to ground scenes in the environment."** (Fixes sensory detail gap)
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Develop NPCs with layered motivations and hidden secrets that drive their actions."** (Fixes NPC motivation gap)
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Specify trap types, loot, and terrain advantages for each major location to ensure playability."** (Fixes encounter design gap)
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-17 01:25
+
+**Test Mission:** Ashen Whispers of the Smoldering Hollow
+**Quality Score:** 6/10
+
+**Gaps Identified:**
+- **Specificity**: Add granular details (e.g., "sulfur concentration at 50 ppm," "shrine built during the reign of King Markos the Second") to anchor the setting.
+- **Sensory Detail**: Enhance immersion by describing textures (e.g., "ash that crackles like embers"), sounds ("whispers like a thousand dying flames"), and smells ("sulfur and charred wood").
+- **NPC Quality**: Flesh out motivations and secrets (e.g., Kaelen’s relic is a key to stopping the cult, Gromm’s betrayal is tied to a personal grudge).
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include granular details like population figures, environmental hazards, and historical context to anchor the setting."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Use vivid sensory descriptions to immerse players in environments—focus on textures, sounds, and smells."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Develop NPCs with clear motivations, hidden secrets, and emotional stakes to drive the plot."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-18 01:19
+
+**Test Mission:** Siege of the Ashen Wastes: Ember's Wrath
+**Quality Score:** 8/10
+
+**Gaps Identified:**
+- **Lack of Specific Numbers/Locations**: The mission mentions "500 gp" but lacks exact coordinates for key locations (e.g., "Scorched Hollow" could have a grid reference). This would ground the adventure in a tangible world.
+- **Insufficient Sensory Detail**: The description of the volcanic environment could include more textures (e.g., "cracked earth with a metallic tang") and sounds (e.g., "rumbling magma veins") to immerse players.
+- **Incomplete NPC Motivations**: Captain Vaelith’s secret about his brother is intriguing but could be expanded with more unique traits (e.g., "a voice like grinding stone" or "a scarred face from a past battle") to make him more memorable.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include exact coordinates or grid references for key locations to ground the adventure in a tangible world."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Add vivid sensory details (textures, sounds, smells) to immerse players in the environment."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Expand NPC motivations with unique traits and secrets to make them memorable and impactful."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-19 01:22
+
+**Test Mission:** The Sunken Sanctum of the Argent Blades
+**Quality Score:** 7/10
+
+**Gaps Identified:**
+- **Incomplete Hidden Truth**: The cut-off "Hidden Truth" section leaves the sanctum's destruction unresolved. Example: "The sanctum’s destruction was not an accident—its collapse was a failed attempt to seal a deeper..." should be completed to explain stakes.
+- **Lack of Unique Worldbuilding**: The "Silver Covenant" is good but needs ties to the broader world. Example: Reference's "Eternal Council" and "Aradea" create a cohesive lore. Add a map or historical context for the Silver Covenant.
+- **Sensory Detail Gaps**: Missing tactile/auditory cues. Example: Add "The air smells of brine and decay" or "The water's chill numbs the party's fingers" to enhance immersion.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include a completed 'Hidden Truth' section explaining the sanctum's destruction and its connection to a deeper threat."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Add sensory details like smells, sounds, and textures to immerse players in the lake's environment."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Incorporate unique worldbuilding elements (maps, historical context) to tie the Silver Covenant to the broader D&D world."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-20 01:26
+
+**Test Mission:** Echoes of the Obsidian Lotus
+**Quality Score:** 6/10
+
+**Gaps Identified:**
+- **Sensory Detail Gap**: The Lotus Archive’s description lacks tactile or olfactory details (e.g., "the scent of old parchment" or "clattering stone floors").
+- **NPC Depth Gap**: Agent Kael’s secret loyalty and motivations are underdeveloped compared to Neses’s tragic backstory.
+- **Encounter Specificity Gap**: The "Echoing Spire" challenge lacks terrain interactions (e.g., collapsing tunnels) and loot specifics (e.g., "a cursed gear with a 10% chance to corrupt the wielder").
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include vivid sensory details (e.g., smells, sounds, textures) to ground scenes in the environment."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Develop NPCs with unique traits, secrets, and conflicting motivations that influence their actions."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Specify encounter mechanics (terrain, loot, morale) and include concrete numbers for enemies and loot."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-21 01:33
+
+**Test Mission:** Shattered Veil of the Obsidian Lotus
+**Quality Score:** 6/10
+
+**Gaps Identified:**
+- **Specificity**: Add concrete numbers (e.g., "5 Veilbreakers guard the Veilshard"), specific item details (e.g., "the scrying mirror shows a map of the sewers"), and precise location coordinates.
+- **Sensory Detail**: Enhance descriptions with textures (e.g., "slick, moss-covered stone walls"), sounds (e.g., "dripping water echoing through tunnels"), and smells (e.g., "metallic tang of blood").
+- **Encounter Design**: Specify trap mechanics (e.g., "collapsing tunnels triggered by pressure plates"), loot (e.g., "a rusted dagger with a cracked hilt"), and terrain features (e.g., "moss-covered stone walls").
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include specific numbers, item details, and location coordinates to ground the story in a tangible world."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Add vivid sensory descriptions of textures, sounds, and smells to immerse players in the setting."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Detail encounter mechanics, terrain hazards, and loot to provide clear guidance for DMs."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-22 01:26
+
+**Test Mission:** The Coiled Conspiracy: Unearthing the Serpent Choir's Forbidden Ritual
+**Quality Score:** 5/10
+
+**Gaps Identified:**
+- **Lack of Unique Names/Identifiers**: The "scroll of divination" is generic; the reference uses specific items (e.g., "mummified bodies"). Add unique, named artifacts (e.g., "The Codex of Vhal’tar").
+- **Sensory Detail Absence**: The "coral-encrusted basilica" lacks texture/smell. Add sensory elements like "the scent of burning incense" or "the sound of dripping water in the Vault."
+- **Encounter Design Gaps**: The "golem-like constructs" lack terrain interaction. Specify how the environment affects combat (e.g., "traps trigger when the party disturbs the Vault’s walls").
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**"Include unique, named artifacts and specific quantities (e.g., 'a scroll of divination bound in dragonhide') to enhance specificity."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**"Add sensory details (e.g., 'the acrid smell of burning incense') to ground scenes in sight, sound, and smell."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**"Detail encounter environments (e.g., 'traps activate when the party disturbs the Vault’s walls') and loot distribution for clear DM guidance."**
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-23 01:32
+
+**Test Mission:** Siege of the Ashen Crucible
+**Quality Score:** 7/10
+
+**Gaps Identified:**
+- **Sensory Detail**: Add more vivid descriptions of the environment (e.g., "the acrid tang of sulfur in the air" or "the sound of molten rock hissing").
+- **Encounter Design**: Specify mechanics for hazards (e.g., "lava canals erupt every 1d4 rounds") and enemy tactics (e.g., "Crimson Blades use fire traps that ignite after 3 rounds").
+- **Incomplete ACT 1**: Complete the first act with a narrative hook and specific encounters (e.g., "The party must navigate collapsing tunnels to reach the Crucible's defenses").
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+"Include vivid sensory details (e.g., smells, sounds, textures) to immerse players in the environment."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+"Specify encounter mechanics with terrain interactions, enemy tactics, and loot distribution for each major location."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+"Complete the first act with a narrative hook and at least two distinct encounters, including a moral choice or puzzle."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-24 02:20
+
+**Test Mission:** Echoes of the Obsidian Lotus: The Vault of Eternal Shadows
+**Quality Score:** 6/10
+
+**Gaps Identified:**
+- **Specificity Gap**: The mission lacks concrete numerical details (e.g., "Kaelith the Hollow" is a named entity, but no CR or lore about its origins). Add a brief lore snippet about Kaelith’s history.
+- **Sensory Detail Gap**: The "Chamber of Whispers" could include more tactile or auditory elements (e.g., "the floor creaks underfoot, echoing like a thousand whispers").
+- **Encounter Design Gap**: The "Echoing Veil" maze lacks terrain mechanics (e.g., "walls shift to mimic your path, forcing you to reroute"). Add a mechanic for how the maze interacts with the party’s movements.
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+**Add numerical specifics**: "Include precise CRs, loot values, and map coordinates for locations (e.g., 'Vault of Eternal Shadows: Coordinates X12, Y34, 50ft below the temple’)."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+**Enhance sensory immersion**: "Use vivid sensory details (e.g., 'the air tastes of burnt sugar and iron,' 'the floor is slick with a gelatinous substance')" to ground scenes.
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+**Detail encounter mechanics**: "Specify terrain interactions (e.g., 'the shifting corridors force enemies to follow the party’s path,' 'spectral artificers phase through walls')" to add strategic depth.
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+
+---
+
+## Patches from 2026-04-25 01:33
+
+**Test Mission:** Unravel the Veil of Silent Alliances
+**Quality Score:** 8/10
+
+**Gaps Identified:**
+- **Encounter Design**: Add structured encounters with terrain, morale, and loot. Example: "The Whispering Gallery's mosaic constellations force attendees to positions, with a trap that triggers if the party disrupts the pattern."
+- **Sensory Detail**: Expand tactile and environmental descriptions. Example: "The Veiled Parlor's mirrored walls are cold to the touch, reflecting not just faces but the faint shimmer of magical surveillance."
+- **Completeness**: Finish the reward section and clarify consequences. Example: "Failure means the Lotus collapses, and the party is branded as traitors, forcing them to flee Velnor under guard."
+
+**Proposed Prompt Patches (PENDING DM APPROVAL):**
+
+### Patch 1
+
+```
+"Include structured encounters with terrain features, morale rules, and specific loot (e.g., magical scrolls or traps)."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 2
+
+```
+"Add tactile and environmental sensory details (e.g., 'cold stone,' 'hum of magical surveillance') to enhance immersion."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
+
+### Patch 3
+
+```
+"Ensure all rewards, consequences, and mission endpoints are fully described, including clear failure conditions and their impacts."
+```
+
+**Status:** ❌ REJECTED (2026-05-01 12:02)
 

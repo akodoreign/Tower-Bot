@@ -23,7 +23,7 @@ MATCH_INTERVAL_MAX = 3 * 24 * 3600
 def _dual_ts() -> str:
     now   = datetime.now()
     tower = now.replace(year=now.year + TOWER_YEAR_OFFSET)
-    return f"{now.strftime('%Y-%m-%d %H:%M')} │ Tower: {tower.strftime('%d %b %Y, %H:%M')}"
+    return f"{now.strftime('%Y-%m-%d %H:%M')} | Tower: {tower.strftime('%d %b %Y, %H:%M')}"
 
 
 _SEED_FIGHTERS = [
@@ -73,12 +73,12 @@ def _load_arena() -> Dict:
 
 def _save_arena(state: Dict) -> None:
     """Save arena state to database."""
+    db_id = state.pop("db_id", None)
     try:
-        db_id = state.pop("db_id", None)
         # Store full state in champions_json, standings in standings_json
         champions_json = json.dumps(state, ensure_ascii=False, default=str)
         standings_json = json.dumps(state.get("fighters", []), ensure_ascii=False, default=str)
-        
+
         if db_id:
             raw_execute(
                 "UPDATE arena_seasons SET season_number = %s, champions_json = %s, standings_json = %s WHERE id = %s",
@@ -94,6 +94,8 @@ def _save_arena(state: Dict) -> None:
             })
             state["db_id"] = new_id
     except Exception as e:
+        if db_id and "db_id" not in state:
+            state["db_id"] = db_id  # restore so next tick updates instead of inserting duplicate
         logger.error(f"Arena save error: {e}")
 
 
@@ -198,7 +200,7 @@ def format_match_bulletin(result: Dict, state: Dict) -> str:
 
     lines = [
         f"🏟️ **ARENA OF ASCENDANCE — {header}** 🏟️",
-        f"-# {_dual_ts()} │ Season {season}, Match {match_num}",
+        f"-# {_dual_ts()} | Season {season}, Match {match_num}",
         "",
         f"**WINNER:** {winner}  ·  #{w_data.get('rank','?')}  ·  {w_data.get('wins',0)}W/{w_data.get('losses',0)}L",
         f"**DEFEATED:** {loser}  ·  #{l_data.get('rank','?')}  ·  {l_data.get('losses',0)}L",
@@ -248,7 +250,7 @@ def format_standings_bulletin() -> str:
         state = _init_arena()
         _save_arena(state)
     season, fighters = state.get("season", 1), state.get("fighters", [])
-    lines = [f"🏟️ **ARENA OF ASCENDANCE — FULL STANDINGS** 🏟️", f"-# {_dual_ts()} │ Season {season}", ""]
+    lines = [f"🏟️ **ARENA OF ASCENDANCE — FULL STANDINGS** 🏟️", f"-# {_dual_ts()} | Season {season}", ""]
     for f in fighters:
         title_str = f"  *{f['title']}*" if f.get("title") else ""
         lines.append(f"#{f['rank']}  **{f['name']}**  {f['wins']}W/{f['losses']}L{title_str}")

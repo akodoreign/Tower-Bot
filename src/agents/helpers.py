@@ -176,8 +176,8 @@ async def generate_bulletin(
 
 RULES:
 - Output ONLY the bulletin. No preamble, no sign-off.
-- Use Discord markdown. {max_lines} lines max.
-- Ground it in specific locations, NPCs, and factions.
+- Use Discord markdown. Aim for {max_lines} lines — up to {max_lines + 4} if the story needs it (a Read More button handles overflow).
+- Ground it in specific locations, NPCs, and factions. Be generous with detail.
 - If your response contains anything other than the bulletin, you have failed."""
     
     try:

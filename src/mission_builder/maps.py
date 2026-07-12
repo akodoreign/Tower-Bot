@@ -1,328 +1,109 @@
 """
-maps.py — VTT battlemap generation for mission modules.
+maps.py - battle map selection for mission modules.
 
-Generates top-down tactical battlemaps for each combat/exploration scene
-in a mission module using A1111/Stable Diffusion.
-
-Uses image_ref.py for iterative improvement — each generated map is saved
-as a location reference, so future maps of the same location improve over time.
-
-Directory layout:
-  generated_modules/[module_name]/
-    maps/
-      act2_lead1_[location_slug].png
-      act4_confrontation_[location_slug].png
-      ...
-
-Exported:
-    extract_map_scenes(module_data) -> list of scene dicts
-    generate_vtt_map(scene, ref_bytes=None) -> bytes (PNG)
-    generate_module_maps(module_data) -> list of paths
+Mission maps now come from battle_maps_library and battle_map_area_memory.
+This module keeps the old public API shape, but it no longer calls A1111 or
+attempts on-the-spot image generation.
 """
-
 from __future__ import annotations
 
-import os
-import re
-import json
-import base64
 import asyncio
-import logging
-from pathlib import Path
+import re
 from datetime import datetime
-from typing import Optional, List, Dict, Tuple
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
-import httpx
-
-from src.image_ref import (
-    get_location_ref,
-    save_location_ref,
-    to_img2img_payload,
-    LOCATION_DENOISE,
-)
+from src.image_ref import LOCATION_DENOISE
 from src.log import logger
-
-# ---------------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------------
-
-A1111_URL = os.getenv("A1111_URL", "http://127.0.0.1:7860")
-A1111_TIMEOUT = 600.0  # 10 minutes per map
-
-# VTT Map dimensions — standard grid-friendly sizes
-MAP_WIDTH = 1024
-MAP_HEIGHT = 1024
-
-# Map generation settings
-MAP_STEPS = 30
-MAP_CFG = 7.5
-MAP_SAMPLER = "DPM++ 2M Karras"
-
-# Checkpoint for maps — use the photorealistic model for battlemaps
-MAP_MODEL = os.getenv("A1111_MODEL", "juggernautXL_version6Rundiffusion.safetensors")
-
-# LoRA for top-down RPG table maps — must be present in A1111's lora folder
-MAP_LORA = "<lora:DD_Table_RPG:0.75>"
+from src.mission_builder.vtt_renderer import write_grid_sidecar
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 
-# ---------------------------------------------------------------------------
-# Undercity battlemap style prompts
-# ---------------------------------------------------------------------------
-
-# Base style applied to all maps
-_BASE_STYLE = """top-down tactical battlemap, D&D VTT map, grid-ready, 
-dungeon map style, dark fantasy, high contrast, clear edges, 
-flat lighting from above, no perspective distortion, orthographic view,
-detailed floor textures, clear walls and boundaries"""
-
-# Negative prompt to avoid
-_NEGATIVE = """3d render, perspective, isometric, character, people, monsters,
-side view, angle, sky, clouds, sun, horizon, blurry, low quality,
-realistic photo, photograph, watermark, signature, text, UI elements,
-miniatures, tokens, grid overlay, numbers, letters"""
-
-# District-specific aesthetics
-_DISTRICT_STYLES: Dict[str, str] = {
-    "markets_infinite": "cobblestone streets, market stalls, crates and barrels, awnings, vendor booths, lantern light, cramped alleyways",
-    "warrens": "ruined buildings, debris piles, makeshift shelters, cracked stone, exposed pipes, dim lighting, dangerous terrain, collapsed walls",
-    "guild_spires": "polished stone floors, ornate pillars, guild banners, clean architecture, magic lighting, elegant design",
-    "sanctum_quarter": "temple architecture, religious symbols, altar spaces, ceremonial chambers, divine light, incense braziers",
-    "grand_forum": "open plaza, fountain features, statue pedestals, wide streets, civic architecture, public squares",
-    "outer_wall": "fortifications, guard towers, heavy stone, murder holes, defensive positions, patrol routes, gatehouse",
-    "underground": "cave systems, rough stone, stalactites, underground river, natural formations, dim bioluminescence",
-    "sewer": "brick tunnels, water channels, walkways, grates, pipes, damp stone, refuse piles",
-    "warehouse": "wooden crates, shelving units, loading areas, support columns, storage containers, industrial space",
-    "tavern": "wooden floor, bar counter, tables and chairs, fireplace, kitchen area, storage room, stairs",
-    "noble_estate": "marble floors, ornate furniture, paintings, chandeliers, formal gardens, hedge maze",
-    "arena": "sand pit, spectator stands, gladiator gates, weapon racks, blood stains, dramatic lighting",
-}
-
-# Scene type specific features
-_SCENE_FEATURES: Dict[str, str] = {
-    "combat": "clear tactical positions, cover objects, elevation changes, chokepoints",
-    "investigation": "clutter and details, searchable objects, hiding spots, evidence markers",
-    "social": "conversation areas, seating arrangements, ambient details",
-    "chase": "long corridors, obstacles, multiple paths, escape routes",
-    "ambush": "hiding spots, high ground, shadows, surprise positions",
-    "boss": "large central area, dramatic centerpiece, lair features, environmental hazards",
-}
-
-
-# ---------------------------------------------------------------------------
-# Scene extraction from module data
-# ---------------------------------------------------------------------------
 
 def _slugify(text: str) -> str:
-    """Convert text to a safe filename slug."""
-    return re.sub(r"[^a-z0-9]+", "_", text.lower().strip()).strip("_")[:50]
+    return re.sub(r"[^a-z0-9]+", "_", str(text or "").lower().strip()).strip("_")[:50]
 
 
 def _detect_district(text: str) -> str:
-    """Detect which district a scene is in based on text content."""
-    text_lower = text.lower()
-    
+    text_lower = str(text or "").lower()
     district_keywords = {
         "markets_infinite": ["market", "bazaar", "vendor", "stall", "cobbleway", "neon row"],
-        "warrens": ["warren", "collapsed", "ruin", "shanty", "slum", "debris"],
+        "shantytown_heights": ["shanty", "slum", "warren"],
+        "collapsed_plaza": ["collapsed", "ruin", "debris"],
         "guild_spires": ["guild", "spire", "tower", "academy", "headquarters"],
         "sanctum_quarter": ["temple", "shrine", "sanctum", "church", "holy", "divine"],
         "grand_forum": ["forum", "plaza", "fountain", "civic", "library"],
         "outer_wall": ["wall", "gate", "fortification", "guard", "watchtower"],
-        "underground": ["cave", "cavern", "underground", "tunnel", "subterranean"],
-        "sewer": ["sewer", "drain", "pipe", "waste", "runoff"],
-        "warehouse": ["warehouse", "storage", "crate", "dock", "loading"],
-        "tavern": ["tavern", "inn", "bar", "soot", "cinder", "pub"],
-        "arena": ["arena", "pit", "gladiator", "combat ring"],
+        "the_fringe": ["cave", "cavern", "underground", "tunnel", "subterranean"],
+        "archive_row": ["archive", "library", "records", "study"],
+        "scrapworks": ["scrap", "factory", "machine", "industrial"],
+        "ironworks": ["ironworks", "forge", "foundry"],
+        "night_pits": ["arena", "pit", "gladiator", "combat ring"],
     }
-    
     for district, keywords in district_keywords.items():
         if any(kw in text_lower for kw in keywords):
             return district
-    
-    return "warrens"  # Default to Warrens aesthetic
+    return ""
 
 
 def _detect_scene_type(text: str) -> str:
-    """Detect the type of scene for tactical feature selection."""
-    text_lower = text.lower()
-    
-    if any(w in text_lower for w in ["boss", "leader", "final", "climax", "lair"]):
+    text_lower = str(text or "").lower()
+    if any(w in text_lower for w in ("boss", "leader", "final", "climax", "lair")):
         return "boss"
-    if any(w in text_lower for w in ["ambush", "trap", "surprise", "hidden"]):
+    if any(w in text_lower for w in ("ambush", "trap", "surprise", "hidden")):
         return "ambush"
-    if any(w in text_lower for w in ["chase", "pursuit", "flee", "escape"]):
+    if any(w in text_lower for w in ("chase", "pursuit", "flee", "escape")):
         return "chase"
-    if any(w in text_lower for w in ["investigate", "search", "clue", "evidence"]):
+    if any(w in text_lower for w in ("investigate", "search", "clue", "evidence")):
         return "investigation"
-    if any(w in text_lower for w in ["talk", "negotiate", "meet", "social", "conversation"]):
+    if any(w in text_lower for w in ("talk", "negotiate", "meet", "social", "conversation")):
         return "social"
-    
-    return "combat"  # Default
+    return "combat"
 
 
-def extract_map_scenes(module_data: dict) -> List[Dict]:
-    """
-    Extract scenes that need battlemaps from module data.
-    
-    Returns list of dicts with:
-    - scene_id: unique identifier
-    - scene_name: human readable name
-    - location: location name/description
-    - description: full scene description
-    - district: detected district for styling
-    - scene_type: combat/investigation/social/etc
-    - act: which act this is from
-    """
-    scenes = []
-    
+def extract_map_scenes(module_data: dict, mission_type: str = "") -> List[Dict]:
+    """Extract likely map-worthy scenes from module data."""
+    mission_type = mission_type or module_data.get("metadata", {}).get("mission_type", "")
     raw_content = module_data.get("raw_content", "")
-    sections = module_data.get("sections", {})
-    
-    # Fallback to raw_content if sections missing
-    if not sections:
-        logger.warning("🗺️ No sections found in module_data; attempting raw_content parse")
-        sections = {"acts_1_2": raw_content, "acts_3_4": raw_content}
-    
-    # Parse Chapter 2 scenes / investigation leads
-    acts_1_2 = sections.get("acts_1_2", "")
-    if not acts_1_2:
-        logger.info("🗺️ No acts_1_2 section found for scene extraction")
+    sections = module_data.get("sections", {}) or {}
+    content = "\n\n".join(str(v or "") for v in sections.values()) or raw_content
+    if not content:
+        return []
 
-    # Match both new "### Scene N: Location" and old "### Lead N: Location" formats
-    scene_pattern = r"###\s*(?:Scene|Investigation\s+Lead|Lead)\s*\d+:\s*([^\n\[]+?)(?:\s*[-—]\s*[^\n]*)?\n(.*?)(?=###|##|\Z)"
-
-    for match in re.finditer(scene_pattern, acts_1_2, re.DOTALL | re.IGNORECASE):
-        location_name = match.group(1).strip()
-        scene_text = match.group(2).strip()
-
-        # Extract scene setting/description if present
-        desc_match = re.search(r"\*\*(?:Setting|Scene Description)\*\*[:\s]*(.*?)(?=\*\*|\Z)", scene_text, re.DOTALL)
-        description = desc_match.group(1).strip() if desc_match else scene_text[:500]
-
-        scenes.append({
-            "scene_id": f"ch2_scene_{_slugify(location_name)}",
-            "scene_name": f"Scene: {location_name}",
-            "location": location_name,
-            "description": description,
-            "district": _detect_district(scene_text),
-            "scene_type": _detect_scene_type(scene_text),
-            "act": 2,
-        })
-
-    # Parse Chapter 3 confrontation — handles both new "### Location:" and old "### Battlefield:" formats
-    acts_3_4 = sections.get("acts_3_4", "")
-
-    # New format: "### Location: [Name]" inside Chapter 3 Part B
-    confrontation_match = re.search(
-        r"###\s*(?:Location|Battlefield):\s*([^\n]+)\n(.*?)(?=###|##|\Z)",
-        acts_3_4, re.DOTALL | re.IGNORECASE
+    pattern = re.compile(
+        r"(?:#{1,4}\s+|\*{1,2}\s*)(?:Scene|Investigation\s+Lead|Lead)\s*\d+\s*[:\-]\s*([^\n\*]{2,80})\*{0,2}\s*\n(.*?)(?=(?:#{1,4}\s+|\*{1,2}\s*(?:Scene|Lead|Investigation|Act|Chapter|Battlefield|Location|Enemy|Reward|Resolution))|\Z)",
+        re.DOTALL | re.IGNORECASE,
     )
 
-    if confrontation_match:
-        location_name = confrontation_match.group(1).strip()
-        scene_text = confrontation_match.group(2).strip()
-
-        desc_match = re.search(r"\*\*(?:Setting|Scene Description)\*\*[:\s]*(.*?)(?=\*\*|\Z)", scene_text, re.DOTALL)
-        description = desc_match.group(1).strip() if desc_match else scene_text[:500]
-
-        scenes.append({
-            "scene_id": f"ch3_confrontation_{_slugify(location_name)}",
-            "scene_name": f"Confrontation: {location_name}",
-            "location": location_name,
-            "description": description,
-            "district": _detect_district(scene_text),
-            "scene_type": "boss",
-            "act": 4,
-        })
-    else:
-        # Fallback: Chapter 3 Part B header itself
-        ch3_match = re.search(
-            r"##\s*Chapter\s*3[,\s]*Part\s*B[:\s]*([^\n]*)\n(.*?)(?=##|\Z)",
-            acts_3_4, re.DOTALL | re.IGNORECASE
+    scenes: List[Dict] = []
+    for idx, match in enumerate(pattern.finditer(content), start=1):
+        location = match.group(1).strip().rstrip("*").strip()
+        description = match.group(2).strip()[:900]
+        combined = f"{location} {description}"
+        scenes.append(
+            {
+                "scene_id": f"scene_{idx}_{_slugify(location) or 'map'}",
+                "scene_name": location,
+                "location": location,
+                "description": description,
+                "district": _detect_district(combined),
+                "scene_type": _detect_scene_type(combined),
+                "mission_type": mission_type,
+                "act": 4 if any(w in combined.lower() for w in ("final", "boss", "climax")) else 2,
+            }
         )
-        if not ch3_match:
-            # Very old Act 4 fallback
-            ch3_match = re.search(
-                r"##\s*Act\s*4[:\s]*([^\n]*)\n(.*?)(?=##|\Z)",
-                acts_3_4, re.DOTALL | re.IGNORECASE
-            )
-        if ch3_match:
-            scene_text = ch3_match.group(2).strip()
-            primary_loc = module_data.get("metadata", {}).get("primary_location", "Undercity")
-            scenes.append({
-                "scene_id": "ch3_confrontation",
-                "scene_name": "Final Confrontation",
-                "location": primary_loc,
-                "description": scene_text[:500],
-                "district": _detect_district(scene_text),
-                "scene_type": "boss",
-                "act": 4,
-            })
-    
-    logger.info(f"🗺️ Extracted {len(scenes)} map scenes from module")
     if not scenes:
-        logger.warning("🗺️ CRITICAL: No scenes extracted. Check module format or sections structure. Raw sample: {acts_1_2[:200]}...")
-    return scenes
+        excerpt = content[:120].replace("\n", " ")
+        logger.info(
+            f"extract_map_scenes: no scenes matched (content {len(content)} chars, "
+            f"mission_type={mission_type!r}, excerpt={excerpt!r})"
+        )
+    return scenes[:8]
 
 
-# ---------------------------------------------------------------------------
-# Map prompt building
-# ---------------------------------------------------------------------------
-
-def build_map_prompt(scene: Dict) -> Tuple[str, str]:
-    """
-    Build the SD prompt and negative prompt for a battlemap.
-    
-    Returns (positive_prompt, negative_prompt)
-    """
-    location = scene.get("location", "unknown location")
-    description = scene.get("description", "")
-    district = scene.get("district", "warrens")
-    scene_type = scene.get("scene_type", "combat")
-    
-    # Get district and scene type styles
-    district_style = _DISTRICT_STYLES.get(district, _DISTRICT_STYLES["warrens"])
-    scene_features = _SCENE_FEATURES.get(scene_type, _SCENE_FEATURES["combat"])
-    
-    # Build prompt — LoRA must come first so A1111 applies it at full weight
-    prompt_parts = [
-        MAP_LORA,
-        _BASE_STYLE,
-        f"location: {location}",
-        district_style,
-        scene_features,
-    ]
-
-    # Add description details if meaningful
-    if description and len(description) > 20:
-        # Extract key visual elements from description
-        visual_words = []
-        for word in description.split():
-            word_clean = word.lower().strip(".,!?;:")
-            if word_clean in ["stone", "wood", "metal", "water", "fire", "dark", "light",
-                             "broken", "ruined", "ornate", "ancient", "blood", "shadow"]:
-                visual_words.append(word_clean)
-        if visual_words:
-            prompt_parts.append(", ".join(visual_words[:5]))
-
-    positive = ", ".join(prompt_parts)
-    
-    return positive, _NEGATIVE
-
-
-# ---------------------------------------------------------------------------
-# A1111 generation
-# ---------------------------------------------------------------------------
-
-async def _check_a1111_available() -> bool:
-    """Check if A1111 is running and responsive."""
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(f"{A1111_URL}/sdapi/v1/sd-models")
-            return resp.status_code == 200
-    except Exception:
-        return False
+def build_map_prompt(scene: Dict, strategy: str = "legacy") -> Tuple[str, str]:
+    """Deprecated compatibility hook. Map prompts are no longer generated."""
+    return "", ""
 
 
 async def generate_vtt_map(
@@ -330,149 +111,56 @@ async def generate_vtt_map(
     ref_bytes: Optional[bytes] = None,
     denoise: float = LOCATION_DENOISE,
 ) -> Optional[bytes]:
-    """
-    Generate a VTT battlemap for a scene.
-    
-    Args:
-        scene: Scene dict from extract_map_scenes()
-        ref_bytes: Optional reference image for img2img
-        denoise: Denoising strength for img2img (0.0-1.0)
-    
-    Returns:
-        PNG image bytes, or None on failure
-    """
-    if not await _check_a1111_available():
-        logger.warning("🗺️ A1111 not available for map generation")
-        return None
-    
-    positive, negative = build_map_prompt(scene)
-    
-    logger.info(f"🗺️ Generating map for: {scene['scene_name']}")
-    logger.debug(f"🗺️ Prompt: {positive[:200]}...")
-    
-    # Build base payload
-    payload = {
-        "prompt": positive,
-        "negative_prompt": negative,
-        "width": MAP_WIDTH,
-        "height": MAP_HEIGHT,
-        "steps": MAP_STEPS,
-        "cfg_scale": MAP_CFG,
-        "sampler_name": MAP_SAMPLER,
-        "seed": -1,  # Random seed
-    }
-    
-    # Use img2img if we have a reference
-    endpoint = "/sdapi/v1/txt2img"
-    if ref_bytes:
-        payload = to_img2img_payload(payload, ref_bytes, denoise)
-        endpoint = "/sdapi/v1/img2img"
-        logger.info(f"🗺️ Using reference image (denoise={denoise})")
-    
-    try:
-        # Import the lock from news_feed to respect A1111 queue
-        from src.news_feed import a1111_lock, _a1111_lock
-        
-        if _a1111_lock.locked():
-            logger.info("🗺️ A1111 busy, waiting for lock...")
-        
-        async with a1111_lock:
-            async with httpx.AsyncClient(timeout=A1111_TIMEOUT) as client:
-                resp = await client.post(f"{A1111_URL}{endpoint}", json=payload)
-                resp.raise_for_status()
-                data = resp.json()
-        
-        images = data.get("images", [])
-        if not images:
-            logger.error("🗺️ A1111 returned no images")
-            return None
-        
-        # Decode first image
-        img_b64 = images[0]
-        img_bytes = base64.b64decode(img_b64)
-        
-        logger.info(f"🗺️ Map generated: {len(img_bytes):,} bytes")
-        return img_bytes
-        
-    except Exception as e:
-        logger.error(f"🗺️ Map generation failed: {e}")
-        return None
+    """Deprecated: mission maps now come from battle_maps_library, not A1111."""
+    logger.info("Mission map generation is disabled; use battle_maps_library selection instead.")
+    return None
 
-
-# ---------------------------------------------------------------------------
-# Full module map generation
-# ---------------------------------------------------------------------------
 
 async def generate_module_maps(
     module_data: dict,
     output_subdir: Optional[str] = None,
     max_maps: int = 5,
 ) -> List[Path]:
-    """
-    Generate VTT maps for all combat/exploration scenes in a module.
-    
-    Uses image_ref.py to check for existing location references and
-    saves newly generated maps as references for future use.
-    
-    Args:
-        module_data: The full module data dict
-        output_subdir: Subdirectory under generated_modules/ for maps
-        max_maps: Maximum number of maps to generate (avoid runaway)
-    
-    Returns:
-        List of paths to generated map files
-    """
+    """Copy matching library maps for extracted module scenes."""
     scenes = extract_map_scenes(module_data)
-    
     if not scenes:
-        logger.info("🗺️ No map scenes found in module")
+        logger.info("No map scenes found in module")
         return []
-    
-    # Limit to max_maps
-    if len(scenes) > max_maps:
-        logger.info(f"🗺️ Limiting to {max_maps} maps (found {len(scenes)} scenes)")
-        # Prioritize: Act 4 boss fight first, then Act 2 leads
-        scenes = sorted(scenes, key=lambda s: (s["act"] != 4, s["act"]))[:max_maps]
-    
-    # Create output directory
+    scenes = scenes[:max_maps]
+
     if output_subdir:
         maps_dir = OUTPUT_DIR / output_subdir / "maps"
     else:
-        title = module_data.get("title", "unknown")
-        safe_title = _slugify(title)
-        maps_dir = OUTPUT_DIR / safe_title / "maps"
-    
+        maps_dir = OUTPUT_DIR / _slugify(module_data.get("title", "unknown")) / "maps"
     maps_dir.mkdir(parents=True, exist_ok=True)
-    
-    generated_paths = []
-    
+
+    generated_paths: List[Path] = []
     for scene in scenes:
         location = scene.get("location", "unknown")
-        scene_id = scene.get("scene_id", "map")
-        
-        # Check for existing reference
-        ref_bytes = get_location_ref(location)
-        if ref_bytes:
-            logger.info(f"🗺️ Found reference for {location}")
-        
-        # Generate map
-        map_bytes = await generate_vtt_map(scene, ref_bytes=ref_bytes)
-        
-        if map_bytes:
-            # Save to output directory
-            map_path = maps_dir / f"{scene_id}.png"
-            map_path.write_bytes(map_bytes)
-            generated_paths.append(map_path)
-            logger.info(f"🗺️ Saved map: {map_path}")
-            
-            # Save as location reference for future iterations
-            save_location_ref(location, map_bytes)
-            logger.info(f"🗺️ Updated reference for: {location}")
-        
-        # Small delay between generations
-        await asyncio.sleep(2)
-    
-    logger.info(f"🗺️ Generated {len(generated_paths)} maps for module")
+        map_path = maps_dir / f"{scene.get('scene_id', 'map')}.png"
+        try:
+            from src.battle_map_library import copy_library_map_for_mission
+
+            picked = copy_library_map_for_mission(
+                {
+                    "title": module_data.get("title", ""),
+                    "faction": module_data.get("metadata", {}).get("faction", ""),
+                },
+                map_path,
+                mission_type=scene.get("mission_type", ""),
+                location_name=location,
+                district=scene.get("district", ""),
+                description=scene.get("description", ""),
+            )
+            if picked:
+                write_grid_sidecar(picked, scene)
+                generated_paths.append(picked)
+                logger.info(f"Reused library map: {picked}")
+            else:
+                logger.info(f"No library map found for {location}; skipping")
+        except Exception as e:
+            logger.warning(f"Library map lookup failed for {location}: {e}")
+        await asyncio.sleep(1)
     return generated_paths
 
 
@@ -483,99 +171,58 @@ async def post_maps_to_channel(
     retry_count: int = 2,
     channel=None,
 ) -> bool:
-    """
-    Post generated maps to the module output channel with retry logic.
-
-    Posts to the same channel as the DOCX (MODULE_OUTPUT_CHANNEL_ID).
-    Pass channel directly to skip the lookup.
-
-    Args:
-        client: Discord client
-        map_paths: List of paths to map files
-        module_data: Module data for context
-        retry_count: Number of retries on transient failures
-        channel: Optional pre-resolved discord.TextChannel (skips env lookup)
-
-    Returns:
-        True if posted successfully, False otherwise
-    """
+    """Post selected map files to the configured Discord channel."""
+    import os
     import discord
 
     if not map_paths:
-        logger.warning("🗺️ No map paths provided to post")
+        logger.warning("No map paths provided to post")
         return False
-
-    # Validate all map files exist before attempting post
-    for p in map_paths:
-        if not p.exists():
-            logger.error(f"🗺️ Map file missing: {p}")
+    for path in map_paths:
+        if not path.exists():
+            logger.error(f"Map file missing: {path}")
             return False
 
-    # Use provided channel, or resolve from MODULE_OUTPUT_CHANNEL_ID
+    channel_id = getattr(channel, "id", None)
     if channel is None:
         channel_id = int(os.getenv("MODULE_OUTPUT_CHANNEL_ID", "0")) or int(os.getenv("MAPS_CHANNEL_ID", "0"))
         if not channel_id:
-            logger.warning("🗺️ No module output channel configured (MODULE_OUTPUT_CHANNEL_ID)")
+            logger.warning("No module output channel configured")
             return False
         channel = client.get_channel(channel_id)
         if not channel:
-            logger.warning(f"🗺️ Module output channel {channel_id} cannot be accessed by bot")
+            logger.warning(f"Module output channel {channel_id} cannot be accessed by bot")
             return False
-    
-    # Verify bot has send permissions
-    try:
-        perms = channel.permissions_for(channel.guild.me) if hasattr(channel, 'guild') and channel.guild else None
-        if perms and not perms.send_messages:
-            logger.error(f"🗺️ Bot lacks send_messages permission in maps channel {channel_id}")
-            return False
-        if perms and not perms.attach_files:
-            logger.error(f"🗺️ Bot lacks attach_files permission in maps channel {channel_id}")
-            return False
-    except Exception as e:
-        logger.warning(f"🗺️ Could not verify permissions: {e} — proceeding anyway")
-    
+        channel_id = channel.id
+
     title = module_data.get("title", "Unknown Mission")
-    
     embed = discord.Embed(
-        title=f"🗺️ VTT Maps: {title}",
-        description=f"Generated {len(map_paths)} tactical battlemaps for this mission.\n"
-                    f"*1024x1024px, optimized for D&D Beyond VTT*",
+        title=f"VTT Maps: {title}",
+        description=f"Selected {len(map_paths)} tactical battlemaps from the map library.",
         color=discord.Color.dark_teal(),
         timestamp=datetime.now(),
     )
-    
-    # Retry loop for transient failures
+
     for attempt in range(1, retry_count + 1):
         try:
-            files = [
-                discord.File(str(p), filename=p.name)
-                for p in map_paths[:10]  # Discord limit
-            ]
+            files = [discord.File(str(path), filename=path.name) for path in map_paths[:10]]
             await channel.send(embed=embed, files=files)
-            logger.info(f"✅ Posted {len(files)} maps to channel {channel_id} for: {title}")
+            logger.info(f"Posted {len(files)} maps to channel {channel_id} for: {title}")
             return True
         except discord.HTTPException as e:
-            if attempt < retry_count and e.status in [429, 503, 500]:  # Retry on rate limit or server error
-                wait_time = 2 ** attempt  # Exponential backoff
-                logger.warning(f"🗺️ HTTP {e.status} from Discord (attempt {attempt}/{retry_count}), waiting {wait_time}s...")
-                await asyncio.sleep(wait_time)
+            if attempt < retry_count and e.status in [429, 503, 500]:
+                await asyncio.sleep(2 ** attempt)
                 continue
-            else:
-                logger.error(f"🗺️ Discord HTTP error (final): {e.status} {e.message}")
-                return False
+            logger.error(f"Discord HTTP error posting maps: {e.status} {e.message}")
+            return False
         except Exception as e:
-            logger.error(f"🗺️ Failed to post maps (attempt {attempt}/{retry_count}): {e}")
+            logger.error(f"Failed to post maps: {e}")
             if attempt < retry_count:
                 await asyncio.sleep(1)
             else:
                 return False
-    
     return False
 
-
-# ---------------------------------------------------------------------------
-# Convenience exports
-# ---------------------------------------------------------------------------
 
 __all__ = [
     "extract_map_scenes",

@@ -299,7 +299,7 @@ def format_leads_for_prompt(leads: List[dict], cr: int) -> str:
     ]
     
     for lead in leads:
-        lines.append(f"### Lead {lead['lead_number']}: {lead['lead_type'].title()}")
+        lines.append(f"### Lead {lead.get('lead_number', '?')}: {lead['lead_type'].title()}")
         lines.append(f"**Location:** {lead['location']}")
         lines.append(f"**Why go here:** {lead['why_go_there']}")
         lines.append(f"**Contact:** {lead['contact_name']} — {lead['contact_description']}")

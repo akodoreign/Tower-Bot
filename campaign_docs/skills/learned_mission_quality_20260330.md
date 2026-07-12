@@ -1,23 +1,23 @@
 # Skill: Mission Quality Report  
 **Keywords:** mission, quality, analysis, improvement, balance  
 **Category:** learned  
-**Version:** 11  
+**Version:** 17  
 **Source:** self-learned  
 
-## Quality Score: 5/10  
+## Quality Score: 6/10  
 ## Issues Detected  
-1. **Faction Imbalance:** Iron Fang Consortium dominates (35% of missions), while Adventurers Guild is underrepresented (5%).  
-2. **Repetitive Mission Types:** "Standard" missions (40%) overrepresent mundane tasks; "rift" and "major" are underused.  
-3. **Completion Rate:** 0% completed/failed/expired; missions remain "open" indefinitely.  
-4. **Claim Ratio:** 1:1 player/NPC claims; players should claim ~70-80% of missions.  
-5. **Seed Quality:** Seeds lack evocative details (e.g., "sentient gemstones" is vague; "cursed automaton workshop" could specify lore).  
+1. **Faction Imbalance**: Iron Fang Consortium (40%) and Serpent Choir (35%) dominate; Patchwork Saints (5%) are underrepresented.  
+2. **Repetitive Patterns**: Standard/major missions (14/20) overrepresented; "retrieval," "sabotage," and "investigation" themes recur.  
+3. **Low Player Claims**: Only 6/20 missions claimed by players (30%), with no NPC claims.  
+4. **Completion Rate**: 50% completion (10/20) meets minimum but lacks engagement.  
+5. **Generic Seeds**: Seeds like "smuggler's cache" and "bounty hunting" lack evocative detail.  
 
 ## Recommendations  
-1. **Balance Factions:** Reduce Iron Fang Consortium missions (currently 35%) to ~25% and add more Adventurers Guild tasks.  
-2. **Diversify Mission Types:** Replace 3-4 "standard" missions with "investigation" or "dungeon" to reduce repetition.  
-3. **Enforce Completion:** Introduce time limits or consequences for unclaimed missions to drive player engagement.  
-4. **Shift Claim Ratio:** Prioritize player-claimable missions (e.g., "local" or "standard" with clear stakes) to boost player involvement.  
-5. **Refine Seeds:** Add sensory details and stakes (e.g., "cursed gemstones that whisper secrets" or "automaton workshop guarded by rogue AI").  
+1. **Balance Factions**: Reduce Iron Fang/Serpent Choir missions by 20% and add 2-3 missions for Patchwork Saints.  
+2. **Diversify Mission Types**: Replace 3-4 standard/major missions with rift or investigation-tier quests to refresh pacing.  
+3. **Boost Player Claims**: Introduce 2-3 "player-driven" seeds (e.g., "defend a village from a cult" instead of "retrieve a relic").  
+4. **Refine Seeds**: Use vivid details (e.g., "a sentient automaton with a fractured soul" instead of "guardian automaton").  
+5. **Incentivize Completion**: Add XP/loot rewards for completed missions to improve engagement.  
 
 ## Next Cycle Focus  
-Prioritize faction balance, mission type diversity, and seed specificity to improve player engagement and mission completion rates.
+Prioritize faction balance and mission variety to enhance replayability and player investment.

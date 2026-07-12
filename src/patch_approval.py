@@ -18,7 +18,10 @@ from src.log import logger
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PATCHES_FILE = PROJECT_ROOT / "skills" / "module-quality" / "PATCHES.md"
+try:
+    from src.module_quality_trainer import PATCHES_FILE
+except Exception:
+    PATCHES_FILE = PROJECT_ROOT / "logs" / "learning" / "module_quality_patches.md"
 
 
 # ---------------------------------------------------------------------------

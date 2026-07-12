@@ -16,7 +16,13 @@ from typing import Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Gold ranges by tier
+# Flat base EC reward before CR/difficulty scaling.
+# The formula (not tier lookup) provides all differentiation.
+# Base = what a yellow-circle CR-1 mission pays.
+EC_FLAT_BASE    = 150   # EC
+KHARMA_FLAT_BASE = 20   # Kharma (much rarer, optional on low tiers)
+
+# Keep GOLD_BY_TIER as a legacy fallback only — not used in new calculation
 GOLD_BY_TIER: Dict[str, Tuple[int, int]] = {
     "local":         (50, 150),
     "patrol":        (75, 200),
@@ -32,6 +38,42 @@ GOLD_BY_TIER: Dict[str, Tuple[int, int]] = {
     "divine":        (2500, 6000),
     "tower":         (3000, 8000),
 }
+
+# Difficulty circle level relative to yellow (baseline = 0).
+# 🟢 green = -1 | 🟡 yellow = 0 | 🟠 orange = +1 | 🔴 red = +2 | 🟣 purple = +3
+DIFFICULTY_CIRCLE_LEVEL: Dict[str, int] = {
+    "local": -1, "patrol": -1,
+    "standard": 0, "escort": 0, "investigation": 0, "social": 0, "bounty": 0,
+    "rift": 1, "dungeon": 1, "major": 1, "combat": 1, "heist": 1,
+    "inter-guild": 2, "high-stakes": 2,
+    "epic": 3, "divine": 3, "tower": 3,
+}
+
+# Tiers that typically award Kharma (lower tiers skip it)
+KHARMA_TIERS = {"standard", "escort", "investigation", "social", "bounty",
+                 "rift", "dungeon", "major", "combat", "heist",
+                 "inter-guild", "high-stakes", "epic", "divine", "tower"}
+
+
+def scale_reward(base: int, cr: int, tier: str) -> int:
+    """
+    Scale a flat base reward by CR and difficulty circle.
+
+    Formula:  base × 1.1^cr × 1.2^diff_level
+      CR     = party level + encounter modifier (separate from difficulty tier)
+      diff   = -1 🟢 | 0 🟡 | +1 🟠 | +2 🔴 | +3 🟣
+
+    Examples (base=150 EC):
+      CR 4, yellow  → 150 × 1.46 × 1.00 = 219 EC
+      CR 4, orange  → 150 × 1.46 × 1.20 = 263 EC
+      CR 2, green   → 150 × 1.21 × 0.83 = 151 EC
+      CR 11, red    → 150 × 2.85 × 1.44 = 616 EC
+      CR 19, purple → 150 × 6.12 × 1.73 = 1590 EC
+    """
+    diff_level = DIFFICULTY_CIRCLE_LEVEL.get(tier.lower().strip(), 0)
+    cr_mult   = 1.1 ** max(cr, 0)
+    diff_mult = 1.2 ** diff_level
+    return max(1, int(base * cr_mult * diff_mult))
 
 # Reputation changes by outcome
 REP_CHANGES: Dict[str, Dict[str, int]] = {
@@ -145,44 +187,36 @@ def get_random_magic_item(cr: int, count: int = 1) -> List[str]:
     return random.sample(items, min(count, len(items)))
 
 
-def calculate_gold_reward(tier: str, party_size: int = 4, pc_level: int = 0) -> Tuple[int, int]:
+def calculate_gold_reward(tier: str, cr: int = 1, party_size: int = 4, pc_level: int = 0) -> Tuple[int, int]:
     """
-    Calculate gold reward range for a mission.
-    
-    CRITICAL FIX: Now scales with PC level.
-    - PC level 1-5:   1.0x multiplier (base reward)
-    - PC level 6-10:  1.2x multiplier
-    - PC level 11-15: 1.5x multiplier
-    - PC level 16-20: 2.0x multiplier (epic tier)
-    
+    Calculate EC reward range for a mission.
+
+    Uses flat base × 1.1^CR × 1.2^diff_level formula.
+    Range is ±30% around the central scaled value.
+
     Args:
-        tier: Mission tier (local, standard, epic, etc)
-        party_size: Number of PCs (affects per-member reward)
-        pc_level: Highest total PC level (used to scale reward)
-    
-    Returns:
-        (min, max) gold per player
+        tier:      Mission difficulty tier label
+        cr:        CR = party level + encounter modifier (separate from tier)
+        party_size / pc_level: legacy params, kept for compatibility
     """
-    base_min, base_max = GOLD_BY_TIER.get(tier.lower(), (150, 400))
-    
-    # Adjust for party size
-    size_multiplier = 4 / max(party_size, 1)
-    
-    # CRITICAL FIX: Scale by PC level
-    level_multiplier = 1.0
-    if pc_level >= 16:
-        level_multiplier = 2.0
-    elif pc_level >= 11:
-        level_multiplier = 1.5
-    elif pc_level >= 6:
-        level_multiplier = 1.2
-    
-    final_min = int(base_min * size_multiplier * level_multiplier)
-    final_max = int(base_max * size_multiplier * level_multiplier)
-    
-    if level_multiplier != 1.0:
-        logger.info(f"💰 Loot scaled by PC level {pc_level}: {level_multiplier}x multiplier ({tier} tier)")
-    
+    central = scale_reward(EC_FLAT_BASE, cr, tier)
+    final_min = int(central * 0.70)
+    final_max = int(central * 1.30)
+    logger.debug(f"💰 EC: central={central} → {final_min}-{final_max} (CR={cr}, tier={tier})")
+    return (final_min, final_max)
+
+
+def calculate_kharma_reward(tier: str, cr: int = 1) -> Tuple[int, int]:
+    """
+    Calculate Kharma reward range. Returns (0, 0) for green-circle tiers.
+    Hard ceiling: 1200 Kharma.
+    """
+    if tier.lower().strip() not in KHARMA_TIERS:
+        return (0, 0)
+    central = scale_reward(KHARMA_FLAT_BASE, cr, tier)
+    final_min = int(central * 0.70)
+    final_max = min(int(central * 1.30), 1200)
+    final_min = min(final_min, final_max)
     return (final_min, final_max)
 
 
@@ -205,22 +239,31 @@ def format_rewards_block(
     
     Returns formatted text block for AI prompts.
     """
-    gold_min, gold_max = calculate_gold_reward(tier, pc_level=pc_level)
+    ec_min, ec_max = calculate_gold_reward(tier, cr=cr, pc_level=pc_level)
+    kh_min, kh_max = calculate_kharma_reward(tier, cr=cr)
     item_tier = get_magic_item_tier(cr)
     sample_items = get_random_magic_item(cr, count=3)
-    
+
+    reward_line = f"**EC Payment**: {ec_min}–{ec_max} EC (total, split between party)"
+    if kh_max > 0:
+        kh_line = f"**Kharma**: {kh_min}–{kh_max} Kharma per character who participated"
+    else:
+        kh_line = "**Kharma**: None (this tier does not typically award Kharma)"
+
     lines = [
         "## Rewards",
+        f"*(Scaled: CR {cr}, {tier} tier — 1.1^CR × 1.2^diff_level)*",
         "",
-        f"**Mission Payment**: {gold_min}-{gold_max} gp per party member",
+        reward_line,
+        kh_line,
         f"**Magic Item Tier**: {item_tier.replace('_', ' ').title()}",
         "",
         "### Treasure Options (pick 1-2):",
     ]
-    
+
     for item in sample_items:
         lines.append(f"  - {item}")
-    
+
     lines.extend([
         "",
         "### Faction Reputation",
@@ -228,21 +271,15 @@ def format_rewards_block(
         "  - Success: +5 reputation",
         "  - Partial Success: +2 reputation",
         "  - Failure: -3 reputation",
-        "",
-        "### Bonus Rewards (for exceptional play)",
-        "  - Discovering hidden information: +50-100 gp",
-        "  - Saving innocent lives: +1 faction rep, possible contact NPC",
-        "  - Exposing faction corruption: Variable (could be positive or negative)",
-        "  - Creative non-combat solution: +1 rep, DM inspiration award",
     ])
-    
+
     if mission_reward_text:
         lines.extend([
             "",
             "### Mission-Specific Rewards",
             mission_reward_text,
         ])
-    
+
     return "\n".join(lines)
 
 
@@ -362,7 +399,7 @@ def build_loot_table(
         magic_item_chance: Probability of magic item (0-1)
         pc_level: Highest total PC level (for scaling)
     """
-    gold_min, gold_max = calculate_gold_reward(tier, pc_level=pc_level)
+    gold_min, gold_max = calculate_gold_reward(tier, cr=cr, pc_level=pc_level)
     item_tier = get_magic_item_tier(cr)
     
     lines = [

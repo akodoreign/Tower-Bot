@@ -3,6 +3,9 @@ from enum import Enum
 from typing import List, Dict, Tuple, Optional
 import re
 import math
+import threading
+
+from src.log import logger
 
 # ---------------------------------------------------------------------------
 # Paths & caches
@@ -11,11 +14,10 @@ import math
 # campaign_docs lives at project_root/campaign_docs
 DOCS_DIR = Path(__file__).resolve().parent.parent / "campaign_docs"
 
-_docs_cache: Optional[List[Tuple[str, str]]] = None
-_chunks_cache: Optional[List[str]] = None
-_chunk_terms_cache: Optional[List[Dict[str, int]]] = None
-_idf_cache: Optional[Dict[str, float]] = None
-_include_rules_cache: Optional[bool] = None  # tracks whether index was built with rules docs included
+# Per-mode TF-IDF index cache: {include_rules: {"docs":..., "chunks":..., "chunk_terms":..., "idf":...}}
+# Keyed by include_rules bool so rules/lore mode alternation doesn't force a rebuild every call.
+_caches: Dict[bool, dict] = {}
+_cache_lock = threading.RLock()  # protects concurrent cold-cache builds
 
 
 # ---------------------------------------------------------------------------
@@ -248,8 +250,8 @@ def _load_docs(include_rules: bool) -> List[Tuple[str, str]]:
                     continue
                 texts.append((name, content))
             return texts
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"Tower RAG DB load failed; falling back to campaign_docs text files: {e}")
 
     # Fallback: files
     if not DOCS_DIR.exists():
@@ -298,56 +300,44 @@ def _chunk_text(text: str, chunk_size: int = 1400, overlap: int = 300) -> List[s
 
 def _ensure_index(include_rules: bool) -> None:
     """
-    Build and cache:
-      - _docs_cache:        list of (filename, full_text)
-      - _chunks_cache:      list of chunk strings
-      - _chunk_terms_cache: list of {term: tf} dicts per chunk
-      - _idf_cache:         {term: idf} across all chunks
-
-    We keep a separate index mode depending on whether rules docs (PHB) are
-    allowed. If include_rules changes, we rebuild the index.
+    Build and cache the TF-IDF index for the given rules-inclusion mode.
+    Uses a threading.RLock so concurrent cold-cache hits don't build the
+    index twice. Keeps separate caches for rules/no-rules modes so switching
+    between them doesn't force a rebuild on every alternating query.
     """
-    global _docs_cache, _chunks_cache, _chunk_terms_cache, _idf_cache, _include_rules_cache
+    with _cache_lock:
+        if include_rules in _caches:
+            return  # already built for this mode
 
-    # If we've already built an index with the correct include_rules mode, skip
-    if (
-        _chunks_cache is not None
-        and _chunk_terms_cache is not None
-        and _idf_cache is not None
-        and _include_rules_cache == include_rules
-    ):
-        return
+        docs = _load_docs(include_rules=include_rules)
+        chunks: List[str] = []
+        chunk_terms: List[Dict[str, int]] = []
+        df: Dict[str, int] = {}
 
-    docs = _load_docs(include_rules=include_rules)
-    chunks: List[str] = []
-    chunk_terms: List[Dict[str, int]] = []
-    df: Dict[str, int] = {}  # document frequency per term
+        for _, text in docs:
+            for ch in _chunk_text(text):
+                if not ch:
+                    continue
+                chunks.append(ch)
+                terms: Dict[str, int] = {}
+                for tok in _tokenize(ch):
+                    terms[tok] = terms.get(tok, 0) + 1
+                chunk_terms.append(terms)
+                for term in terms.keys():
+                    df[term] = df.get(term, 0) + 1
 
-    for _, text in docs:
-        for ch in _chunk_text(text):
-            if not ch:
-                continue
-            chunks.append(ch)
-            terms: Dict[str, int] = {}
-            for tok in _tokenize(ch):
-                terms[tok] = terms.get(tok, 0) + 1
-            chunk_terms.append(terms)
-            # update document frequency for each distinct term in this chunk
-            for term in terms.keys():
-                df[term] = df.get(term, 0) + 1
+        N = max(len(chunks), 1)
+        idf: Dict[str, float] = {
+            term: math.log((N + 1) / (d + 1)) + 1.0
+            for term, d in df.items()
+        }
 
-    # Build IDF cache
-    N = max(len(chunks), 1)
-    idf: Dict[str, float] = {}
-    for term, d in df.items():
-        # standard idf-style formula, smoothed
-        idf[term] = math.log((N + 1) / (d + 1)) + 1.0
-
-    _docs_cache = docs
-    _chunks_cache = chunks
-    _chunk_terms_cache = chunk_terms
-    _idf_cache = idf
-    _include_rules_cache = include_rules
+        _caches[include_rules] = {
+            "docs": docs,
+            "chunks": chunks,
+            "chunk_terms": chunk_terms,
+            "idf": idf,
+        }
 
 
 def _tfidf_score(query_terms: List[str], chunk_terms: Dict[str, int], idf: Dict[str, float]) -> float:
@@ -383,7 +373,11 @@ def get_relevant_chunks(query: str, top_k: int = 8) -> List[str]:
     include_rules = _is_rules_question(query)
     _ensure_index(include_rules=include_rules)
 
-    if not _chunks_cache or not _chunk_terms_cache or not _idf_cache:
+    cache = _caches.get(include_rules, {})
+    chunks_cache = cache.get("chunks")
+    chunk_terms_cache = cache.get("chunk_terms")
+    idf_cache = cache.get("idf")
+    if not chunks_cache or not chunk_terms_cache or not idf_cache:
         return []
 
     query_terms = _tokenize(query)
@@ -391,9 +385,9 @@ def get_relevant_chunks(query: str, top_k: int = 8) -> List[str]:
         return []
 
     scored = []
-    for idx, ch in enumerate(_chunks_cache):
-        chunk_terms = _chunk_terms_cache[idx]
-        s = _tfidf_score(query_terms, chunk_terms, _idf_cache)
+    for idx, ch in enumerate(chunks_cache):
+        chunk_terms = chunk_terms_cache[idx]
+        s = _tfidf_score(query_terms, chunk_terms, idf_cache)
         if s > 0:
             scored.append((s, ch))
 
@@ -494,7 +488,7 @@ def build_context_from_messages(
     - Lore mode (default): Tower lore only, conversational DM voice,
       with concise answers unless the user explicitly asks for more.
 
-    If there are no user messages at all, returns "" (no extra context).
+    If there are no user messages at all, returns — (no extra context).
     """
     if not messages:
         return ""
