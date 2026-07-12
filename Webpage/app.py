@@ -1346,10 +1346,18 @@ def _is_external():
 
 
 def _pin_ok(data: dict | None = None) -> bool:
-    """Validate the dashboard action PIN for external requests."""
-    expected = os.getenv("DASHBOARD_EXTERNAL_PIN", "86753").strip()
+    """Validate the dashboard action PIN for external (Cloudflare tunnel) requests.
+
+    Fail-CLOSED: if no DASHBOARD_EXTERNAL_PIN is configured, external actions are
+    DENIED. (The old code fell back to a hardcoded default that ended up in the
+    public repo, and an empty PIN silently allowed every external action.)
+    Local-network requests never reach here — _is_external() is False for them.
+    """
+    import hmac
+    expected = os.getenv("DASHBOARD_EXTERNAL_PIN", "").strip()
     if not expected:
-        return True
+        logger.warning("Dashboard external action denied: DASHBOARD_EXTERNAL_PIN not set")
+        return False
     data = data or {}
     supplied = (
         data.get("pin")
@@ -1357,7 +1365,7 @@ def _pin_ok(data: dict | None = None) -> bool:
         or request.args.get("pin")
         or ""
     )
-    return str(supplied).strip() == expected
+    return hmac.compare_digest(str(supplied).strip(), expected)
 
 
 @app.route("/api/view-mode")
