@@ -1543,3 +1543,35 @@ lesson, num_ctx fitting, gate self-poisoning, Mimir-not-memory rules source, pea
 window, dashboard security model, outage caps, git hygiene, BOM note) and the Butterfly
 section now documents the outcomes-feed-generation, crew-blood-price, and party-lifecycle
 chains.
+
+---
+
+## 2026-07-13 - DONE: loop-health observability (/api/loop-health + World Loops dashboard card)
+
+WHY: /api/status shows SERVICE health (Ollama/A1111/DB/Discord/Mimir up?) but nothing tracked
+whether the ~15 background LOOPS actually ran. This bot's signature failure mode: the hourly
+news bulletin died silently for 30+ hours behind green services, and the party lifecycle sat
+unwired for six weeks -- both invisible on the dashboard.
+
+BUILT:
+- src/loop_health.py: `loop_heartbeats` table (real columns per CLAUDE.md JSON rule; survives
+  restarts). record_loop_heartbeat(name, ok, note) upserts last_run/ok/note/run_count/fail_count
+  (never raises -- instrumentation can't take a loop down). get_loop_health() verdicts each loop
+  vs EXPECTED (label + overdue threshold ~2.5x cadence): ok / failing / overdue / never-ran,
+  worst-first. never-ran surfaces the exact party-lifecycle failure mode (a loop that was never
+  wired shows immediately).
+- Instrumented all 15 loops: aclient gets a `self._beat()` helper + beats at each pass boundary
+  (news_feed, mission_board, personal_missions, discord_heartbeat, towerbot_world_shop/item_art,
+  chat_reminder, story_images, npc_portraits, npc_lifecycle, party_lifecycle, log_cleanup,
+  ad_feed); character_monitor beats inside its own 30-min poll (character_monitor.py); db_backup
+  beats in db_backup.py. ok/note carry failure context where the loop already try/excepts.
+- Webpage/app.py: /api/loop-health (loops + summary + worst). Dashboard "World Loops" panel
+  under Backend Services: one row/loop, colour by status (green ok / amber failing / red
+  overdue|never-ran with glow), "42m ago" / "overdue" / "never ran", note on hover, header
+  summary "N need attention". Polls every 60s.
+
+VERIFIED: 33 tests pass (new tests/test_loop_health.py: fresh-boot all-never-ran, ok, overdue
+at 6h vs 3h threshold, failing, worst-first order, record-never-raises; + regressions). Live
+endpoint 200, table auto-created, all 15 loops correctly never-ran pre-restart. Bot + dashboard
+import clean. On restart day this becomes the single pane to watch loops report in.
+CLAUDE.md schema map + MAP note updated.

@@ -150,7 +150,17 @@ async def db_backup_loop() -> None:
             loop = asyncio.get_event_loop()
             backup_path = await loop.run_in_executor(None, run_backup)
             logger.info(f"💾 Backup loop: next run in 24 hours (last: {backup_path.name})")
+            _beat_backup(True, backup_path.name)
         except Exception as e:
             logger.error(f"💾 DB backup failed: {e}")
+            _beat_backup(False, str(e)[:120])
 
         await asyncio.sleep(BACKUP_INTERVAL)
+
+
+def _beat_backup(ok: bool, note: str) -> None:
+    try:
+        from src.loop_health import record_loop_heartbeat
+        record_loop_heartbeat("db_backup", ok=ok, note=note)
+    except Exception:
+        pass

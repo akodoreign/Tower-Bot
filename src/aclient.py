@@ -176,6 +176,15 @@ class DiscordClient(discord.Client):
                             self.message_queue.task_done()
             await asyncio.sleep(1)
 
+    def _beat(self, name: str, ok: bool = True, note: str = "") -> None:
+        """Record a background-loop heartbeat (see src/loop_health.py). Safe no-op
+        on failure so instrumentation can never take a loop down."""
+        try:
+            from src.loop_health import record_loop_heartbeat
+            record_loop_heartbeat(name, ok=ok, note=note)
+        except Exception:
+            pass
+
     async def towerbot_world_shop_loop(self):
         """Send queued web-only TowerBot purchase requests to the DM."""
         await self.wait_until_ready()
@@ -187,6 +196,9 @@ class DiscordClient(discord.Client):
                     logger.info(f"TowerBot world shop DM request(s) sent: {sent}")
             except Exception as e:
                 logger.warning(f"TowerBot world shop loop error: {e}")
+                self._beat("towerbot_world_shop", ok=False, note=str(e)[:120])
+            else:
+                self._beat("towerbot_world_shop")
             await asyncio.sleep(60)
 
     async def towerbot_item_art_loop(self):
@@ -201,6 +213,9 @@ class DiscordClient(discord.Client):
                     logger.info(f"TowerBot item art generated: {made}")
             except Exception as e:
                 logger.warning(f"TowerBot item art loop error: {e}")
+                self._beat("towerbot_item_art", ok=False, note=str(e)[:120])
+            else:
+                self._beat("towerbot_item_art")
             await asyncio.sleep(30 * 60)
 
     async def discord_heartbeat_loop(self):
@@ -217,6 +232,7 @@ class DiscordClient(discord.Client):
                 })
             except Exception:
                 pass
+            self._beat("discord_heartbeat")
             await asyncio.sleep(60)
 
     async def _dispatch_calendar_bulletins(self, channel, source_label: str) -> int:
@@ -357,6 +373,7 @@ class DiscordClient(discord.Client):
                 channel = self.get_channel(int(discord_channel_id))
                 if channel is None:
                     logger.warning(f"📰 News feed: channel {discord_channel_id} not found — skipping.")
+                    self._beat("news_feed", ok=False, note="channel not found")
                     continue
 
                 # 35% chance to use new agent-based editorial system
@@ -495,8 +512,10 @@ class DiscordClient(discord.Client):
                 except Exception as e:
                     logger.exception(f"📰 News type daily refresh error: {e}")
 
+                self._beat("news_feed")
             except Exception as e:
                 logger.exception(f"📰 News feed error: {e}")
+                self._beat("news_feed", ok=False, note=str(e)[:120])
 
     async def mission_board_loop(self):
         """Post missions to the dedicated board channel, check expirations hourly."""
@@ -562,6 +581,7 @@ class DiscordClient(discord.Client):
             await asyncio.sleep(60)  # tick every minute
             elapsed += 60
             tick_count += 1
+            self._beat("mission_board")
 
             # Check dashboard module-gen queue (written by /api/claim-mission)
             try:
@@ -809,6 +829,7 @@ class DiscordClient(discord.Client):
         while not self.is_closed():
             await asyncio.sleep(60)
             elapsed += 60
+            self._beat("personal_missions")
 
             characters = _load_characters()  # reload in case file updated
             for char in characters:
@@ -895,8 +916,10 @@ class DiscordClient(discord.Client):
                     reminder = random.choice(REMINDERS)
                     await channel.send(embed=wrap_bulletin(reminder, "reminder"), view=make_bulletin_view(reminder, "reminder", source_attribution="Tower Oracle"))
                     logger.info("💬 Chat reminder posted")
+                self._beat("chat_reminder")
             except Exception as e:
                 logger.warning(f"💬 Chat reminder error: {e}")
+                self._beat("chat_reminder", ok=False, note=str(e)[:120])
 
             await asyncio.sleep(random.randint(MIN_INTERVAL, MAX_INTERVAL))
 
@@ -971,14 +994,17 @@ class DiscordClient(discord.Client):
                         embed.set_image(url="attachment://undercity_scene.png")
                         await channel.send(file=file, embed=embed)
                         logger.info("🖼️ Story image posted via local A1111")
+                        self._beat("story_images")
                         interval = next_image_interval_seconds()
                         logger.info(f"🖼️ Next story image in {interval // 3600}h {(interval % 3600) // 60}m")
                         await asyncio.sleep(interval)
                     else:
                         logger.warning("🖼️ A1111 returned no image — retrying in 10 minutes")
+                        self._beat("story_images", ok=False, note="A1111 returned no image")
                         await asyncio.sleep(600)
             except Exception as e:
                 logger.warning(f"🖼️ Story image loop error: {e!r} — retrying in 10 minutes")
+                self._beat("story_images", ok=False, note=str(e)[:120])
                 await asyncio.sleep(600)
 
     async def npc_portrait_loop(self):
@@ -1101,6 +1127,7 @@ class DiscordClient(discord.Client):
                             f"📅 Startup calendar tick after NPC portrait error failed: {cal_exc}"
                         )
 
+            self._beat("npc_portraits")
             # Every 6-9 hours — slowed from 2.5-3.5h on 2026-07-12 (images were
             # posting too fast; A1111 GPU draw matters under peak power pricing).
             interval = random.randint(6 * 3600, 9 * 3600)
@@ -1216,6 +1243,7 @@ class DiscordClient(discord.Client):
                 await asyncio.sleep(retry_seconds)
                 continue
 
+            self._beat("npc_lifecycle", note="daily lifecycle pass complete")
             interval = next_lifecycle_seconds()
             logger.info(f"🧬 Next NPC lifecycle in {interval // 3600}h {(interval % 3600) // 60}m")
             await asyncio.sleep(interval)
@@ -1270,6 +1298,7 @@ class DiscordClient(discord.Client):
             if lines:
                 logger.info("\U0001f6e1️ Party lifecycle: " + "; ".join(lines))
 
+            self._beat("party_lifecycle", note=("; ".join(lines)[:180] if lines else "no crew movements this pass"))
             # Daily-ish cadence with jitter, same spirit as the NPC lifecycle.
             interval = random.randint(20 * 3600, 28 * 3600)
             logger.info(f"\U0001f6e1️ Next party lifecycle in {interval // 3600}h {(interval % 3600) // 60}m")
@@ -1340,6 +1369,8 @@ class DiscordClient(discord.Client):
                 except Exception as e:
                     logger.warning(f"🧹 Log cleanup error on {log_path.name}: {e}")
 
+            self._beat("log_cleanup")
+
     async def _self_learning_loop(self):
         """Wrapper to start the self-learning background loop."""
         await self.wait_until_ready()
@@ -1389,8 +1420,10 @@ class DiscordClient(discord.Client):
                         )
                         await channel.send(embed=embed, view=view)
                         logger.info(f"📢 Ad posted: {ad['shop_name']} ({ad['district']})")
+                self._beat("ad_feed")
             except Exception as e:
                 logger.exception(f"📢 Ad loop error: {e}")
+                self._beat("ad_feed", ok=False, note=str(e)[:120])
 
             await asyncio.sleep(30 * 60)  # check every 30 minutes
 

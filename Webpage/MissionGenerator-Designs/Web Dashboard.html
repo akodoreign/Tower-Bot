@@ -904,6 +904,11 @@
       <div class="backend-row"><i class="dot ok"></i><b>Discord</b><span class="m">gateway</span></div>
       <div class="backend-row"><i class="dot ok"></i><b>MySQL</b><span class="m">connected</span></div>
     </div>
+
+    <div class="backend" style="margin-top:10px;">
+      <h5 style="display:flex;align-items:center;gap:6px;">World Loops <span id="loop-health-summary" style="margin-left:auto;font-size:10px;color:rgba(244,234,213,.45);"></span></h5>
+      <div id="loop-health-list"><div class="backend-row"><span class="m">loading…</span></div></div>
+    </div>
   </aside>
 
 
@@ -1865,8 +1870,48 @@ async function pollStatus() {
     });
   } catch (_) { /* backend not running — dots stay as-is */ }
 }
+
+function _agoText(sec) {
+  if (sec == null) return "never";
+  if (sec < 90) return sec + "s ago";
+  if (sec < 5400) return Math.round(sec / 60) + "m ago";
+  if (sec < 172800) return Math.round(sec / 3600) + "h ago";
+  return Math.round(sec / 86400) + "d ago";
+}
+
+async function pollLoopHealth() {
+  const list = document.getElementById("loop-health-list");
+  const sum  = document.getElementById("loop-health-summary");
+  if (!list) return;
+  try {
+    const d = await (await fetch(API + "/loop-health")).json();
+    const loops = d.loops || [];
+    if (!loops.length) { list.innerHTML = `<div class="backend-row"><span class="m">no data</span></div>`; return; }
+    const colour = { "ok": "var(--sage,#7a9a6a)", "overdue": "var(--rust,#c0392b)",
+                     "failing": "#e6b800", "never-ran": "var(--rust,#c0392b)" };
+    list.innerHTML = loops.map(l => {
+      const c = colour[l.status] || "rgba(244,234,213,.45)";
+      const glow = (l.status === "overdue" || l.status === "never-ran")
+        ? "box-shadow:0 0 0 3px rgba(192,57,43,.22);" : "";
+      const meta = l.status === "never-ran" ? "never ran"
+                 : (_agoText(l.age_seconds) + (l.status === "overdue" ? " · overdue" : (l.status === "failing" ? " · error" : "")));
+      const t = l.note ? ` title="${(l.note+"").replace(/"/g,"&quot;")}"` : "";
+      return `<div class="backend-row"${t}><i class="dot" style="background:${c};${glow}"></i><b>${l.label}</b><span class="m">${meta}</span></div>`;
+    }).join("");
+    if (sum) {
+      const s = d.summary || {};
+      const bad = (s.overdue || 0) + (s.never_ran || 0);
+      sum.textContent = bad ? `${bad} need attention` : `all ${s.ok || 0} healthy`;
+      sum.style.color = bad ? "var(--rust,#c0392b)" : "rgba(244,234,213,.45)";
+    }
+  } catch (_) {
+    list.innerHTML = `<div class="backend-row"><span class="m">unreachable</span></div>`;
+  }
+}
 pollStatus();
 setInterval(pollStatus, 30000);
+pollLoopHealth();
+setInterval(pollLoopHealth, 60000);
 
 /* ── Generate mission button — handled in wiring block below ────────── */
 

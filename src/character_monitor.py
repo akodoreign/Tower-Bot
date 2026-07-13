@@ -533,6 +533,12 @@ async def run_character_monitor(channel) -> None:
             f"📊 Poll complete: {success} ok, {changed} changed, {failed} failed. "
             f"Next in {POLL_INTERVAL // 60}m"
         )
+        try:
+            from src.loop_health import record_loop_heartbeat
+            record_loop_heartbeat("character_monitor", ok=(failed == 0),
+                                  note=f"{success} ok, {changed} changed, {failed} failed")
+        except Exception:
+            pass
         await asyncio.sleep(POLL_INTERVAL)
 
 

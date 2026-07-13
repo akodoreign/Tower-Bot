@@ -342,6 +342,34 @@ def api_status():
     })
 
 
+@app.route("/api/loop-health")
+def api_loop_health():
+    """Per-loop heartbeat verdicts (see src/loop_health.py). Answers 'did the
+    background loops actually run?' — the layer above /api/status's service checks.
+    """
+    try:
+        from src.loop_health import get_loop_health
+        loops = get_loop_health()
+    except Exception as e:
+        return jsonify({"loops": [], "error": str(e)})
+    summary = {"ok": 0, "overdue": 0, "failing": 0, "never_ran": 0}
+    for row in loops:
+        if row["status"] == "ok":
+            summary["ok"] += 1
+        elif row["status"] == "overdue":
+            summary["overdue"] += 1
+        elif row["status"] == "failing":
+            summary["failing"] += 1
+        elif row["status"] == "never-ran":
+            summary["never_ran"] += 1
+    worst = "ok"
+    if summary["never_ran"] or summary["overdue"]:
+        worst = "alert"
+    elif summary["failing"]:
+        worst = "warn"
+    return jsonify({"loops": loops, "summary": summary, "worst": worst})
+
+
 # ---------------------------------------------------------------------------
 # /api/missions — active missions
 # ---------------------------------------------------------------------------
