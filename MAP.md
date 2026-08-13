@@ -8,6 +8,38 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 
 ---
 
+## Where the campaign data actually lives
+
+MySQL (`tower_bot`) is authoritative — **65 tables** as of 2026-08-13. Read via
+`src/db_api.py` (`raw_query`, `raw_execute`, `get_global_state`, `set_global_state`).
+The full annotated table map lives in `CLAUDE.md` under "Live MySQL Schema Map".
+
+**NOTE:** `CLAUDE.md` is gitignored (`.gitignore:29`), so it does NOT survive a fresh
+clone. Regenerate the table map by dumping `information_schema`; never hand-edit counts.
+
+Fast orientation to the tables you will actually touch:
+
+| I need... | table | notes |
+|---|---|---|
+| a mission | `missions` (1063) | `difficulty` is a real column, ABSENT from `mission_json` on ~2/3 of rows |
+| what a mission did to the world | `mission_outcomes` (761) | `notable_moments` holds the bulletin as posted — strip formatting before prompting |
+| who plays the contact | `mission_cast` | written by `npc_dossier.cast_mission_contact()` |
+| a person | `npcs` (250) | `relationships` is sometimes a JSON map, sometimes prose |
+| who matters to whom | `npc_bonds` (84) | death does not close a bond; it becomes `mourning` + a stance |
+| what happened to a person | `npc_history` (888) | `add_npc_history_event(npc_id, body, date, event_type)` — body is SECOND |
+| a monster | `monsters` (348) | via `mission_builder/monster_roster.py`; size CR with `cr_scaling.mission_cr()` |
+| who leads a faction | `faction_reputation` (45) | authoritative; a hardcoded map must never outrank it |
+| a battle map | `battle_maps_library` (260) | via `battle_map_library.get_battle_map()` |
+| did the loops run | `loop_heartbeats` (15) | add an `EXPECTED` entry in `loop_health.py` for any new loop |
+
+**Reserved words:** `rank` and `role` need backticks in MySQL 8.
+
+**JSON blobs mirror real columns** (`data_json`, `mission_json`, `profile_json`) and drift.
+The column wins: apply the blob first, then overlay columns — never `dict.update(blob)`.
+`src/world_integrity.py` detects and repairs the drift.
+
+---
+
 ## src/ — Core Modules
 
 ### Bot Infrastructure
