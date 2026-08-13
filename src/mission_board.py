@@ -321,6 +321,9 @@ def _load_missions() -> List[dict]:
                 "title": row.get("title") or mission_data.get("title", "Unknown"),
                 "faction": row.get("faction") or mission_data.get("faction", ""),
                 "tier": row.get("tier") or mission_data.get("tier", "standard"),
+                # Authoritative column; most older rows have no `difficulty`
+                # inside mission_json at all.
+                "difficulty": row.get("difficulty") or mission_data.get("difficulty"),
                 "status": row.get("status") or "active",
                 "message_id": _msg_id,
                 "player_claimer": row.get("claimed_by") or mission_data.get("player_claimer", ""),
@@ -366,6 +369,10 @@ def _load_mission_by_id(mission_id: int) -> Optional[dict]:
             "title": row.get("title") or mission_data.get("title", "Unknown"),
             "faction": row.get("faction") or mission_data.get("faction", ""),
             "tier": row.get("tier") or mission_data.get("tier", "standard"),
+            # The column is authoritative and always populated; mission_json is
+            # missing `difficulty` on most older rows, so a pipeline reading only
+            # the blob saw no difficulty at all and scaled to the default.
+            "difficulty": row.get("difficulty") or mission_data.get("difficulty"),
             "status": row.get("status") or "active",
             "message_id": _msg_id,
             "player_claimer": row.get("claimed_by") or mission_data.get("player_claimer", ""),

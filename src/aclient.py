@@ -156,6 +156,7 @@ class DiscordClient(discord.Client):
         loop.create_task(self.npc_portrait_loop())
         loop.create_task(self.npc_lifecycle_loop())
         loop.create_task(self.party_lifecycle_loop())
+        loop.create_task(self.social_pulse_loop())
         loop.create_task(self.character_monitor_loop())
         loop.create_task(self._self_learning_loop())
         loop.create_task(db_backup_loop())
@@ -1302,6 +1303,88 @@ class DiscordClient(discord.Client):
             # Daily-ish cadence with jitter, same spirit as the NPC lifecycle.
             interval = random.randint(20 * 3600, 28 * 3600)
             logger.info(f"\U0001f6e1️ Next party lifecycle in {interval // 3600}h {(interval % 3600) // 60}m")
+            await asyncio.sleep(interval)
+
+    async def social_pulse_loop(self):
+        """The world's private life: people pair off, people grieve, people argue.
+
+        Runs three things in ascending cost order:
+          1. world_integrity  -- pure DB. Catches the world contradicting itself
+             (the Adventurers Guild spent two months led by a corpse because
+             nothing compared faction_reputation.leader against npcs.status).
+          2. social_tick      -- pure DB. Courtships form and deepen.
+          3. daily_voices     -- the only GPU work: an obituary voiced by whoever
+             loved them most, or an interview, forum argument, or union notice.
+
+        Capped per pass so a long outage drains as a stream rather than a storm,
+        and gated on the weekday peak-rate window like every other discretionary
+        GPU loop.
+        """
+        discord_channel_id = os.getenv("DISCORD_CHANNEL_ID")
+        await self.wait_until_ready()
+        # Sit well clear of the NPC (45m) and party (90m) lifecycle ticks so the
+        # three never contend for Ollama on boot.
+        await asyncio.sleep(150 * 60)
+
+        logger.info("\U0001f56f️ Social pulse loop started")
+
+        while not self.is_closed():
+            notes: list[str] = []
+            posted = 0
+            try:
+                # 1. Integrity first -- never build stories on a contradictory world.
+                from src.world_integrity import run_all, repair, summarise
+                findings = run_all()
+                if findings:
+                    fixed = repair(findings)
+                    logger.info(f"\U0001f56f️ {summarise(findings)}"
+                                + (f" | auto-repaired {len(fixed)}" if fixed else ""))
+                    unresolved = [f for f in run_all()]
+                    if unresolved:
+                        logger.warning(f"\U0001f56f️ needs a human: {summarise(unresolved)}")
+
+                # 2. Affections advance. Cheap, no model.
+                from src.npc_bonds import ensure_schema, social_tick
+                ensure_schema()
+                notes = social_tick(max_new=2) or []
+
+                # 3. The world says something out loud.
+                delay = _peak_power_delay_seconds()
+                if delay:
+                    logger.info(f"\U0001f56f️ Peak-rate window -- skipping voiced "
+                                f"bulletins for {delay // 60}m")
+                else:
+                    from src.tower_news_voices import daily_voices
+                    for news_type, text in await daily_voices(max_items=2):
+                        if not (text and discord_channel_id):
+                            continue
+                        try:
+                            channel = self.get_channel(int(discord_channel_id))
+                            if channel:
+                                await channel.send(
+                                    embed=wrap_bulletin(text, "news"),
+                                    view=make_bulletin_view(
+                                        text, "news",
+                                        source_attribution="Tower News Network"),
+                                )
+                                posted += 1
+                        except Exception as post_err:
+                            logger.warning(f"\U0001f56f️ Could not post {news_type}: {post_err}")
+            except Exception as e:
+                logger.exception(f"\U0001f56f️ Social pulse error: {e}")
+                self._beat("social_pulse", ok=False, note=str(e)[:180])
+                await asyncio.sleep(60 * 60)
+                continue
+
+            if notes:
+                logger.info("\U0001f56f️ " + "; ".join(notes))
+
+            summary = "; ".join(notes)[:140] if notes else "no new attachments"
+            self._beat("social_pulse", note=f"{summary} | {posted} bulletin(s)")
+
+            interval = random.randint(20 * 3600, 28 * 3600)
+            logger.info(f"\U0001f56f️ Next social pulse in {interval // 3600}h "
+                        f"{(interval % 3600) // 60}m")
             await asyncio.sleep(interval)
 
     async def log_cleanup_loop(self):

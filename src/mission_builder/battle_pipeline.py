@@ -1289,19 +1289,24 @@ async def build_battle_module(mission: dict, out_dir: Optional[Path] = None) -> 
                     for _e in _b_enemies:
                         if not _e.get("name"):
                             continue
+                        # Curated monsters are already on DDB with their real stats.
+                        # Re-pushing would just create a second, worse copy.
+                        if _e.get("ddb_url"):
+                            logger.debug(f"[DDB_HB] Already on DDB, skipping: {_e['name']!r}")
+                            continue
                         _cr = str(_e.get("cr", "1"))
                         try:
                             _cr_num = float(_cr.replace("1/8", "0.125").replace("1/4", "0.25").replace("1/2", "0.5"))
                         except Exception:
                             _cr_num = 1.0
-                        _prebuilt = {
+                        _prebuilt = dict(_e.get("statblock") or {}) or {
                             "hp":            _e.get("hp") or max(1, int(_cr_num * 13 + 7)),
                             "ac":            _e.get("ac") or max(10, min(18, int(_cr_num + 12))),
                             "creature_type": _e.get("creature_type", "humanoid"),
                             "speed":         _e.get("speed", "30 ft."),
                         }
                         _atks = _e.get("attacks", [])
-                        if _atks:
+                        if _atks and not _prebuilt.get("actions"):
                             _prebuilt["actions"] = "\n\n".join(
                                 f"**{a.split('.')[0]}.** {'.'.join(a.split('.')[1:]).strip()}"
                                 if '.' in a else f"**Attack.** {a}"

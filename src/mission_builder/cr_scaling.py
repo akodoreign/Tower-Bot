@@ -50,6 +50,12 @@ TIER_CR_OFFSET: Dict[str, int] = {
 _DEFAULT_OFFSET = 0  # fallback for unknown tiers
 _BASE_PARTY_CR_BONUS = 4
 
+# Numeric difficulty (1-10, 5 = standard) -> the scale band pipelines tune against.
+# Pipelines keep their OWN band tables (a defense band means waves, an assault band
+# means defender strength); this only decides WHICH band a mission lands in.
+_DIFFICULTY_BANDS = ((5, "standard"), (7, "seasoned"), (9, "elite"))
+_TOP_BAND = "legend"
+
 
 # ---------------------------------------------------------------------------
 # Party strength — canonical, replaces all per-pipeline _party_strength()
@@ -154,3 +160,47 @@ def mission_cr(mission: dict) -> int:
         pass
 
     return max(1, min(30, avg + _BASE_PARTY_CR_BONUS + offset))
+
+
+# ---------------------------------------------------------------------------
+# Mission difficulty -- the numeric the board posts, and the band it maps to
+# ---------------------------------------------------------------------------
+
+def mission_difficulty(mission: dict) -> int:
+    """
+    Return this mission's numeric difficulty, 1-10, where 5 is standard.
+
+    The missions row stores `difficulty` as a string ('9'), so read it loosely.
+    When it is missing entirely, derive an equivalent from the named tier so a
+    tier-only mission still scales instead of silently landing on standard.
+    """
+    raw = mission.get("difficulty")
+    if raw in (None, ""):
+        raw = mission.get("diff")
+    try:
+        if raw not in (None, ""):
+            return max(1, min(10, int(float(raw))))
+    except (TypeError, ValueError):
+        pass
+
+    tier = (mission.get("tier") or mission.get("difficulty_label") or "standard").lower().strip()
+    return max(1, min(10, 5 + TIER_CR_OFFSET.get(tier, _DEFAULT_OFFSET)))
+
+
+def difficulty_band(mission: dict) -> str:
+    """
+    Map a mission onto the standard/seasoned/elite/legend ladder the pipelines
+    scale against.
+
+    Pipelines must key their scale tables off THIS, not off the raw tier string.
+    Tier names are open vocabulary ('high-stakes', 'divine', 'rift', 'tower',
+    'inter-guild'...) and a table keyed by tier silently fell through to
+    'standard' for every tier but one -- a difficulty 9 mission got built as a 5.
+
+    Bands: 1-5 standard | 6-7 seasoned | 8-9 elite | 10 legend.
+    """
+    value = mission_difficulty(mission)
+    for ceiling, band in _DIFFICULTY_BANDS:
+        if value <= ceiling:
+            return band
+    return _TOP_BAND

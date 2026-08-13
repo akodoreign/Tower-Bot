@@ -776,16 +776,25 @@ def _npc_context(mission: Dict) -> Dict:
         "contact_faction":    (mission.get("faction") or "").strip() or "the faction",
         "antagonist_faction": _opp or "the opposition",
     }
+    # Cast a REAL npcs row and carry their whole dossier. The old path did an
+    # exact-name get_npc() on a free-text string like "Guild Liaison Varek at
+    # Ironhold Outpost", matched nothing, and left the model improvising for a
+    # person with no past -- which is why the dialog read dry.
     try:
-        from src.db_api import get_npc
-        row = get_npc(ctx["contact_name"]) if ctx["contact_name"] != "your contact" else None
+        from src.npc_dossier import cast_mission_contact, dossier_block
+
+        row = cast_mission_contact(mission)
         if row:
-            ctx["contact_role"]  = str(row.get("rank") or row.get("motivation") or "").strip()[:80]
+            ctx["contact_name"]  = str(row.get("name") or ctx["contact_name"])
+            ctx["contact_role"]  = str(row.get("rank") or row.get("role") or "").strip()[:80]
             ctx["contact_quote"] = str(row.get("quote") or "").strip()[:160]
             if row.get("faction"):
                 ctx["contact_faction"] = str(row["faction"]).strip()
+            ctx["dossier"] = dossier_block(mission, row)
+            logger.info(f"[dialogs] cast {ctx['contact_name']!r} "
+                        f"({len(ctx['dossier'])} chars of dossier)")
     except Exception as e:
-        logger.debug(f"[dialogs] NPC lookup skipped: {e}")
+        logger.debug(f"[dialogs] NPC casting skipped: {e}")
     return ctx
 
 
@@ -810,22 +819,51 @@ def _build_module_dialog_prompt(mission: Dict, npc: Dict, grounding: str) -> str
     cvoice  = f' That NPC tends to speak like this: "{npc["contact_quote"]}"' if npc["contact_quote"] else ""
     faction = npc["contact_faction"]
     foe     = npc["antagonist_faction"]
+    dossier = npc.get("dossier") or ""
+    dossier_section = (
+        f"\nWHO YOU ARE PLAYING\n{dossier}\n"
+        if dossier else
+        f"\nPrimary NPC the party deals with: {contact}{crole}.{cvoice}\n"
+    )
+
     return f"""Mission: "{title}" (employer: {faction}; opposing side: {foe}).
-Primary NPC the party deals with: {contact}{crole}.{cvoice}
+{dossier_section}
 What happens in this module: {grounding}
 
 Write table-ready dialog the DM can run when players interact during THIS mission.
 Voice every NPC response as a NAMED speaker -- use {contact} for the employer/contact,
-and name {foe} for the opposing side. Tie each response to the mission's real stakes.
+and name {foe} for the opposing side.
+
+PLAY THE PERSON, NOT THE QUEST-GIVER. This is the difference between dialog a table
+remembers and dialog it skims. {contact} is not an information dispenser; they want
+something, they are protecting something, and this job costs them personally. Use the
+dossier above -- their history, their ties, what the world just did to their faction --
+as the material every line is made of. Reference a specific person, place, or past
+event from it rather than speaking in generalities. Never state their secret outright;
+let it pull on what they say and refuse to say.
+
+Across the 12 beats, you MUST include:
+  - one beat where {contact} deflects a question because the honest answer would cost
+    them something specific from the dossier
+  - one beat where their guard drops -- a moment of warmth, grief, humour, or plain
+    exhaustion that shows the person under the role
+  - one beat where what they SAY and what they WANT visibly disagree, and a DC for the
+    party to catch it
+  - one beat that lands on a named individual from their relationships or history --
+    someone they miss, resent, owe, or fear
+  - one beat where the party can hurt them by being careless, and one where kindness or
+    patience gets them further than a check would
+
+Concrete over abstract every time. "The Choir took my brother" beats "the opposition is
+dangerous". Short lines. Let them stop mid-sentence. Let them be wrong about something.
 
 Output valid JSON only, no markdown:
 {{
   "dialogs": [
     {{"trigger": "If players ask/do X", "response": "<named NPC> says or does Y (include a DC or mechanic where useful)"}}
-    -- exactly 12 entries covering: pressing {contact} for the real reason behind the job,
-       haggling pay, asking what is being withheld, threatening or bribing {contact},
-       asking about {foe}, asking about the location, who else was hired, what happens on failure,
-       a failed social check, refusing the job, a creative or unexpected approach, asking about risks
+    -- exactly 12 entries, each a distinct beat, together covering the required beats above
+       plus the practical ground: the real reason behind the job, pay, what is withheld,
+       {foe}, what happens on failure, and refusing or walking away
   ],
   "visual_clues": [
     {{"element": "specific thing seen/heard/smelled", "detail": "what it reveals and why it matters"}}

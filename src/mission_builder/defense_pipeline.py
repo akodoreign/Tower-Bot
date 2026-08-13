@@ -35,7 +35,12 @@ from typing import Optional, Dict, List, Any
 
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
-from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.cr_scaling import (
+    mission_cr,
+    difficulty_band,
+    mission_difficulty,
+    party_strength as _party_strength,
+)
 from src.mission_builder.monster_roster import faction_role_monsters, mission_enemy_entry
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
@@ -228,8 +233,15 @@ TIER_SCALES = {
     "legend":   {"morale_mult": 2.0, "grunt_bonus": 6,  "wave_count": 4},
 }
 
-def _tier_scale(tier: str) -> Dict:
-    return TIER_SCALES.get((tier or "standard").lower(), TIER_SCALES["standard"])
+def _tier_scale(mission: dict) -> Dict:
+    """Scale row for this mission, chosen by numeric difficulty.
+
+    Keyed off difficulty_band(), NOT the raw tier string: live tiers are
+    'high-stakes', 'divine', 'rift', 'tower', 'inter-guild' and friends, none of
+    which are rows here, so a tier lookup fell through to 'standard' and every
+    defense module was built at difficulty 5 no matter what the board posted.
+    """
+    return TIER_SCALES.get(difficulty_band(mission), TIER_SCALES["standard"])
 
 
 # ---------------------------------------------------------------------------
@@ -591,6 +603,8 @@ async def _generate_waves(
 
     prompt = f"""Write {wave_count} attack waves for a D&D defense mission module.
 
+Contract difficulty: {mission_difficulty(mission)}/10 ({difficulty_band(mission)}) — write the
+pressure to match; a high number means a disciplined, committed, costly assault.
 Attacker: {opposing} — {profile['tactics']}
 Army type: {army['label']} — {army['description']}
 Grunt type: {army['grunt_label']} (CR {army['grunt_cr']})
@@ -662,13 +676,28 @@ def _defense_enemy_type(army: Dict, profile: Dict) -> str:
     return "humanoid"
 
 
-def _defense_mimir_enemies(waves: List[Dict], army: Dict, profile: Dict) -> List[Dict]:
-    """Build defense-specific Mimir enemy entries from generated wave data."""
+def _defense_mimir_enemies(
+    waves: List[Dict],
+    army: Dict,
+    profile: Dict,
+    target_cr: int = 9,
+) -> List[Dict]:
+    """Build defense-specific Mimir enemy entries from generated wave data.
+
+    Ranks are picked relative to the mission's own encounter CR rather than at
+    fixed caps. The offsets below reproduce what the old hardcoded 3/6/8 caps
+    meant at a baseline standard mission (mission_cr 9) -- grunts well under the
+    party, lieutenants mid, commander near parity -- so a harder contract now
+    fields harder troops instead of the same CR 3 fodder.
+    """
     creature_type = _defense_enemy_type(army, profile)
     enemies: dict[tuple[str, str], Dict] = {}
-    db_grunt = (faction_role_monsters(["enforcer", "thug", "zealot", "scout"], count=1, cr_max=3) or [None])[0]
-    db_lt = (faction_role_monsters(["lieutenant", "priest", "mage", "duelist"], count=1, cr_max=6) or [None])[0]
-    db_commander = (faction_role_monsters(["captain", "champion", "quartermaster"], count=1, cr_max=8) or [None])[0]
+    grunt_cr_cap = max(1, target_cr - 6)
+    lt_cr_cap    = max(2, target_cr - 3)
+    cmd_cr_cap   = max(3, target_cr - 1)
+    db_grunt = (faction_role_monsters(["enforcer", "thug", "zealot", "scout"], count=1, cr_max=grunt_cr_cap, target_cr=grunt_cr_cap) or [None])[0]
+    db_lt = (faction_role_monsters(["lieutenant", "priest", "mage", "duelist"], count=1, cr_max=lt_cr_cap, target_cr=lt_cr_cap) or [None])[0]
+    db_commander = (faction_role_monsters(["captain", "champion", "quartermaster"], count=1, cr_max=cmd_cr_cap, target_cr=cmd_cr_cap) or [None])[0]
 
     def add_enemy(name: str, cr: str, count: int, note: str, db_monster: Dict | None = None) -> None:
         if count <= 0:
@@ -1150,9 +1179,10 @@ async def build_defense_module(mission: dict, out_dir: Optional[Path] = None) ->
 
     profile    = _get_profile(opposing)
     army       = ARMY_TYPES[profile["army_style"]]
-    tier_data  = _tier_scale(tier)
+    tier_data  = _tier_scale(mission)
     location   = _pick_location(faction)
     strength   = _party_strength()
+    target_cr  = mission_cr(mission)
 
     # Morale pool = base * tier multiplier, rounded to int
     morale_pool = max(5, int(
@@ -1160,7 +1190,11 @@ async def build_defense_module(mission: dict, out_dir: Optional[Path] = None) ->
         * tier_data["morale_mult"]
     ))
 
-    logger.info(f"[DEFENSE] Army={army['label']} | morale={morale_pool} | waves={tier_data['wave_count']} | location={location}")
+    logger.info(
+        f"[DEFENSE] Army={army['label']} | difficulty={mission_difficulty(mission)} "
+        f"({difficulty_band(mission)}) | CR={target_cr} | morale={morale_pool} "
+        f"| waves={tier_data['wave_count']} | location={location}"
+    )
 
     # Generate content concurrently where possible
     briefing_task      = asyncio.create_task(_generate_briefing(mission, location, profile))
@@ -1194,7 +1228,7 @@ async def build_defense_module(mission: dict, out_dir: Optional[Path] = None) ->
     # Mimir: create module + upload map + catalog-enriched wave enemies
     from src.mission_builder.mimir_module import create_module as _mc, enrich_monsters as _me, upload_map as _mu, render_mimir_section as _ms, push_documents as _mpd, enrich_mission_loot as _mel
     _mimir_id = await _mc(mission, mission_type="defense")
-    _d_enemies = _defense_mimir_enemies(waves, army, profile)
+    _d_enemies = _defense_mimir_enemies(waves, army, profile, target_cr=target_cr)
     _enriched = await _me(_mimir_id or "", _d_enemies)
     if _mimir_id and map_path:
         await _mu(_mimir_id, map_path, "Defense Map")
@@ -1210,19 +1244,24 @@ async def build_defense_module(mission: dict, out_dir: Optional[Path] = None) ->
                     for _e in _d_enemies:
                         if not _e.get("name"):
                             continue
+                        # Curated monsters are already on DDB with their real stats.
+                        # Re-pushing would just create a second, worse copy.
+                        if _e.get("ddb_url"):
+                            logger.debug(f"[DDB_HB] Already on DDB, skipping: {_e['name']!r}")
+                            continue
                         _cr = str(_e.get("cr", "1"))
                         try:
                             _cr_num = float(_cr.replace("1/8", "0.125").replace("1/4", "0.25").replace("1/2", "0.5"))
                         except Exception:
                             _cr_num = 1.0
-                        _prebuilt = {
+                        _prebuilt = dict(_e.get("statblock") or {}) or {
                             "hp":            _e.get("hp") or max(1, int(_cr_num * 13 + 7)),
                             "ac":            _e.get("ac") or max(10, min(18, int(_cr_num + 12))),
                             "creature_type": _e.get("creature_type", "humanoid"),
                             "speed":         _e.get("speed", "30 ft."),
                         }
                         _atks = _e.get("attacks", [])
-                        if _atks:
+                        if _atks and not _prebuilt.get("actions"):
                             _prebuilt["actions"] = "\n\n".join(
                                 f"**{a.split('.')[0]}.** {'.'.join(a.split('.')[1:]).strip()}"
                                 if '.' in a else f"**Attack.** {a}"

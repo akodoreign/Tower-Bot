@@ -40,7 +40,12 @@ from typing import Optional, Dict, List, Any
 
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
-from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.cr_scaling import (
+    mission_cr,
+    difficulty_band,
+    mission_difficulty,
+    party_strength as _party_strength,
+)
 from src.mission_builder.monster_roster import faction_role_monsters, mission_enemy_entry
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
@@ -482,8 +487,14 @@ TIER_SCALES = {
     "legend":   {"defender_mult": 2.0, "grunt_bonus": 6,  "morale_mult": 2.0},
 }
 
-def _tier_scale(tier: str) -> Dict:
-    return TIER_SCALES.get((tier or "standard").lower(), TIER_SCALES["standard"])
+def _tier_scale(mission: dict) -> Dict:
+    """Scale row for this mission, chosen by numeric difficulty.
+
+    Keyed off difficulty_band(), NOT the raw tier string -- live tiers
+    ('high-stakes', 'divine', 'rift', 'tower'...) are not rows here, so a tier
+    lookup fell through to 'standard' and every assault was built as difficulty 5.
+    """
+    return TIER_SCALES.get(difficulty_band(mission), TIER_SCALES["standard"])
 
 
 # ---------------------------------------------------------------------------
@@ -1151,10 +1162,13 @@ async def build_assault_module(mission: dict, out_dir: Optional[Path] = None) ->
         out_dir = OUTPUT_BASE / f"{_safe_filename(title)}_{ts}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"[ASSAULT] Building: {title!r} | faction={faction} | defending={defending_faction} | tier={tier}")
+    logger.info(
+        f"[ASSAULT] Building: {title!r} | faction={faction} | defending={defending_faction} "
+        f"| tier={tier} | difficulty={mission_difficulty(mission)} ({difficulty_band(mission)})"
+    )
 
     attacker_force   = _get_force(faction)
-    tier_data        = _tier_scale(tier)
+    tier_data        = _tier_scale(mission)
     position         = _pick_position(defending_faction)
     strength         = _party_strength()
 
@@ -1217,19 +1231,24 @@ async def build_assault_module(mission: dict, out_dir: Optional[Path] = None) ->
                     for _e in _a_enemies:
                         if not _e.get("name"):
                             continue
+                        # Curated monsters are already on DDB with their real stats.
+                        # Re-pushing would just create a second, worse copy.
+                        if _e.get("ddb_url"):
+                            logger.debug(f"[DDB_HB] Already on DDB, skipping: {_e['name']!r}")
+                            continue
                         _cr = str(_e.get("cr", "1"))
                         try:
                             _cr_num = float(_cr.replace("1/8","0.125").replace("1/4","0.25").replace("1/2","0.5"))
                         except Exception:
                             _cr_num = 1.0
-                        _prebuilt = {
+                        _prebuilt = dict(_e.get("statblock") or {}) or {
                             "hp":            _e.get("hp") or max(1, int(_cr_num * 13 + 7)),
                             "ac":            _e.get("ac") or max(10, min(18, int(_cr_num + 12))),
                             "creature_type": _e.get("creature_type", "humanoid"),
                             "speed":         _e.get("speed", "30 ft."),
                         }
                         _atks = _e.get("attacks", [])
-                        if _atks:
+                        if _atks and not _prebuilt.get("actions"):
                             _prebuilt["actions"] = "\n\n".join(
                                 f"**{a.split('.')[0]}.** {'.'.join(a.split('.')[1:]).strip()}"
                                 if '.' in a else f"**Attack.** {a}"

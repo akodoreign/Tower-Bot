@@ -1,5 +1,5 @@
 # Codebase Map — chatGPT-discord-bot
-Last updated: 2026-05-22
+Last updated: 2026-08-13
 
 ## Architecture Overview
 Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all campaign data. Cogs handle slash commands. Background tasks handle world simulation. Mission pipelines generate D&D adventure modules.
@@ -61,6 +61,8 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 | `npc_appearance.py` | NPC visual description gen; handles multiclass blending | ACTIVE |
 | `npc_consequence.py` | Post-bulletin NPC consequence scanner; writes history via `_hist()` | ACTIVE |
 | `npc_lookup.py` | NPC name→context for chat; reads revealed_secrets from DB | ACTIVE |
+| `npc_bonds.py` | **Relationship graph** (`npc_bonds`): love/family/rivalry/unrequited. Grief + stance on death, return-by-kind (raise/reincarnation/undead/doppelganger), `sever_on_tower_loss`, `social_tick` | ACTIVE |
+| `npc_dossier.py` | Casts a REAL npc into a mission (`mission_cast`) and assembles the full actor's dossier that feeds module dialog | ACTIVE |
 | `npc_statblock_backfill.py` | D&D stat block backfill | ACTIVE |
 | `character_profiles.py` | PC profile; reads/writes `profile_text` and `appearance` real columns (not profile_json) | ACTIVE |
 | `character_monitor.py` | Memory + consequence polling (uses character_memory/ dir) | ACTIVE |
@@ -75,6 +77,7 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 |------|---------|--------|
 | `news_feed.py` | World news bulletin generation | ACTIVE |
 | `news_integration.py` | News feed integration layer | ACTIVE |
+| `tower_news_voices.py` | TTN voiced bulletins: `obituary` (spoken by the closest mourner), `interview`, `forum`, `union`. Carries `canon_anchor()` so the model cannot invent factions/places | ACTIVE |
 | `ad_feed.py` | Advertisement/job posting generation | ACTIVE |
 | `bounty_board.py` | Bounty/contract postings | ACTIVE |
 | `bulletin_embeds.py` | Discord embed formatting | ACTIVE |
@@ -104,6 +107,7 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 | File | Purpose | Status |
 |------|---------|--------|
 | `resource_cop.py` | Resource/token usage cop | ACTIVE |
+| `world_integrity.py` | Reconciles the world against itself (dead faction leaders, resurrection_queue vs npcs, JSON shadow-copy drift, orphan bonds). `run_all()` / `repair()` — never kills anyone | ACTIVE |
 | `ollama_queue.py` | Ollama request queue | ACTIVE |
 | `ollama_busy.py` | Ollama busy-state tracker | ACTIVE |
 | `weekly_archive.py` | Weekly log archival | ACTIVE |
@@ -236,6 +240,10 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 - `gearrun_mimir.py`, `experiment_map_lanes.py`
 - `retry_map_pretty.py`, `retry_module_gen.py`
 - `backfill_*.py` (4 files) — May still be needed
+- `rewrite_monsters_2024_phrasing.py` — regex 2014→2024 attack phrasing (--dry-run/--apply)
+- `rewrite_monster_saves_2024.py` — LLM save restructuring behind a hard validation gate
+- `build_2024_style_corpus.py` — mines the WotC MM↔XMM parallel corpus into `training_docs`
+- `build_tower_2024_model.py` — `ollama create tower-2024` (Modelfile, not a fine-tune)
 - `ebp_enriched_data.py` — Data file for EBP enrichment
 
 ---

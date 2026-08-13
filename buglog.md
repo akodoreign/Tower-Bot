@@ -1575,3 +1575,548 @@ at 6h vs 3h threshold, failing, worst-first order, record-never-raises; + regres
 endpoint 200, table auto-created, all 15 loops correctly never-ran pre-restart. Bot + dashboard
 import clean. On restart day this becomes the single pane to watch loops report in.
 CLAUDE.md schema map + MAP note updated.
+
+---
+
+## 2026-08-10 - NOTE-ONLY: post-restart log watch (oddities, not acted on)
+
+Observation log only, per user request: note oddities/errors, do NOT act, fix, or investigate.
+Bot restarted this session at 17:41:15 (single clean boot cluster; no tracebacks at startup;
+all 11 cogs loaded; dashboard on 5001; DB / Discord / Mimir / A1111 all ok).
+
+Observed (17:41-17:56):
+- ~17:45  Ollama-busy skips at boot: 3x "Ollama busy: Ollama primary queue is busy" ->
+  2 generations returned None and were skipped (one mission-board contract, one Boxxo personal
+  mission). Transient boot-time contention on the single Ollama queue; self-recovers next tick.
+  WATCH: only a concern if it recurs when the queue should be idle (well past boot).
+- Routine, NOT bugs (noted for context only): "Reward clamped: N Kharma -> M Kharma
+  (difficulty=X)" WARNING fires normally on high-reward rolls; expected clamp behavior.
+- loop-health at +8min: worst=alert driven solely by 10 never-ran CADENCE loops (news_feed,
+  mission_board, npc_lifecycle, party_lifecycle, npc_portraits, personal_missions, story_images,
+  ad_feed, chat_reminder, log_cleanup). failing=0, overdue=0 -- expected this soon after boot;
+  should drain to ok once each loop hits its first cadence. Recheck later.
+
+Live monitor window 17:56-18:01 (tail -f on bot_stderr.log, error/oddity filter):
+- CLEAN. Full 5-min watch, zero matches on the filter (Traceback|ERROR|CRITICAL|WARNING|
+  Exception|Ollama busy|returned None|disconnect|reconnect|rate-limit|Timeout|OOM|Killed|
+  HTTP 5xx/429). No new oddities beyond the boot-time items above. Bot steady post-restart.
+
+Hardware note (for the "can I game while the bot runs?" question, 2026-08-10 ~17:56):
+- GPU RTX 3060 Ti, 8 GB VRAM. At idle-ish (GPU 6%) the bot already holds ~6.8 GB VRAM
+  (Ollama llama-server / qwen3-8b-slim resident); only ~1.2 GB free. Sys RAM 32 GB / ~15 GB free.
+- Implication: 8 GB is the contention point for any GPU game (Palworld). During peak (Mon-Fri
+  4-9pm) A1111 image loops are throttled so GPU pressure is lower; after ~9pm SDXL generations
+  (4-6 GB each) resume and would fight a game for VRAM -> expect CUDA OOM / failed portraits+maps
+  and/or game stutter. NOTE-ONLY; no action taken.
+- LIVE TEST result (~18:05): user launched Palworld with bot up. VRAM went from 6815/1210 free
+  (17:56) to 7780MiB used / 245MiB free / 97% util at launch -- card saturated before the game
+  even finished loading. VRAM monitor flagged CRITICAL immediately. User verdict: "too laggy",
+  quit the game. Confirms the 8 GB card cannot serve Palworld + the bot's Ollama/A1111 at once.
+  Resolution: user will game on a separate laptop; desktop GPU stays dedicated to the bot. No
+  code change; no action taken. (If dual-use is ever wanted here: second GPU, or move Ollama to
+  CPU, or stop A1111 while gaming.)
+
+## 2026-08-13 - DONE: difficulty never reached the build + modules shipped monster chips, not stat blocks
+
+Reported after playing mission 1431 "Secure Deepvein Mine Operations" (defense, tier=high-stakes,
+difficulty=9, generated 2026-08-11 07:02): "difficulty was supposed to be 9, it generated a 5" and
+"monster stat block, just use the list of ones we have created from mimir".
+
+### Smoke test BEFORE touching anything (per the bug rule)
+
+```
+mission_cr        = 13          <- header was right
+_tier_scale(tier) = {'morale_mult': 1.0, 'grunt_bonus': 0, 'wave_count': 2}
+_tier_scale(std)  = {'morale_mult': 1.0, 'grunt_bonus': 0, 'wave_count': 2}   <- IDENTICAL
+ enemy: Faction Enforcer CR 3 x7
+ enemy: Faction Duelist  CR 5 x4
+rendered chars = 1281 | has Actions? False | has abilities? False
+```
+`index.html` printed "CR: 13" while the module delivered a difficulty-5 encounter. Log confirms:
+`[DEFENSE] Building: ... tier=high-stakes` -> `Army=Warband | morale=28 | waves=2` (the standard row).
+
+### Bug 1 - tier-keyed scale tables (a BUG CLASS, 3 pipelines)
+
+`TIER_SCALES` / `FRAGILITY_DC` / `quota_map` were keyed `standard|seasoned|elite|legend` and looked
+up with the RAW mission tier. Live tier vocabulary is `standard, investigation, major, rift, local,
+tower, high-stakes, escort, patrol, divine, inter-guild, dungeon` -- **only 'standard' is ever a
+row**, so every other tier fell through to the easiest setting and the numeric `difficulty` was
+never read at all. Every defense/assault/gather module ever built ran at difficulty 5.
+
+- `cr_scaling.py`: added `mission_difficulty()` (reads the column, falls back to the tier ladder)
+  and `difficulty_band()` (1-5 standard | 6-7 seasoned | 8-9 elite | 10 legend). This is the one
+  shared difficulty authority, same as `mission_cr()`; pipelines keep their OWN band tables so a
+  defense band still means waves and an assault band still means defender strength.
+- `defense_pipeline` / `assault_pipeline`: `_tier_scale(mission)` now keys off the band.
+- `gather_pipeline`: `_generate_item_details(..., band)` instead of the raw tier.
+- `defense_pipeline._defense_mimir_enemies(..., target_cr)`: ranks were pinned at `cr_max=3/6/8`
+  regardless of mission CR. Now derived from `mission_cr()` at the offsets those hardcodes meant
+  at a baseline standard mission (grunt cr-6, lieutenant cr-3, commander cr-1).
+- `mission_board._load_mission_by_id()` / `_load_missions()`: **655 of ~1013 missions have no
+  `difficulty` key inside `mission_json`** while the column is always populated -- the mission dict
+  handed to pipelines simply had no difficulty on those. Column now surfaced explicitly, like tier.
+
+### Bug 2 - modules shipped monster chips and fabricated homebrew
+
+`render_mimir_section()` printed a name/CR/HP/AC card and threw away the `actions`, `traits`,
+`reactions`, ability scores and saves already sitting in the `monsters` row. Worse, `enrich_monsters()`
+fuzzy-searched the Mimir *catalog* for "Faction Enforcer", missed, and fell into a homebrew branch
+that invented a stub (`hp formula {cr*3}d8`, entries=[notes]) plus an LLM stat block -- on EVERY
+build. That is why Mimir homebrew contains junk like `soldiers / fighters` and `squad sergeants`
+(army label strings registered as monsters, with wave tactics text as their entries).
+
+- `monster_roster.mission_enemy_entry()`: carries the whole curated row now (`statblock` sub-dict:
+  ability scores, saves, passive perception, languages, hp dice, traits/actions/reactions/bonus/
+  legendary/mythic/lair) plus `db_backed`, `ddb_url`, `portrait_path`.
+- `mimir_module.enrich_monsters()`: `db_backed` entries short-circuit -- registered on the module
+  and synced with their REAL stats. No catalog search, no fabricated stub, no LLM stat block.
+- `mimir_module._sync_curated_homebrew()` + `_curated_monster_data()`: builds a full 5etools payload
+  from MySQL and guards on the `mimir_sync` table (`entity_type='monster'`) so repeat builds stop
+  stacking duplicate copies.
+- `mimir_module._render_curated_statblock()`: full runnable stat block in module.html.
+- defense/assault/battle/infestation DDB fallback: skip anything that already has a `ddb_url`
+  (all 348 curated monsters do) and use the real statblock when pushing.
+
+### Smoke test AFTER (same path)
+
+```
+difficulty        = 9 | band = elite
+_tier_scale(msn)  = {'morale_mult': 1.6, 'grunt_bonus': 4, 'wave_count': 3}
+_tier_scale(std)  = {'morale_mult': 1.0, 'grunt_bonus': 0, 'wave_count': 2}
+ enemy: Faction Zealot   CR 4 x10  db_backed=True ddb=True
+ enemy: Faction Duelist  CR 5 x7   db_backed=True ddb=True
+ enemy: Faction Champion CR 8 x1   db_backed=True ddb=True
+rendered chars = 7707 | Multiattack? True | STR? True | Reactions? True
+```
+Verified end to end through the real `_load_mission_by_id`: #1431 and #1435 (high-stakes/9) -> elite,
+CR 13; #1444 (standard/4) -> standard, CR 8.
+
+Tests: `tests/test_aug2026_difficulty_statblocks.py` (21 cases) pins both bugs, including a
+parametrized check that all 11 live tier names no longer collapse to 'standard'. `tests/conftest.py`
+FakeMimirClient gained `search_monsters` / `add_monster` / `create_homebrew_monster` so a test can
+assert nothing was fabricated. Full suite green.
+
+### OPEN - not fixed, needs a decision
+
+All 348 rows in `monsters` use **2014 phrasing** ("Melee Weapon Attack: +6 to hit") but the campaign
+is D&D 2024/5.5e, where it is "Melee Attack Roll: +6, reach 5 ft. Hit: ...". 0/348 use 2024 phrasing.
+`monster_stat_gen._SRD` was re-extracted from XMM on 2026-07-11 but the seeded `monsters` rows were
+never rewritten. Mechanically identical, wrong era on the page. Needs a one-off rewrite pass.
+
+## 2026-08-13 - DONE: monsters table rewritten to 2024 (XMM) attack phrasing
+
+Follow-up to the OPEN item above. All 348 rows in `monsters` carried 2014 phrasing while the
+campaign is D&D 2024. Target format taken from XMM rows in the Mimir catalog (not from memory) --
+`{@atkr m} {@hit 5}, reach 5 ft. {@h}10 ({@damage 2d6 + 3}) Slashing damage.` renders as
+`Melee Attack Roll: +5, reach 5 ft. Hit: 10 (2d6 + 3) Slashing damage.`
+
+`scripts/rewrite_monsters_2024_phrasing.py` (--dry-run / --apply / --report-saves). Rewrote:
+1. `<Melee|Ranged|Melee or Ranged> <Weapon|Spell> Attack: +N to hit,` -> `... Attack Roll: +N,`
+2. dropped the 2014 `, one target` / `, one creature` tail
+3. dice spacing `2d12+8` -> `2d12 + 8`
+4. damage types capitalised inside damage contexts only
+
+Damage-type capitalisation is context-gated on purpose: a blanket pass wrecks ordinary prose in
+this flavour text ("fire at will", "under fire", "cold iron", "force the door", "acid vat"). Three
+contexts are recognised -- after a dice group, a coordinated list before the word "damage"
+("fire or acid damage" -> "Fire or Acid damage"), and a list after resistant/immune/vulnerable to.
+
+Backup before applying: 348 rows dumped to scratchpad `monsters_backup_pre2024.json`.
+Pre-flight validator over all 348 (double periods, stray commas, dropped text, leftover 2014
+headers, tight dice): NO ANOMALIES. Applied: 348/348 rows, 541 fields.
+Post-check: p2024=348, p2014=0, tight_dice=0 across all three sources. The single grep hit left
+(`#36 UC Syndicate Assassin`) is a false positive -- "One target within 5 ft.:" is sentence-initial
+prose, not the 2014 tail. Verified through `mission_enemy_entry` -> `render_mimir_section`.
+Pinned by 7 cases in `tests/test_aug2026_difficulty_statblocks.py` including idempotence and an
+ordinary-prose guard.
+
+### OPEN - save clauses are still 2014, deliberately not automated
+
+331 of 348 rows carry 2014 save phrasing ("Each enemy in a 30-foot cone must make a DC 16 CON save.
+On a failure, ..."). 2024 leads with the save and restructures the sentence around it:
+`Constitution Saving Throw: DC 16, each creature in a 30-foot Cone. Failure: ... Success: Half damage.`
+Shape survey: 272 "must make a DC N X save", 147 "succeed on a DC N X save or ...", 20 "<target>: DC N
+X save", 2 "<target> makes a DC N X save", **165 in no regular shape at all**. Moving the target
+clause after the DC is prose restructuring, not pattern substitution -- regex would mangle a real
+fraction of authoritative rules text, so it was left alone. Needs an LLM restructuring pass with
+strict numeric validation (DCs, dice, damage types preserved byte-for-byte) or hand editing.
+
+### NOTE - downstream copies are now stale
+
+MySQL is the 2024 truth; the copies are not. All 348 rows have a `ddb_url` and the DDB homebrew
+pages still hold the 2014 text (and the new push-skip guard means they will not be overwritten --
+correct, but it means DDB drifts). The 19 Mimir homebrew mirrors WILL self-correct: the
+`mimir_sync` guard hashes the stat block, the hash changed, so the next module build that fields
+each creature re-syncs it with the 2024 text.
+
+## 2026-08-13 - IN PROGRESS: 2024 save clauses + teaching the local model 2024
+
+### Save-clause restructuring (LLM + hard validation gate)
+
+`scripts/rewrite_monster_saves_2024.py`. The attack rewrite was pure regex because it is
+pattern substitution; saves are not -- 2024 leads with the save and moves the target clause
+after the DC, so the sentence is rebuilt. An LLM does the restructuring and is NEVER trusted
+with the rules content: every candidate must clear `validate()` or the paragraph is left
+exactly as it was. Each gate below exists because the model actually did that thing:
+
+| observed failure | gate |
+|---|---|
+| changed a DC / die / damage number | integer multiset equality (reorder allowed -- the DC legitimately moves) |
+| `Force` -> `Fire` | damage-type multiset |
+| `Constitution` -> `Dexterity` save | save-ability multiset |
+| **reverted the 2024 attack line to `Melee Weapon Attack: +6 to hit`** | attack span must return byte-for-byte |
+| nudged `reach 5 ft.` -> `reach 5 feet` in an untouched attack line | same span check |
+| **`On success it drops to 1 HP` -> `Failure: ... drops to 1 HP`** (rule inverted, numbers clean) | branch preservation |
+| **invented `Success: ... reduced by half that amount`** where the source had no success branch | inverse branch check |
+| invented a `Skill Suppression` condition | condition names must be real 5e conditions |
+| `DC 14, a 15-foot Cone` instead of `each creature in a 15-foot Cone` | target-clause check |
+
+The two bolded rows are numerically spotless -- a numbers-only validator would have written
+both into authoritative rules text. Also fixed a bug in the gate itself: leftmost-match
+captured `target has the Stunned` instead of `Stunned` and false-rejected 4 good rewrites.
+
+Model choice: `qwen3.6-27b` is 17.4 GB against an 8 GB card so it CPU-offloads at ~150 s per
+paragraph (~25 h for this job); `qwen3-8b-slim` fits in VRAM at ~3 s. The gate, not the model,
+is what guarantees correctness, so the 8B runs the bulk and the 27B can re-run afterwards --
+the pass only picks up paragraphs still matching RE_SAVE_2014, so it gets exactly the leftovers.
+
+Added a MID-LOOP peak-power guard: the script previously checked the 16:00-21:00 window only at
+startup, so a long pass could start at 15:50 and run for hours at 89c/kWh. It now re-checks each
+row and stops cleanly; committed rows stay and a later run resumes.
+
+### Teaching the local model 2024 (grounding, NOT a fine-tune)
+
+User asked about retraining the models because "it doesn't completely understand D&D 2024".
+The diagnosis is right; a weights fine-tune is the wrong lever here. CLAUDE.md says rules
+content comes from Mimir and never from model memory -- baking rules into weights produces a
+model that recites half-remembered statblocks confidently. What it actually lacks is FORMAT
+knowledge. Two things built instead, both free and reversible:
+
+1. `scripts/build_2024_style_corpus.py` -- 373 monsters appear under BOTH `MM` (2014) and
+   `XMM` (2024) in mimir.db. Where an ability has the same name in both books the pair is a
+   WotC-authored example of exactly this rewrite. 322 pairs mined; **82 are PURE REFORMATS**
+   (numbers identical on both sides). The other 240 were redesigned between editions -- the
+   Aboleth's Tentacle went from "diseased" at reach 10 ft. to "Grappled" at reach 15 ft. -- and
+   are excluded, because training on a redesign teaches that changing effects is allowed, the
+   exact failure the gate exists to stop. Stored in `training_docs` (doc_type='style_2024_pair').
+2. `rewrite_monster_saves_2024.few_shot_for()` -- retrieval-grounded few-shot. Ranks the pure
+   pairs by shape/condition/damage-type overlap with the paragraph being rewritten, so a cone +
+   half-damage input gets real dragon/mephit breath weapons and a single-target frightened input
+   gets Terrifying Glare and Scare.
+3. `scripts/build_tower_2024_model.py` -> `ollama create tower-2024` -- Modelfile pinning a
+   SYSTEM prompt of 2024 conventions plus mined examples. Same probe, both models:
+   - tower-2024: `Melee Attack Roll: +5, reach 5 ft. Hit: 6 (1d6 + 3) Piercing damage.` /
+     `Dexterity Saving Throw: DC 13, each creature in a 15-foot Cone. Failure: 10 (3d6) Fire
+     damage. Success: Half damage.`
+   - stock 8B: `Spear +5 to hit, reach 5 ft., 6 (1d6 + 3) piercing.` / `Concussive blast in a
+     15-ft. cone: DC 13 Dexterity save for half damage.`
+   Delete with `ollama rm tower-2024`; rebuild any time.
+
+### OPEN - actual LoRA fine-tune not attempted
+
+No training stack is installed (torch/transformers/peft/trl/bitsandbytes all absent, ~6 GB of
+downloads) and a LoRA would then need llama.cpp GGUF conversion to get back into Ollama.
+QLoRA on an 8B at 8 GB VRAM is feasible but tight, needs the GPU exclusively (Ollama holds
+5.2 GB serving the bot), and would run for hours -- straight into the peak-rate window. Worth
+doing only if the grounding above proves insufficient; measure first.
+
+## 2026-08-13 - DONE: NPC dialog was dry because the speaker had no past
+
+User: "It doesn't feel like there is enough Tension or tender moments, everything feels dry.
+They have histories, and the butterfly effect to draw on." Asked whether the model could be
+trained to roleplay. Diagnosis: not a training problem. Three causes, all data-flow.
+
+**1. Casting failure.** Missions carry a free-text `contact` ("Guild Liaison Varek at Ironhold
+Outpost") and `db_api.get_npc()` is exact-name only, so it matched NOTHING. Verified on the
+shipped module for mission 1431: `get_npc('Guild Liaison Varek at Ironhold Outpost')` -> False.
+The module invented a stranger and asked a model to improvise for a person with no history.
+The module even printed "-- not in NPC roster" next to generic placeholder knowledge.
+
+**2. Context starvation.** `scene_dialogs._npc_context()` read four thin fields (name, rank,
+160-char quote, faction) and dropped motivation, secret, oracle_notes, relationships, lived
+history, faction standing and every recorded consequence. Sitting unused: **854 npc_history
+events, 109 NPCs with relationships, 105 with secrets, 761 mission_outcomes, 567 party_history,
+44 factions with leaders and mottos.**
+
+**3. The prompt asked for coverage, not drama.** "exactly 12 entries covering: pressing for the
+real reason, haggling pay, threatening or bribing, asking about the location, who else was
+hired..." -- a topic checklist produces a uniform Q&A grid by construction. Nothing asked what
+the NPC wants, what answering costs them, or where they soften.
+
+### Built
+
+`src/npc_dossier.py`:
+- `resolve_npc()` -- strips titles ("Guild Liaison", "Warden", "Sergeant"...) and trailing
+  " at/of/in <place>" clauses, then exact -> case-insensitive -> LIKE -> token overlap.
+  **Requires score >= 2** (two name tokens, or one plus faction agreement): a single shared
+  token is usually just a surname, and "Jax Ironclaw" silently casting "Elara Ironclaw" of a
+  DIFFERENT faction is a different person with the wrong history. Falls back to a living member
+  of the employing faction rather than inventing a stranger.
+- `cast_mission_contact()` -- persists the casting to the new `mission_cast` table so the same
+  face recurs across regenerations. Real table, not a JSON blob (queried and joined -> real
+  columns, per the JSON reflex rule).
+- `dossier_block()` -- assembles who they are, voice, what they want, what they feel underneath,
+  what they hide (explicitly fenced: "never say outright; it leaks under pressure"), who they are
+  tied to, what they have lived through (npc_history), faction standing (leader/motto/alignment/
+  reputation) and **what the world just did to them** (mission_outcomes notable_moments,
+  key_decisions, loose_threads) -- the butterfly effect reaching the dialog layer.
+- `_plain()` -- strips Discord presentation (emoji, **bold**, headers) out of stored world text.
+  `mission_outcomes.notable_moments` holds the bulletin AS POSTED; feeding that to a model
+  teaches it to write press releases.
+
+`scene_dialogs`: `_npc_context()` now casts a real NPC and carries the dossier (200 chars ->
+**2141 chars** of character material). `_build_module_dialog_prompt()` rewritten to demand
+dramatic beats -- a deflection that costs them, a moment the guard drops, a say/want mismatch
+with a DC to catch it, a beat landing on a named person from their relationships, and beats
+where carelessness wounds and patience earns.
+
+### Measured, same model and generator, only context changed
+
+Before (shipped): "We're not just securing the mine. The opposition is trying to weaponize the
+ore." / "The tunnels are alive. The ore is cursed."
+
+After: "You think I'd talk about my brother? He's not worth the dirt under your boots." /
+"[Jax] thinks I'm a traitor. But he's wrong. I just don't want to be the one who lets the Choir
+take more." / "That debt's still on us. We lost a man. Not a thing I'm proud of." (a REAL prior
+mission_outcome surfacing unprompted) / on patience: "He was a Warden too. Not like you think.
+He just... wanted something else."
+
+15 tests in `tests/test_npc_dossier.py` pin casting, the surname guard, presentation stripping,
+and dossier assembly.
+
+### Save-rewrite passes, for the record
+
+- pass 1 (stock 8B, static examples): 309/331 rows, 454 fields. 141 paragraphs held back.
+- pass 2 (tower-2024 + retrieval grounding): only **10** more rows. **A better model and real
+  WotC examples barely touched the residue** -- 110 of 130 remaining failures were still
+  "numbers changed". Grounding fixed FORMAT; the residue is not a format problem.
+- Analysis of pass 1 rejects: **95 of 103 numeric failures were pure content LOSS** (nothing
+  invented, content dropped) and **102 of 103 had a SETUP SENTENCE before the save clause**.
+  The model reads "A 5-ft. rift opens at a point within 60 ft. Creatures within 15 ft.: DC 16
+  Con save...", recognises the save, and emits only the save -- deleting the rift and every
+  number in it. Not a 2024-knowledge gap; an instruction gap. No fine-tune would have fixed it.
+- pass 3 adds an explicit preamble rule anchored on XMM precedent (Mucus Cloud keeps its setup
+  sentence before the save line). Running at time of writing.
+
+### Pass 3 result -- the experiment that settles it
+
+| pass | change | rows converted |
+|---|---|---|
+| 1 | stock 8B, static examples | 309 |
+| 2 | tower-2024 + retrieval-grounded WotC examples | **10** |
+| 3 | same model, same grounding, + one preamble instruction | **89** |
+
+Remaining "numbers changed" failures fell 110 -> 21. **A single line of instruction was worth
+roughly nine times the model upgrade and the retrieval corpus combined.** Final state: 33 of 348
+monsters still carry any 2014 save clause, down from 331 (90% converted, every write gated).
+
+This is the case against reaching for a fine-tune first. The dominant failure was never missing
+2024 knowledge -- it was the model silently dropping a sentence it had not been told to keep.
+Training on that data would have burned hours of GPU at peak rates and taught the model nothing
+it needed. Measure, find the actual failure mode, then decide.
+
+The 33 leftovers are the genuine residue: 21 numeric, 11 invented-Success, 4 damage-type, and a
+few singletons. Small enough to hand-edit, or to re-run once with the 27B after 21:00.
+
+## 2026-08-13 - DONE: the world had no heart (npc_bonds, grief, and provisional death)
+
+User wants the world to live: "Interviews on TTN bulletins, arguments in the forums, NPCs
+finding their significant others, buring a beloved."
+
+Survey of what the world actually recorded about people:
+`injury 225 | recovery 204 | death 128 | resurrection 67 | promotion 12 | defection 9 |
+betrayal 8 | alliance 6`. All violence and career. **128 NPCs had died and not one person had
+ever mourned them** -- nothing in the schema could say who would miss them. News was equally
+monolithic: `bulletin 2383 | council_ruling 108 | rift 20`. No interviews, no arguments, no
+obituaries.
+
+`npcs.relationships` held real ties but as free prose -- unqueryable, so no system could act on it.
+
+### `src/npc_bonds.py` -- ties become first-class
+
+New `npc_bonds` table (real columns; bonds are queried and joined constantly). Directed rows with
+reciprocals where the tie is mutual. Seeded from the prose already in the roster: **30 ties found,
+47 rows with reciprocals** (14 rival, 12 acquaintance, 8 friend, 4 sibling, 2 enemy, 2 mentor,
+2 protege, 2 spouse, 1 debt).
+
+Seeding caught its own bug: the first pass defaulted unmatched ties to "friend" and filed
+"Serrik Dhal - she removed him from leadership cleanly" (the Iron Fang civil war) as a FRIENDSHIP.
+Default is now `acquaintance`, and enemy patterns cover ousted/deposed/removed/purged/at war with.
+Sera Voss -> Serrik Dhal now correctly reads `enemy`. Inventing warmth is worse than recording none.
+
+### Death is provisional -- user correction, and it reshaped the design
+
+"Until a person is lost to the tower, they are not truely dead, a freind or love one could be
+looking to resurect them or put them back in the grave." And: raise dead, resurrection,
+reincarnation, undead, doppelganger -- only when the SOUL is gone does it end.
+
+So `bereave()` does NOT close bonds. It marks them `mourning` and assigns the survivor a STANCE:
+- loved them  -> `seeking_return`  (a widow petitioning for a raising)
+- feared them -> `wants_them_gone` (a rival paying to let the queue time out)
+- owed/owing  -> `unfinished`
+
+`mourners_seeking_return()` returns ready-made mission hooks. The world already had the machinery:
+`resurrection_queue.status` resolves to 'raised' or 'lost_to_tower', and **30 dead NPCs are sitting
+in that limbo right now**.
+
+`restore_on_return(npc_id, name, kind)` -- HOW they come back decides what the bond becomes:
+| kind | bond becomes | what it means |
+|---|---|---|
+| raise / resurrection | `active` | they got them back |
+| reincarnation | `changed` | "learn a stranger's face and call it beloved" |
+| undead | `haunted` | "decide whether to put them back in the grave" |
+| doppelganger | `impostor` | something wears their face; the real one is still gone |
+
+`sever_on_tower_loss()` is the ONLY thing that ends a bond. Everything before it was hope.
+
+Wired into `npc_lifecycle._move_to_graveyard()` (the death chokepoint). `npc_dossier` now carries
+bonds and live grief, so a mourning NPC's next scene is coloured by it.
+
+### Bug found in the shared helper
+
+`add_npc_history_event(npc_id, body, event_date=None)` -- I had been calling it with four
+positional args in the old (npc_id, date, type, body) order. The TypeError went into a swallowing
+`except` and **grief was silently never written**. Exactly the class of failure CLAUDE.md warns
+about. Fixed all four call sites and added an explicit `event_type` override to the helper:
+inference only knows the old violence/career vocabulary and dumped grief, marriage, return and
+soul-loss into the catch-all "event" bucket, making them unqueryable.
+
+Also cleaned up after myself: an end-to-end rehearsal wrote to the LIVE database. Rows removed,
+bonds restored, verified 0 stray rows. Tests now use an in-memory graph fixture.
+
+11 tests in `tests/test_npc_bonds.py`; 95 green across the suite.
+
+### NOT built yet (the rest of the ask)
+
+TTN interviews, forum arguments, obituaries voiced by the closest bond, and the courtship tick
+posting to the news feed. `social_tick()` exists (pure DB, no GPU) but is not wired to a loop, and
+nothing generates the BULLETIN side yet. The dossier is the engine for all of it -- an obituary
+should be voiced by whoever `bereave()` ranked first.
+
+## 2026-08-13 - DONE: the world gets a voice (TTN voices, Unknown Party protection, Aldric Vane)
+
+### `src/tower_news_voices.py`
+
+The feed had one register: 2383 `bulletin`, 108 `council_ruling`, 20 `rift` -- all reported ABOUT
+the Undercity, none spoken BY anyone in it. Four new voiced types, every one built from
+`npc_dossier`, persisted via `add_news_entry(news_type=...)` so they become world memory:
+`obituary`, `interview`, `forum`, `union`.
+
+The obituary is the important one. It is voiced by whoever `bereave()` ranked closest and is
+explicitly NOT allowed to read as final -- the body is still raisable and the widow knows it, so
+it ends on what she intends to DO about that. First generation, voiced by Mari Fen:
+"He's not dead. He's just late to the meeting." ... "I'll raise him. I'll pay. I'll pray. Or I'll
+kill whoever buried him."
+
+**Canon anchor (`canon_anchor()`)** -- that same first generation invented a "Drowned Ledger"
+tavern, a smuggler named Kael Vey, the "Bloodstone Arena", and an entire faction called the
+"Deliberate Few". None exist. Because bulletins are PERSISTED and read back as context, a
+confabulated faction poisons world memory permanently. Every voiced generation now carries the
+real `faction_reputation` names and `area_profiles` districts plus an explicit "do not invent
+factions, districts, taverns, arenas, or named people" instruction.
+
+### Unknown Party were dying constantly -- guard was missing
+
+User: "unknown party they die way to much, the LLM has a hard on to kill them all the time...
+these guys should be the best of the best."
+
+Real: 6 deaths across the five. **The Ward had died and been resurrected FIVE times.** Sable was
+dead at time of writing. `apply_npc_event` protected faction leaders from the random death roll:
+
+    if event == "death" and is_faction_leader(...)   # reroll
+
+Unknown Party members were NOT in that guard, and the injury-resolution tick killed at a flat 10%
+with no exemption either -- over many ticks that is a slow execution. Fixed both: an identical
+reroll guard for `is_unknown_party_member()`, and 98% (vs 90%) recovery on the injury tick. They
+can still die, but only from a deliberate gated outcome, never an ambient roll. Sable restored.
+
+### Aldric Vane -- leader auto-return had NOT happened
+
+User was right to suspect it. `faction_reputation.leader = 'Aldric Vane (Guildmaster)'` while
+`npcs.status = 'dead'` -- the Guild had been run by a corpse since 2026-06-06. And the two
+death markers disagreed: `resurrection_queue.status = 'lost_to_tower'` but
+`npcs.tower_absorbed = 0`. Whatever ran, it half-finished. Brought him back as a D&D
+**Resurrection** (same person -- Reincarnate is the one that changes you, which the codebase's
+LEADER_DEATH_OUTCOMES comment conflates), queue row set to `raised`, bonds reopened, and return
+events written for Sera Vane and Mari Fen.
+
+**Open:** nothing reconciles `resurrection_queue.status` against `npcs.status` /
+`tower_absorbed`, and nothing checks that a faction's listed leader is alive. Both are cheap
+sweeps worth adding.
+
+### Seeder bug: `relationships` is sometimes JSON
+
+Sera Vane's row is `{"Mari Fen": "cordial...", "Aldric Vane": "husband..."}`. My +/-90 char window
+around "Mari Fen" spilled into the ADJACENT entry, caught "husband", and **invented a marriage
+between Mari Fen and Aldric Vane**. The seeder now parses the JSON map when present and reads only
+that person's own description. Re-seeded: Sera Vane is the wife, Mari Fen is an acquaintance.
+
+Per user lore, Mari Fen (front desk of the Adventurers Guild, the glue of the place) carries
+**unrequited** feelings for both Aldric and Sera. New bond type, deliberately absent from
+`RECIPROCAL` -- it is the one tie that must never be mirrored back, because mutuality is exactly
+what it is not.
+
+15 tests in test_npc_bonds.py, 95 green overall.
+
+### NOT wired yet
+
+`social_tick()` and `daily_voices()` exist and work but are NOT attached to an aclient loop. That
+wiring needs a `_peak_power_delay_seconds()` gate, a per-pass cap, a `record_loop_heartbeat()`
+call and a `loop_health.EXPECTED` entry. Deliberately left until it can be done properly.
+
+## 2026-08-13 - DONE: world integrity sweep + the social pulse loop is live
+
+### `src/world_integrity.py`
+
+Written because the Adventurers Guild spent two months being run by a corpse and nothing
+compared `faction_reputation.leader` against `npcs.status`. First run: **41 findings.**
+
+| finding | count | resolution |
+|---|---|---|
+| leader_missing | 26 | 2 were name-format ("Archivist Eir Velan"); 24 were genuinely absent |
+| raised_but_dead | 7 -> 1 | queue dedupe collapsed 6 phantoms; 1 real (Grimnir Shattered restored) |
+| absorbed_flag_missing | 5 | 3 marked absorbed; 2 refused (they are alive) |
+| walking_while_absorbed | 2 | stale queue rows retired -- the NPC is never touched |
+| blob_divergence | 1 | resynced from the authoritative column |
+
+Root cause of the resurrection mess: **`resurrection_queue` is append-only with no dedupe**, so
+one NPC carries several contradictory rows (Tarn Veyne had three; Sera Veyne had both `raised`
+and `lost_to_tower`). The check now resolves by LATEST row per NPC -- a later raising overturns
+an earlier absorption, which is also how the fiction works.
+
+Two rules the repair follows, both learned today:
+- **A sweep never kills anyone.** A living NPC with a `lost_to_tower` row means the QUEUE is
+  stale, not the person. Retire the row; leave the character alone. Same principle as the
+  Unknown Party guard.
+- **Repair order matters.** Status fixes write columns directly, which desyncs the shadow copies
+  step 1 just resynced. There is now a re-scan at the end so one pass leaves the world consistent
+  instead of needing to be run twice (my own bug, caught by re-running).
+
+**24 phantom guild leaders given real NPC rows** (name + faction + rank parsed from the title,
+`Bore-Captain Grael Dusthammer` -> rank `Bore-Captain`, name `Grael Dusthammer`), and
+`faction_reputation.leader` normalised to match. Those guilds had been citing characters who did
+not exist, so nothing could ever cast them. The existing quote/appearance backfill loops will
+flesh them out. Final state: **world integrity: clean.**
+
+### `aclient.social_pulse_loop` -- the world now has a private life
+
+Ascending cost order: integrity sweep (pure DB) -> `social_tick()` (pure DB, courtships form and
+deepen) -> `daily_voices(max_items=2)` (the only GPU work). Carries every rule the project
+learned the hard way: `_peak_power_delay_seconds()` gate that SKIPS the voiced bulletins during
+the weekday 16:00-21:00 window while still running the free DB work, a per-pass cap, a failure
+heartbeat, and `loop_health.EXPECTED["social_pulse"]` at 44h (~2.5x the 20-28h cadence). Offset
+150 minutes from boot so it never contends with the NPC (45m) and party (90m) ticks for Ollama.
+
+First tick produced its own first courtship, unprompted: "Thalia Parchment and Grommash Ironfist
+have started seeing each other."
+
+230 tests green.
+
+### Still open
+- 33 statblocks with residual 2014 save phrasing (hand-edit, or one 27B pass after 21:00).
+- The dossier is wired into `scene_dialogs` only; per-pipeline Table Talk sections each need the
+  same treatment (deliberate per-pipeline work, not one sweep -- the no-refactor rule holds).
+- `data_json` / `mission_json` / `profile_json` still mirror real columns. The integrity sweep now
+  DETECTS the drift and repairs it, but the real fix is to stop writing the mirrors. That needs a
+  reader audit first: anything doing `data_json["faction"]` must repoint to the column, and
+  silently returning None would be worse than the drift.

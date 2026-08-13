@@ -1951,14 +1951,21 @@ def _infer_event_type(body: str) -> str:
 _DATE_PAT = _re.compile(r'^\[(\d{4}-\d{2}-\d{2})\]')
 
 
-def add_npc_history_event(npc_id: int, body: str, event_date=None) -> None:
-    """Insert one history event for an NPC. Parses date from body if not given."""
+def add_npc_history_event(npc_id: int, body: str, event_date=None,
+                          event_type: str = "") -> None:
+    """Insert one history event for an NPC. Parses date from body if not given.
+
+    `event_type` overrides keyword inference. Inference only knows the older
+    violence/career vocabulary and falls through to "event", which would bucket
+    grief, marriage, return-from-death and soul-loss into one unqueryable pile --
+    pass the type explicitly when you know it.
+    """
     if not npc_id or not body:
         return
     if event_date is None:
         m = _DATE_PAT.match(body.strip())
         event_date = m.group(1) if m else None
-    etype = _infer_event_type(body)
+    etype = event_type or _infer_event_type(body)
     raw_execute(
         "INSERT INTO npc_history (npc_id, event_date, event_type, body) VALUES (%s, %s, %s, %s)",
         (npc_id, event_date, etype, body),

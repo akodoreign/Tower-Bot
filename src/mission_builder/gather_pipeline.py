@@ -30,7 +30,12 @@ import httpx
 
 from src.log import logger
 from src.mission_builder.html_renderer import _faction_color, _CSS, _page
-from src.mission_builder.cr_scaling import mission_cr, party_strength as _party_strength
+from src.mission_builder.cr_scaling import (
+    mission_cr,
+    difficulty_band,
+    mission_difficulty,
+    party_strength as _party_strength,
+)
 
 OUTPUT_BASE  = Path(__file__).resolve().parent.parent.parent / "generated_modules"
 OLLAMA_URL   = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
@@ -511,13 +516,19 @@ Return JSON only:
 async def _generate_item_details(
     faction: str,
     gather_profile: Dict,
-    tier: str,
+    band: str,
 ) -> Dict:
-    """Pick a specific item from the faction's gather list and define quota/stock."""
+    """Pick a specific item from the faction's gather list and define quota/stock.
+
+    `band` is difficulty_band(mission), not the raw tier: FRAGILITY_DC and the
+    quota map below are keyed standard/seasoned/elite/legend, and live tiers
+    ('high-stakes', 'divine', 'rift'...) matched none of them, so every gather
+    job silently used the easiest DC and the smallest quota.
+    """
     item = random.choice(gather_profile["examples"])
     fragility = gather_profile["fragility"]
     dc_table  = FRAGILITY_DC.get(fragility, FRAGILITY_DC["medium"])
-    dc        = dc_table.get(tier, 14)
+    dc        = dc_table.get(band, 14)
 
     skills = GATHER_SKILLS.get(gather_profile["item_category"], ["Investigation", "Perception"])
     primary_skill   = skills[0]
@@ -525,7 +536,7 @@ async def _generate_item_details(
 
     # Quota and stock: stock is quota + 1 to several extras depending on fragility
     quota_map  = {"standard": (3,5), "seasoned": (4,6), "elite": (5,8), "legend": (6,10)}
-    q_lo, q_hi = quota_map.get(tier, (3,5))
+    q_lo, q_hi = quota_map.get(band, (3,5))
     quota      = random.randint(q_lo, q_hi)
 
     # Stock extras: extreme fragility = barely any surplus, low = plenty of room
@@ -1048,12 +1059,17 @@ async def build_gather_module(mission: dict, out_dir: Optional[Path] = None) -> 
         out_dir = OUTPUT_BASE / f"{_safe_filename(title)}_{ts}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"[GATHER] Building: {title!r} | faction={faction} | tier={tier}")
+    band    = difficulty_band(mission)
+
+    logger.info(
+        f"[GATHER] Building: {title!r} | faction={faction} | tier={tier} "
+        f"| difficulty={mission_difficulty(mission)} ({band})"
+    )
 
     strength       = _party_strength()
     gather_profile = _get_gather_profile(faction)
     contact        = _get_faction_contact(faction)
-    item_data      = await _generate_item_details(faction, gather_profile, tier)
+    item_data      = await _generate_item_details(faction, gather_profile, band)
     pressure       = max(0, strength["party_size"] - 4)
     level_pressure = max(0, strength["max_level"] - 5)
     item_data["quota"] = int(item_data.get("quota", 4)) + (pressure // 2)

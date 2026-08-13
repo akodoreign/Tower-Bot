@@ -339,20 +339,67 @@ def mission_enemy_entry(
     count: int = 1,
     notes: str = "",
 ) -> dict[str, Any]:
-    """Shape a DB monster row for Mimir/DDB mission enemy enrichment."""
+    """Shape a DB monster row for Mimir/DDB mission enemy enrichment.
+
+    Carries the WHOLE curated stat block, not just name/CR/HP/AC. A row in
+    `monsters` is the authoritative version of that creature -- ability scores,
+    actions, traits, reactions, saves, and in most cases an existing DDB homebrew
+    URL and portrait. Downstream renderers and pushers must use these fields as
+    given and never re-derive them from CR or ask a model to invent them.
+
+    `db_backed` is the flag consumers check before deciding whether a creature
+    needs stats generated at all. It is always True here.
+    """
     attacks = []
     if monster.get("actions"):
         attacks = [p.strip() for p in str(monster["actions"]).split("\n\n") if p.strip()][:4]
+
+    statblock = {
+        "name":              monster.get("name"),
+        "cr":                str(monster.get("cr") or "1"),
+        "creature_type":     monster.get("creature_type") or "humanoid",
+        "size":              monster.get("size") or "M",
+        "ac":                monster.get("ac"),
+        "hp":                monster.get("hp"),
+        "hp_die":            str(monster.get("hp_die") or "8"),
+        "hp_die_count":      monster.get("hp_die_count"),
+        "str_":              monster.get("stat_str"),
+        "dex":               monster.get("stat_dex"),
+        "con":               monster.get("stat_con"),
+        "int_":              monster.get("stat_int"),
+        "wis":               monster.get("stat_wis"),
+        "cha":               monster.get("stat_cha"),
+        "passive_perc":      monster.get("passive_perc"),
+        "languages":         monster.get("languages") or "Common",
+        "speed":             monster.get("speed") or "30 ft.",
+        "saves":             monster.get("saves") or {},
+        "actions":           monster.get("actions") or "",
+        "traits":            monster.get("traits") or "",
+        "reactions":         monster.get("reactions") or "",
+        "bonus_actions":     monster.get("bonus_actions") or "",
+        "legendary_actions": monster.get("legendary_actions") or "",
+        "mythic_actions":    monster.get("mythic_actions") or "",
+        "lair_actions":      monster.get("lair_actions") or "",
+        "notes":             monster.get("notes") or "",
+    }
+
     return {
         "name": monster.get("name"),
         "cr": str(monster.get("cr") or "1"),
         "count": count,
         "notes": notes or monster.get("notes") or monster_summary(monster),
         "creature_type": monster.get("creature_type") or "humanoid",
+        "size": monster.get("size") or "M",
         "hp": monster.get("hp"),
         "ac": monster.get("ac"),
         "speed": monster.get("speed") or "30 ft.",
         "attacks": attacks,
         "traits": monster.get("traits") or "",
         "source": monster.get("source") or "",
+        # Full curated block + provenance for renderers and homebrew pushers.
+        "db_backed": True,
+        "monster_id": monster.get("id"),
+        "ddb_url": monster.get("ddb_url") or "",
+        "portrait_path": monster.get("portrait_path") or "",
+        "statblock": statblock,
     }

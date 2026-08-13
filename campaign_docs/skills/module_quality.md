@@ -1791,3 +1791,94 @@ Investigation modules MUST include a reason the players can't take forever:
 
 **Content gaps (LLM critique):**
 - None identified
+
+
+---
+
+## Self-Evaluation — 2026-08-11 01:19
+
+**Module evaluated:** Veyra_Maws_Silent_Ledger_id1276_20260606_152714_182
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Only 1 clue indicator(s) — three-clue rule requires 3 independent paths to each revelation
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-08-12 01:10
+
+**Module evaluated:** Secure_Deepvein_Mine_Operations_id1431_20260811_070225_630
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 0 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 1 (need ≥4)
+- Inline stat blocks: 4 (need ≥1 per combat scene)
+- Skill checks / branches: 28 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- CRITICAL: No READ ALOUD blocks — players have no atmospheric immersion text
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: 1 stat block(s) placed in appendix — must be INLINE immediately after NPC/monster introduction in the scene
+- LOW: 20 DC(s) but only 4 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 0 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
+
+
+---
+
+## Self-Evaluation — 2026-08-13 01:10
+
+**Module evaluated:** The_Ring_of_Regenerations_Hidden_Truth_id1446_20260812_055027_276
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 2 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified

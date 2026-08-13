@@ -283,6 +283,119 @@ async def create_module(mission: dict, mission_type: str = "") -> Optional[str]:
 
 
 # ---------------------------------------------------------------------------
+# Curated monsters -- our `monsters` table is the authority, never the model
+# ---------------------------------------------------------------------------
+
+def _blocks_to_entries(text: str) -> list[dict]:
+    """Split a curated 'Name. Body text' block into 5etools {name, entries} dicts."""
+    out: list[dict] = []
+    for para in [p.strip() for p in str(text or "").split("\n\n") if p.strip()]:
+        head, sep, body = para.partition(". ")
+        if sep and len(head) <= 60:
+            out.append({"name": head.strip(), "entries": [body.strip()]})
+        else:
+            out.append({"name": "", "entries": [para]})
+    return out
+
+
+def _speed_value(speed: str) -> dict | str:
+    """'30 ft.' -> {'walk': 30}; anything more exotic stays as written."""
+    m = re.match(r"^\s*(\d+)\s*ft\.?\s*$", str(speed or ""))
+    return {"walk": int(m.group(1))} if m else str(speed or "30 ft.")
+
+
+def _curated_monster_data(sb: dict) -> str:
+    """5etools-shaped payload built entirely from a curated `monsters` row.
+
+    Every field here comes from MySQL. Nothing is estimated from CR and nothing
+    is generated -- that is the whole point of this path.
+    """
+    import json as _json
+
+    hp     = sb.get("hp")
+    die    = sb.get("hp_die") or "8"
+    die_n  = sb.get("hp_die_count")
+    data: dict = {
+        "name": sb.get("name"),
+        "size": [str(sb.get("size") or "M")[:1].upper()],
+        "type": sb.get("creature_type") or "humanoid",
+        "cr":   str(sb.get("cr") or "1"),
+        "ac":   [{"ac": sb["ac"]}] if sb.get("ac") else [],
+        "hp":   {"average": hp, "formula": f"{die_n}d{die}" if die_n else ""} if hp else {},
+        "speed": _speed_value(sb.get("speed")),
+    }
+
+    for out_key, in_key in (("str", "str_"), ("dex", "dex"), ("con", "con"),
+                            ("int", "int_"), ("wis", "wis"), ("cha", "cha")):
+        if sb.get(in_key) is not None:
+            data[out_key] = sb[in_key]
+
+    if sb.get("saves"):
+        data["save"] = {k: (f"+{v}" if isinstance(v, int) and v >= 0 else str(v))
+                        for k, v in dict(sb["saves"]).items()}
+    if sb.get("passive_perc") is not None:
+        data["passive"] = sb["passive_perc"]
+    if sb.get("languages"):
+        data["languages"] = [s.strip() for s in str(sb["languages"]).split(",") if s.strip()]
+
+    for out_key, in_key in (("trait", "traits"), ("action", "actions"),
+                            ("reaction", "reactions"), ("bonus", "bonus_actions"),
+                            ("legendary", "legendary_actions"), ("mythic", "mythic_actions"),
+                            ("legendaryGroup", "lair_actions")):
+        entries = _blocks_to_entries(sb.get(in_key))
+        if entries:
+            data[out_key] = entries
+
+    if sb.get("notes"):
+        data["entries"] = [str(sb["notes"])]
+
+    return _json.dumps(data)
+
+
+async def _sync_curated_homebrew(mimir, enemy: dict) -> None:
+    """Mirror a curated monster into Mimir homebrew once, with its real stats.
+
+    Guarded by the `mimir_sync` table (entity_type='monster') so repeated module
+    builds stop stacking duplicate copies of the same creature -- the old path
+    re-created a fresh stub on every single build, which is why the homebrew
+    table filled up with things like 'soldiers / fighters'.
+    """
+    sb   = enemy.get("statblock") or {}
+    name = str(sb.get("name") or enemy.get("name") or "").strip()
+    if not name:
+        return
+
+    try:
+        from src.mimir_sync import _get_sync_row, _upsert_sync, _make_hash
+    except Exception as exc:
+        logger.debug(f"[MIMIR] Curated sync bookkeeping unavailable: {exc}")
+        return
+
+    payload = _curated_monster_data(sb)
+    try:
+        stat_hash = _make_hash({"data": payload})
+        row = _get_sync_row("monster", name)
+        if row and row.get("sync_hash") == stat_hash:
+            return
+    except Exception as exc:
+        logger.debug(f"[MIMIR] Curated sync lookup failed for {name!r}: {exc}")
+        return
+
+    try:
+        hw = await mimir.create_homebrew_monster(
+            name          = name,
+            data_json     = payload,
+            cr            = str(sb.get("cr") or "1"),
+            creature_type = sb.get("creature_type") or "humanoid",
+        )
+        if hw:
+            _upsert_sync("monster", name, str(hw.get("id") or ""), stat_hash)
+            logger.debug(f"[MIMIR] Curated homebrew synced: {name!r} CR {sb.get('cr')}")
+    except Exception as exc:
+        logger.warning(f"[MIMIR] Curated homebrew sync failed for {name!r}: {exc}")
+
+
+# ---------------------------------------------------------------------------
 # Monster enrichment
 # ---------------------------------------------------------------------------
 
@@ -314,6 +427,18 @@ async def enrich_monsters(
         notes = enemy.get("notes", "")
 
         cr_val = _parse_cr(cr)
+
+        # Creatures from our curated `monsters` table are already authoritative:
+        # real 5e stat block, already pushed to DDB, already portrait-enriched.
+        # Register them on the module and stop -- no catalog fuzzy-match (which
+        # used to resolve "Faction Enforcer" to nothing and fall through), no
+        # fabricated homebrew stub, and no LLM-generated stat block.
+        if enemy.get("db_backed") and enemy.get("statblock"):
+            await mimir.add_monster(module_id, name, count=count, notes=notes)
+            await _sync_curated_homebrew(mimir, enemy)
+            enriched.append({**enemy, "catalog_name": name, "catalog_data": None})
+            logger.debug(f"[MIMIR] Curated monster used as-is: {name!r} CR {cr}")
+            continue
 
         # Search by name first; widen if no results
         results = await mimir.search_monsters(
@@ -545,6 +670,107 @@ def _cr_color(cr_str: str) -> str:
     return "#7b1e1e"
 
 
+_ABILITY_LABELS = (("STR", "str_"), ("DEX", "dex"), ("CON", "con"),
+                   ("INT", "int_"), ("WIS", "wis"), ("CHA", "cha"))
+
+
+def _ability_mod(score) -> str:
+    try:
+        mod = (int(score) - 10) // 2
+    except (TypeError, ValueError):
+        return ""
+    return f"+{mod}" if mod >= 0 else str(mod)
+
+
+def _render_curated_statblock(enemy: dict) -> str:
+    """Full runnable stat block for a creature from our `monsters` table.
+
+    The DM has to fight this thing at the table, so print what it actually does
+    -- ability scores, saves, traits, actions, reactions -- not a CR/HP/AC chip.
+    """
+    sb    = enemy.get("statblock") or {}
+    color = _cr_color(str(sb.get("cr") or 1))
+    count = enemy.get("count", 1)
+    name  = _e(sb.get("name") or enemy.get("name") or "?")
+    if count and int(count) > 1:
+        name += f' <span style="font-weight:normal;font-size:13px;">x{count}</span>'
+
+    size_word = {"T": "Tiny", "S": "Small", "M": "Medium",
+                 "L": "Large", "H": "Huge", "G": "Gargantuan"}.get(
+        str(sb.get("size") or "M")[:1].upper(), "Medium")
+
+    rows = [
+        f'<div style="font-size:18px;font-weight:bold;color:{color};">{name}</div>',
+        f'<div style="font-style:italic;color:#555;font-size:13px;margin-bottom:6px;">'
+        f'{_e(size_word)} {_e(sb.get("creature_type") or "humanoid")}</div>',
+        f'<div style="border-top:2px solid {color};margin:6px 0;"></div>',
+    ]
+
+    stat_line = " &nbsp; ".join(
+        f"<b>{lab}</b> {_e(sb.get(key))} ({_e(_ability_mod(sb.get(key)))})"
+        for lab, key in _ABILITY_LABELS if sb.get(key) is not None
+    )
+    meta = [
+        f'<b>AC</b> {_e(sb.get("ac"))}' if sb.get("ac") else "",
+        f'<b>HP</b> {_e(sb.get("hp"))}' + (
+            f' ({_e(sb.get("hp_die_count"))}d{_e(sb.get("hp_die"))})'
+            if sb.get("hp_die_count") else ""
+        ) if sb.get("hp") else "",
+        f'<b>Speed</b> {_e(sb.get("speed"))}' if sb.get("speed") else "",
+        f'<b>CR</b> {_e(sb.get("cr"))}' if sb.get("cr") else "",
+    ]
+    rows.append('<div style="font-size:13px;">' + " &nbsp; ".join(p for p in meta if p) + "</div>")
+    if stat_line:
+        rows.append(f'<div style="font-size:13px;margin-top:4px;">{stat_line}</div>')
+
+    extras = []
+    if sb.get("saves"):
+        extras.append("<b>Saves</b> " + _e(", ".join(
+            f"{k.upper()} {'+' if isinstance(v, int) and v >= 0 else ''}{v}"
+            for k, v in dict(sb["saves"]).items()
+        )))
+    if sb.get("passive_perc") is not None:
+        extras.append(f'<b>Passive Perception</b> {_e(sb.get("passive_perc"))}')
+    if sb.get("languages"):
+        extras.append(f'<b>Languages</b> {_e(sb.get("languages"))}')
+    if extras:
+        rows.append(f'<div style="font-size:13px;margin-top:4px;">{" &nbsp; ".join(extras)}</div>')
+
+    for heading, key in (("Traits", "traits"), ("Actions", "actions"),
+                         ("Bonus Actions", "bonus_actions"), ("Reactions", "reactions"),
+                         ("Legendary Actions", "legendary_actions"),
+                         ("Mythic Actions", "mythic_actions"),
+                         ("Lair Actions", "lair_actions")):
+        body = str(sb.get(key) or "").strip()
+        if not body:
+            continue
+        rows.append(f'<div style="border-top:1px solid {color};margin:8px 0 4px;"></div>')
+        rows.append(
+            f'<div style="font-variant:small-caps;font-weight:bold;letter-spacing:1px;'
+            f'color:{color};font-size:14px;">{heading}</div>'
+        )
+        for para in [p.strip() for p in body.split("\n\n") if p.strip()]:
+            head, sep, rest = para.partition(". ")
+            if sep and len(head) <= 60:
+                rows.append(f'<div style="font-size:13px;margin:3px 0;">'
+                            f'<b><i>{_e(head)}.</i></b> {_e(rest)}</div>')
+            else:
+                rows.append(f'<div style="font-size:13px;margin:3px 0;">{_e(para)}</div>')
+
+    if enemy.get("ddb_url"):
+        rows.append(
+            f'<div style="font-size:11px;margin-top:8px;">'
+            f'<a href="{_e(enemy["ddb_url"])}" style="color:#666;">D&amp;D Beyond stat block</a></div>'
+        )
+
+    return (
+        f'<div style="border:1px solid {color};border-left:5px solid {color};border-radius:6px;'
+        f'padding:12px 16px;background:#fffdf8;flex:1 1 320px;max-width:460px;">'
+        + "\n".join(rows) +
+        "</div>"
+    )
+
+
 def render_mimir_section(
     enemies: list[dict],
     rewards: list[dict],
@@ -570,6 +796,13 @@ def render_mimir_section(
         parts.append('<h3 style="color:#7b1e1e;margin:0 0 8px;">Encounter Monsters</h3>')
         parts.append('<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">')
         for enemy in enemies:
+            # Curated `monsters` row -> print the whole stat block. These are the
+            # creatures we built and already pushed to DDB; the DM should not have
+            # to go look anything up mid-fight.
+            if enemy.get("db_backed") and enemy.get("statblock"):
+                parts.append(_render_curated_statblock(enemy))
+                continue
+
             cd = enemy.get("catalog_data") or {}
             # Prefer our own DB-backed stats (authoritative) over the fuzzy Mimir
             # catalog match, which often resolves grunts/bosses to a generic

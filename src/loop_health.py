@@ -39,6 +39,7 @@ EXPECTED: Dict[str, tuple] = {
     "npc_portraits":      ("NPC portraits",            26 * 60 * 60),
     "npc_lifecycle":      ("NPC lifecycle",            44 * 60 * 60),
     "party_lifecycle":    ("Party lifecycle",          44 * 60 * 60),
+    "social_pulse":       ("Social pulse / TTN voices", 44 * 60 * 60),
     "log_cleanup":        ("Log cleanup",              50 * 60 * 60),
     "db_backup":          ("MySQL backup",             50 * 60 * 60),
 }

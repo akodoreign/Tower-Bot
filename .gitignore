@@ -218,3 +218,7 @@ archive/
 scripts/npc_ddb_staging.json
 scripts/creature_ddb_staging.json
 Webpage/thumb_cache/
+
+# Generated Ollama Modelfile — embeds verbatim MM/XMM statblock excerpts (copyrighted).
+# Rebuild with: python scripts/build_tower_2024_model.py --build
+Modelfile.tower-2024

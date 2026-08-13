@@ -521,6 +521,18 @@ def _move_to_graveyard(npc: dict, npcs: List[dict]) -> None:
         logger.warning(f"💀 Could not set deceased_at for {npc.get('name')}: {_e}")
     logger.info(f"💀 {npc.get('name')} moved to graveyard")
 
+    # Somebody has to miss them. Bonds are NOT closed here -- in the Undercity a
+    # corpse is provisional (raise, resurrection, reincarnation, undead, or the
+    # doppelganger wearing their face), so each survivor gets grief plus a stance:
+    # the ones who loved them want them back, the ones who feared them want the
+    # grave to hold. Bonds only truly end when the Tower takes the soul.
+    try:
+        from src.npc_bonds import bereave
+        bereave(int(npc.get("id") or 0), str(npc.get("name") or "Someone"),
+                str(npc.get("death_cause") or ""))
+    except Exception as _be:
+        logger.debug(f"[bonds] bereavement skipped for {npc.get('name')}: {_be}")
+
     # Remove from active roster list
     try:
         npcs.remove(npc)
@@ -951,7 +963,12 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> tuple:
     # ── Injured NPCs: resolve before anything else ────────────────────────────
     # 90% recover, 10% die. Either way generate a bulletin explaining the outcome.
     if npc.get("status") == "injured":
-        event = "injury_recovery" if random.random() < 0.90 else "injury_death"
+        # The Unknown Party are the best operators in the Undercity. They get hurt;
+        # they do not bleed out on a background tick. 98% recover instead of 90% --
+        # over many ticks a flat 10% was quietly killing them again and again
+        # (The Ward had died and been resurrected FIVE times).
+        _recover_odds = 0.98 if is_unknown_party_member(npc.get("name", "")) else 0.90
+        event = "injury_recovery" if random.random() < _recover_odds else "injury_death"
 
     # ── Dead NPCs: only resurrection (5% chance), otherwise skip ─────────────
     elif npc.get("status") == "dead":
@@ -967,6 +984,16 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> tuple:
         if event == "death" and is_faction_leader(npc.get("name", "")):
             logger.info(f"\U0001f451 Protected leader {npc.get('name')} from random death — rerolling event")
             event = random.choice(["promotion", "public_incident", "new_secret", "revelation"])
+
+        # Same protection for the Unknown Party. They are the best of the best and
+        # the story's recurring faces; a random ambient roll must never take one.
+        # If they die it should be a deliberate, gated outcome the DM can see coming.
+        # (This guard was missing entirely: 6 deaths across the five, Sable twice.)
+        if event == "death" and is_unknown_party_member(npc.get("name", "")):
+            logger.info(f"\U0001f3ad Protected Unknown Party member {npc.get('name')} "
+                        f"from random death — rerolling event")
+            event = random.choice(["revelation", "new_secret", "public_incident",
+                                   "alliance", "betrayal"])
 
         # Party-bound NPCs (npcs.party_name) live their career through their crew:
         # party_lifecycle drives contracts/splits/merges, so ambient faction-career

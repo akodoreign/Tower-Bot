@@ -115,6 +115,13 @@ def fake_mimir(monkeypatch):
         available = False
         items: dict = {}
         added: list = []
+        # Monster side: `monsters` are catalog search hits keyed by substring,
+        # `monsters_added` records add_monster_to_module, `homebrew` records every
+        # create_homebrew call (assert on this to prove nothing was fabricated).
+        monsters: dict = {}
+        monster_searches: list = []
+        monsters_added: list = []
+        homebrew: list = []
 
         async def ensure_connected(self):
             return self.available
@@ -128,6 +135,23 @@ def fake_mimir(monkeypatch):
 
         async def add_item(self, module_id, name):
             self.added.append((module_id, name))
+
+        async def search_monsters(self, **kw):
+            self.monster_searches.append(kw)
+            name = (kw.get("name") or "").lower()
+            for key, val in self.monsters.items():
+                if key.lower() in name:
+                    return [val]
+            return []
+
+        async def add_monster(self, module_id, monster_name, count=1, notes=""):
+            self.monsters_added.append((module_id, monster_name, count))
+            return True
+
+        async def create_homebrew_monster(self, name, data_json, cr="1",
+                                          creature_type="humanoid", **kw):
+            self.homebrew.append({"name": name, "data": data_json, "cr": cr})
+            return {"id": f"hb-{name}"}
 
     client = FakeMimirClient()
     mod = types.ModuleType("src.mimir_client")

@@ -1549,11 +1549,24 @@ async def build_infestation_module(mission: dict, out_dir: Optional[Path] = None
                     for _e in _enemy_input:
                         if not _e.get("name"):
                             continue
+                        # Curated monsters are already on DDB with their real stats.
+                        # Re-pushing would just create a second, worse copy.
+                        if _e.get("ddb_url"):
+                            logger.debug(f"[DDB_HB] Already on DDB, skipping: {_e['name']!r}")
+                            continue
                         _cr = str(_e.get("cr", "1"))
                         try:
                             _cr_num = float(_cr.replace("1/8","0.125").replace("1/4","0.25").replace("1/2","0.5"))
                         except Exception:
                             _cr_num = 1.0
+                        if _e.get("statblock"):
+                            _prebuilt = dict(_e["statblock"])
+                            try:
+                                await _ddb_push(_e, cr_val=_cr, statblock=_prebuilt)
+                                logger.info(f"[DDB_HB] Direct push (curated): {_e['name']!r} CR {_cr}")
+                            except Exception as _de:
+                                logger.warning(f"[DDB_HB] Direct push failed for {_e.get('name')!r}: {_de}")
+                            continue
                         try:
                             from src.mission_builder.monster_stat_gen import build_statblock
                             _prebuilt = build_statblock(
