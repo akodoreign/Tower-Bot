@@ -58,20 +58,32 @@ def load_npc_roster() -> List[dict]:
     """Load the NPC roster from MySQL. Returns empty list on failure."""
     try:
         from src.db_api import raw_query as _rq
+        # `rank` is a real column and is selected explicitly now -- get_faction_leader
+        # below depends on it, and it previously arrived only via data_json expansion.
+        # Both `role` and `rank` are MySQL 8 reserved words, hence the backticks.
         rows = _rq(
-            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "SELECT name, faction, `role`, location, status, `rank`, motivation, "
+            "secret, relationships, data_json FROM npcs "
             "WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name"
         ) or []
         if rows:
+            _COLUMNS = ("name", "faction", "role", "location", "status", "rank",
+                        "motivation", "secret", "relationships")
             npcs = []
             for row in rows:
-                npc = {"name": row["name"], "faction": row["faction"],
-                       "role": row["role"], "location": row["location"], "status": row["status"]}
                 dj = row.get("data_json") or {}
                 if isinstance(dj, str):
                     try: dj = json.loads(dj)
                     except: dj = {}
-                npc.update(dj)
+                if not isinstance(dj, dict):
+                    dj = {}
+                # Blob FIRST for the genuinely schemaless extras (stats, equipment,
+                # dnd_class...), then real columns overlay it. The old order was
+                # reversed -- npc.update(dj) let a stale shadow copy overwrite the
+                # authoritative column, so an NPC whose data_json still said "dead"
+                # read as dead even after they had been raised.
+                npc = dict(dj)
+                npc.update({k: row[k] for k in _COLUMNS if row.get(k) is not None})
                 npcs.append(npc)
             return npcs
     except Exception:
@@ -89,8 +101,35 @@ def get_faction_leader(faction: str) -> Optional[dict]:
     """
     roster = load_npc_roster()
     faction_lower = faction.lower().strip()
-    
-    # Get canonical leader name
+
+    # DB FIRST. `faction_reputation.leader` is the authoritative record and is kept
+    # normalised ("Aldric Vane (Guildmaster)"). The hardcoded FACTION_LEADERS map
+    # below had gone stale and pointed the Adventurers Guild at Mari Fen -- the
+    # front-desk clerk, rank Member -- while Aldric Vane sat there ranked
+    # Guildmaster. A hardcoded table must never outrank live data.
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT leader FROM faction_reputation WHERE LOWER(faction_name) = %s "
+            "OR LOWER(faction_name) LIKE %s LIMIT 1",
+            (faction_lower, f"%{faction_lower}%"),
+        ) or []
+        if rows and rows[0].get("leader"):
+            leader_name = str(rows[0]["leader"]).split("(")[0].strip()
+            for npc in roster:
+                if npc.get("name", "").lower() == leader_name.lower():
+                    return npc
+            from src.npc_dossier import resolve_npc
+            match = resolve_npc(leader_name, faction)
+            if match and str(match.get("status")) == "alive":
+                return dict(match)
+    except Exception:
+        pass
+
+    # DEPRECATED FALLBACK. `faction_reputation` is the source of truth (36 factions
+    # with leaders vs 26 here) and is checked above. This map is leftovers -- it had
+    # already drifted, naming Mari Fen as head of the Adventurers Guild. Do not add
+    # to it; if a faction is missing a leader, fix the DB row.
     canonical_name = None
     for key, name in FACTION_LEADERS.items():
         if key in faction_lower or faction_lower in key:

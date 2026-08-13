@@ -161,3 +161,54 @@ def test_dossier_is_empty_when_nobody_is_cast(monkeypatch):
     import src.npc_dossier as nd
     monkeypatch.setattr(nd, "cast_mission_contact", lambda m: None)
     assert nd.dossier_block({"id": 1, "contact": "nobody at all"}) == ""
+
+
+# ---------------------------------------------------------------------------
+# The DB outranks every hardcoded table
+# ---------------------------------------------------------------------------
+
+def test_roster_columns_beat_the_json_shadow_copy(monkeypatch):
+    """`npc.update(data_json)` let a stale blob overwrite the real column, so an
+    NPC whose data_json still said 'dead' read as dead after being raised."""
+    import json as _json
+    from src.mission_builder import npcs as mb_npcs
+
+    row = {"name": "Aldric Vane", "faction": "Adventurers Guild",
+           "role": "Guildmaster", "location": "Guild hall", "status": "alive",
+           "rank": "Guildmaster", "motivation": None, "secret": None,
+           "relationships": None,
+           # the stale shadow copy
+           "data_json": _json.dumps({"status": "dead", "rank": "Member",
+                                     "stats": {"str": 14}})}
+    monkeypatch.setattr(mb_npcs, "raw_query", lambda *a, **k: [row], raising=False)
+    import src.db_api as db_api
+    monkeypatch.setattr(db_api, "raw_query", lambda *a, **k: [row])
+
+    roster = mb_npcs.load_npc_roster()
+    assert roster, "roster failed to load"
+    npc = roster[0]
+    assert npc["status"] == "alive", "stale blob overwrote the authoritative column"
+    assert npc["rank"] == "Guildmaster"
+    # Genuinely schemaless extras still survive.
+    assert npc.get("stats") == {"str": 14}
+
+
+def test_faction_leader_comes_from_the_db_not_the_hardcoded_map(monkeypatch):
+    """FACTION_LEADERS had gone stale and named the front-desk clerk as Guildmaster."""
+    from src.mission_builder import npcs as mb_npcs
+
+    assert mb_npcs.FACTION_LEADERS.get("adventurers guild") is not None, \
+        "fixture assumes the legacy map still exists as a fallback"
+
+    monkeypatch.setattr(mb_npcs, "load_npc_roster", lambda: [
+        {"name": "Aldric Vane", "faction": "Adventurers Guild",
+         "status": "alive", "rank": "Guildmaster"},
+        {"name": "Mari Fen", "faction": "Adventurers Guild",
+         "status": "alive", "rank": "Member"},
+    ])
+    import src.db_api as db_api
+    monkeypatch.setattr(db_api, "raw_query",
+                        lambda *a, **k: [{"leader": "Aldric Vane (Guildmaster)"}])
+
+    leader = mb_npcs.get_faction_leader("Adventurers Guild")
+    assert leader and leader["name"] == "Aldric Vane"

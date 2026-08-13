@@ -2120,3 +2120,29 @@ have started seeing each other."
   DETECTS the drift and repairs it, but the real fix is to stop writing the mirrors. That needs a
   reader audit first: anything doing `data_json["faction"]` must repoint to the column, and
   silently returning None would be worse than the drift.
+
+## 2026-08-13 - DONE: the DB is the source of truth (read side)
+
+Committed f9a33a2, then audited who READS the JSON mirrors. Two real bugs, both the read-side
+counterpart of the write-side drift:
+
+**1. The blob overwrote the column.** `mission_builder/npcs.load_npc_roster()` built the NPC from
+real columns and then did `npc.update(data_json)` -- so a stale shadow copy WON. Sable and Aldric
+Vane sat at `column='alive', blob='dead'` for part of today, meaning every caller of the roster saw
+them as dead. Order reversed: blob first for genuinely schemaless extras (stats, equipment,
+dnd_class), then real columns overlay it. Also added `rank` to the SELECT -- `get_faction_leader()`
+depended on it and it only ever arrived via blob expansion (the code comment admitted as much).
+
+**2. A hardcoded table outranked the DB.** `FACTION_LEADERS` mapped `'adventurers guild' ->
+'Mari Fen'` -- the front-desk clerk, rank Member -- while Aldric Vane sat there ranked Guildmaster.
+It was checked BEFORE any DB lookup, so every mission citing the Guild's leader named the wrong
+person. `get_faction_leader()` now reads `faction_reputation` first (36 factions with leaders vs 26
+hardcoded), then rank keywords, and the legacy map is marked deprecated: do not add to it, fix the
+DB row. Only 3 conflicts existed and all are resolved.
+
+Also repaired 9 guild-leader names from my own earlier splitting bug: compound titles ("Prime
+Engineer Tessla Voltmane", "High Medicant Cael Voss") only had their first word stripped, leaving
+"Engineer"/"Medicant" glued to the name. Titles rejoined into `rank`, names cleaned, and
+`faction_reputation.leader` normalised to match. World integrity still clean.
+
+232 tests green.
