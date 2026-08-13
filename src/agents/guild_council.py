@@ -409,6 +409,72 @@ Do NOT include any other text, preamble, or markdown fences."""
 
     # ── Member voting ──────────────────────────────────────────────────────
 
+    @staticmethod
+    def _live_seat(member: dict) -> str:
+        """What the WORLD currently knows about this councillor.
+
+        The seat definitions above are static strings. The person behind them is a
+        real `npcs` row with a motivation, a secret, live relationships, open grief
+        and a faction standing that moves. Without this the council debates as six
+        interchangeable policy analysts; with it, Director Myra Kess is mourning
+        Corvin Thale and wants him raised, which is not a neutral position to hold
+        when the ruling touches the resurrection market.
+        """
+        try:
+            from src.db_api import raw_query
+            from src.npc_dossier import resolve_npc, build_dossier, _plain
+            from src.npc_bonds import get_bonds
+        except Exception:
+            return ""
+
+        name = str(member.get("name") or "")
+        rows = raw_query("SELECT * FROM npcs WHERE name = %s LIMIT 1", (name,)) or []
+        npc = rows[0] if rows else resolve_npc(name)
+        if not npc:
+            return ""
+
+        lines: list[str] = []
+        d = build_dossier(npc)
+        if d.get("motivation"):
+            lines.append(f"What you actually want: {d['motivation']}")
+        if d.get("secret"):
+            lines.append(f"What you never say aloud (it shapes you anyway): {d['secret']}")
+        if d.get("oracle_notes"):
+            lines.append(f"Underneath: {d['oracle_notes']}")
+
+        # Ties AMONG the council are where dissent comes from.
+        seat_names = {m["name"] for m in COUNCIL_MEMBERS} | {COUNCIL_PRESIDENT["name"]}
+        for bond in get_bonds(int(npc["id"]), active_only=False):
+            other = str(bond.get("other_name") or "")
+            if bond.get("status") == "mourning":
+                stance = bond.get("stance")
+                if stance == "seeking_return":
+                    lines.append(
+                        f"OPEN WOUND: your {bond['bond_type']} {other} is dead and NOT yet "
+                        f"lost to the Tower. You want them back. Anything touching "
+                        f"resurrection, the Choir, or the price of a soul is personal.")
+                elif stance == "wants_them_gone":
+                    lines.append(f"Your {bond['bond_type']} {other} is dead and you would "
+                                 f"rather the grave held.")
+            elif bond.get("bond_type") in ("rival", "enemy") and bond.get("status") == "active":
+                at_table = " — and they sit at this table" if other in seat_names else ""
+                label = {"rival": "rivals", "enemy": "enemies"}[bond["bond_type"]]
+                lines.append(f"You are {label} with {other}{at_table}.")
+
+        standing = d.get("standing") or {}
+        if standing.get("reputation_score") is not None:
+            lines.append(f"Your faction currently stands at {standing['reputation_score']}"
+                         + (f" ({standing['tier']})" if standing.get("tier") else "")
+                         + " with the adventurers who do the actual work.")
+        for c in (d.get("consequences") or [])[:2]:
+            # _plain strips the Discord bulletin formatting these are stored with;
+            # raw emoji and **bold** teach the model to write press releases.
+            moment = _plain(c.get("notable_moments"), 170)
+            if moment:
+                lines.append(f"Recently, and you have not forgotten it: {moment}")
+
+        return "\n".join(lines)
+
     async def _member_vote(
         self,
         member: dict,
@@ -433,11 +499,14 @@ Do NOT include any other text, preamble, or markdown fences."""
         else:
             speak_note = "You speak first. Set the tone for the debate."
 
+        live = self._live_seat(member)
+        live_block = f"\nWHAT IS TRUE OF YOU RIGHT NOW:\n{live}\n" if live else ""
+
         prompt = f"""You are {member['name']}, {member['title']} of the {member['faction']}.
 Your agenda: {member['agenda']}
 Your bias: {member['bias']}
 Your voice: {member['voice']}
-
+{live_block}
 WORLD CONTEXT:
 {briefing[:500]}
 
@@ -446,12 +515,20 @@ PROPOSED RULING:
 {debate_context}
 {speak_note}
 
-Do not merely vote your faction bias. In 2-3 sentences:
-- Name the strongest argument FOR the ruling
-- Name the strongest objection or cost
-- Explain why your faction accepts or rejects that tradeoff
+Speak as this person, not as a policy analyst. Do NOT write a balanced summary of
+pros and cons — that is how six different people end up sounding identical. Argue
+the way YOU argue: grandstand, cite precedent, make it about money, make it about
+the dead, be contemptuous, be tired. Use your own cadence and your own fixations.
 
-Format exactly:
+Concrete over abstract. Name a district, a faction, a person, a number, or
+something from "what is true of you right now" — that is what makes a position
+land instead of evaporating. If you are personally compromised on this, the room
+should be able to hear it even if you refuse to admit it.
+
+You may vote against your own faction's interest if this particular issue costs
+you something you care about more. Say so plainly when it happens.
+
+2-4 sentences. Format exactly:
 POSITION: [your statement]
 VOTE: YES  or  VOTE: NO"""
 
@@ -493,11 +570,14 @@ VOTE: YES  or  VOTE: NO"""
             for speaker, stmt in prior_statements:
                 debate_context += f'  {speaker}: "{stmt}"\n'
 
+        live = self._live_seat(member)
+        live_block = f"\nWHAT IS TRUE OF YOU RIGHT NOW:\n{live}\n" if live else ""
+
         prompt = f"""You are {member['name']}, {member['title']} of the {member['faction']}.
 Your agenda: {member['agenda']}
 Your bias: {member['bias']}
 Your voice: {member['voice']}
-
+{live_block}
 WORLD CONTEXT:
 {briefing[:700]}
 
@@ -511,6 +591,10 @@ Requirements:
 - Directly answer or challenge at least one prior argument if any exists
 - State one condition, amendment, or concession that would make this ruling acceptable or unacceptable
 - Give a concrete reason grounded in your faction's interests, not a generic slogan
+- Sound like YOURSELF, not like a committee. Six people reading the same balanced
+  brief is how this room turns into one voice. If something above makes this
+  personal for you, let it show, or let the effort of hiding it show
+- If you are at odds with someone at this table, address them by name
 - 2-3 sentences only
 
 Output only your spoken argument."""

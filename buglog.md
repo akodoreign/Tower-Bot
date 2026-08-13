@@ -2177,3 +2177,47 @@ after every boot there was no evidence it was alive and loop-health read "never-
 log line before the sleep.
 
 Restart verified clean (16:34:43 boot, zero tracebacks, all loops up). 234 tests green.
+
+## 2026-08-13 - DONE: council personality (the same data-flow bug, third instance)
+
+User: "council voting, personality does not leak through for decision and dissention."
+
+`agents/guild_council.py` defines the 6 seats + President as **hardcoded persona strings**
+(name/faction/agenda/bias/voice) -- the same antipattern as `FACTION_LEADERS`. All 7 are real
+`npcs` rows, and none of their live data reached the prompt.
+
+Worse, both the vote and debate prompts imposed a uniform template:
+
+    - Name the strongest argument FOR the ruling
+    - Name the strongest objection or cost
+    - Explain why your faction accepts or rejects that tradeoff
+
+That is a coverage checklist. It turns six distinct people into six policy analysts writing the
+same balanced memo -- personality cannot survive it. Identical root cause to the dry Table Talk.
+
+Added `GuildCouncil._live_seat()`, wired into BOTH the vote and debate prompts, carrying
+motivation, secret, oracle_notes, live bonds among the seated members, open grief with its
+stance, faction standing, and recent `mission_outcomes` (run through `_plain()` -- the raw rows
+carry Discord emoji/markdown and teach the model to write press releases).
+
+What was sitting unused, per seat:
+- **Director Myra Kess** (Tower compliance, votes on resurrection policy): secretly a former Iron
+  Veil cultist channelling blood magic and sacrificing agents; died and was raised herself; and
+  is currently mourning Corvin Thale with stance `seeking_return`. She is compromised three ways
+  and the council never knew.
+- **High Apostle Yzura** (runs the resurrection market): "resurrected imperfectly. Now Dwarf.
+  Erratic... The Oracle questions whether this is truly the same soul."
+- **Senior Archivist Pell**: also imperfectly resurrected, now a Tiefling, warmer since.
+- **Serrik Dhal**: dying of void cancer, wants to die on his own terms "not Sara Voss's", hiding
+  a Rift-sight ability; `enemy` bond with Sera Voss.
+
+Prompts now explicitly forbid the balanced-summary shape, tell each member to argue in their own
+cadence and fixations, allow voting AGAINST their own faction when the issue costs them something
+they care about more, and instruct them to address a rival at the table by name.
+
+**Not changed, flagged instead:** `COUNCIL_PRESIDENT` is "Guildmaster Mari Fen" -- but Mari Fen is
+rank Member (front desk) and Aldric Vane is Guildmaster. Same stale-hardcoded-data class as
+FACTION_LEADERS. Her holding the chair while Aldric was dead for two months is good fiction; the
+TITLE is simply wrong. Left for a world decision rather than silently rewritten.
+
+234 tests green.
