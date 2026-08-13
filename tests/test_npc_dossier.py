@@ -212,3 +212,57 @@ def test_faction_leader_comes_from_the_db_not_the_hardcoded_map(monkeypatch):
 
     leader = mb_npcs.get_faction_leader("Adventurers Guild")
     assert leader and leader["name"] == "Aldric Vane"
+
+
+# ---------------------------------------------------------------------------
+# The knowledge card and the dialog must name the SAME person
+# ---------------------------------------------------------------------------
+
+def test_knowledge_card_resolves_a_title_prefixed_contact(monkeypatch):
+    """_lookup_npc tried exact then a PREFIX LIKE, which anchors on the title --
+    so "Guild Liaison Varek at Ironhold Outpost" produced a placeholder card
+    reading "not in NPC roster"."""
+    from src.mission_builder import npc_knowledge_cards as cards
+
+    calls = {"n": 0}
+
+    def fake_query(sql, params=()):
+        calls["n"] += 1
+        # Exact and prefix-LIKE both miss; only the resolved bare name hits.
+        if params and str(params[0]).strip().lower() == "kree scorch":
+            return [{"name": "Kree Scorch", "faction": "Wardens of Ash",
+                     "role": "Patrols the Quarter", "location": "Ashen Spire",
+                     "status": "alive", "species": "Kobold", "rank": "Warden",
+                     "motivation": "Hunts a missing brother.", "quote": "",
+                     "oracle_notes": "", "secret": "", "relationships": "",
+                     "data_json": "{}"}]
+        return []
+
+    monkeypatch.setattr(cards, "raw_query", fake_query, raising=False)
+    import src.db_api as db_api
+    monkeypatch.setattr(db_api, "raw_query", fake_query)
+    monkeypatch.setattr("src.npc_dossier.resolve_npc",
+                        lambda name, faction="": {"name": "Kree Scorch"})
+
+    found = cards._lookup_npc("Guild Liaison Kree Scorch at the Ash Gate")
+    assert found and found["name"] == "Kree Scorch"
+
+
+def test_card_uses_the_same_casting_as_the_dialog(monkeypatch):
+    """If the card resolved separately the module would contradict itself --
+    one person described, a different one voiced."""
+    from src.mission_builder import npc_knowledge_cards as cards
+
+    monkeypatch.setattr("src.npc_dossier.cast_mission_contact",
+                        lambda m: {"id": 1, "name": "Grael Dusthammer"})
+    captured = {}
+
+    def fake_build(npc_lines, mission, *, extra_names=None):
+        captured["names"] = extra_names
+        return "<div>card</div>"
+
+    monkeypatch.setattr(cards, "build_npc_cards_html", fake_build)
+    cards.build_module_npc_cards("<p>x</p>",
+                                 {"id": 5, "contact": "Guild Liaison Varek at Ironhold"})
+    assert captured["names"] == ["Grael Dusthammer"], \
+        "card did not use the persisted casting"

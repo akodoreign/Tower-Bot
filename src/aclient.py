@@ -1322,11 +1322,12 @@ class DiscordClient(discord.Client):
         """
         discord_channel_id = os.getenv("DISCORD_CHANNEL_ID")
         await self.wait_until_ready()
+        # Announce BEFORE the offset sleep: otherwise there is no evidence the loop
+        # is alive for 2.5 hours and loop-health reads "never-ran" the whole time.
+        logger.info("\U0001f56f️ Social pulse loop started (first pass in 150m)")
         # Sit well clear of the NPC (45m) and party (90m) lifecycle ticks so the
         # three never contend for Ollama on boot.
         await asyncio.sleep(150 * 60)
-
-        logger.info("\U0001f56f️ Social pulse loop started")
 
         while not self.is_closed():
             notes: list[str] = []

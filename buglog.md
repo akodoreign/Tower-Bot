@@ -2146,3 +2146,34 @@ Engineer Tessla Voltmane", "High Medicant Cael Voss") only had their first word 
 `faction_reputation.leader` normalised to match. World integrity still clean.
 
 232 tests green.
+
+## 2026-08-13 - DONE: NPC knowledge cards cast the same person the dialog does
+
+**Correction to an earlier note in this log:** I wrote that "the dossier is wired into
+scene_dialogs only; per-pipeline Table Talk each needs the same treatment." That was wrong.
+There is no per-pipeline Table Talk -- `mission_builder/__init__.py:340` calls
+`inject_module_dialog()` centrally for EVERY pipeline, so the dossier work already reached all
+of them. No per-pipeline wiring needed.
+
+The dry surface directly below it was the real gap. `npc_knowledge_cards` rendered the card that
+read "Guild Liaison Varek at Ironhold Outpost — **not in NPC roster**" with placeholder bullets
+("the version of events they witnessed directly"). Two causes:
+
+1. `_lookup_npc()` tried exact match then a PREFIX `LIKE 'name%'` -- which anchors on the TITLE,
+   so a title-prefixed contact could never match. Now falls back to `npc_dossier.resolve_npc()`,
+   the same resolver the dialog caster uses.
+2. `build_module_npc_cards()` resolved the contact independently by splitting on `" - "` or `,`
+   -- neither of which appears in "Guild Liaison Varek at Ironhold Outpost". It now calls
+   `cast_mission_contact()`, so the card and the Table Talk name the SAME person. Resolving
+   separately meant a module could describe one person and voice another.
+
+End to end on the real mission-1431 shape: contact "Guild Liaison Varek at Ironhold Outpost"
+(nobody) -> casting falls back to the employing faction -> card renders **Grael Dusthammer,
+Bore-Captain of the Deepvein Extractors** -- one of the 24 guild leaders the integrity sweep
+created earlier today. Sweep -> casting -> card is now a connected chain.
+
+Also: `social_pulse_loop` announced itself AFTER its 150-minute offset sleep, so for 2.5 hours
+after every boot there was no evidence it was alive and loop-health read "never-ran". Moved the
+log line before the sleep.
+
+Restart verified clean (16:34:43 boot, zero tracebacks, all loops up). 234 tests green.

@@ -305,6 +305,19 @@ def _lookup_npc(name: str) -> Optional[Dict[str, Any]]:
                 (f"{name.strip()}%",),
             )
         if not rows:
+            # Both of the above fail on a title-prefixed contact string like
+            # "Guild Liaison Varek at Ironhold Outpost" -- exact misses, and the
+            # prefix LIKE anchors on the TITLE. Fall back to the same resolver the
+            # dialog caster uses (strips titles and " at <place>", demands two
+            # matching name tokens or one plus faction).
+            try:
+                from src.npc_dossier import resolve_npc
+                match = resolve_npc(name)
+                if match:
+                    rows = raw_query(sql, (str(match.get("name") or "").strip(),))
+            except Exception:
+                pass
+        if not rows:
             return None
         row = rows[0]
         # General description ("who they are") lives in data_json.appearance —
@@ -572,8 +585,21 @@ def build_module_npc_cards(module_html: str, mission: dict, max_cards: int = 6) 
     contact plus any roster NPC named in the module HTML. Lets any pipeline's
     module surface who the NPCs are and what they want — not just name them."""
     names: List[str] = []
+
+    # Use the SAME casting the Table Talk dialog used, or the module contradicts
+    # itself -- the card would describe one person while the dialog voices another.
+    # cast_mission_contact() reads the persisted `mission_cast` row first, so both
+    # surfaces land on the same face across regenerations.
+    try:
+        from src.npc_dossier import cast_mission_contact
+        cast = cast_mission_contact(mission)
+        if cast and cast.get("name"):
+            names.append(str(cast["name"]))
+    except Exception:
+        pass
+
     contact = (mission.get("contact") or "").strip()
-    if contact:
+    if contact and not names:
         # Contact strings are often "Name, Location" or "Name - role"; the DB
         # lookup needs just the name part.
         contact = re.split(r"\s[-–—]\s|,", contact)[0].strip()
