@@ -174,3 +174,77 @@ def test_roster_query_selects_rank():
     src = inspect.getsource(news_feed._load_live_roster)
     assert "`rank`" in src, "roster query must select rank (backticked -- reserved word)"
     assert "species" in src
+
+
+# --------------------------------------------------------------------------
+# A rejected bulletin must be REGENERATED, never posted half-written
+#
+# Reported from live use: "a bunch of refuse failures without force rewrite --
+# it was giving news bulletins with no info or half a sentence."
+#
+# Both halves of that are real. A truncated reply used to be logged as "may be
+# malformed" and then posted AND persisted anyway; and a rejection with no retry
+# silently loses the hour. The fix is neither: regenerate, then give up cleanly.
+# --------------------------------------------------------------------------
+
+def test_malformed_bulletin_is_rejected_not_posted():
+    import inspect
+    from src import news_feed
+
+    src = inspect.getsource(news_feed.generate_bulletin)
+    assert "malformed/truncated" in src, "short bulletins are not treated as failures"
+    # The old behaviour was a bare warning followed by the normal return path.
+    assert "may be malformed" not in src, "still warning-and-posting a malformed bulletin"
+
+
+def test_rejected_bulletin_forces_a_rewrite():
+    import inspect
+    from src import news_feed
+
+    src = inspect.getsource(news_feed.generate_bulletin)
+    assert "_attempt=_attempt + 1" in src, "a rejected bulletin is dropped without retrying"
+    assert news_feed._MAX_BULLETIN_ATTEMPTS >= 1
+    # Bounded, so a broken model cannot spin the GPU all night.
+    assert news_feed._MAX_BULLETIN_ATTEMPTS <= 4
+
+
+def test_persist_only_happens_after_validation():
+    """_write_memory must be unreachable for a rejected draft."""
+    import inspect
+    from src import news_feed
+
+    src = inspect.getsource(news_feed.generate_bulletin)
+    reject_at = src.find("if _reject:")
+    persist_at = src.rfind("_write_memory(bulletin)")
+    assert reject_at != -1 and persist_at != -1
+    assert reject_at < persist_at, "a rejected bulletin can still reach news_memory"
+
+
+def test_voiced_bulletins_reject_truncated_drafts():
+    import inspect
+    from src import tower_news_voices
+
+    src = inspect.getsource(tower_news_voices._write)
+    assert "truncated" in src, "voiced path accepts a truncated draft"
+
+
+def test_editorial_path_is_guarded_too():
+    """~35% of bulletins come from the agent editorial path, which had neither
+    a completeness check nor a canon check."""
+    from src.news_integration import _editorial_problem
+
+    class _R:
+        def __init__(self, text):
+            self.raw_content = text
+            self.success = True
+
+    assert _editorial_problem(_R("The Ironworks District reported that"))
+    assert _editorial_problem(_R(""))
+    assert _editorial_problem(_R(
+        "TNN Report\nSenior Archivist Pell has been suspended from the Glass Sigil."
+    ))
+    assert not _editorial_problem(_R(
+        "IRONWORKS DISTRICT - FORGE STRIKE ENTERS THIRD DAY\n"
+        "The Ironworks Combine confirmed that furnace crews walked out again, "
+        "and Denn Ashkeel refused to meet the delegation."
+    ))

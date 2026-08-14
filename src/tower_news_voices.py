@@ -144,7 +144,23 @@ async def _write(news_type: str, instruction: str, context: str, max_lines: int 
             max_lines=max_lines,
         )
         if not text:
-            return None
+            retry_note = "Your previous attempt returned nothing. Write the piece."
+            continue
+
+        # An empty reply was already caught; a TRUNCATED one was not. A 30-char
+        # answer to an obituary is a failed generation, not a terse eulogy, and
+        # posting it is how the feed ends up with half sentences. Treat it as a
+        # rejection and regenerate, same as a canon violation.
+        if len(text.strip()) < 80 or len(text.strip().splitlines()) < 2:
+            logger.warning(
+                f"[voices] {news_type} draft {attempt + 1} looks truncated "
+                f"({len(text.strip())} chars) -- regenerating"
+            )
+            retry_note = ("Your previous attempt was cut off after a few words. "
+                          "Write the COMPLETE piece.")
+            text = None
+            continue
+
         violations = check(text, allow=allow)
         if not violations:
             break
@@ -156,7 +172,7 @@ async def _write(news_type: str, instruction: str, context: str, max_lines: int 
         text = None
 
     if not text:
-        logger.error(f"[voices] dropped {news_type}: could not produce a canon-safe draft")
+        logger.error(f"[voices] dropped {news_type}: no usable draft after 2 attempts")
         return None
 
     try:

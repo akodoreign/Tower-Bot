@@ -273,6 +273,32 @@ def _is_invalid_form_body(exc: Exception) -> bool:
 # Integration with news_feed.py posting
 # ---------------------------------------------------------------------------
 
+_MAX_EDITORIAL_ATTEMPTS = 2
+
+
+def _editorial_problem(result) -> Optional[str]:
+    """Why this editorial must not be posted, or None if it is fine.
+
+    Two failure modes, both previously unchecked on this path:
+      * truncated -- a couple of words back from the model reads as a bulletin
+        with no information. It is a failed generation, not a short news day.
+      * contradicts standing -- an editorial that arrests or buries a guild
+        leader becomes world memory the moment it is written.
+    """
+    body = (getattr(result, "raw_content", "") or "").strip()
+    if len(body) < 80 or len(body.splitlines()) < 2:
+        return f"truncated ({len(body)} chars): {body[:60]!r}"
+
+    try:
+        from src.canon_guard import check as _canon_check
+        violations = _canon_check(body)
+        if violations:
+            return f"contradicts standing ({len(violations)}): {violations[0][:140]}"
+    except Exception as exc:
+        logger.debug(f"canon guard unavailable for editorial: {exc}")
+    return None
+
+
 async def post_editorial_bulletin(
     channel: discord.TextChannel,
     editor_type: EditorType = EditorType.RANDOM,
@@ -295,16 +321,39 @@ async def post_editorial_bulletin(
     Returns:
         The posted message, or None if generation failed
     """
-    result = await generate_editorial_bulletin(
-        editor_type=editor_type,
-        topic=topic,
-        venue=venue,
-    )
-    
-    if not result.success:
-        logger.warning(f"📰 Editorial bulletin failed: {result.error}")
+    # This path produces roughly a third of all bulletins and carried NEITHER
+    # guard the legacy path has: nothing checked that the piece was complete,
+    # and nothing checked that it had not deposed a guild leader. `success` only
+    # means the generator returned without raising.
+    #
+    # Refusing outright would just make the board go quiet, and posting the bad
+    # draft is what filled the feed with half sentences -- so regenerate, then
+    # give up cleanly.
+    result = None
+    for attempt in range(_MAX_EDITORIAL_ATTEMPTS + 1):
+        result = await generate_editorial_bulletin(
+            editor_type=editor_type,
+            topic=topic,
+            venue=venue,
+        )
+        if not result.success:
+            logger.warning(f"📰 Editorial bulletin failed: {result.error}")
+            result = None
+        else:
+            problem = _editorial_problem(result)
+            if not problem:
+                break
+            logger.warning("📰 Editorial bulletin rejected (%s) — regenerating (%d/%d)",
+                           problem, attempt + 2, _MAX_EDITORIAL_ATTEMPTS + 1)
+            result = None
+        if attempt >= _MAX_EDITORIAL_ATTEMPTS:
+            break
+
+    if result is None:
+        logger.error("📰 Editorial bulletin dropped after %d attempts",
+                     _MAX_EDITORIAL_ATTEMPTS + 1)
         return None
-    
+
     try:
         # Add timestamp and clamp mutable fields to Discord's embed limits.
         if result.embed:

@@ -3444,7 +3444,12 @@ def _apply_death_honorifics(bulletin: str, dead_names: list) -> str:
 # Main async generator
 # ---------------------------------------------------------------------------
 
-async def generate_bulletin() -> Optional[str]:
+# How many extra generations a rejected bulletin gets before the hour is
+# skipped. Bounded so a persistently broken model cannot spin the GPU all night.
+_MAX_BULLETIN_ATTEMPTS = 2
+
+
+async def generate_bulletin(_attempt: int = 0) -> Optional[str]:
     """
     Generate a fresh bulletin via local Ollama.
     Saves result to news_memory DB table. Returns the bulletin string or None.
@@ -3624,27 +3629,39 @@ async def generate_bulletin() -> Optional[str]:
             # premise of everything written after it. Drop it rather than post
             # it: a missed hourly bulletin costs nothing, a deposed Guildmaster
             # costs every bulletin that follows.
+            import logging as _lg
+            _log = _lg.getLogger(__name__)
+            _reject = None
+
+            _violations = []
             try:
                 from src.canon_guard import check as _canon_check
                 _violations = _canon_check(bulletin)
-                if _violations:
-                    import logging
-                    logging.getLogger(__name__).warning(
-                        "📰 Bulletin REJECTED — contradicts standing (%d): %s",
-                        len(_violations), _violations[0][:200]
-                    )
-                    return None
             except Exception as _cg_err:
-                import logging
-                logging.getLogger(__name__).debug(f"canon guard unavailable: {_cg_err}")
+                _log.debug(f"canon guard unavailable: {_cg_err}")
+            if _violations:
+                _reject = f"contradicts standing ({len(_violations)}): {_violations[0][:160]}"
 
-            # Validate bulletin has proper content (not just a title)
-            bulletin_lines = bulletin.strip().splitlines()
-            if len(bulletin_lines) < 2 or len(bulletin.strip()) < 50:
-                import logging
-                logging.getLogger(__name__).warning(
-                    f"📰 Bulletin too short ({len(bulletin_lines)} lines, {len(bulletin)} chars) — may be malformed: {bulletin[:100]}..."
-                )
+            # A malformed bulletin used to be WARNED about and then posted and
+            # persisted anyway -- that is where "bulletins with no info or half
+            # a sentence" came from. A truncated reply is a FAILED GENERATION,
+            # not a short news day, so it is now a rejection like any other.
+            _lines = bulletin.strip().splitlines()
+            if _reject is None and (len(_lines) < 2 or len(bulletin.strip()) < 50):
+                _reject = (f"malformed/truncated ({len(_lines)} lines, "
+                           f"{len(bulletin.strip())} chars): {bulletin[:80]!r}")
+
+            if _reject:
+                # Force a rewrite rather than silently losing the hour. Refusing
+                # without regenerating is how the board goes quiet; posting the
+                # bad draft is how it fills with half sentences. Neither.
+                if _attempt < _MAX_BULLETIN_ATTEMPTS:
+                    _log.warning("📰 Bulletin rejected (%s) — regenerating (attempt %d/%d)",
+                                 _reject, _attempt + 2, _MAX_BULLETIN_ATTEMPTS + 1)
+                    return await generate_bulletin(_attempt=_attempt + 1)
+                _log.error("📰 Bulletin dropped after %d attempts — last reason: %s",
+                           _MAX_BULLETIN_ATTEMPTS + 1, _reject)
+                return None
             # Ensure proper separation between timestamp and content
             # Use double-newline for better Discord embed rendering
             _write_memory(bulletin)
