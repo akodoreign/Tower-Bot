@@ -441,8 +441,13 @@ async def restructure(body: str, model: str, strict_retry: bool = False) -> str:
 # Paragraph plumbing
 # ---------------------------------------------------------------------------
 
+# The terminator has to be OPTIONAL at end of string. Requiring a trailing
+# period made this a silent no-op whenever the model ended on
+# "... Success: The target is unaffected" with no full stop -- which it usually
+# does, because the clause it appends is the last thing it writes. That alone
+# cost two full 27B passes: the trimmer looked wired up and recovered nothing.
 RE_SUCCESS_SENTENCE = re.compile(
-    r"\s*Success(?:\s+or\s+Failure)?:\s*[^.]*\.(?:\s|$)", re.IGNORECASE
+    r"\s*Success(?:\s+or\s+Failure)?:\s*[^.]*(?:\.(?:\s|$)|$)", re.IGNORECASE
 )
 
 

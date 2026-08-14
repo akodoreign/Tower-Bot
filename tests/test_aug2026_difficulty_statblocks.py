@@ -487,3 +487,34 @@ def test_length_band_still_catches_actual_rambling():
               "and lingering dread that follows them home for many nights after.")
     ok, _ = _validate(SAVE_OR_SUFFER, padded)
     assert not ok, "gate should still reject padded output"
+
+
+@pytest.mark.parametrize("label,draft", [
+    ("trailing period",
+     "Wisdom Saving Throw: DC 16, one creature the enforcer can see. "
+     "Failure: The target has the Frightened condition for 1 minute. "
+     "Success: The target is unaffected."),
+    # The model usually ends HERE, with no full stop, because the invented
+    # clause is the last thing it writes. Requiring a terminator made the
+    # trimmer a silent no-op and cost two full 27B passes.
+    ("no trailing period",
+     "Wisdom Saving Throw: DC 16, one creature the enforcer can see. "
+     "Failure: The target has the Frightened condition for 1 minute. "
+     "Success: The target is unaffected"),
+    ("no-effect wording",
+     "Wisdom Saving Throw: DC 16, one creature the enforcer can see. "
+     "Failure: The target has the Frightened condition for 1 minute. "
+     "Success: No effect"),
+    ("success before failure",
+     "Wisdom Saving Throw: DC 16, one creature the enforcer can see. "
+     "Success: No effect. "
+     "Failure: The target has the Frightened condition for 1 minute."),
+])
+def test_invented_success_trimmed_in_every_shape(label, draft):
+    """Whatever shape the invention takes, the rewrite must be recoverable."""
+    out = _trim(SAVE_OR_SUFFER, draft)
+    assert out != draft, f"trimmer was a no-op on {label!r}"
+    assert "Success:" not in out
+    assert "Failure:" in out
+    ok, why = _validate(SAVE_OR_SUFFER, out)
+    assert ok, f"{label}: {why}"
