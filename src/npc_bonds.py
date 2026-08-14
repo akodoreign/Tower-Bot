@@ -590,6 +590,16 @@ def backfill_grief(limit: int = 40) -> list[dict[str, Any]]:
     return touched
 
 
+def _unrequited_between(a_id: int, b_id: int) -> bool:
+    """True when either of these two carries a one-sided attachment to the other."""
+    rows = raw_query(
+        "SELECT 1 FROM npc_bonds WHERE bond_type='unrequited' AND status='active' "
+        "AND ((npc_a_id=%s AND npc_b_id=%s) OR (npc_a_id=%s AND npc_b_id=%s)) LIMIT 1",
+        (int(a_id), int(b_id), int(b_id), int(a_id)),
+    ) or []
+    return bool(rows)
+
+
 def social_tick(max_new: int = 2) -> list[str]:
     """Advance the affections of the living. Pure DB, no model, no GPU.
 
@@ -669,6 +679,13 @@ def social_tick(max_new: int = 2) -> list[str]:
         b = random.choice(candidates)
         if random.random() > 0.5:
             continue
+        # An unrequited bond between these two must not be resolved by a dice
+        # roll. Requited-ness is the whole content of the tie: if it is ever
+        # going to become mutual that is a deliberate, visible story beat, the
+        # same standard the death paths are held to -- not a silent 50/50 in a
+        # nightly tick that leaves the old one-sided row sitting underneath.
+        if _unrequited_between(a["id"], b["id"]):
+            continue
         add_bond(a["id"], b["id"], "courting", strength=40)
         used.update({a["id"], b["id"]})
         made += 1
@@ -685,6 +702,31 @@ def social_tick(max_new: int = 2) -> list[str]:
 # For the dossier
 # ---------------------------------------------------------------------------
 
+# How a tie should be PLAYED, not merely named.
+#
+# `unrequited` is the one that has to be spelled out, because the word is a
+# statement about what is NOT said. It may be hinted at -- a kept seat, a shift
+# covered without being asked, a sentence started and abandoned -- and it is
+# never declared, never named, and never returned. The moment it is stated
+# plainly it stops being unrequited.
+#
+# Handed over as a bare label, a model reaches for the nearest relationship
+# word: an obituary took `unrequited: Aldric Vane` off Mari Fen's dossier and
+# called her his "spouse", marrying the front desk to the Guildmaster.
+BOND_NOTES = {
+    "unrequited": "never said, never returned -- hint through what they DO, never name it",
+    "rival":      "competitive, not murderous",
+    "debt":       "owed, and it shapes what they will agree to",
+    "enemy":      "active hostility, not a grudge",
+    "protege":    "they are still being taught, and know it",
+}
+
+
+def bond_note(bond_type: str) -> str:
+    """Directive for how to render a tie in prose, or '' when the label suffices."""
+    return BOND_NOTES.get(str(bond_type or "").strip().lower(), "")
+
+
 def bonds_block(npc_id: int) -> str:
     """Human-readable tie summary for an NPC dossier."""
     bonds = get_bonds(int(npc_id))
@@ -694,8 +736,10 @@ def bonds_block(npc_id: int) -> str:
     for b in bonds[:8]:
         label = str(b["bond_type"])
         name = b.get("other_name")
+        note = bond_note(label)
+        suffix = f" [{note}]" if note else ""
         if str(b.get("other_status") or "").lower() == "dead":
-            parts.append(f"{label}: {name} (dead)")
+            parts.append(f"{label}: {name} (dead){suffix}")
         else:
-            parts.append(f"{label}: {name}")
+            parts.append(f"{label}: {name}{suffix}")
     return "; ".join(parts)

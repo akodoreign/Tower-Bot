@@ -2553,7 +2553,13 @@ def _load_live_roster() -> List[Dict]:
     """Load all alive/injured NPCs from MySQL npcs table (falls back to file)."""
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT id, name, faction, role, status, location, data_json FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
+        # `rank` and `species` are REAL columns and were missing from this
+        # SELECT, while _build_live_roster_block below reads n.get("rank") --
+        # so every roster line rendered a blank rank and the model was free to
+        # invent one. That is how the Guildmaster of the Adventurers Guild got
+        # introduced to the city as "Senior Adventurer". `rank` is a MySQL 8
+        # reserved word: backtick it.
+        rows = _rq("SELECT id, name, faction, `rank`, species, role, status, location, data_json FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
         if rows:
             result = []
             for row in rows:
@@ -2563,8 +2569,12 @@ def _load_live_roster() -> List[Dict]:
                         dj = json.loads(dj)
                     except Exception:
                         dj = {}
+                # Blob first, columns overlaid -- the column is authoritative.
                 npc = {**dj, "_db_id": row["id"], "name": row["name"], "faction": row["faction"],
                        "role": row["role"], "status": row["status"], "location": row["location"]}
+                for col in ("rank", "species"):
+                    if row.get(col):
+                        npc[col] = row[col]
                 result.append(npc)
             return result
     except Exception as e:
@@ -2621,6 +2631,12 @@ def _build_live_roster_block(max_npcs: int = 6, recently_featured: List[str] = N
     prioritized = interesting_fresh + mundane_fresh + interesting_recent + mundane_recent
     chosen = prioritized[:max_npcs]
 
+    try:
+        from src.canon_guard import protected_people
+        _protected = protected_people()
+    except Exception:
+        _protected = {}
+
     lines = ["ROSTER NPCs (LIVE from city records — use for conflict/drama pieces — do NOT kill them in bulletins):"]
     for n in chosen:
         name    = n.get("name", "Unknown")
@@ -2630,6 +2646,9 @@ def _build_live_roster_block(max_npcs: int = 6, recently_featured: List[str] = N
         loc     = n.get("location", "")
         role    = n.get("role", "")
         status  = n.get("status", "alive")
+        # "do NOT kill them" covered exactly one way to remove someone. These
+        # people also cannot be suspended, arrested, demoted, or retitled.
+        protected = name.lower() in _protected
         # Build a one-liner like the old hardcoded format
         desc_parts = []
         if role:
@@ -2641,9 +2660,17 @@ def _build_live_roster_block(max_npcs: int = 6, recently_featured: List[str] = N
                 desc_parts.append(mot)
         desc = "; ".join(desc_parts) if desc_parts else "active in the city"
         status_tag = " [INJURED]" if status == "injured" else ""
+        if protected:
+            status_tag += " [STANDING FIXED — cannot be killed, arrested, suspended, demoted, or retitled]"
         loc_tag    = f", {loc.split(',')[0].strip()}" if loc else ""
         lines.append(
             f"- {name} ({species}, {faction}, {rank}{loc_tag}){status_tag} — {desc}"
+        )
+    if any(n.get("name", "").lower() in _protected for n in chosen):
+        lines.append(
+            "A person marked STANDING FIXED holds their post right now. Write them acting, "
+            "ruling, refusing, or being criticised — never losing the post. If your story "
+            "needs someone to fall, invent a generic subordinate instead."
         )
     return "\n".join(lines)
 
@@ -3590,6 +3617,26 @@ async def generate_bulletin() -> Optional[str]:
             bulletin = '\n'.join(_content_lns).strip()
 
         if bulletin:
+            # CANON GATE — the last thing between a hallucinated coup and world
+            # memory. Bulletins are persisted to news_memory and read back as
+            # context by later prompts, so one invented suspension becomes the
+            # premise of everything written after it. Drop it rather than post
+            # it: a missed hourly bulletin costs nothing, a deposed Guildmaster
+            # costs every bulletin that follows.
+            try:
+                from src.canon_guard import check as _canon_check
+                _violations = _canon_check(bulletin)
+                if _violations:
+                    import logging
+                    logging.getLogger(__name__).warning(
+                        "📰 Bulletin REJECTED — contradicts standing (%d): %s",
+                        len(_violations), _violations[0][:200]
+                    )
+                    return None
+            except Exception as _cg_err:
+                import logging
+                logging.getLogger(__name__).debug(f"canon guard unavailable: {_cg_err}")
+
             # Validate bulletin has proper content (not just a title)
             bulletin_lines = bulletin.strip().splitlines()
             if len(bulletin_lines) < 2 or len(bulletin.strip()) < 50:

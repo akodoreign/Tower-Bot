@@ -243,3 +243,51 @@ def test_random_death_cannot_touch_the_unknown_party():
     guard = src.split("event == \"death\"")
     # Two guards must exist: faction leaders AND the Unknown Party.
     assert len(guard) >= 3, "expected both a leader guard and an Unknown Party guard"
+
+
+# ---------------------------------------------------------------------------
+# Unrequited: it may be HINTED at, never declared. That is the definition.
+# ---------------------------------------------------------------------------
+
+def test_unrequited_is_never_mirrored():
+    """Mirroring it back would make it mutual -- the opposite of what it means."""
+    from src.npc_bonds import RECIPROCAL
+    assert "unrequited" not in RECIPROCAL
+
+
+def test_unrequited_carries_a_prose_directive():
+    """Handed over as a bare label, a model substitutes a relationship word it
+    knows: an obituary read `unrequited: Aldric Vane` off Mari Fen's dossier and
+    called her his spouse. The label must arrive with instructions."""
+    from src.npc_bonds import bond_note
+
+    note = bond_note("unrequited")
+    assert note, "unrequited must carry a directive"
+    assert "never" in note.lower()
+    # It must permit the hint, not forbid the feeling entirely.
+    assert "hint" in note.lower()
+    # Ordinary ties need no special handling.
+    assert bond_note("spouse") == ""
+
+
+def test_obituary_never_names_an_unrequited_tie():
+    """'their {bond_type}' rendered as 'their unrequited' -- not English, and an
+    invitation to swap in a word that is."""
+    import inspect
+    from src import tower_news_voices
+
+    src = inspect.getsource(tower_news_voices.obituary)
+    assert 'bond_type == "unrequited"' in src, "obituary does not special-case unrequited"
+    assert "never returned" in src
+    # The piece must still be allowed to imply it.
+    assert "do not name it" in src or "never name" in src
+
+
+def test_a_dice_roll_cannot_make_unrequited_mutual():
+    """If it ever becomes mutual that is a deliberate story beat, not a nightly
+    50/50 that leaves the one-sided row sitting underneath it."""
+    import inspect
+    from src import npc_bonds
+
+    src = inspect.getsource(npc_bonds.social_tick)
+    assert "_unrequited_between" in src, "courtship tick can silently requite a one-sided bond"

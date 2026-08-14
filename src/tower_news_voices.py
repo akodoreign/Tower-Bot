@@ -63,7 +63,7 @@ def canon_anchor() -> str:
     context by later prompts.
     """
     if "block" in _CANON_CACHE:
-        return _CANON_CACHE["block"]
+        return _CANON_CACHE["block"] + _standing()
 
     factions = [r["faction_name"] for r in (raw_query(
         "SELECT faction_name FROM faction_reputation ORDER BY faction_name") or [])
@@ -85,29 +85,80 @@ def canon_anchor() -> str:
     )
     block = "\n".join(parts)
     _CANON_CACHE["block"] = block
-    return block
+    return block + _standing()
+
+
+def _standing() -> str:
+    """Who holds which post, appended live.
+
+    Kept OUT of the cached block on purpose: leadership is the thing most likely
+    to change during a long uptime, and a stale roster is how a bulletin ends up
+    announcing that the Guildmaster was suspended for smuggling.
+    """
+    try:
+        from src.canon_guard import protected_block
+        block = protected_block()
+        return ("\n\n" + block) if block else ""
+    except Exception as exc:
+        logger.debug(f"[voices] standing block unavailable: {exc}")
+        return ""
 
 
 def _recent_memory(limit: int = 6) -> str:
+    # Skip retracted bulletins. A bulletin that contradicted standing keeps its
+    # prose in `bulletin_text` (it is the record of what the city read) but is
+    # marked `news_type = 'retracted_*'` with `facts` emptied. Feeding one back
+    # as context is how a single invented suspension becomes the premise of the
+    # next six bulletins.
     rows = raw_query(
-        "SELECT bulletin_text FROM news_memory ORDER BY id DESC LIMIT %s", (int(limit),)
+        "SELECT bulletin_text FROM news_memory "
+        "WHERE news_type IS NULL OR news_type NOT LIKE 'retracted\\_%%' "
+        "ORDER BY id DESC LIMIT %s", (int(limit),)
     ) or []
     return "\n".join(str(r.get("bulletin_text") or "")[:220] for r in rows)
 
 
-async def _write(news_type: str, instruction: str, context: str, max_lines: int = 6) -> Optional[str]:
-    from src.agents import generate_bulletin
+async def _write(news_type: str, instruction: str, context: str, max_lines: int = 6,
+                 allow: Optional[list] = None) -> Optional[str]:
+    """Generate, GATE, then persist.
 
-    text = await generate_bulletin(
-        news_type=news_type,
-        instruction=instruction + "\n\nCANON (do not contradict, do not extend):\n"
-                    + canon_anchor(),
-        memory_context=_recent_memory(),
-        additional_context=context,
-        max_lines=max_lines,
-    )
+    The gate is not optional politeness. An obituary is the one voice that is
+    *supposed* to talk about a death, so it is also the one most likely to
+    volunteer a death nobody authorised -- `allow` names the person the piece is
+    legitimately about, and everyone else stays untouchable.
+    """
+    from src.agents import generate_bulletin
+    from src.canon_guard import check, reject_reason
+
+    base = instruction + "\n\nCANON (do not contradict, do not extend):\n" + canon_anchor()
+
+    text = None
+    retry_note = ""
+    for attempt in range(2):
+        prompt = base if not retry_note else base + "\n\n" + retry_note
+        text = await generate_bulletin(
+            news_type=news_type,
+            instruction=prompt,
+            memory_context=_recent_memory(),
+            additional_context=context,
+            max_lines=max_lines,
+        )
+        if not text:
+            return None
+        violations = check(text, allow=allow)
+        if not violations:
+            break
+        retry_note = reject_reason(text, allow=allow)
+        logger.warning(
+            f"[voices] {news_type} draft {attempt + 1} contradicted canon "
+            f"({len(violations)}): {violations[0][:140]}"
+        )
+        text = None
+
     if not text:
+        logger.error(f"[voices] dropped {news_type}: could not produce a canon-safe draft")
         return None
+
     try:
         add_news_entry(bulletin_text=text, facts=context[:2000], news_type=news_type)
     except Exception as exc:
@@ -129,7 +180,14 @@ async def obituary(dead: dict, mourners: list[dict]) -> Optional[str]:
     """
     name = str(dead.get("name") or "Someone")
     speaker = mourners[0] if mourners else None
-    others = ", ".join(f"{m['name']} ({m['bond_type']})" for m in mourners[1:4])
+    def _mourner_label(m: dict) -> str:
+        # Same trap as the speaker line: naming the tie "unrequited" in a list
+        # of the grieving invites the model to translate it into a stated one.
+        if str(m.get("bond_type") or "").lower() == "unrequited":
+            return f"{m['name']} (close to them in a way they have never said -- leave it unsaid)"
+        return f"{m['name']} ({m['bond_type']})"
+
+    others = ", ".join(_mourner_label(m) for m in mourners[1:4])
 
     if speaker:
         speaker_row = raw_query(
@@ -143,11 +201,30 @@ async def obituary(dead: dict, mourners: list[dict]) -> Optional[str]:
             if wants_back else
             f"{speaker['name']} is not sorry, and is careful about how they say so."
         )
+        # "their {bond_type}" renders as "their unrequited" -- not English, and
+        # an invitation to substitute a relationship word that IS. That is how
+        # an obituary called Mari Fen the Guildmaster's spouse when her bond is
+        # unrequited and his actual wife is Sera Vane.
+        bond_type = str(speaker.get("bond_type") or "").lower()
+        if bond_type == "unrequited":
+            carried_by = (
+                f"The notice is carried by {speaker['name']}. What they felt for {name} "
+                f"was never said aloud and never returned, and this notice is NOT where "
+                f"it gets said -- do not name it, do not call them a partner, spouse, or "
+                f"lover, do not have them confess. Let it show only in what they attend "
+                f"to: what they straighten, what they keep, what they cannot finish "
+                f"saying. The reader should feel it; nobody in the piece should say it."
+            )
+        else:
+            carried_by = (
+                f"The notice is carried by {speaker['name']}, their {speaker['bond_type']}."
+            )
+
         instruction = (
             f"Tower News Network death notice for {name}"
             + (f", {dead.get('rank')} of the {dead.get('faction')}" if dead.get("faction") else "")
             + f". Cause: {dead.get('death_cause') or 'unclear'}.\n"
-            f"The notice is carried by {speaker['name']}, their {speaker['bond_type']}. "
+            f"{carried_by} "
             f"Quote {speaker['name']} directly at least twice, in their own cadence.\n"
             f"{stance_line}\n"
             f"IMPORTANT: in the Undercity the dead are not finished. The body is still "
@@ -169,7 +246,10 @@ async def obituary(dead: dict, mourners: list[dict]) -> Optional[str]:
         )
         context = f"THE DEAD: {name}. {dead.get('description') or ''}"
 
-    return await _write(TYPE_OBITUARY, instruction, context)
+    # The deceased is the whole point of the piece -- they are exempt from the
+    # standing gate. Everyone else named in it is not, which is what stops an
+    # obituary from quietly burying a second person or inventing a widow.
+    return await _write(TYPE_OBITUARY, instruction, context, allow=[name])
 
 
 # ---------------------------------------------------------------------------
@@ -249,7 +329,11 @@ async def union_notice(a: dict, b: dict, kind: str = "partner") -> Optional[str]
         f"Two or three lines. No emoji."
     )
     context = f"A:\n{_dossier_for(a)}\n\nB:\n{_dossier_for(b)}"
-    return await _write(TYPE_UNION, instruction, context, max_lines=4)
+    # A union notice IS a marriage announcement, and the two people named in it
+    # consented via the bond graph -- exempt them, or the spouse rule rejects
+    # the one bulletin type that is allowed to marry someone off.
+    return await _write(TYPE_UNION, instruction, context, max_lines=4,
+                        allow=[a.get("name") or "", b.get("name") or ""])
 
 
 # ---------------------------------------------------------------------------
