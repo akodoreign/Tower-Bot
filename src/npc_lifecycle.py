@@ -329,12 +329,38 @@ def _scalar(value) -> str | None:
     return s or None
 
 
+# Keys that must NEVER be written into npcs.data_json.
+#
+# Everything here is a REAL COLUMN on the npcs row being written in the very
+# same statement, so putting it in the blob too creates a second copy that
+# immediately starts drifting -- and `world_integrity.blob_divergence()` existed
+# solely to reconcile the drift this caused.
+#
+# Verified safe before switching: every roster reader was widened to select the
+# columns it uses, then all four were replayed over the live roster with these
+# keys stripped from the blob. 724 row-loads, zero differences.
+#
+# What legitimately STAYS in the blob is genuinely schemaless: stats, equipment,
+# appearance, dnd_class, subclass, level, mimir_id, age, style, sd_prompt,
+# home_district, traits/ideals/bonds/flaws, pronouns, designation.
+_BLOB_EXCLUDE = frozenset({
+    # runtime-only
+    "_db_id", "_source", "history", "revealed_secrets",
+    # real columns (previously mirrored)
+    "id", "name", "faction", "role", "location", "status", "rank", "species",
+    "motivation", "quote", "oracle_notes", "secret", "relationships",
+    "death_cause", "cause_of_death", "tower_absorbed", "party_name",
+    "arrival_date", "deceased_at", "created_at", "updated_at",
+    "data_json", "appearance_json",
+})
+
+
 def _save_npc(npc: dict) -> None:
     """Save a single NPC to database (insert or update)."""
     try:
         name = npc.get("name", "Unknown")
         # Prepare data_json — strip runtime-only keys and fields now in real columns
-        npc_copy = {k: v for k, v in npc.items() if k not in ("_db_id", "history", "revealed_secrets", "death_cause", "cause_of_death", "tower_absorbed", "party_name")}
+        npc_copy = {k: v for k, v in npc.items() if k not in _BLOB_EXCLUDE}
         data_json = json.dumps(npc_copy, ensure_ascii=False, default=str)
 
         # Check if exists by name

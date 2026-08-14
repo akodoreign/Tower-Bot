@@ -3180,21 +3180,22 @@ async def _fact_check_bulletin(draft: str) -> str:
 
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT name, faction, role, status, data_json FROM npcs ORDER BY name")
+        rows = _rq("SELECT name, faction, `rank`, role, status, data_json FROM npcs ORDER BY name")
         for row in rows:
             name    = row.get("name", "")
             faction = row.get("faction", "Independent") or "Independent"
             status  = row.get("status", "alive") or "alive"
             if not name:
                 continue
-            # Pull rank/role from data_json if available
+            # `rank` is a real column -- prefer it, and fall back to the blob
+            # only for installs whose column has not been backfilled.
             dj = row.get("data_json") or {}
             if isinstance(dj, str):
                 try:
                     import json as _j; dj = _j.loads(dj)
                 except Exception:
                     dj = {}
-            rank = dj.get("rank", "") or row.get("role", "")
+            rank = row.get("rank") or dj.get("rank", "") or row.get("role", "")
             role = dj.get("role", "") or row.get("role", "")
 
             if status == "dead":

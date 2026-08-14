@@ -40,7 +40,12 @@ def _load_all_npcs() -> List[Dict]:
     """Load all NPCs from MySQL npcs table (falls back to JSON files)."""
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT id, name, faction, role, status, location, data_json FROM npcs ORDER BY name") or []
+        # SELECT * so every real column is present. This used to name six
+        # columns while `secret`, `motivation`, `oracle_notes`, `rank`,
+        # `species` and `relationships` -- all real columns -- were taken from
+        # the data_json mirror instead, which is what kept the mirror load-
+        # bearing. Blob first, then EVERY non-null column overlaid on top.
+        rows = _rq("SELECT * FROM npcs ORDER BY name") or []
         if rows:
             npcs = []
             for row in rows:
@@ -50,9 +55,11 @@ def _load_all_npcs() -> List[Dict]:
                         dj = json.loads(dj)
                     except Exception:
                         dj = {}
-                npc = {**dj, "_db_id": row["id"], "name": row["name"], "faction": row["faction"],
-                       "role": row["role"], "status": row["status"], "location": row["location"],
-                       "_source": "graveyard" if row["status"] == "dead" else "roster"}
+                npc = dict(dj) if isinstance(dj, dict) else {}
+                npc.update({k: v for k, v in row.items()
+                            if k not in ("data_json", "appearance_json") and v is not None})
+                npc["_db_id"] = row["id"]
+                npc["_source"] = "graveyard" if row.get("status") == "dead" else "roster"
                 npcs.append(npc)
             return npcs
     except Exception as e:

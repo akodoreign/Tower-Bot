@@ -395,7 +395,8 @@ def _pick_location() -> Dict[str, str]:
 
 def _npcs_for_faction(faction: str, limit: int = 8) -> List[Dict]:
     return _db_rows(
-        "SELECT name, faction, role, location, status, data_json FROM npcs "
+        "SELECT name, faction, `rank`, species, role, location, status, "
+        "motivation, quote, secret, oracle_notes, relationships, data_json FROM npcs "
         "WHERE status IN ('alive','injured','undead','doppelganger') "
         "AND faction LIKE %s ORDER BY RAND() LIMIT %s",
         (f"%{faction}%", limit),

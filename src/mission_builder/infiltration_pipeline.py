@@ -487,14 +487,16 @@ def _scenario_briefing_fallback(scenario: Dict[str, Any], roles: Dict[str, str])
 
 def _npcs_for_site(site_faction: str, limit: int = 12) -> List[Dict]:
     rows = _db_rows(
-        "SELECT name, faction, role, location, status, data_json FROM npcs "
+        "SELECT name, faction, `rank`, species, role, location, status, "
+        "motivation, quote, secret, oracle_notes, relationships, data_json FROM npcs "
         "WHERE status IN ('alive','injured','undead','doppelganger') "
         "AND faction LIKE %s ORDER BY RAND() LIMIT %s",
         (f"%{site_faction}%", limit),
     )
     if not rows:
         rows = _db_rows(
-            "SELECT name, faction, role, location, status, data_json FROM npcs "
+            "SELECT name, faction, `rank`, species, role, location, status, "
+        "motivation, quote, secret, oracle_notes, relationships, data_json FROM npcs "
             "WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY RAND() LIMIT %s",
             (limit,),
         )

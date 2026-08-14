@@ -91,8 +91,11 @@ def _hist(npc: dict, body: str) -> None:
 def _load_roster() -> List[Dict]:
     """Load alive/injured NPCs from MySQL."""
     try:
+        # SELECT * -- naming a subset left `secret`, `motivation`,
+        # `oracle_notes`, `rank` and `relationships` coming from the data_json
+        # mirror even though each is a real column.
         rows = _rq(
-            "SELECT id, name, faction, role, location, status, data_json FROM npcs "
+            "SELECT * FROM npcs "
             "WHERE status IN ('alive', 'injured', 'undead', 'doppelganger') ORDER BY name"
         ) or []
         npcs = []
@@ -103,9 +106,10 @@ def _load_roster() -> List[Dict]:
                     dj = json.loads(dj)
                 except Exception:
                     dj = {}
-            npc = {**dj, "name": row["name"], "faction": row["faction"],
-                   "role": row["role"], "location": row["location"],
-                   "status": row["status"], "_db_id": row.get("id")}
+            npc = dict(dj) if isinstance(dj, dict) else {}
+            npc.update({k: v for k, v in row.items()
+                        if k not in ("data_json", "appearance_json") and v is not None})
+            npc["_db_id"] = row.get("id")
             npcs.append(npc)
         return npcs
     except Exception as e:
@@ -127,10 +131,7 @@ def _save_roster(npcs: List[Dict]) -> None:
 def _load_graveyard() -> List[Dict]:
     """Load dead NPCs from MySQL."""
     try:
-        rows = _rq(
-            "SELECT id, name, faction, role, location, status, data_json FROM npcs "
-            "WHERE status = 'dead' ORDER BY name"
-        ) or []
+        rows = _rq("SELECT * FROM npcs WHERE status = 'dead' ORDER BY name") or []
         graveyard = []
         for row in rows:
             dj = row.get("data_json") or {}
@@ -139,9 +140,11 @@ def _load_graveyard() -> List[Dict]:
                     dj = json.loads(dj)
                 except Exception:
                     dj = {}
-            npc = {**dj, "name": row["name"], "faction": row["faction"],
-                   "role": row["role"], "location": row["location"],
-                   "status": "dead", "_db_id": row.get("id")}
+            npc = dict(dj) if isinstance(dj, dict) else {}
+            npc.update({k: v for k, v in row.items()
+                        if k not in ("data_json", "appearance_json") and v is not None})
+            npc["_db_id"] = row.get("id")
+            npc["status"] = "dead"
             graveyard.append(npc)
         return graveyard
     except Exception as e:

@@ -270,7 +270,10 @@ def _hist(npc: dict, body: str) -> None:
 def _load_npcs() -> List[Dict]:
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT id, name, faction, role, location, status, data_json FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
+        # SELECT * so ALL real columns win over the blob, not just the six that
+        # happened to be named. `secret`, `motivation`, `oracle_notes`, `rank`
+        # and `relationships` were previously read from the mirror.
+        rows = _rq("SELECT * FROM npcs WHERE status IN ('alive','injured','undead','doppelganger') ORDER BY name") or []
         npcs = []
         for row in rows:
             dj = row.get("data_json") or {}
@@ -278,9 +281,10 @@ def _load_npcs() -> List[Dict]:
                 try: dj = json.loads(dj)
                 except: dj = {}
             # DB columns win over stale data_json values
-            npc = {**dj,
-                   "_db_id": row["id"], "name": row["name"], "faction": row["faction"],
-                   "role": row["role"], "location": row["location"], "status": row["status"]}
+            npc = dict(dj) if isinstance(dj, dict) else {}
+            npc.update({k: v for k, v in row.items()
+                        if k not in ("data_json", "appearance_json") and v is not None})
+            npc["_db_id"] = row["id"]
             if "history" not in npc:
                 npc["history"] = []
             npcs.append(npc)
@@ -304,15 +308,22 @@ def _save_npcs(npcs: List[Dict]) -> None:
 def _load_graveyard() -> List[Dict]:
     try:
         from src.db_api import raw_query as _rq
-        rows = _rq("SELECT name, faction, role, status, data_json FROM npcs WHERE status='dead' ORDER BY name") or []
+        rows = _rq("SELECT * FROM npcs WHERE status='dead' ORDER BY name") or []
         npcs = []
         for row in rows:
-            npc = {"name": row["name"], "faction": row["faction"], "role": row["role"], "status": "dead"}
             dj = row.get("data_json") or {}
             if isinstance(dj, str):
                 try: dj = json.loads(dj)
                 except: dj = {}
-            npc.update(dj)
+            # Blob FIRST, columns overlaid. This was `npc.update(dj)`, which let
+            # the mirror overwrite the columns -- including `status`, in the
+            # GRAVEYARD loader. A stale blob saying "alive" put a dead NPC back
+            # among the living. The column is authoritative, always.
+            npc = dict(dj) if isinstance(dj, dict) else {}
+            npc.update({k: v for k, v in row.items()
+                        if k not in ("data_json", "appearance_json") and v is not None})
+            npc["_db_id"] = row.get("id")
+            npc["status"] = "dead"
             if "history" not in npc:
                 npc["history"] = []
             npcs.append(npc)
