@@ -996,6 +996,25 @@ async def apply_npc_event(npc: dict, all_npcs: List[dict]) -> tuple:
         _recover_odds = 0.98 if is_unknown_party_member(npc.get("name", "")) else 0.90
         event = "injury_recovery" if random.random() < _recover_odds else "injury_death"
 
+        # The death guards further down live in the ambient-event branch and only
+        # test `event == "death"` -- this branch never reaches them. So an injured
+        # faction leader carried a flat 10% chance of dying on EVERY tick, and the
+        # Unknown Party 2%, with no reroll at all. That is precisely the "random
+        # world tick kills a leader" the rules forbid; the raised recovery odds
+        # only ever made it slower, not impossible.
+        #
+        # An injury does not finish a protected character. Only a deliberate,
+        # gated outcome the DM can see coming does.
+        if event == "injury_death":
+            _name = npc.get("name", "")
+            if is_faction_leader(_name):
+                logger.info(f"\U0001f451 Protected leader {_name} from injury death -- recovering instead")
+                event = "injury_recovery"
+            elif is_unknown_party_member(_name):
+                logger.info(f"\U0001f3ad Protected Unknown Party member {_name} "
+                            f"from injury death -- recovering instead")
+                event = "injury_recovery"
+
     # ── Dead NPCs: only resurrection (5% chance), otherwise skip ─────────────
     elif npc.get("status") == "dead":
         if random.random() < 0.05:

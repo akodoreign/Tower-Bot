@@ -291,3 +291,49 @@ def test_a_dice_roll_cannot_make_unrequited_mutual():
 
     src = inspect.getsource(npc_bonds.social_tick)
     assert "_unrequited_between" in src, "courtship tick can silently requite a one-sided bond"
+
+
+# ---------------------------------------------------------------------------
+# An injury must never finish a protected character
+# ---------------------------------------------------------------------------
+
+def test_injury_death_cannot_take_a_faction_leader():
+    """The death guards sit in the ambient-event branch and only test
+    `event == "death"`. The injured branch resolves to `injury_death` and
+    returns before ever reaching them, so an injured faction leader carried a
+    flat 10% chance of dying on EVERY tick -- exactly the random world tick the
+    rules forbid. Raised recovery odds only made it slower, never impossible."""
+    import inspect
+    from src import npc_lifecycle
+
+    src = inspect.getsource(npc_lifecycle.apply_npc_event)
+    marker = 'if event == "injury_death":'
+    assert marker in src, "the injury path has no death guard at all"
+    guard = src[src.index(marker):src.index(marker) + 900]
+    assert "is_faction_leader" in guard, "no leader guard on the injury path"
+    assert "is_unknown_party_member" in guard, "no Unknown Party guard on the injury path"
+
+
+def test_injury_guard_converts_to_recovery():
+    import inspect
+    from src import npc_lifecycle
+
+    src = inspect.getsource(npc_lifecycle.apply_npc_event)
+    marker = 'if event == "injury_death":'
+    guard = src[src.index(marker):src.index(marker) + 900]
+    # Both protected classes must end up RECOVERING, not rerolling into some
+    # other event that could still be fatal.
+    assert guard.count('event = "injury_recovery"') >= 2
+
+
+def test_world_integrity_separates_injured_from_dead():
+    """A faction led by a corpse is broken. A faction led by someone with a
+    broken arm is Tuesday. Reporting both as `leader_dead` trains the reader to
+    ignore the check."""
+    import inspect
+    from src import world_integrity
+
+    src = inspect.getsource(world_integrity.dead_faction_leaders)
+    assert "leader_injured" in src
+    assert "leader_not_themselves" in src, "undead/doppelganger leaders are a plot, not an error"
+    assert "never auto-repair" in src

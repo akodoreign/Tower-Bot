@@ -62,11 +62,39 @@ def dead_faction_leaders() -> list[dict[str, Any]]:
             findings.append({"check": "leader_missing", "faction": row["faction_name"],
                              "leader": name,
                              "detail": "listed leader is not on the NPC roster"})
-        elif str(npc[0]["status"]).lower() != "alive":
+            continue
+
+        status = str(npc[0]["status"]).lower()
+        if status == "alive":
+            continue
+
+        # Not-alive is three different situations and they were all reported as
+        # "leader_dead", which cried wolf every time any leader stubbed a toe.
+        #
+        #   dead      -- the real contradiction. The Adventurers Guild was run by
+        #                a corpse for two months.
+        #   injured   -- normal and transient. The injury-resolution tick settles
+        #                it, and leaders carry the reroll guard so it cannot end
+        #                in a death. Nothing to repair; reporting it as a broken
+        #                world trains the reader to ignore the check.
+        #   undead /
+        #   doppelganger -- not errors at all. Death is provisional here and both
+        #                are real outcomes of that. A guild being run by something
+        #                wearing its Director's face is a PLOT, and the one thing
+        #                a sweep must never do is quietly "fix" it.
+        if status in ("undead", "doppelganger"):
+            findings.append({"check": "leader_not_themselves", "faction": row["faction_name"],
+                             "leader": name, "npc_id": npc[0]["id"], "severity": "story",
+                             "detail": f"faction is led by someone marked '{status}' -- "
+                                       f"deliberate world state, never auto-repair"})
+        elif status == "injured":
+            findings.append({"check": "leader_injured", "faction": row["faction_name"],
+                             "leader": name, "npc_id": npc[0]["id"], "severity": "transient",
+                             "detail": "leader is injured; the lifecycle tick resolves this"})
+        else:
             findings.append({"check": "leader_dead", "faction": row["faction_name"],
-                             "leader": name, "npc_id": npc[0]["id"],
-                             "detail": f"faction is led by someone marked "
-                                       f"'{npc[0]['status']}'"})
+                             "leader": name, "npc_id": npc[0]["id"], "severity": "broken",
+                             "detail": f"faction is led by someone marked '{status}'"})
     return findings
 
 
