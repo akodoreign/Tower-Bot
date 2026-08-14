@@ -1956,9 +1956,9 @@ async def _study_archive_interviews() -> str:
         count = archive_expired_interviews()
         if count == 0:
             return "Interview archive: no expired interviews to archive tonight."
-        from src.db_api import get_global_state
-        archive = get_global_state("interview_archive") or []
-        total = len(archive) if isinstance(archive, list) else "?"
+        # Counted off the table, not a parallel JSON list.
+        from src.party_interview import interview_corpus_size
+        total = interview_corpus_size()
         return (
             f"## Interview Archive\n"
             f"Archived {count} expired interview(s) into research corpus. "

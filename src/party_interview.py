@@ -15,8 +15,9 @@ Flow:
 
 Archival (called from self_learning._study_archive_interviews):
     archive_expired_interviews()
-        → fetch expired rows, append to global_state['interview_archive']
-        → mark archived in DB
+        → mark expired rows archived=1 in party_interviews
+    archived_interviews() / interview_corpus_size()
+        → read the research corpus back off the table
 """
 
 from __future__ import annotations
@@ -323,44 +324,53 @@ def _save_interview(
 
 
 def archive_expired_interviews() -> int:
+    """Retire interviews past their 7-day window. Returns the count archived.
+
+    This used to ALSO append each interview to a `global_state['interview_archive']`
+    JSON list, which was pure duplication: every field it copied
+    (mission_title, party_name, sponsor_name, epic_score, interview_text,
+    archived_at) is already a column on the very row being updated. The copy was
+    strictly worse than the table -- text truncated to 2000 chars, the list
+    capped at the last 100, and nothing could query it by party or by score.
+    Archiving is a state change on a row, so it is one UPDATE.
     """
-    Called from self_learning nightly.
-    Fetches interviews past their 7-day window, appends to global_state['interview_archive'],
-    and marks them archived. Returns count archived.
-    """
-    from src.db_api import raw_query, raw_execute, get_global_state, set_global_state
+    from src.db_api import raw_query, raw_execute
 
     expired = raw_query(
-        "SELECT id, mission_title, party_name, sponsor_name, interview_text, epic_score "
-        "FROM party_interviews WHERE archived = 0 AND expires_at < NOW()"
+        "SELECT id FROM party_interviews WHERE archived = 0 AND expires_at < NOW()"
     ) or []
-
     if not expired:
         return 0
 
-    archive = get_global_state("interview_archive") or []
-    if isinstance(archive, str):
-        try: archive = json.loads(archive)
-        except: archive = []
-
     for row in expired:
-        archive.append({
-            "mission_title": row.get("mission_title", ""),
-            "party_name":    row.get("party_name", ""),
-            "sponsor":       row.get("sponsor_name", ""),
-            "epic_score":    row.get("epic_score", 0),
-            "text":          (row.get("interview_text") or "")[:2000],
-            "archived_at":   datetime.now().isoformat(),
-        })
         raw_execute(
             "UPDATE party_interviews SET archived=1, archived_at=NOW() WHERE id=%s",
             (row["id"],),
         )
-
-    # Keep last 100 in global_state
-    archive = archive[-100:]
-    set_global_state("interview_archive", archive)
     return len(expired)
+
+
+def archived_interviews(limit: int = 50) -> list[dict]:
+    """The research corpus: past interviews, newest first.
+
+    The point of archiving was to make these available to mission generation and
+    world-building studies. The JSON list was never read by anything except a
+    line that counted it, so this is the accessor that makes the corpus real.
+    """
+    from src.db_api import raw_query
+    return raw_query(
+        "SELECT id, mission_title, party_name, sponsor_name, sponsor_district, "
+        "interview_text, epic_score, posted_at, archived_at "
+        "FROM party_interviews WHERE archived = 1 "
+        "ORDER BY archived_at DESC, id DESC LIMIT %s",
+        (int(limit),),
+    ) or []
+
+
+def interview_corpus_size() -> int:
+    from src.db_api import raw_query
+    rows = raw_query("SELECT COUNT(*) c FROM party_interviews WHERE archived = 1") or [{"c": 0}]
+    return int(rows[0]["c"])
 
 
 # ── Main entry point ──────────────────────────────────────────────────────────
