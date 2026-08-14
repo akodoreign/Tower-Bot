@@ -82,3 +82,49 @@ def test_party_interview_is_sized_and_gated():
         # Fall back to scanning the module for the gate.
         post = inspect.getsource(party_interview)
     assert "canon_guard" in post, "interview output is not canon-gated"
+
+
+# ---------------------------------------------------------------------------
+# Studies vs actions
+# ---------------------------------------------------------------------------
+
+def test_actions_do_not_pollute_the_skill_corpus():
+    """A study produces knowledge; an action does something and reports on it.
+
+    Three actions were filing their reports into the retrieval corpus as if they
+    were knowledge -- and since a report carries no `**Keywords:**` header,
+    score_skill could never surface them. One row was the literal status line
+    "Interview archive: no expired interviews to archive tonight."
+    """
+    src = inspect.getsource(self_learning.run_learning_session)
+    assert "saves_skill" in src, "studies and actions are not distinguished"
+    # The three known actions must be declared as non-skill.
+    for action in ("ad_generation", "council_outcomes", "interview_archive"):
+        idx = src.find(f'("{action}"')
+        assert idx != -1, f"{action} missing from the study table"
+        entry = src[idx:idx + 200]
+        assert "False" in entry, f"{action} still saves a skill"
+
+
+def test_studies_still_save_skills():
+    src = inspect.getsource(self_learning.run_learning_session)
+    for study in ("failure_analysis", "world_state", "news_memory", "npc_roster"):
+        idx = src.find(f'("{study}"')
+        assert idx != -1
+        assert "True" in src[idx:idx + 200], f"{study} no longer saves a skill"
+
+
+def test_council_dispatches_are_canon_gated():
+    """The dispatch prompt asks for scandal and corruption BY NAME, then inserts
+    the answer into news_memory where every later generator reads it back."""
+    src = inspect.getsource(self_learning._study_council_outcomes)
+    assert "canon_guard" in src, "council dispatches are not gated"
+    gate = src.find("canon_check")
+    insert = src.find("INSERT INTO news_memory")
+    assert gate != -1 and insert != -1
+    assert gate < insert, "the gate must run before the insert"
+
+
+def test_council_dispatch_prompt_carries_standing():
+    src = inspect.getsource(self_learning._council_canon)
+    assert "protected_block" in src

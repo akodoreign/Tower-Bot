@@ -120,6 +120,35 @@ def protected_people(force: bool = False) -> dict[str, dict]:
     except Exception as exc:
         logger.debug(f"[canon_guard] unknown party lookup failed: {exc}")
 
+    # Council seats are standing too, and most seat-holders are NOT faction
+    # leaders -- the President and the Patchwork Saints representative would
+    # otherwise be unprotected. The nightly council-dispatch writer is asked for
+    # "scandal" and "corruption" by name, so an unguarded seat is the easiest
+    # thing in the world for it to vacate.
+    try:
+        from src.council_registry import get_members, get_president
+        seats = list(get_members())
+        pres = get_president()
+        if pres:
+            seats.append(pres)
+        for seat in seats:
+            name = str(seat.get("name") or "").strip()
+            if not name:
+                continue
+            existing = people.get(name.lower())
+            if existing:
+                existing.setdefault("seat", seat.get("title") or "Council seat")
+                continue
+            people[name.lower()] = {
+                "name": name,
+                "title": seat.get("title") or "",
+                "faction": seat.get("faction") or "",
+                "kind": "council",
+                "seat": seat.get("title") or "Council seat",
+            }
+    except Exception as exc:
+        logger.debug(f"[canon_guard] council seat lookup failed: {exc}")
+
     _CACHE["people"] = people
     _CACHE["people_at"] = now
     return people
@@ -152,9 +181,12 @@ def protected_block(limit: int = 40) -> str:
         lines.append(f"- {p['name']} is the {title} of the {p['faction']} and is alive.")
 
     party = [p["name"] for p in people.values() if p.get("kind") == "unknown_party"]
+    council = [p for p in people.values() if p.get("kind") == "council"]
 
     parts = ["STANDING (these people hold their posts RIGHT NOW -- do not contradict):"]
     parts.extend(lines)
+    for p in council:
+        parts.append(f"- {p['name']} holds a Grand Council seat: {p.get('seat') or p.get('title')}.")
     if party:
         parts.append(
             "- The Unknown Party (" + ", ".join(sorted(party)) + ") are the most capable "
@@ -180,8 +212,8 @@ def protected_block(limit: int = 40) -> str:
 # a leader DOING these ("Captain Korin arrested a smuggler") must not trip.
 _STATUS_VERBS = (
     r"suspend(?:ed|s)?|arrest(?:ed|s)?|detain(?:ed|s)?|expel(?:led|s)?|expulsion|"
-    r"demot(?:ed|es|ion)|depos(?:ed|es)|oust(?:ed|s)?|remov(?:ed|es)\s+from|"
-    r"replac(?:ed|es)|strip(?:ped|s)?\s+of|indict(?:ed|s)?|convict(?:ed|s)?|"
+    r"demot(?:ed|es|ion)|depos(?:e|ed|es)|oust(?:ed|s)?|remov(?:ed|es)\s+from|"
+    r"unseat(?:ed|s)?|replac(?:ed|es)|strip(?:ped|s)?\s+of|indict(?:ed|s)?|convict(?:ed|s)?|"
     r"charg(?:ed|es)\s+with|execut(?:ed|es)|assassinat(?:ed|es)|murder(?:ed|s)?|"
     r"kill(?:ed|s)?|die[sd]?|dead|deceas(?:ed|es)|slain|succumb(?:ed|s)?|"
     r"step(?:ped|s)?\s+down|resign(?:ed|s)?|found\s+guilty|stand(?:s)?\s+trial|"
@@ -207,8 +239,19 @@ _INTRANSITIVE = re.compile(
 # The name as the OBJECT. Anchored to the end of the preceding text so the verb
 # has to be adjacent -- otherwise "mourned the death of the guard, and Aldric
 # Vane spoke" trips on a death that was never his.
+# Verbs that only count when the protected name is the DIRECT object. "remove"
+# is far too common to sit in the loose passive pattern -- it matched "Serrik
+# Dhal, confirmed the service is available to those seeking to remove
+# inconvenient recollections", which deposes nobody. Anchored immediately
+# before the name, "voted to remove Kaelen Voss" is unambiguous.
+_DEPOSE_VERBS = (
+    r"remov(?:e|ed|es|ing)|unseat(?:ed|s|ing)?|vacat(?:e|ed|es)|dismiss(?:ed|es|ing)?|"
+    r"recall(?:ed|s)?|replac(?:e|ed|es|ing)|depos(?:e|ed|es|ing)"
+)
+
 _ACTIVE_TAIL = re.compile(
-    r"\b(?:" + _STATUS_VERBS + r")\s+(?:the\s+|a\s+|an\s+)?$", re.IGNORECASE
+    r"\b(?:" + _STATUS_VERBS + r"|" + _DEPOSE_VERBS + r")\s+(?:the\s+|a\s+|an\s+)?$",
+    re.IGNORECASE
 )
 _OF_TAIL = re.compile(
     r"\b(?:death|demise|passing|funeral|burial|obituary|murder|killing|arrest|"

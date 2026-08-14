@@ -1771,6 +1771,23 @@ Output ONLY a valid JSON array, no commentary."""
 
 # ── Council Outcome Dispatches ─────────────────────────────────────────
 
+def _council_canon() -> str:
+    """Who holds which post, for the dispatch writer.
+
+    Council dispatches are LLM prose inserted straight into `news_memory`, and
+    the prompt above explicitly offers "scandal" and "corruption" as outcomes.
+    Without this the obvious way to dramatise a contested ruling is to remove
+    whoever lost -- and that becomes world memory the moment it is written.
+    """
+    try:
+        from src.canon_guard import protected_block
+        block = protected_block()
+        return ("CANON — do not contradict:\n" + block) if block else ""
+    except Exception as exc:
+        logger.debug(f"self_learning: canon block unavailable: {exc}")
+        return ""
+
+
 def _normalize_council_topic(topic: object) -> str:
     """Normalize council topics for exact duplicate checks."""
     return re.sub(r"\s+", " ", str(topic or "")).strip().casefold()
@@ -1868,7 +1885,9 @@ Generate a JSON array (one object per ruling) with:
   "outcome_rating": "success" | "partial" | "mixed" | "failure" | "scandal",
   "faction_impact": str (which faction gained or lost influence and why, 1 sentence)
 
-Output ONLY valid JSON array."""
+Output ONLY valid JSON array.
+
+{_council_canon()}"""
 
     response = await _ask_ollama(prompt, system="You are a gritty political journalist. Output only JSON.", timeout=150)
     m = re.search(r'\[.*\]', response, re.DOTALL)
@@ -1897,6 +1916,24 @@ Output ONLY valid JSON array."""
             f"Re: {topic} ({'PASSED' if passed else 'REJECTED'}) — "
             f"{headline}. {dispatch} {fi}"
         )[:1000]
+
+        # This prompt asks for scandal and corruption by name, then persists the
+        # answer to news_memory where every later generator reads it back. Drop
+        # the individual dispatch that deposes someone rather than the whole
+        # batch -- the other rulings' outcomes are still good.
+        try:
+            from src.canon_guard import check as _canon_check
+            bad = _canon_check(fact)
+            if bad:
+                logger.warning(
+                    "self_learning: council dispatch rejected (%s): %s",
+                    topic[:40], bad[0][:140]
+                )
+                written.append(f"  [rejected — contradicted standing] {headline[:60]}")
+                continue
+        except ImportError:
+            pass
+
         try:
             raw_execute(
                 "INSERT INTO news_memory (facts, news_type, created_at) VALUES (%s, %s, NOW())",
@@ -1972,47 +2009,64 @@ async def run_learning_session(discord_client=None):
         _journal(f"ERROR: Agent orchestrator failed: {e}")
 
     # Regular studies continue below
+    # (label, coroutine, skill_name, saves_a_skill)
+    #
+    # The last flag matters. A STUDY produces knowledge the bot can retrieve
+    # later; an ACTION does something to the world and returns a report of what
+    # it did. The three actions at the bottom were being filed into the skill
+    # corpus as if they were knowledge -- and since their reports carry no
+    # `**Keywords:**` header, `score_skill` could never surface them. They were
+    # write-only: three permanently unreachable rows, one of which was the
+    # literal status line "Interview archive: no expired interviews to archive
+    # tonight." stored as campaign knowledge. Reports belong in the journal.
     studies = [
         # CRITICAL FIX: Study failures FIRST to learn from errors and bugs
-        ("failure_analysis",   _study_failure_logs,       "failure_analysis"),
+        ("failure_analysis",   _study_failure_logs,       "failure_analysis", True),
         # World state assessment runs first — guided by LEARNING_PHILOSOPHY
-        ("world_state",        _study_world_state,         "world_assessment"),
+        ("world_state",        _study_world_state,         "world_assessment", True),
         # MODULE QUALITY TRAINING — generates test mission and compares to PDFs
-        ("module_quality_training", study_module_quality,   "module_quality_report"),
-        ("news_memory",        _study_news_memory,        "current_events"),
-        ("mission_patterns",   _study_mission_patterns,   "mission_patterns"),
+        ("module_quality_training", study_module_quality,   "module_quality_report", True),
+        ("news_memory",        _study_news_memory,        "current_events", True),
+        ("mission_patterns",   _study_mission_patterns,   "mission_patterns", True),
         # Mission quality analysis — deep dive into mission health
-        ("mission_quality",    _study_mission_quality,     "mission_quality"),
+        ("mission_quality",    _study_mission_quality,     "mission_quality", True),
         # Mission type variety — generate fresh mission type seeds
-        ("mission_types",      _study_mission_type_variety, "mission_type_ideas"),
+        ("mission_types",      _study_mission_type_variety, "mission_type_ideas", True),
         # Pipeline council — 4 agents review one pipeline type per night
-        ("pipeline_review",    _study_pipeline_type,        "pipeline_review"),
+        ("pipeline_review",    _study_pipeline_type,        "pipeline_review", True),
         # Columbus - keeps downloaded map-library tags aligned with gazetteer areas
-        ("map_tagging",        _study_maps_today,           "columbus_map_tagging"),
-        ("npc_roster",         _study_npc_roster,          "npc_landscape"),
-        ("faction_reputation", _study_faction_reputation,  "faction_standing"),
-        ("conversation_logs",  _study_conversation_logs,   "conversation_insights"),
+        ("map_tagging",        _study_maps_today,           "columbus_map_tagging", True),
+        ("npc_roster",         _study_npc_roster,          "npc_landscape", True),
+        ("faction_reputation", _study_faction_reputation,  "faction_standing", True),
+        ("conversation_logs",  _study_conversation_logs,   "conversation_insights", True),
+        # --- ACTIONS: they change the world, then report. Journal only. ---
         # Generate new ads for places, tourism, faction recruiting, guilds, bards, races
-        ("ad_generation",      _study_ad_generation,        "generated_ads_log"),
+        ("ad_generation",      _study_ad_generation,        "generated_ads_log", False),
         # Write outcome dispatches for last week's council rulings
-        ("council_outcomes",   _study_council_outcomes,     "council_outcomes_log"),
+        ("council_outcomes",   _study_council_outcomes,     "council_outcomes_log", False),
         # Archive expired post-mission interviews into research corpus
-        ("interview_archive",  _study_archive_interviews,   "interview_archive_log"),
+        ("interview_archive",  _study_archive_interviews,   "interview_archive_log", False),
     ]
 
-    results = {"studied": 0, "saved": 0, "deferred": 0, "errors": 0}
+    results = {"studied": 0, "saved": 0, "acted": 0, "deferred": 0, "errors": 0}
 
-    for label, study_func, skill_name in studies:
+    for label, study_func, skill_name, saves_skill in studies:
         deferred_token = _OLLAMA_DEFERRED_REASON.set("")
         try:
-            logger.info(f"🧠 Studying: {label}")
-            _journal(f"Studying: {label}")
+            logger.info(f"🧠 {'Studying' if saves_skill else 'Running'}: {label}")
+            _journal(f"{'Studying' if saves_skill else 'Running'}: {label}")
 
             content = await study_func()
             results["studied"] += 1
             deferred_reason = _OLLAMA_DEFERRED_REASON.get()
 
-            if content:
+            if content and not saves_skill:
+                # An action's report is a record of work done, not knowledge.
+                results["acted"] += 1
+                for line in str(content).splitlines():
+                    if line.strip():
+                        _journal(f"  {line.strip()[:200]}")
+            elif content:
                 saved = _save_learned_skill(content, skill_name)
                 if saved:
                     results["saved"] += 1
