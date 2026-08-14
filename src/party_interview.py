@@ -141,7 +141,22 @@ def pick_sponsor(party_profile: Optional[dict]) -> dict:
 
 # ── Interview generation ──────────────────────────────────────────────────────
 
-async def _ask_ollama(prompt: str, system: str = "", timeout: int = 180) -> str:
+def _fit_ctx(prompt: str, reply_tokens: int = 1400) -> int:
+    """Size the context window to the prompt + planned reply.
+
+    An interview prompt grows with the world -- the mission outcome, the party
+    roster, the sponsor dossier. Unsized, Ollama silently truncates and returns
+    a stub, which reads as "the crew had little to say" rather than as a failed
+    call. Only raises; capped at 32k. Local by the no-shared-helpers rule."""
+    needed = len(prompt) // 4 + reply_tokens + 768
+    for cand in (8192, 12288, 16384, 24576, 32768):
+        if cand >= needed:
+            return cand
+    return 32768
+
+
+async def _ask_ollama(prompt: str, system: str = "", timeout: int = 180,
+                      reply_tokens: int = 1400) -> str:
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
@@ -157,6 +172,10 @@ async def _ask_ollama(prompt: str, system: str = "", timeout: int = 180) -> str:
                 "model": OLLAMA_MODEL,
                 "messages": messages,
                 "stream": False,
+                "options": {
+                    "num_ctx": _fit_ctx(system + prompt, reply_tokens),
+                    "num_predict": reply_tokens,
+                },
             })
             return resp.json().get("message", {}).get("content", "").strip()
     except Exception as e:
@@ -380,6 +399,30 @@ async def maybe_trigger_interview(
         if not interview_text:
             logger.warning(f"party_interview: Ollama returned empty for {party_name}")
             return
+
+        # An interview is world-facing prose that gets POSTED and PERSISTED to
+        # party_interviews, so it is exactly the surface the canon guard exists
+        # for: a crew debriefing about a job has every reason to mention a guild
+        # leader, and no business announcing that one was arrested. One retry,
+        # then drop -- a missing interview is a non-event, a fabricated arrest
+        # is not.
+        try:
+            from src.canon_guard import check as _canon_check
+            violations = _canon_check(interview_text)
+            if violations:
+                logger.warning(
+                    "party_interview: draft contradicted standing (%d): %s -- regenerating",
+                    len(violations), violations[0][:150]
+                )
+                interview_text = await generate_interview(outcome, party_profile, sponsor)
+                if not interview_text or _canon_check(interview_text):
+                    logger.error(
+                        f"party_interview: dropped {party_name} interview -- "
+                        f"could not produce a canon-safe draft"
+                    )
+                    return
+        except ImportError:
+            pass
 
         channel = await _get_interview_channel(discord_client)
         message_id = None

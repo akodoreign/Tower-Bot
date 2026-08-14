@@ -40,6 +40,10 @@ EXPECTED: Dict[str, tuple] = {
     "npc_lifecycle":      ("NPC lifecycle",            44 * 60 * 60),
     "party_lifecycle":    ("Party lifecycle",          44 * 60 * 60),
     "social_pulse":       ("Social pulse / TTN voices", 44 * 60 * 60),
+    # Nightly, inside LEARN_HOUR_START..END. 44h rather than 2.5x24h because a
+    # session that fails is marked done-for-today and will not retry until the
+    # next window -- one miss must not read as healthy.
+    "self_learning":      ("Nightly self-learning",     44 * 60 * 60),
     "log_cleanup":        ("Log cleanup",              50 * 60 * 60),
     "db_backup":          ("MySQL backup",             50 * 60 * 60),
 }

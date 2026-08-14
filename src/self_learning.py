@@ -96,7 +96,28 @@ def _journal(entry: str):
 
 # ── Ollama Helper ──────────────────────────────────────────────────────
 
-async def _ask_ollama(prompt: str, system: str = "", timeout: int = 120) -> str:
+def _fit_ctx(prompt: str, reply_tokens: int = 1200) -> int:
+    """Size the Ollama context window to the prompt + planned reply.
+
+    With no num_ctx set, Ollama uses a small default and silently truncates --
+    the oversized prompt goes in, a 1-char reply comes back, and the caller
+    treats it as "nothing learned" rather than as a failure. That is exactly how
+    the hourly news bulletin died for weeks.
+
+    The learning loop is the worst possible place for this, because every one of
+    its prompts GROWS WITH THE WORLD: 30 bulletins, 50 missions, the whole NPC
+    roster, faction reputation, failure logs, pipeline source. It ran for months
+    with no sizing at all. Only raises; capped at 32k. Local by the
+    no-shared-helpers rule."""
+    needed = len(prompt) // 4 + reply_tokens + 768
+    for cand in (8192, 12288, 16384, 24576, 32768):
+        if cand >= needed:
+            return cand
+    return 32768
+
+
+async def _ask_ollama(prompt: str, system: str = "", timeout: int = 120,
+                      reply_tokens: int = 1200) -> str:
     """Send a prompt to Ollama and return the response text."""
     messages = []
     if system:
@@ -110,14 +131,26 @@ async def _ask_ollama(prompt: str, system: str = "", timeout: int = 120) -> str:
             logger.info(f"self_learning: Ollama deferred by resource cop: {decision.reason}")
             _OLLAMA_DEFERRED_REASON.set(decision.reason or "resource cop busy")
             return ""
+        ctx = _fit_ctx(system + prompt, reply_tokens)
         async with httpx.AsyncClient(timeout=timeout) as client:
             resp = await client.post(OLLAMA_URL, json={
                 "model": OLLAMA_MODEL,
                 "messages": messages,
                 "stream": False,
+                "options": {"num_ctx": ctx, "num_predict": reply_tokens},
             })
             data = resp.json()
-            return data.get("message", {}).get("content", "").strip()
+            reply = data.get("message", {}).get("content", "").strip()
+            # A near-empty reply to a large prompt is the silent-truncation
+            # signature. Say so out loud instead of returning "" and letting the
+            # caller record it as "nothing worth learning today".
+            if len(reply) < 40 and len(prompt) > 2000:
+                logger.warning(
+                    "self_learning: %d-char prompt (num_ctx=%d) returned only %d chars "
+                    "-- possible context overflow, not an empty finding",
+                    len(prompt), ctx, len(reply)
+                )
+            return reply
     except Exception as e:
         logger.error(f"self_learning: Ollama call failed: {e}")
         return ""
@@ -129,8 +162,15 @@ async def _study_news_memory() -> Optional[str]:
     """Read recent news bulletins from MySQL and extract recurring themes."""
     try:
         from src.db_api import raw_query as _rq
+        # Retracted bulletins are excluded at the query. They keep their prose
+        # in `bulletin_text` as the record of what the city read, but `facts` is
+        # emptied -- and the `facts or bulletin_text` fallback below would have
+        # reached straight past the emptied field and fed the retracted prose to
+        # the learner, which is the one reader that turns a bad bulletin into a
+        # persisted "lesson".
         rows = _rq(
             "SELECT bulletin_text, facts, created_at FROM news_memory "
+            "WHERE news_type IS NULL OR news_type NOT LIKE 'retracted\\_%' "
             "ORDER BY id DESC LIMIT 30"
         ) or []
         recent_text = "\n---\n".join(
@@ -2026,6 +2066,20 @@ def _in_learning_window() -> bool:
     return LEARN_HOUR_START <= now.hour < LEARN_HOUR_END
 
 
+def _heartbeat(ok: bool, note: str = "") -> None:
+    """Stamp loop_heartbeats so the learning loop is visible on the dashboard.
+
+    It ran nightly for months without one: a loop that fires once a day in the
+    small hours and writes only to a journal file is exactly the loop that can
+    die silently for a week before anyone notices.
+    """
+    try:
+        from src.loop_health import record_loop_heartbeat
+        record_loop_heartbeat("self_learning", ok=ok, note=note[:200])
+    except Exception as exc:
+        logger.debug(f"self_learning: heartbeat failed: {exc}")
+
+
 async def self_learning_loop(discord_client=None):
     """
     Background loop that checks every 15 minutes whether we're in the
@@ -2049,7 +2103,9 @@ async def self_learning_loop(discord_client=None):
             try:
                 await run_learning_session(discord_client=discord_client)
                 last_session_date = today
+                _heartbeat(True, "learning session complete")
             except Exception as e:
                 logger.exception(f"🧠 Learning session failed: {e}")
                 _journal(f"SESSION FAILED: {e}")
                 last_session_date = today  # don't retry today
+                _heartbeat(False, f"session failed: {str(e)[:120]}")
