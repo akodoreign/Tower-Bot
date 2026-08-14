@@ -33,6 +33,7 @@ Fast orientation to the tables you will actually touch:
 | what the Council decided | `council_rulings` + `council_ruling_votes` | replaced the global_state JSON blob |
 | a battle map | `battle_maps_library` (260) | via `battle_map_library.get_battle_map()` |
 | did the loops run | `loop_heartbeats` (15) | add an `EXPECTED` entry in `loop_health.py` for any new loop |
+| a past crew debrief | `party_interviews` | `archived_interviews()` / `interview_corpus_size()`; the old global_state blob is gone |
 
 **Reserved words:** `rank` and `role` need backticks in MySQL 8.
 
@@ -112,10 +113,11 @@ Add any new real column to those sets.
 ### Content Feeds
 | File | Purpose | Status |
 |------|---------|--------|
-| `news_feed.py` | World news bulletin generation | ACTIVE |
-| `news_integration.py` | News feed integration layer | ACTIVE |
+| `news_feed.py` | World news bulletin generation. A rejected draft is REGENERATED (`_MAX_BULLETIN_ATTEMPTS`) then dropped — never posted half-written, never persisted before validation | ACTIVE |
+| `news_integration.py` | News feed integration layer. `post_editorial_bulletin()` is ~35% of all bulletins — validates completeness + canon via `_editorial_problem()` and regenerates before dropping | ACTIVE |
 | `tower_news_voices.py` | TTN voiced bulletins: `obituary` (spoken by the closest mourner), `interview`, `forum`, `union`. Carries `canon_anchor()` so the model cannot invent factions/places, and gates every draft through `canon_guard` | ACTIVE |
 | `council_registry.py` | The Grand Council in MySQL: `council_seats` (seat_role/npc_id/agenda/bias/voice), `council_rulings` + `council_ruling_votes`. Replaced hardcoded dicts and a 64KB global_state JSON blob | ACTIVE |
+| `party_interview.py` | Post-mission sponsored Q&A. Context-sized, canon-gated, and archived onto its own table (`archived=1`) rather than a JSON blob | ACTIVE |
 | `canon_guard.py` | Stops generated prose from deposing people. `protected_block()` states each leader's real title (from `faction_reputation`) + the Unknown Party; `check(text, allow=[...])` rejects a protected name on the receiving end of a status verb (killed/arrested/suspended/demoted/"the late"/invented spouse). Gates `news_feed` + `tower_news_voices` | ACTIVE |
 | `ad_feed.py` | Advertisement/job posting generation | ACTIVE |
 | `bounty_board.py` | Bounty/contract postings | ACTIVE |
@@ -146,6 +148,7 @@ Add any new real column to those sets.
 | File | Purpose | Status |
 |------|---------|--------|
 | `resource_cop.py` | Resource/token usage cop | ACTIVE |
+| `self_learning.py` | Nightly learning session (LEARN_HOUR_START..END). Local `_fit_ctx` on every Ollama call, heartbeats on both outcomes, and a `saves_skill` flag separating STUDIES (knowledge) from ACTIONS (journal only) | ACTIVE |
 | `world_integrity.py` | Reconciles the world against itself (dead faction leaders, resurrection_queue vs npcs, JSON shadow-copy drift, orphan bonds). `run_all()` / `repair()` — never kills anyone | ACTIVE |
 | `ollama_queue.py` | Ollama request queue | ACTIVE |
 | `ollama_busy.py` | Ollama busy-state tracker | ACTIVE |

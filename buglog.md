@@ -2221,3 +2221,261 @@ FACTION_LEADERS. Her holding the chair while Aldric was dead for two months is g
 TITLE is simply wrong. Left for a world decision rather than silently rewritten.
 
 234 tests green.
+
+## 2026-08-13 - DONE: generated prose was quietly deposing guild leaders
+
+User: "lol i swear the llm have a hard on for fucking with guild leaders" -- after TNN posted
+"Senior Adventurer Aldric Vane Suspended for Smuggling". He is the **Guildmaster** of the
+Adventurers Guild, he is alive, and he was suspended by nobody.
+
+Measured before fixing, across all 2589 rows of `news_memory`: **19 bulletins had rewritten a
+protected person's standing.** "the late Sable" **seven** times for a living member of the
+Unknown Party. "Senior Archivist Pell has been suspended from the Glass Sigil." An obituary that
+called Mari Fen the Guildmaster's spouse when her bond is `unrequited` and his actual wife is
+Sera Vane. About 0.7% -- a slow drip, not one bad night, and bulletins are read back as context
+so each one became the premise for the next.
+
+**Half of it was a data bug, not the model.** `news_feed._load_live_roster()` read
+`n.get("rank")` from a SELECT that never fetched `rank`. Every roster line rendered a blank
+title, so the model invented one -- which is exactly how the Guildmaster was introduced to the
+city as a "Senior Adventurer". The only guard was one clause in the prompt, "do NOT kill them in
+bulletins", which covers precisely one of the many ways to remove someone from a job.
+
+`src/canon_guard.py` follows the statblock-rewriter pattern: state the truth, then GATE the
+output, because instruction alone leaks.
+- `protected_block()` -- every leader's REAL title from `faction_reputation` (authoritative;
+  `npc_lifecycle.is_faction_leader` still reads a stale hardcoded map and is NOT used here),
+  plus the Unknown Party, plus every Grand Council seat.
+- `check(text, allow=[...])` -- rejects a protected name landing on the receiving end of a
+  status verb. Sentence-scoped, so "Vane condemned the arrests" still passes. `allow` exempts an
+  obituary's own subject and a union notice's couple.
+
+Two false-positive classes cost real time and are pinned by tests: **"The Ward" matched inside
+"The Wardens"** (six innocent bulletins), and the possessive "the late Aldric Vane's apprentice"
+initially slipped through because the trailing boundary ate the apostrophe.
+
+Later, widening the verbs to catch "voted to remove Kaelen Voss" made bare "remove" match
+"Serrik Dhal, confirmed the service is available to those seeking to *remove inconvenient
+recollections*" -- which deposes nobody. Deposition verbs now live in a separate set used ONLY in
+the anchored direct-object pattern, where the protected name must immediately follow the verb.
+
+The 19 offending rows keep `bulletin_text` exactly as posted (the record of what the city read)
+and are marked `news_type='retracted_*'` with `facts=''`. `facts` is the prompt-injection payload
+~18 readers pull back, so it must be EMPTY rather than carry a marker string -- a bracketed
+"[RETRACTED]" note is just a different kind of noise in a prompt. 21 rows retracted in total.
+
+## 2026-08-13 - DONE: unrequited may be hinted at, never declared
+
+User: "it can be hinted at but not declared thats the definition of unrequited."
+
+That reframing found the actual cause of the invented marriage. The obituary prompt said:
+
+    The notice is carried by {speaker}, their {bond_type}.
+
+which renders as "carried by Mari Fen, their **unrequited**" -- not English, and an open
+invitation to substitute a relationship word that is. The model picked "spouse". The dossier had
+the same hole: `unrequited: Aldric Vane` handed over as a bare label with no instruction.
+
+`npc_bonds.BOND_NOTES` / `bond_note()` now carry the directive into every dossier, and the
+obituary special-cases an unrequited speaker: the piece may show it in what they attend to --
+what they straighten, what they keep, what they cannot finish saying -- and must never name it,
+never have them confess, never call them a partner. The guard blocks *declaring*; hints contain
+no relationship nouns and pass untouched.
+
+The asymmetry now renders correctly, which is the part that matters: Mari Fen's dossier says
+`unrequited: Aldric Vane`, his says only `acquaintance: Mari Fen`. He does not know.
+
+Also: the courtship tick's "singles" query excluded existing romances but NOT unrequited bonds,
+so a nightly 50/50 could have paired Mari Fen with Aldric Vane and silently made it mutual,
+leaving the one-sided row underneath. `_unrequited_between()` blocks it. If it ever becomes
+requited that is a deliberate beat, not a dice roll.
+
+## 2026-08-13 - DONE: the learning loop (the whole loop, second pass)
+
+First pass -- the plumbing:
+
+1. **NOT ONE of the loop's ~15 Ollama calls set `num_ctx`.** Every study prompt grows with the
+   world (30 bulletins, 50 missions, the whole NPC roster, faction reputation, failure logs,
+   pipeline source). That is the exact silent-truncation shape that killed the hourly news
+   bulletin -- except here the 1-char reply is recorded as "nothing worth learning today" and
+   nothing is raised. Added a local `_fit_ctx` plus an explicit warning when a large prompt
+   returns near-empty, so truncation stops impersonating an empty finding.
+2. `_study_news_memory` did `facts or bulletin_text`, which reached straight past the emptied
+   `facts` on a retracted bulletin and fed the retracted prose to the learner -- the one reader
+   that turns a bad bulletin into a persisted *lesson*. Excluded in the query.
+3. No heartbeat, no `loop_health` entry. A job that fires once at 1 AM and writes only to a
+   journal file can die for a week unnoticed. Stamps both outcomes now; 44h threshold because a
+   failed session marks itself done-for-today and will not retry.
+
+An AST sweep of all 31 Ollama-calling functions confirmed every mission pipeline is correctly
+sized. (A first regex sweep claimed 21 unsized callers and was WRONG -- it scanned after each
+`.post(`, but the pipelines build `payload` with `num_ctx` beforehand, and one "hit" was an A1111
+unload call.) `party_interview._ask_ollama` was the one genuine straggler.
+
+Second pass -- what the studies actually do:
+
+**Good news, measured first:** the loop's output IS reachable. Learned skills feed aclient's chat
+RAG through `match_skills()` and surface on 6 of 6 plausible player questions.
+
+**Three "studies" were actions.** `ad_generation`, `council_outcomes` and `interview_archive` do
+not produce knowledge -- they change the world and return a report. Those reports were filed into
+the skill corpus, and because a report has no `**Keywords:**` header, `score_skill` could never
+retrieve them: three permanently unreachable rows, one of which was the literal status line
+"Interview archive: no expired interviews to archive tonight." stored as campaign knowledge. The
+study table carries a `saves_skill` flag now; actions journal instead.
+
+**`_study_council_outcomes` was an ungated world-facing generator.** It prompts for outcomes on a
+spectrum that explicitly includes "scandal: evidence of corruption, manipulation, or a hidden
+agenda emerged", then INSERTs the result into `news_memory`. No canon anchor, no gate. It is a
+machine for deposing guild leaders, running nightly. Now carries `protected_block()` and gates
+each dispatch before insert, dropping the individual bad dispatch rather than the whole batch.
+
+## 2026-08-13 - DONE: the Grand Council moves into MySQL; the FTA takes the chair
+
+User: "for council_president lets pull in someone from the FTA. Mari can go back to bein a
+secretary. Man if we can not use JSON at all for this i would be happier (archive it if you can)."
+
+Two pieces lived outside the database and both had drifted.
+
+**Seats** were hardcoded Python dicts, and the president literal read "Guildmaster Mari Fen" -- a
+title she has never held. A seat is held by a real person and changes hands, so it is a row:
+`council_seats` (seat_role, npc_id, faction, title, agenda, bias, voice, sort_order, active).
+
+The chair passes to **Kaelen Voss** (npc 214), Senior Officer, Tower Authority / FTA. Chosen over
+Gideon Steelforge, whose role line ("coordinating with other factions to maintain peace and
+order") is the better fit on paper, because `_live_seat()` feeds motivation, secret and
+oracle_notes into every vote and dissent -- Kaelen has all three, Gideon has none, and an empty
+dossier is exactly how a council seat ends up sounding like a form letter. Verified: the new
+president's seat block renders three lines of interiority (atoning for a sibling's death; last
+surviving engineer of the failed Dome Stabilization Project, secretly rebuilding it) where Mari
+Fen's rendered none. A tiebreaker secretly rebuilding the project that caused the last Collapse
+will break ties interestingly.
+
+Consequence worth seeing coming: the FTA now holds a voting seat (Myra Kess) AND the tiebreak.
+
+Mari Fen's seat is retired (`active=0`, not deleted -- who sat on the council is world history).
+She keeps her front desk; she was only ever mislabelled here.
+
+**Rulings** were a 64KB JSON list in `global_state` with votes as name arrays, sliced to "last
+200" purely because the whole history had to fit in one column. Now `council_rulings` +
+`council_ruling_votes`, one row per ruling and per vote, keeping each member's position text --
+which the blob discarded entirely. All 110 migrated; the payload is preserved under
+`global_state['council_rulings_archived_json']` and the live key is emptied.
+
+## 2026-08-13 - DONE: the JSON mirror purge
+
+**`interview_archive` was a lossy copy of its own table.** `archive_expired_interviews()` marked
+the row archived AND appended a copy to a `global_state` list. Every field it copied is already a
+column on the exact row being updated; the copy truncated text to 2000 chars, capped at the last
+100, and could not be queried by party or score. Nothing read it except one line that counted it.
+Deleted. Added `archived_interviews()` / `interview_corpus_size()`, which make the "research
+corpus" the docstring promised actually reachable -- it never was.
+
+**`npcs.data_json`** mirrored 12 real columns (name, rank, role, secret, status, faction, species,
+location, motivation, oracle_notes, relationships, quote). Done in the order the readers demanded,
+because the mirror was load-bearing:
+
+1. **Widen the readers.** 16 call sites pulled `data_json` while naming only a subset of columns,
+   so `secret`, `motivation`, `oracle_notes`, `rank` and `relationships` came off the blob.
+   Stripping first would have silently emptied exactly the fields that make NPCs sound like
+   people. Found a live bug doing it: `mission_outcomes._load_graveyard` did `npc.update(dj)` --
+   the blob overwriting the columns, in the GRAVEYARD loader. A stale blob status would have put
+   a dead NPC back among the living.
+2. **Stop writing it** -- `npc_lifecycle._BLOB_EXCLUDE`.
+3. **Strip** -- 250 rows, 604,449 -> 415,534 bytes (31% smaller).
+
+Verified BEFORE applying: all four roster readers replayed over the live roster with the mirrored
+keys removed. 724 row-loads, zero differences.
+
+**`missions.mission_json`** mirrored 10. The verification REFUSED the first attempt, correctly:
+stripping blanked `expires_at` on 741 of 1090 rows, because `_load_missions()` merges a NAMED key
+set and `expires_at` was not in it -- `SELECT *` fetched it and the merge threw it away. Added the
+six missing columns; re-verified 1090 rows, zero differences.
+
+`_update_mission_by_message_id` was the dangerous one: it loaded ONLY the blob, mutated it, and
+handed the result to `_save_mission()`, which writes the real columns from that same dict. Once
+the blob stopped carrying title/tier/faction/difficulty, every update through that path would
+have BLANKED those columns. Fixed before stripping. 1090 rows, 18% smaller.
+
+## 2026-08-14 - DONE: an injury could kill a faction leader on a background tick
+
+Chasing why `world_integrity` flagged an injured Pale Morren, and the check itself turned out to
+be the smaller problem.
+
+`apply_npc_event` resolves an injured NPC at the TOP of the function: 90% `injury_recovery`, 10%
+`injury_death` (98/2 for the Unknown Party). The two death guards -- the ones that reroll a
+faction leader or an Unknown Party member away from dying -- live in the ambient-event branch
+further down and only test `event == "death"`. **The injured branch never reaches them.**
+
+So an injured faction leader carried a flat 10% chance of dying on EVERY tick, and an injured
+Unknown Party member 2%, with no reroll at all. The raised recovery odds added for the Unknown
+Party made that slower, never impossible -- consistent with the observed history of them dying
+over and over. Both classes now convert `injury_death` to `injury_recovery`. An injury does not
+finish a protected character; only a deliberate, gated outcome does.
+
+`dead_faction_leaders()` reported ANY non-alive status as "leader_dead", conflating three things:
+- **dead** -- the real contradiction (the Adventurers Guild ran on a corpse for two months)
+- **injured** -- normal and transient, now `leader_injured`
+- **undead / doppelganger** -- not errors at all. Death is provisional here and both are real
+  outcomes of it; a guild run by something wearing its Director's face is a PLOT. Now
+  `leader_not_themselves`, explicitly never auto-repaired.
+
+Crying wolf on a sprained ankle is how a reader learns to ignore the check meant to catch the
+corpse.
+
+## 2026-08-14 - DONE: the 2014 -> 2024 save rewrite, and why refusals are not free
+
+33 monsters still carried 2014 save phrasing. The first full 27B pass applied 16 and refused 23
+paragraphs. The refusals were not random -- one mode was **10 of the 23**: "invented a 'Success:'
+branch the source does not have". Those sources are plain "save or suffer" ("DC 16 Wis save or
+frightened 1 minute"), where correct 2024 form is a Failure: line and NOTHING else; the model
+appends "Success: The target is unaffected." anyway because most 2024 saves have one. Everything
+else about the rewrite was correct and validated, and the whole restructure was being binned over
+one appended sentence.
+
+`drop_invented_success()` deletes that clause and hands the result back to the FULL validator.
+This is not the model writing rules text: it fires only when the SOURCE carries no success
+language, touches no numbers, dice, DCs or the Failure branch, and refuses to return anything
+that lost the Failure branch.
+
+The **length band** accounted for 3 more. It was a pure ratio (0.5x-2.0x), which is wrong for this
+corpus: these statblocks are compressed shorthand (8 words) while 2024 form carries fixed
+scaffolding ("<Ability> Saving Throw: DC n, <who>. Failure: ... Success: ..."). That overhead is
+roughly constant, so a faithful rewrite of a terse source legitimately more than doubles it.
+Ceiling is now `max(2.0x, +16 words)`; the ratio still governs long text where real rambling
+shows up. Length was only ever a chatter heuristic -- every rule-bearing check runs before it and
+is unchanged, and a padded-output test proves the gate still rejects actual rambling.
+
+Note for next time: pass 2 applied only 4, because it started BEFORE the length-band change was
+saved -- the trimmer recovered the Success cases and they then failed on length instead. Restart
+the run after editing the validator, not alongside it.
+
+## 2026-08-14 - DONE: bulletins regenerate instead of posting half a sentence
+
+User: "I think last time we had a bunch of refuse failures without force re write it was giving
+news builins with no info or half a sentance."
+
+Both halves of that were real, and one of them had just been made worse.
+
+**Warn-and-post.** `generate_bulletin()` checked whether the draft was under 2 lines or 50
+characters, logged "may be malformed", and then posted AND persisted it anyway. A truncated reply
+is a FAILED GENERATION, not a short news day -- that is the half-sentence bulletin, and it went
+into `news_memory` where later prompts read it back. Now a rejection like any other.
+
+**Refuse with no retry.** The canon gate added earlier returned None on a violation, which
+silently loses the hour. Both rejection paths now force a rewrite: up to two extra generations,
+then a clean drop with an error log. Bounded so a persistently broken model cannot spin the GPU
+all night.
+
+**The voiced path** rejected an empty draft but not a truncated one -- a 30-char answer to an
+obituary passed straight through to `news_memory`. Now regenerates with an explicit "your previous
+attempt was cut off" instruction.
+
+**The editorial path was the real gap.** `post_editorial_bulletin()` produces roughly a third of
+all bulletins (the 35% agent roll in `aclient`) and carried NEITHER guard: nothing checked the
+piece was complete, and nothing checked it had not deposed a guild leader -- `result.success` only
+means the generator returned without raising. So 35% of bulletins bypassed the entire canon guard.
+Now validated by `_editorial_problem()` with the same regenerate-then-drop policy.
+
+Ordering is pinned by a test: `_write_memory` must be unreachable for a rejected draft, or the bad
+bulletin poisons world memory even when it is never posted.
