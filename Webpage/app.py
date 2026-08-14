@@ -126,15 +126,13 @@ def _mission_generation_context_block(limit: int = 6) -> str:
 
     council_items = []
     try:
-        rulings = get_global_state("council_rulings") or []
-        if isinstance(rulings, str):
-            rulings = json.loads(rulings)
-        if isinstance(rulings, list):
-            for item in rulings[-limit:]:
-                if isinstance(item, dict):
-                    council_items.append(_trim(" | ".join(str(item.get(k, "")) for k in ("topic", "ruling", "outcome") if item.get(k))))
-                else:
-                    council_items.append(_trim(item))
+        # Real rows now, newest first -- `council_rulings` replaced the
+        # global_state JSON blob (archived as council_rulings_archived_json).
+        from src.council_registry import recent_rulings
+        for item in recent_rulings(limit=limit):
+            council_items.append(_trim(" | ".join(
+                str(item.get(k, "")) for k in ("topic", "proposal") if item.get(k)
+            )))
     except Exception as exc:
         logger.warning(f"council context unavailable: {exc}")
 

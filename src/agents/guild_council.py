@@ -92,6 +92,37 @@ COUNCIL_PRESIDENT = {
 }
 
 
+# The two literals above are now SEED DATA ONLY -- the live roster is the
+# `council_seats` table. They stay as the fallback for a fresh install whose
+# table has not been seeded yet, because convening an empty council is worse
+# than convening a stale one. Note the president literal is the very drift that
+# motivated the move: Mari Fen is rank Member and runs the Adventurers Guild
+# front desk. She was never Guildmaster; Aldric Vane is.
+
+def council_members() -> list[dict]:
+    """Voting seats, from the DB, falling back to the literal above."""
+    try:
+        from src.council_registry import get_members
+        seats = get_members()
+        if seats:
+            return seats
+    except Exception as exc:
+        logger.debug(f"[council] seat lookup failed, using literals: {exc}")
+    return COUNCIL_MEMBERS
+
+
+def council_president() -> dict:
+    """The tiebreaker seat, from the DB, falling back to the literal above."""
+    try:
+        from src.council_registry import get_president
+        seat = get_president()
+        if seat:
+            return seat
+    except Exception as exc:
+        logger.debug(f"[council] president lookup failed, using literal: {exc}")
+    return COUNCIL_PRESIDENT
+
+
 # ── Data Classes ───────────────────────────────────────────────────────────
 
 @dataclass
@@ -443,7 +474,7 @@ Do NOT include any other text, preamble, or markdown fences."""
             lines.append(f"Underneath: {d['oracle_notes']}")
 
         # Ties AMONG the council are where dissent comes from.
-        seat_names = {m["name"] for m in COUNCIL_MEMBERS} | {COUNCIL_PRESIDENT["name"]}
+        seat_names = {m["name"] for m in council_members()} | {council_president()["name"]}
         for bond in get_bonds(int(npc["id"]), active_only=False):
             other = str(bond.get("other_name") or "")
             if bond.get("status") == "mourning":
@@ -663,7 +694,7 @@ Output ONLY JSON:
         prior_statements: list[tuple[str, str]] | None = None,
     ) -> tuple[str, str]:
         """Ask the President for a tiebreaker vote, with full debate context."""
-        p = COUNCIL_PRESIDENT
+        p = council_president()
         debate_block = ""
         if prior_statements:
             debate_block = "\nTHE COUNCIL DEBATE:\n"
@@ -716,7 +747,7 @@ VOTE: YES  (or VOTE: NO)"""
         prior_statements: list[tuple[str, str]] = []
 
         # Sequential debate — each member sees what came before
-        for member in COUNCIL_MEMBERS:
+        for member in council_members():
             logger.info(f"🏛️   → asking {member['name']} ({member['faction']}) ...")
             try:
                 vote, statement = await self._member_vote(
@@ -753,7 +784,7 @@ VOTE: YES  (or VOTE: NO)"""
             ruling.tiebreak_used = True
             pv, ps = await self._president_vote(ruling_proposal, briefing, prior_statements)
             ruling.tiebreak_vote = pv
-            ruling.positions[COUNCIL_PRESIDENT["name"]] = ps
+            ruling.positions[council_president()["name"]] = ps
             ruling.passed = (pv == "YES")
 
         result_str = "PASSED" if ruling.passed else "FAILED"
@@ -773,7 +804,7 @@ VOTE: YES  (or VOTE: NO)"""
         debate_statements: list[tuple[str, str]] = []
 
         logger.info(f"Council ruling {index}: debate round opening")
-        for member in COUNCIL_MEMBERS:
+        for member in council_members():
             logger.info(f"Council debate: {member['name']} ({member['faction']})")
             try:
                 statement = await self._member_debate_statement(
@@ -800,7 +831,7 @@ VOTE: YES  (or VOTE: NO)"""
         )
         prior_statements = debate_statements[:]
 
-        for member in COUNCIL_MEMBERS:
+        for member in council_members():
             logger.info(f"Council vote: {member['name']} ({member['faction']})")
             try:
                 vote, statement = await self._member_vote(
@@ -833,7 +864,7 @@ VOTE: YES  (or VOTE: NO)"""
             ruling.tiebreak_used = True
             pv, ps = await self._president_vote(final_proposal, briefing, prior_statements)
             ruling.tiebreak_vote = pv
-            ruling.positions[COUNCIL_PRESIDENT["name"]] = ps
+            ruling.positions[council_president()["name"]] = ps
             ruling.passed = (pv == "YES")
 
         result_str = "PASSED" if ruling.passed else "FAILED"
@@ -963,7 +994,7 @@ VOTE: YES  (or VOTE: NO)"""
             no_count  = len(ruling.votes_no)
             vote_str  = f"{yes_count}-{no_count}"
             if ruling.tiebreak_used:
-                vote_str += f" (tiebreak: {COUNCIL_PRESIDENT['name']} voted {ruling.tiebreak_vote})"
+                vote_str += f" (tiebreak: {council_president()['name']} voted {ruling.tiebreak_vote})"
 
             lines += [
                 f"─────────────────────────────────",
@@ -973,7 +1004,7 @@ VOTE: YES  (or VOTE: NO)"""
             ]
 
             # Member positions
-            for member in COUNCIL_MEMBERS:
+            for member in council_members():
                 mname = member["name"]
                 vote_icon = "✅" if mname in ruling.votes_yes else "❌"
                 statement = ruling.positions.get(mname, "")
@@ -983,7 +1014,7 @@ VOTE: YES  (or VOTE: NO)"""
 
             # Tiebreak
             if ruling.tiebreak_used:
-                pname = COUNCIL_PRESIDENT["name"]
+                pname = council_president()["name"]
                 tie_icon = "✅" if ruling.tiebreak_vote == "YES" else "❌"
                 lines.append(f"{tie_icon} **{pname}** *(tiebreaker)*")
                 pstatement = ruling.positions.get(pname, "")
@@ -1056,16 +1087,15 @@ VOTE: YES  (or VOTE: NO)"""
     # ── World change application ───────────────────────────────────────────
 
     def _load_decided_topics(self) -> list[dict]:
-        """Load all previously decided rulings (pass or fail) from global_state."""
-        from src.db_api import raw_query
+        """Previously decided rulings (pass or fail), so topics are not repeated.
+
+        Reads `council_rulings` rows. This used to decode a 64KB JSON list out
+        of global_state and slice it to the last 200 -- a cap that existed only
+        because the whole history had to fit in one column.
+        """
         try:
-            rows = raw_query(
-                "SELECT state_value FROM global_state WHERE state_key = %s",
-                (self._RULINGS_STATE_KEY,),
-            )
-            if rows and rows[0].get("state_value"):
-                val = rows[0]["state_value"]
-                return json.loads(val) if isinstance(val, str) else val
+            from src.council_registry import recent_rulings
+            return recent_rulings(limit=300)
         except Exception as e:
             logger.warning(f"🏛️ Could not load decided topics: {e}")
         return []
@@ -1075,19 +1105,23 @@ VOTE: YES  (or VOTE: NO)"""
         from src.db_api import raw_query, raw_execute
         applied = []
 
-        existing = self._load_decided_topics()
-
         for ruling in all_rulings:
-            record = {
-                "date":      datetime.now().isoformat(),
-                "topic":     ruling.topic,
-                "proposal":  ruling.proposal,
-                "votes_yes": ruling.votes_yes,
-                "votes_no":  ruling.votes_no,
-                "tiebreak":  ruling.tiebreak_used,
-                "passed":    ruling.passed,
-            }
-            existing.append(record)
+            # One row per ruling, one row per vote. Individual positions are
+            # kept alongside the vote, which the JSON blob threw away entirely.
+            try:
+                from src.council_registry import record_ruling
+                record_ruling(
+                    topic=ruling.topic,
+                    proposal=ruling.proposal,
+                    passed=ruling.passed,
+                    tiebreak=ruling.tiebreak_used,
+                    votes_yes=ruling.votes_yes,
+                    votes_no=ruling.votes_no,
+                    positions=ruling.positions,
+                    tiebreak_vote=ruling.tiebreak_vote,
+                )
+            except Exception as e:
+                logger.warning(f"🏛️ Could not persist ruling '{ruling.topic}': {e}")
 
             # Post passed rulings to news_memory for world continuity
             if ruling.passed:
@@ -1107,26 +1141,9 @@ VOTE: YES  (or VOTE: NO)"""
             else:
                 applied.append(f"Ruling rejected (recorded): {ruling.topic}")
 
-        # Persist all rulings (keep last 200) in global_state
-        try:
-            payload = json.dumps(existing[-200:], ensure_ascii=False)
-            exists = raw_query(
-                "SELECT id FROM global_state WHERE state_key = %s",
-                (self._RULINGS_STATE_KEY,),
-            )
-            if exists:
-                raw_execute(
-                    "UPDATE global_state SET state_value = %s WHERE state_key = %s",
-                    (payload, self._RULINGS_STATE_KEY),
-                )
-            else:
-                raw_execute(
-                    "INSERT INTO global_state (state_key, state_value) VALUES (%s, %s)",
-                    (self._RULINGS_STATE_KEY, payload),
-                )
-        except Exception as e:
-            logger.warning(f"🏛️ Could not persist rulings to global_state: {e}")
-
+        # Rulings are persisted per-ruling above, into `council_rulings` /
+        # `council_ruling_votes`. The old global_state JSON blob is archived
+        # under `council_rulings_archived_json`; nothing writes it any more.
         return applied
 
     # ── Journal ────────────────────────────────────────────────────────────

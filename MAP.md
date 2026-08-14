@@ -29,6 +29,8 @@ Fast orientation to the tables you will actually touch:
 | what happened to a person | `npc_history` (888) | `add_npc_history_event(npc_id, body, date, event_type)` — body is SECOND |
 | a monster | `monsters` (348) | via `mission_builder/monster_roster.py`; size CR with `cr_scaling.mission_cr()` |
 | who leads a faction | `faction_reputation` (45) | authoritative; a hardcoded map must never outrank it |
+| who sits on the Council | `council_seats` | read via `guild_council.council_members()` / `council_president()`, never the literals |
+| what the Council decided | `council_rulings` + `council_ruling_votes` | replaced the global_state JSON blob |
 | a battle map | `battle_maps_library` (260) | via `battle_map_library.get_battle_map()` |
 | did the loops run | `loop_heartbeats` (15) | add an `EXPECTED` entry in `loop_health.py` for any new loop |
 
@@ -110,6 +112,7 @@ The column wins: apply the blob first, then overlay columns — never `dict.upda
 | `news_feed.py` | World news bulletin generation | ACTIVE |
 | `news_integration.py` | News feed integration layer | ACTIVE |
 | `tower_news_voices.py` | TTN voiced bulletins: `obituary` (spoken by the closest mourner), `interview`, `forum`, `union`. Carries `canon_anchor()` so the model cannot invent factions/places, and gates every draft through `canon_guard` | ACTIVE |
+| `council_registry.py` | The Grand Council in MySQL: `council_seats` (seat_role/npc_id/agenda/bias/voice), `council_rulings` + `council_ruling_votes`. Replaced hardcoded dicts and a 64KB global_state JSON blob | ACTIVE |
 | `canon_guard.py` | Stops generated prose from deposing people. `protected_block()` states each leader's real title (from `faction_reputation`) + the Unknown Party; `check(text, allow=[...])` rejects a protected name on the receiving end of a status verb (killed/arrested/suspended/demoted/"the late"/invented spouse). Gates `news_feed` + `tower_news_voices` | ACTIVE |
 | `ad_feed.py` | Advertisement/job posting generation | ACTIVE |
 | `bounty_board.py` | Bounty/contract postings | ACTIVE |

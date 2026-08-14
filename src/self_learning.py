@@ -1800,10 +1800,13 @@ async def _study_council_outcomes() -> str:
     from datetime import datetime, timedelta
     from src.db_api import raw_query, raw_execute, get_global_state
 
-    rulings_raw = get_global_state("council_rulings") or []
-    if isinstance(rulings_raw, str):
-        try: rulings_raw = json.loads(rulings_raw)
-        except: rulings_raw = []
+    # Rulings are rows now (`council_rulings` + `council_ruling_votes`), not a
+    # JSON list in global_state. recent_rulings() returns the same entry shape.
+    try:
+        from src.council_registry import recent_rulings
+        rulings_raw = recent_rulings(limit=100)
+    except Exception:
+        rulings_raw = []
 
     cutoff = datetime.now() - timedelta(days=7)
     recent = []
