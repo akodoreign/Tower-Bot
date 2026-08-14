@@ -1882,3 +1882,34 @@ Investigation modules MUST include a reason the players can't take forever:
 
 **Content gaps (LLM critique):**
 - None identified
+
+
+---
+
+## Self-Evaluation — 2026-08-14 01:09
+
+**Module evaluated:** The_Ring_of_Regenerations_Hidden_Truth_id1446_20260812_055027_276
+**LLM quality score:** 5/10
+
+**Structural counts (from real output):**
+- READ ALOUD blocks: 1 (need ≥4 per 5-scene module)
+- Numbered areas (N - Name): 0 (need ≥4)
+- Inline stat blocks: 0 (need ≥1 per combat scene)
+- Skill checks / branches: 21 (need ≥5)
+- GM NOTE boxes: 0 (need ≥3)
+- Transitions: 0 (need ≥4)
+
+**Format failures this run:**
+- LOW: Only 1 READ ALOUD block(s) — need ≥4 for a 3-scene module
+- CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable
+- MISSING: No GM NOTE boxes — DMs have no private guidance during scenes
+- CRITICAL: No stat blocks — enemies cannot be run in combat
+- LOW: 14 DC(s) but only 1 failure consequence(s) — most skill checks leave DMs guessing what failure means
+- LOW: Only 0 transition(s) — scenes don't lead into each other
+- LOW: 1 weak transition(s) using 'the party proceeds/moves' — transitions must PULL players with a mystery or threat, not just move them
+- LOW: Clues exist but are not labeled 'Clue A / Clue B / Clue C' — DMs cannot track which paths players have used
+- LOW: Only 2 NPC truth element(s) — NPCs need explicit Wants/Knows/Hides
+- LOW: Missing NPC truth sheet structure — found Wants:0 Knows:0 Hides:0. Every NPC with dialogue must have all three.
+
+**Content gaps (LLM critique):**
+- None identified
