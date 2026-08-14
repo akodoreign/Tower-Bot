@@ -207,9 +207,11 @@ def _load_missions_from_db(limit: int = 50) -> List[Dict]:
     """Load recent missions from MySQL."""
     try:
         from src.db_api import raw_query as _rq
+        # SELECT * -- `difficulty` in particular is a real column that is ABSENT
+        # from mission_json on ~2/3 of rows, so naming a subset meant the learner
+        # read difficulty off the blob and usually got nothing.
         rows = _rq(
-            "SELECT title, status, tier, faction, mission_json FROM missions "
-            "ORDER BY id DESC LIMIT %s", (limit,)
+            "SELECT * FROM missions ORDER BY id DESC LIMIT %s", (limit,)
         ) or []
         missions = []
         for row in rows:
@@ -219,8 +221,9 @@ def _load_missions_from_db(limit: int = 50) -> List[Dict]:
                     mj = json.loads(mj)
                 except Exception:
                     mj = {}
-            m = {**mj, "title": row["title"], "status": row["status"],
-                 "tier": row["tier"], "faction": row["faction"]}
+            m = dict(mj) if isinstance(mj, dict) else {}
+            m.update({k: v for k, v in row.items()
+                      if k != "mission_json" and v is not None})
             # Normalise legacy keys
             if row["status"] in ("completed",):
                 m.setdefault("resolved", True)

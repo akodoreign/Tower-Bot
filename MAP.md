@@ -36,11 +36,12 @@ Fast orientation to the tables you will actually touch:
 
 **Reserved words:** `rank` and `role` need backticks in MySQL 8.
 
-**JSON blobs mirror real columns** (`mission_json`, `profile_json`) and drift.
+**JSON blobs mirror real columns** (`profile_json` only, now) and drift.
 The column wins: apply the blob first, then overlay columns — never `dict.update(blob)`.
 `src/world_integrity.py` detects and repairs the drift.
-`npcs.data_json` is DONE — mirrors stripped 2026-08-13, guarded by
-`npc_lifecycle._BLOB_EXCLUDE`. Add any new real column to that set.
+`npcs.data_json` and `missions.mission_json` are DONE — mirrors stripped 2026-08-13,
+guarded by `npc_lifecycle._BLOB_EXCLUDE` and `mission_board._MISSION_BLOB_EXCLUDE`.
+Add any new real column to those sets.
 
 ---
 

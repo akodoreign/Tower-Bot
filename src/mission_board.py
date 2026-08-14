@@ -315,6 +315,7 @@ def _load_missions() -> List[dict]:
                 _msg_id = _raw_mid
             _created_at = row.get("created_at")
             _posted_at  = row.get("posted_at") or mission_data.get("posted_at")
+            _expires_at = row.get("expires_at") or mission_data.get("expires_at")
             mission = {
                 **mission_data,
                 "id": row.get("id"),
@@ -329,6 +330,16 @@ def _load_missions() -> List[dict]:
                 "player_claimer": row.get("claimed_by") or mission_data.get("player_claimer", ""),
                 "created_at": str(_created_at) if _created_at else mission_data.get("created_at"),
                 "posted_at":  str(_posted_at)  if _posted_at  else mission_data.get("posted_at"),
+                # These are real columns that this merge never named, so they
+                # were being read out of the mirror -- `expires_at` on 739 of
+                # 1087 rows. Column first, blob only as the legacy fallback.
+                "expires_at":   str(_expires_at) if _expires_at else mission_data.get("expires_at"),
+                "description":  row.get("description")  or mission_data.get("description", ""),
+                "reward_ec":    row.get("reward_ec")    or mission_data.get("reward_ec"),
+                "npc_giver":    row.get("npc_giver")    or mission_data.get("npc_giver", ""),
+                "module_slug":  row.get("module_slug")  or mission_data.get("module_slug", ""),
+                "completed_at": str(row["completed_at"]) if row.get("completed_at")
+                                else mission_data.get("completed_at"),
             }
             # Map DB status to legacy flags
             status = row.get("status", "active")
@@ -391,6 +402,24 @@ def _load_mission_by_id(mission_id: int) -> Optional[dict]:
         return None
 
 
+# Keys that must NEVER be written into missions.mission_json.
+#
+# Each is a real column on the row being written in the same statement. The
+# duplicate copy drifts immediately: `expires_at` disagreed with its column on
+# 739 of 1087 rows, and `difficulty` is the one that bit hardest -- it is absent
+# from the blob on ~2/3 of rows, so any reader taking it from here silently got
+# nothing and a difficulty 9 contract shipped as a 5.
+#
+# What legitimately STAYS is schemaless mission content: body, reward, type,
+# contact, public_text, opposing_faction, location, and the claim/resolution
+# flags (claimed, npc_claimed, player_claimer, completed, failed, resolved).
+_MISSION_BLOB_EXCLUDE = frozenset({
+    "id", "title", "description", "difficulty", "faction", "npc_giver", "status",
+    "reward_ec", "tier", "posted_at", "expires_at", "created_at", "completed_at",
+    "claimed_by", "message_id", "module_slug", "mission_json",
+})
+
+
 def _save_missions(missions: List[dict]) -> None:
     """Save all missions to database."""
     try:
@@ -432,8 +461,14 @@ def _save_mission(mission: dict) -> None:
         else:
             status = "active"
 
-        # Prepare mission_json (full mission data)
-        mission_json = json.dumps(mission, ensure_ascii=False, default=str)
+        # Prepare mission_json — schemaless content ONLY. Every key in
+        # _MISSION_BLOB_EXCLUDE is a real column set in this same statement, so
+        # writing it here too creates a second copy that drifts. `expires_at`
+        # proved it: 739 of 1087 rows disagreed with their column.
+        mission_json = json.dumps(
+            {k: v for k, v in mission.items() if k not in _MISSION_BLOB_EXCLUDE},
+            ensure_ascii=False, default=str,
+        )
 
         # Parse dates for DB columns
         posted_at = None
@@ -649,7 +684,12 @@ def _update_mission(message_id: int, updates: dict) -> None:
     """Update a mission by its Discord message_id."""
     try:
         # Find the mission by message_id
-        rows = raw_query("SELECT id, mission_json FROM missions WHERE message_id = %s", (message_id,))
+        # SELECT * is required, not a nicety: this reads the row, mutates it,
+        # and hands the result to _save_mission(), which writes the real columns
+        # from that same dict. Loading only mission_json would feed back a dict
+        # with no title/tier/faction/difficulty -- and now that the blob no
+        # longer mirrors them, that would blank those columns on every update.
+        rows = raw_query("SELECT * FROM missions WHERE message_id = %s", (message_id,))
         if not rows:
             return
 
@@ -658,6 +698,11 @@ def _update_mission(message_id: int, updates: dict) -> None:
         mission_data = row.get("mission_json", {})
         if isinstance(mission_data, str):
             mission_data = json.loads(mission_data) if mission_data else {}
+        if not isinstance(mission_data, dict):
+            mission_data = {}
+        # Columns win over the blob, then updates are applied on top.
+        mission_data.update({k: v for k, v in row.items()
+                             if k != "mission_json" and v is not None})
 
         # Apply updates
         mission_data.update(updates)

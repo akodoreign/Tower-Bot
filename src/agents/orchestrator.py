@@ -175,7 +175,9 @@ class AgentOrchestrator:
         """Calculate key mission metrics from MySQL missions table."""
         try:
             from src.db_api import raw_query as _rq
-            rows = _rq("SELECT title, status, tier, faction, mission_json FROM missions ORDER BY id") or []
+            # SELECT * -- `difficulty` is a real column absent from mission_json
+            # on ~2/3 of rows; naming a subset read it off the blob instead.
+            rows = _rq("SELECT * FROM missions ORDER BY id") or []
             missions = []
             for row in rows:
                 mj = row.get("mission_json") or {}
@@ -185,8 +187,10 @@ class AgentOrchestrator:
                     except Exception:
                         mj = {}
                 s = row["status"]
-                m = {**mj, "title": row["title"], "tier": row["tier"], "faction": row["faction"],
-                     "outcome": s if s in ("completed","failed","expired") else None}
+                m = dict(mj) if isinstance(mj, dict) else {}
+                m.update({k: v for k, v in row.items()
+                          if k != "mission_json" and v is not None})
+                m["outcome"] = s if s in ("completed", "failed", "expired") else None
                 missions.append(m)
         except Exception as _db_err:
             logger.warning(f"[orchestrator] mission stats DB query failed: {_db_err}")
