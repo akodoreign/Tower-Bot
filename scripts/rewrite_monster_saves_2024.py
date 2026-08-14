@@ -275,7 +275,13 @@ def validate(before: str, after: str) -> tuple[bool, str]:
         return False, "no target clause after the DC (area given without 'each creature in')"
 
     src_success = bool(RE_SRC_SUCCESS.search(before))
-    src_failure = bool(RE_SRC_FAILURE.search(before))
+    # A 2014 save construct ALWAYS implies a failure effect -- "DC 14 Con save"
+    # exists precisely to say what happens when you fail it. RE_SRC_FAILURE only
+    # matched "save or" adjacently, so the shorthand in this corpus defeated it:
+    # "DC 14 Con save at start of turn within 15 ft. or infected" puts a whole
+    # clause between the two words, and the gate then rejected a correct rewrite
+    # for having "invented a 'Failure:' branch the source does not have".
+    src_failure = bool(RE_SRC_FAILURE.search(before)) or bool(RE_SAVE_2014.search(before))
     out_success = bool(RE_HAS_SUCCESS_CLAUSE.search(after))
     out_failure = bool(RE_HAS_FAILURE_CLAUSE.search(after))
 

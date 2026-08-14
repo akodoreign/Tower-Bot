@@ -575,3 +575,38 @@ def test_5etools_markup_is_stripped_from_candidates():
     assert "[Area of Effect]" not in src
     assert "10-foot Radius" in src
     assert "Area of Effect" in inspect.getsource(rw.restructure)
+
+
+# ---------------------------------------------------------------------------
+# 7. A save construct implies a failure effect
+#
+# RE_SRC_FAILURE matched "save or" ADJACENTLY. The shorthand in this corpus puts
+# a clause between them -- "DC 14 Con save at start of turn within 15 ft. or
+# infected" -- so the gate decided the source had no failure branch and rejected
+# the correct rewrite for inventing one. Real case, UC Void Plague Hulk.
+# ---------------------------------------------------------------------------
+
+AURA = "DC 14 Con save at start of turn within 15 ft. or infected."
+AURA_OK = ("Constitution Saving Throw: DC 14, each creature within 15 feet. "
+           "Failure: The target is infected.")
+
+
+def test_save_construct_implies_a_failure_branch():
+    ok, why = _validate(AURA, AURA_OK)
+    assert ok, why
+
+
+def test_invented_success_then_failure_recovers_in_one_go():
+    """The full recovery path on the real draft: trim the invented Success, and
+    the remaining Failure branch must be accepted rather than called invented."""
+    draft = AURA_OK + " Success: None."
+    assert not _validate(AURA, draft)[0]
+    ok, why = _validate(AURA, _trim(AURA, draft))
+    assert ok, why
+
+
+def test_failure_branch_still_rejected_when_there_is_no_save():
+    """The relaxation keys off an actual save construct, not off nothing."""
+    no_save = "The hulk lumbers 15 feet and knocks over a brazier."
+    ok, _ = _validate(no_save, AURA_OK)
+    assert not ok, "a Failure branch was accepted for a source with no save"
