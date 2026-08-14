@@ -302,12 +302,25 @@ def validate(before: str, after: str) -> tuple[bool, str]:
         if span not in after:
             return False, "attack line was modified"
 
-    # Integers: reorder is fine (the DC legitimately moves), change is not.
-    b_ints, a_ints = Counter(RE_INT.findall(before)), Counter(RE_INT.findall(after))
+    # Integers, damage types and conditions: an INVENTED or LOST value is a rules
+    # change; a REPEATED one is formatting.
+    #
+    # These were multiset comparisons, which conflates the two. 2024 form requires
+    # the area to be restated inside the save clause -- the source says "Each
+    # rift: 10-ft. radius" and the rewrite must also say "each creature in a
+    # 10-foot Radius" -- so a correct rewrite legitimately carries that 10 twice
+    # and was rejected as "numbers changed (added ['10'])". Same for a damage type
+    # or condition named once in the lead and again in the Failure clause.
+    #
+    # Set semantics still catch every real tampering: a changed DC introduces a
+    # number the source never had AND loses one, an invented damage type appears
+    # from nowhere, a dropped condition vanishes. And the load-bearing values have
+    # their own STRICT multiset checks immediately below (dice, DC), so a number
+    # that actually matters cannot be silently duplicated either.
+    b_ints, a_ints = set(RE_INT.findall(before)), set(RE_INT.findall(after))
     if b_ints != a_ints:
-        added = a_ints - b_ints
-        lost = b_ints - a_ints
-        return False, f"numbers changed (added {sorted(added.elements())}, lost {sorted(lost.elements())})"
+        return False, (f"numbers changed (added {sorted(a_ints - b_ints)}, "
+                       f"lost {sorted(b_ints - a_ints)})")
 
     if _norm_dice(before) != _norm_dice(after):
         return False, "dice expressions changed"
@@ -315,15 +328,17 @@ def validate(before: str, after: str) -> tuple[bool, str]:
     if Counter(RE_DC.findall(before)) != Counter(RE_DC.findall(after)):
         return False, "DC values changed"
 
-    b_types = Counter(t.lower() for t in RE_TYPE.findall(before))
-    a_types = Counter(t.lower() for t in RE_TYPE.findall(after))
+    b_types = {t.lower() for t in RE_TYPE.findall(before)}
+    a_types = {t.lower() for t in RE_TYPE.findall(after)}
     if b_types != a_types:
-        return False, f"damage types changed ({sorted((a_types - b_types).elements())} / {sorted((b_types - a_types).elements())})"
+        return False, (f"damage types changed ({sorted(a_types - b_types)} / "
+                       f"{sorted(b_types - a_types)})")
 
-    b_cond = Counter(c.lower() for c in RE_COND.findall(before))
-    a_cond = Counter(c.lower() for c in RE_COND.findall(after))
+    b_cond = {c.lower() for c in RE_COND.findall(before)}
+    a_cond = {c.lower() for c in RE_COND.findall(after)}
     if b_cond != a_cond:
-        return False, f"conditions changed ({sorted((a_cond - b_cond).elements())} / {sorted((b_cond - a_cond).elements())})"
+        return False, (f"conditions changed ({sorted(a_cond - b_cond)} / "
+                       f"{sorted(b_cond - a_cond)})")
 
     if _abilities(before) != _abilities(after):
         return False, f"save ability changed ({_abilities(before)} -> {_abilities(after)})"
@@ -429,6 +444,13 @@ async def restructure(body: str, model: str, strict_retry: bool = False) -> str:
             content = (data.get("message") or {}).get("content", "").strip()
             if content:
                 content = re.sub(r"^2024:\s*", "", content).strip().strip('"')
+                # 5etools markup bleeding out of the few-shot corpus. The WotC
+                # source JSON tags areas as "{@variantrule Area of Effect|XPHB}";
+                # the model reproduces the rendered leftover "[Area of Effect]",
+                # which is corpus contamination, not rules text. Strip it rather
+                # than let a bracketed editorial tag reach the statblock.
+                content = re.sub(r"\s*\[Area of Effect\]", "", content)
+                content = re.sub(r"\s{2,}", " ", content).strip()
                 return content
         except Exception as exc:
             logger.warning(f"[SAVE_2024] Ollama error {attempt}/5: {exc}")

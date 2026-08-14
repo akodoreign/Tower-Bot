@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 
 import pytest
@@ -518,3 +519,59 @@ def test_invented_success_trimmed_in_every_shape(label, draft):
     assert "Failure:" in out
     ok, why = _validate(SAVE_OR_SUFFER, out)
     assert ok, f"{label}: {why}"
+
+
+# ---------------------------------------------------------------------------
+# 6. A restatement is not a change
+#
+# 2024 form requires the area to be named again INSIDE the save clause. The
+# source says "Each rift: 10-ft. radius" and the rewrite must also say "each
+# creature in a 10-foot Radius", so a correct rewrite carries that 10 twice.
+# Multiset comparison called that "numbers changed (added ['10'])" and rejected
+# it. Real case, UC Rift Colossus.
+# ---------------------------------------------------------------------------
+
+RIFT = ("Three rifts open at three points within 90 ft. Each rift: 10-ft. radius. "
+        "DC 17 Dex save or pulled 30 ft. toward rift + 27 (6d8) Necrotic. "
+        "Rifts close at start of next turn.")
+RIFT_OK = ("Three rifts open at three points within 90 feet. Each rift: 10-foot radius. "
+           "Dexterity Saving Throw: DC 17, each creature in a 10-foot Radius. "
+           "Failure: Pulled 30 feet toward the rift and takes 27 (6d8) Necrotic damage. "
+           "Rifts close at the start of the monster's next turn.")
+
+
+def test_repeated_area_is_not_a_number_change():
+    ok, why = _validate(RIFT, RIFT_OK)
+    assert ok, why
+
+
+@pytest.mark.parametrize("label,bad", [
+    ("dropped the pull distance", RIFT_OK.replace("Pulled 30 feet toward", "Pulled toward")),
+    ("dropped the damage type", RIFT_OK.replace("Necrotic damage", "damage")),
+    ("halved the damage", RIFT_OK.replace("27 (6d8)", "13 (3d8)")),
+    ("changed the save ability", RIFT_OK.replace("Dexterity Saving", "Constitution Saving")),
+    ("invented a range", RIFT_OK.replace("within 90 feet", "within 120 feet")),
+    ("changed the DC", RIFT_OK.replace("DC 17", "DC 15")),
+])
+def test_set_semantics_still_catch_real_tampering(label, bad):
+    """Relaxing repetition must not relax invention or loss."""
+    ok, _ = _validate(RIFT, bad)
+    assert not ok, f"gate let {label!r} through"
+
+
+def test_5etools_markup_is_stripped_from_candidates():
+    """'[Area of Effect]' is the rendered leftover of a {@variantrule ...} tag in
+    the WotC few-shot corpus -- contamination, not rules text."""
+    import re as _re
+    import sys
+    from pathlib import Path
+
+    scripts = str(Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    import rewrite_monster_saves_2024 as rw
+
+    src = _re.sub(r"\s*\[Area of Effect\]", "", "each creature in a 10-foot Radius [Area of Effect].")
+    assert "[Area of Effect]" not in src
+    assert "10-foot Radius" in src
+    assert "Area of Effect" in inspect.getsource(rw.restructure)
