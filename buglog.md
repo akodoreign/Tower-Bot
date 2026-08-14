@@ -2479,3 +2479,28 @@ Now validated by `_editorial_problem()` with the same regenerate-then-drop polic
 
 Ordering is pinned by a test: `_write_memory` must be unreachable for a rejected draft, or the bad
 bulletin poisons world memory even when it is never posted.
+
+## 2026-08-14 - CORRECTION: pipelines may be refactored, never combined
+
+User, reviewing the rules: "i think 11 was a misunderstanding, pipelines can be refractered but
+never combined."
+
+CLAUDE.md rule 11 read "**No refactoring mission pipelines**", which overshot. The intent is
+about COMBINING:
+
+- **Allowed:** refactoring a pipeline internally -- renaming, splitting long functions, fixing
+  structure, improving it. A pipeline is normal code.
+- **Never:** condensing, merging or collapsing two pipelines into one implementation, or
+  generalising them into a single parameterised pipeline.
+
+The test is "does this change make two pipelines more alike?" If yes, stop. Improving ONE
+pipeline does not erase the distinction between pipelines, and the distinction is the point --
+it is what keeps the missions from reading generic.
+
+Rule 11 rewritten, and the restatement under "Where consequences fire" softened from "the
+no-refactor rule still holds" to "pipelines stay distinct".
+
+Note this does NOT automatically relax the separate, narrower rule that pipelines carry LOCAL
+copies of helper logic (`_fit_ctx`, canon extraction) rather than importing a shared module.
+That is a different claim, the code comments cite it by name ("no-shared-helpers rule"), and it
+has not been re-confirmed -- confirm before extracting a shared helper.
