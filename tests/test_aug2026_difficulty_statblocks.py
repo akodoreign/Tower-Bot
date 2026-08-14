@@ -406,3 +406,84 @@ def test_unknown_creatures_still_get_the_old_homebrew_path(monkeypatch, fake_mim
 
     assert fake_mimir.monster_searches, "catalog search skipped for an unknown creature"
     assert [h["name"] for h in fake_mimir.homebrew] == ["Ledgerbound Revenant"]
+
+
+# ---------------------------------------------------------------------------
+# 5. Recovering a rewrite the model spoiled with one extra clause
+#
+# The dominant failure on the first full pass (10 of 23 rejections): the source
+# is a plain "save or suffer X" with no success behaviour, and the model appends
+# a Success: clause anyway because most 2024 saves have one. The restructure is
+# otherwise correct, so throwing it away wastes a good rewrite -- but the clause
+# cannot be kept, because it invents a rule the monster never had.
+# ---------------------------------------------------------------------------
+
+def _trim(before: str, after: str) -> str:
+    import sys
+    from pathlib import Path
+
+    scripts = str(Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    from rewrite_monster_saves_2024 import drop_invented_success
+
+    return drop_invented_success(before, after)
+
+
+# Verbatim shape of UC Void Iron Fang Enforcer's Syndicate Judgment: a DC, a
+# duration, and no area -- so a faithful rewrite introduces no new numbers.
+SAVE_OR_SUFFER = "DC 16 Wis save or frightened 1 minute."
+WITH_INVENTED = ("Wisdom Saving Throw: DC 16, one creature the enforcer can see. "
+                 "Failure: The target has the Frightened condition for 1 minute. "
+                 "Success: The target is unaffected.")
+
+
+def test_invented_success_clause_is_dropped():
+    out = _trim(SAVE_OR_SUFFER, WITH_INVENTED)
+    assert "Success:" not in out
+    assert "Failure:" in out, "the Failure branch must survive"
+    assert "Frightened" in out and "DC 16" in out
+
+
+def test_trimmed_rewrite_then_passes_the_gate():
+    """The whole point: recover the rewrite, then re-run the FULL validator."""
+    assert not _validate(SAVE_OR_SUFFER, WITH_INVENTED)[0], "gate should reject the invention"
+    ok, why = _validate(SAVE_OR_SUFFER, _trim(SAVE_OR_SUFFER, WITH_INVENTED))
+    assert ok, why
+
+
+def test_legitimate_success_clause_is_left_alone():
+    """When the source DOES say what happens on a save, the clause is real."""
+    assert _trim(CONE, CONE_OK) == CONE_OK
+
+
+def test_never_trims_away_the_only_branch():
+    """Refuse rather than hand back something with no Failure branch."""
+    only_success = "Wisdom Saving Throw: DC 16, each creature. Success: The target is unaffected."
+    assert _trim(SAVE_OR_SUFFER, only_success) == only_success
+
+
+def test_trimmer_touches_no_numbers():
+    out = _trim(SAVE_OR_SUFFER, WITH_INVENTED)
+    import re
+    assert re.findall(r"\d+", out) == ["16", "1"], "the trimmer must not alter numbers"
+
+
+def test_length_band_allows_2024_scaffolding_on_terse_sources():
+    """These statblocks are shorthand; 2024 form has fixed overhead.
+
+    "DC 16 Wis save or frightened 1 minute." is 8 words. The faithful rewrite
+    carries "<Ability> Saving Throw: DC n, <who>. Failure: ..." and lands near
+    21. A flat 2.0x ceiling called that rambling and threw away correct output.
+    """
+    ok, why = _validate(SAVE_OR_SUFFER, _trim(SAVE_OR_SUFFER, WITH_INVENTED))
+    assert ok, why
+
+
+def test_length_band_still_catches_actual_rambling():
+    """The additive allowance must not become a licence to pad."""
+    padded = (WITH_INVENTED + " The enforcer's reputation precedes them throughout "
+              "the district, and witnesses describe the moment as one of profound "
+              "and lingering dread that follows them home for many nights after.")
+    ok, _ = _validate(SAVE_OR_SUFFER, padded)
+    assert not ok, "gate should still reject padded output"

@@ -328,8 +328,21 @@ def validate(before: str, after: str) -> tuple[bool, str]:
     if _abilities(before) != _abilities(after):
         return False, f"save ability changed ({_abilities(before)} -> {_abilities(after)})"
 
+    # Length is only a chatter/truncation heuristic -- every rule-bearing check
+    # (numbers, dice, DCs, damage types, conditions, save ability, 2014 markers,
+    # branch preservation) has already run above.
+    #
+    # A pure ratio band is wrong for THIS corpus. These statblocks are written in
+    # compressed shorthand ("DC 16 Wis save or frightened 1 minute." -- 8 words)
+    # while 2024 form carries fixed scaffolding: "<Ability> Saving Throw: DC n,
+    # <who>. Failure: ... Success: ...". That overhead is roughly constant, so on
+    # a short source a faithful rewrite legitimately more than doubles it and a
+    # 2.0x ceiling rejected correct output (3 of 23 first-pass failures). Allow
+    # the scaffolding as a flat additive budget; keep the ratio for long text,
+    # where genuine rambling actually shows up.
     words_b, words_a = len(before.split()), len(after.split())
-    if not (0.5 * words_b <= words_a <= 2.0 * words_b):
+    ceiling = max(2.0 * words_b, words_b + 16)
+    if not (0.5 * words_b <= words_a <= ceiling):
         return False, f"length out of band ({words_b} -> {words_a} words)"
 
     if "\n" in after:
@@ -428,6 +441,34 @@ async def restructure(body: str, model: str, strict_retry: bool = False) -> str:
 # Paragraph plumbing
 # ---------------------------------------------------------------------------
 
+RE_SUCCESS_SENTENCE = re.compile(
+    r"\s*Success(?:\s+or\s+Failure)?:\s*[^.]*\.(?:\s|$)", re.IGNORECASE
+)
+
+
+def drop_invented_success(before: str, after: str) -> str:
+    """Remove a Success: clause the source never had.
+
+    Only fires when the SOURCE carries no success language at all -- a plain
+    "DC 16 Wis save or Frightened 1 minute", whose correct 2024 form is a
+    Failure: line and nothing else. If the source does describe what happens on
+    a save, the clause is legitimate and is left exactly where it is.
+
+    Deliberately does NOT touch numbers, dice, DCs or the Failure branch; it
+    deletes one sentence and hands the result back to validate().
+    """
+    if not after or RE_SRC_SUCCESS.search(before or ""):
+        return after
+    if not RE_HAS_SUCCESS_CLAUSE.search(after):
+        return after
+    trimmed = RE_SUCCESS_SENTENCE.sub(" ", after).strip()
+    trimmed = re.sub(r"\s{2,}", " ", trimmed)
+    # Never hand back something that lost the Failure branch too.
+    if not RE_HAS_FAILURE_CLAUSE.search(trimmed):
+        return after
+    return trimmed
+
+
 def split_block(para: str) -> tuple[str, str]:
     """'Name. Body text' -> ('Name. ', 'Body text'). Mirrors how the renderer and
     _blocks_to_entries parse these fields, so the header must survive intact."""
@@ -460,6 +501,25 @@ async def process_row(row: dict, model: str, dry_run: bool, report: list) -> dic
                 logger.info(f"[SAVE_2024] retry {row['name']}/{field}: {reason}")
                 candidate = await restructure(body, model, strict_retry=True)
                 ok, reason = validate(body, candidate)
+
+            if not ok:
+                # By far the most common failure (10 of 23 on the first full
+                # pass): the source is a plain "save or suffer X" with no
+                # success behaviour, and the model appends a Success: clause
+                # anyway because most 2024 saves have one. The restructure is
+                # otherwise correct, so discarding it wastes a good rewrite.
+                #
+                # Deleting a clause the source never had is not the model
+                # writing rules -- it restores fidelity to the source, and the
+                # FULL validator runs again afterwards. If anything else is
+                # wrong, it still fails.
+                trimmed = drop_invented_success(body, candidate)
+                if trimmed and trimmed != candidate:
+                    ok2, reason2 = validate(body, trimmed)
+                    if ok2:
+                        logger.info(f"[SAVE_2024] recovered {row['name']}/{field}: "
+                                    f"dropped an invented Success clause")
+                        candidate, ok, reason = trimmed, ok2, reason2
 
             if not ok:
                 report.append({
