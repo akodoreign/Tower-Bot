@@ -650,9 +650,12 @@ def _award_sold_items(sold_items: List[Dict]) -> None:
     if not sold_items:
         return
     try:
-        acquisitions = get_global_state("towerbay_npc_acquisitions") or []
-        if not isinstance(acquisitions, list):
-            acquisitions = []
+        # One row per acquisition. This used to decode the whole list, append,
+        # and write back the last 100 -- a cap that existed only because the
+        # history had to fit in a column. Winner and faction are indexed now, so
+        # "what has the Iron Fang been buying" is a query.
+        from src.db_api import db as _db
+        acquisitions = []
         for item in sold_items:
             winner_name = (
                 item.get("npc_bidder_name")
@@ -671,15 +674,24 @@ def _award_sold_items(sold_items: List[Dict]) -> None:
                 "sold_at":      datetime.now().isoformat(),
             }
             acquisitions.append(record)
+            try:
+                _db.insert("towerbay_npc_acquisitions", {
+                    "item":       str(record["item"])[:200],
+                    "rarity":     record.get("rarity") or None,
+                    "winner":     str(record["winner"])[:200],
+                    "faction":    record.get("faction") or None,
+                    "final_bid":  record.get("final_bid") or 0,
+                    "sold_at":    datetime.now(),
+                    "created_at": datetime.now(),
+                })
+            except Exception as _ins:
+                logger.warning(f"TowerBay acquisition insert failed: {_ins}")
             logger.info(
                 f"🏆 TowerBay: {item.get('name','?')} sold to "
                 f"{winner_name} for {item.get('current_bid',0):,} EC"
             )
-        # Keep last 100 acquisition records
-        set_global_state("towerbay_npc_acquisitions", acquisitions[-100:])
-
         # Push won items to Mimir as NPC documents (best-effort)
-        _push_acquisitions_to_mimir(acquisitions[-len(sold_items):])
+        _push_acquisitions_to_mimir(acquisitions)
     except Exception as e:
         logger.warning(f"TowerBay award tracking error: {e}")
 

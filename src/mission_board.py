@@ -2901,41 +2901,62 @@ def _load_party_list() -> List[str]:
     return []
 
 
-def _load_used_parties() -> List[str]:
-    """Load used parties list from database."""
+_USED_PARTIES_READY = False
+
+
+def _ensure_used_parties_table() -> None:
+    """`used_parties` -- which crews have already been handed a contract.
+
+    Was a JSON list of 134 names that had to be decoded in full to answer "has
+    this party been used", and rewritten in full to record one more. The name is
+    the key, so the UNIQUE index answers both.
+    """
+    global _USED_PARTIES_READY
+    if _USED_PARTIES_READY:
+        return
     try:
-        rows = raw_query(
-            "SELECT state_value FROM global_state WHERE state_key = 'used_parties'"
+        raw_execute(
+            """
+            CREATE TABLE IF NOT EXISTS used_parties (
+                id         INT AUTO_INCREMENT PRIMARY KEY,
+                party_name VARCHAR(200) NOT NULL,
+                used_at    DATETIME NOT NULL,
+                UNIQUE KEY uniq_party (party_name)
+            )
+            """,
+            (),
         )
-        if rows and rows[0].get("state_value"):
-            data = rows[0]["state_value"]
-            if isinstance(data, str):
-                data = json.loads(data)
-            return data if isinstance(data, list) else []
-        return []
+        _USED_PARTIES_READY = True
+    except Exception as e:
+        logger.error(f"used_parties schema init failed: {e}")
+
+
+def _load_used_parties() -> List[str]:
+    """Every party that has already been used."""
+    _ensure_used_parties_table()
+    try:
+        rows = raw_query("SELECT party_name FROM used_parties ORDER BY id") or []
+        return [r["party_name"] for r in rows if r.get("party_name")]
     except Exception:
         return []
 
 
 def _save_used_parties(used: List[str]) -> None:
-    """Save used parties list to database."""
-    try:
-        data = json.dumps(used, ensure_ascii=False)
-        existing = raw_query(
-            "SELECT id FROM global_state WHERE state_key = 'used_parties'"
-        )
-        if existing:
+    """Record parties as used. Additive -- a name already present stays."""
+    _ensure_used_parties_table()
+    now = datetime.now()
+    for name in (used or []):
+        name = str(name).strip()[:200]
+        if not name:
+            continue
+        try:
             raw_execute(
-                "UPDATE global_state SET state_value = %s WHERE state_key = 'used_parties'",
-                (data,)
+                "INSERT INTO used_parties (party_name, used_at) VALUES (%s,%s) "
+                "ON DUPLICATE KEY UPDATE used_at = used_at",
+                (name, now),
             )
-        else:
-            db.insert("global_state", {
-                "state_key": "used_parties",
-                "state_value": data
-            })
-    except Exception:
-        pass
+        except Exception:
+            pass
 
 
 async def _get_party_name() -> str:

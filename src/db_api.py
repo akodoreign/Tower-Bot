@@ -300,35 +300,22 @@ def adjust_district_wealth(district: str, delta: int, reason: str) -> int:
         (new_level, district),
     )
 
-    # Log to global_state wealth_events so the world remembers what happened
-    _log_key = "wealth_event_log"
+    # One row per wealth change. This used to decode a JSON list, append, slice
+    # to the last 200 and write the whole thing back -- a log is the clearest
+    # possible case for a table, and the 200 cap existed only because the whole
+    # history had to fit in one column.
+    _ensure_wealth_log_table()
     try:
-        existing_rows = raw_query(
-            "SELECT state_value FROM global_state WHERE state_key = %s", (_log_key,)
-        ) or []
-        log = _json.loads(existing_rows[0]["state_value"]) if existing_rows else []
-        log.append({
-            "ts":       _dt.now().isoformat(),
-            "district": district,
-            "old":      current,
-            "new":      new_level,
-            "delta":    delta,
-            "reason":   reason,
+        db.insert("district_wealth_events", {
+            "district":   district,
+            "old_level":  current,
+            "new_level":  new_level,
+            "delta":      delta,
+            "reason":     str(reason or "")[:400],
+            "created_at": _dt.now(),
         })
-        log = log[-200:]  # keep last 200 events
-        payload = _json.dumps(log)
-        if existing_rows:
-            raw_execute(
-                "UPDATE global_state SET state_value = %s WHERE state_key = %s",
-                (payload, _log_key),
-            )
-        else:
-            raw_execute(
-                "INSERT INTO global_state (state_key, state_value) VALUES (%s, %s)",
-                (_log_key, payload),
-            )
-    except Exception:
-        pass  # log failure is non-fatal
+    except Exception as exc:
+        logger.warning(f"wealth event log write failed: {exc}")
 
     from src.log import logger as _log
     direction = "↑" if delta > 0 else "↓"
@@ -373,19 +360,68 @@ def get_charitable_gods(
     return raw_query(query, tuple(params)) or []
 
 
-def get_wealth_event_log(limit: int = 20) -> list:
-    """Return recent district wealth change events."""
-    import json as _json
-    rows = raw_query(
-        "SELECT state_value FROM global_state WHERE state_key = 'wealth_event_log'"
-    ) or []
-    if not rows:
-        return []
+_WEALTH_LOG_READY = False
+
+
+def _ensure_wealth_log_table() -> None:
+    """`district_wealth_events` -- one row per change to a district's wealth."""
+    global _WEALTH_LOG_READY
+    if _WEALTH_LOG_READY:
+        return
     try:
-        log = _json.loads(rows[0]["state_value"])
-        return log[-limit:]
-    except Exception:
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS district_wealth_events (
+                id         INT AUTO_INCREMENT PRIMARY KEY,
+                district   VARCHAR(120) NOT NULL,
+                old_level  INT NULL,
+                new_level  INT NULL,
+                delta      INT NULL,
+                reason     VARCHAR(400) NULL,
+                created_at DATETIME NOT NULL,
+                KEY idx_district (district, created_at),
+                KEY idx_created (created_at)
+            )
+            """,
+            (),
+        )
+        _WEALTH_LOG_READY = True
+    except Exception as exc:
+        logger.error(f"district_wealth_events schema init failed: {exc}")
+
+
+def get_wealth_event_log(limit: int = 20, district: str = "") -> list:
+    """Recent district wealth changes, newest last (the shape callers expect).
+
+    Now filterable by district, which the JSON list could never do without
+    decoding every event.
+    """
+    _ensure_wealth_log_table()
+    try:
+        if district:
+            rows = raw_query(
+                "SELECT * FROM (SELECT * FROM district_wealth_events WHERE district=%s "
+                "ORDER BY id DESC LIMIT %s) t ORDER BY id",
+                (district, int(limit)),
+            ) or []
+        else:
+            rows = raw_query(
+                "SELECT * FROM (SELECT * FROM district_wealth_events "
+                "ORDER BY id DESC LIMIT %s) t ORDER BY id",
+                (int(limit),),
+            ) or []
+    except Exception as exc:
+        logger.warning(f"get_wealth_event_log failed: {exc}")
         return []
+    # Keep the historical key names so existing readers are untouched.
+    return [{
+        "ts":       r["created_at"].isoformat() if r.get("created_at") else "",
+        "district": r.get("district"),
+        "old":      r.get("old_level"),
+        "new":      r.get("new_level"),
+        "delta":    r.get("delta"),
+        "reason":   r.get("reason"),
+    } for r in rows]
 
 
 # =============================================================================
