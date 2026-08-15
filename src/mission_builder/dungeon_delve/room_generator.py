@@ -307,6 +307,21 @@ RULES:
 Respond with ONLY the JSON, no other text."""
 
 
+def _fit_ctx(prompt: str, reply_tokens: int = 1200) -> int:
+    """Size the context window to the prompt + planned reply.
+
+    A room prompt grows with the dungeon: faction, position, room type and the
+    running context of what came before. Unsized, Ollama silently truncates and
+    the room comes back empty, which reads as "generation declined" rather than
+    as a failed call. Only raises; capped at 32k. Local by the no-shared-helpers
+    rule."""
+    needed = len(prompt) // 4 + reply_tokens + 768
+    for cand in (8192, 12288, 16384, 24576, 32768):
+        if cand >= needed:
+            return cand
+    return 32768
+
+
 async def _generate_room_llm(
     room: RoomPosition,
     room_num: int,
@@ -347,6 +362,10 @@ async def _generate_room_llm(
                     "model": OLLAMA_MODEL,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {
+                        "num_ctx": _fit_ctx(prompt, 1200),
+                        "num_predict": 1200,
+                    },
                 },
             )
             resp.raise_for_status()
