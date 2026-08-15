@@ -347,7 +347,13 @@ _BLOB_EXCLUDE = frozenset({
     # runtime-only
     "_db_id", "_source", "history", "revealed_secrets",
     # real columns (previously mirrored)
-    "id", "name", "faction", "role", "location", "status", "rank", "species",
+    #
+    # NOT "species" / "race". `npcs.species` is a VIRTUAL GENERATED column:
+    #     species = coalesce(data_json->'$.species', data_json->'$.race')
+    # so the column is DERIVED FROM the blob, not a copy of it. Stripping those
+    # keys as "mirrors" had it exactly backwards and emptied the column for all
+    # 250 NPCs. Any key a generated column reads MUST stay in the blob.
+    "id", "name", "faction", "role", "location", "status", "rank",
     "motivation", "quote", "oracle_notes", "secret", "relationships",
     "death_cause", "cause_of_death", "tower_absorbed", "party_name",
     "arrival_date", "deceased_at", "created_at", "updated_at",

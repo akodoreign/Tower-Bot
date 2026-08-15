@@ -337,3 +337,38 @@ def test_world_integrity_separates_injured_from_dead():
     assert "leader_injured" in src
     assert "leader_not_themselves" in src, "undead/doppelganger leaders are a plot, not an error"
     assert "never auto-repair" in src
+
+
+# ---------------------------------------------------------------------------
+# A generated column reads FROM the blob -- it is not a mirror OF it
+# ---------------------------------------------------------------------------
+
+def test_species_is_not_treated_as_a_mirror():
+    """`npcs.species` is VIRTUAL GENERATED:
+
+        species = coalesce(data_json->'$.species', data_json->'$.race')
+
+    So the column is DERIVED FROM the blob. Stripping those keys as "mirrors of
+    a real column" had it backwards and emptied species for all 250 NPCs.
+    """
+    from src.npc_lifecycle import _BLOB_EXCLUDE
+
+    assert "species" not in _BLOB_EXCLUDE, "stripping species empties the generated column"
+    assert "race" not in _BLOB_EXCLUDE, "species falls back to data_json.race"
+
+
+def test_strip_script_protects_generated_column_inputs():
+    """Detected from information_schema, not remembered -- so a NEW generated
+    column is protected automatically."""
+    import inspect
+    import pathlib
+    import sys
+
+    scripts = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    import strip_npc_blob_mirrors as strip
+
+    src = inspect.getsource(strip)
+    assert "GENERATION_EXPRESSION" in src, "strip script does not consult generated columns"
+    assert "if k in protected" in src, "protected keys are not skipped in the strip loop"

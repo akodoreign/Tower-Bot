@@ -14,6 +14,7 @@ Run with --apply.
 
 import argparse
 import json
+import re
 import sys
 
 sys.path.insert(0, r'c:\Users\akodoreign\Desktop\chatGPT-discord-bot')
@@ -32,8 +33,37 @@ def norm(v) -> str:
     return str(v).strip()
 
 
+def generated_column_deps(table: str) -> set:
+    """JSON keys that a GENERATED column reads. These can never be stripped.
+
+    `npcs.species` is VIRTUAL GENERATED from
+    coalesce(data_json->'$.species', data_json->'$.race') -- the column is
+    DERIVED FROM the blob, not a copy of it. Treating those keys as mirrors and
+    removing them emptied the column for all 250 NPCs. Detected from
+    information_schema rather than remembered, so a new generated column is
+    protected automatically.
+    """
+    deps = set()
+    rows = raw_query(
+        "SELECT COLUMN_NAME, GENERATION_EXPRESSION FROM information_schema.COLUMNS "
+        "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s "
+        "AND GENERATION_EXPRESSION <> ''",
+        (table,),
+    ) or []
+    for r in rows:
+        for key in re.findall(r"\$\.([A-Za-z_][A-Za-z0-9_]*)", str(r.get("GENERATION_EXPRESSION") or "")):
+            deps.add(key)
+        # The generated column's own name is not a mirror either.
+        if r.get("COLUMN_NAME"):
+            deps.add(str(r["COLUMN_NAME"]))
+    return deps
+
+
 def main(apply: bool) -> None:
     columns = {r["Field"] for r in raw_query("SHOW COLUMNS FROM npcs") or []}
+    protected = generated_column_deps("npcs")
+    if protected:
+        print(f"protected by generated columns (never stripped): {sorted(protected)}")
     rows = raw_query("SELECT * FROM npcs") or []
 
     stripped_keys = {}
@@ -55,6 +85,9 @@ def main(apply: bool) -> None:
         bytes_before += len(raw if isinstance(raw, str) else json.dumps(raw))
         new_blob = {}
         for k, v in blob.items():
+            if k in protected:
+                new_blob[k] = v      # a generated column reads this
+                continue
             if k not in _BLOB_EXCLUDE:
                 new_blob[k] = v
                 continue
