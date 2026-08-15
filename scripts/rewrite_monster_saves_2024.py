@@ -142,13 +142,53 @@ RE_ATTACK_HEAD = re.compile(r"(?:Melee or Ranged|Melee|Ranged)\s+Attack Roll:")
 RE_ATTACK_2014 = re.compile(r"(?:Weapon|Spell)\s+Attack:|\bto hit\b", re.IGNORECASE)
 
 
+# A save the MONSTER makes about its own survival. 2024 still writes these as
+# prose with a DC -- XMM's Undead Fortitude is the reference:
+#
+#   "If damage reduces the zombie to 0 Hit Points, it makes a Constitution
+#    saving throw (DC 5 plus the damage taken)... On a successful save, the
+#    zombie drops to 1 Hit Points instead."
+#
+# RE_SAVE_2014 matches any "DC n <ability> save", so it flagged these as 2014
+# phrasing needing conversion. They are not: there is nothing to convert, and
+# the block format ("Saving Throw: DC n, each creature...") cannot express a
+# save with no target. Skip them entirely.
+RE_SELF_SAVE = re.compile(
+    r"drops? to \d+ HP|reduced to \d+ HP|stay at \d+ HP|instead of 0|"
+    r"drops? to \d+ Hit Point",
+    re.IGNORECASE,
+)
+
+
+def is_self_save(text: str) -> bool:
+    """True when the save is the monster's own, not one it imposes."""
+    return bool(RE_SELF_SAVE.search(text or ""))
+
+
 def attack_span(text: str) -> str:
-    """The already-2024 attack sentence that precedes a save rider, if any."""
+    """The already-2024 attack sentence that precedes a save rider, if any.
+
+    Ends at the damage clause, NOT at the save. It used to run all the way to
+    the save match, which swallowed the connective ("On hit vs. undead/fiends:")
+    -- text a correct rewrite MUST restructure, per XMM's own form:
+    "...Psychic damage. If the target is a creature, it is subjected to the
+    following effect. Cha Saving Throw: DC 17. Failure: ..."
+    Including the connective in the immutable span made a faithful rewrite fail
+    as "attack line was modified".
+    """
     head = RE_ATTACK_HEAD.search(text)
     if not head:
         return ""
-    save = RE_SAVE_2014.search(text, head.end())
-    return text[head.start():(save.start() if save else len(text))].strip()
+    tail = RE_SAVE_2014.search(text, head.end())
+    end = tail.start() if tail else len(text)
+    chunk = text[head.start():end]
+    # Cut at the end of the damage sentence. "ft." and "vs." are abbreviations,
+    # not sentence ends -- cutting at those left the span dangling mid-phrase
+    # ("...Psychic damage. On hit vs. ") and it never matched the rewrite.
+    ends = [m for m in re.finditer(r"(?<!\bft)(?<!\bvs)(?<!\bin)\.\s+", chunk)]
+    if ends:
+        chunk = chunk[:ends[-1].end()]
+    return chunk.strip()
 
 FALLBACK_FEW_SHOT = """\
 2014: Each creature in a 30-foot cone must make a DC 18 CON save. On a failure, the target takes 45 (10d8) Cold damage; on a success, half damage.
@@ -271,7 +311,13 @@ def validate(before: str, after: str) -> tuple[bool, str]:
     if still_2014:
         return False, f"2014 save construct survived: {still_2014.group(0)!r}"
 
-    if not RE_TARGET_CLAUSE.search(after):
+    # A save that RIDES on an attack does not repeat the target -- the attack
+    # already named it. XMM, Arcanaloth's Banishing Claw:
+    #   "...Psychic damage. If the target is a creature, it is subjected to the
+    #    following effect. Cha Saving Throw: DC 17. Failure: ..."
+    # There is no "each creature in" there, and demanding one rejected genuine
+    # WotC phrasing.
+    if not RE_ATTACK_HEAD.search(after) and not RE_TARGET_CLAUSE.search(after):
         return False, "no target clause after the DC (area given without 'each creature in')"
 
     src_success = bool(RE_SRC_SUCCESS.search(before))
@@ -524,6 +570,13 @@ async def process_row(row: dict, model: str, dry_run: bool, report: list) -> dic
 
         for i, para in enumerate(paras):
             if not RE_SAVE_2014.search(para):
+                continue
+            if is_self_save(para):
+                # The monster's own survival save. 2024 keeps these as prose
+                # with a DC (XMM Undead Fortitude), so there is nothing to
+                # convert and the block format cannot express it.
+                logger.info(f"[SAVE_2024] skip {row['name']}/{field}: "
+                            f"monster-made save, already valid 2024 prose")
                 continue
 
             prefix, body = split_block(para)

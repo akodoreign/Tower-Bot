@@ -610,3 +610,69 @@ def test_failure_branch_still_rejected_when_there_is_no_save():
     no_save = "The hulk lumbers 15 feet and knocks over a brazier."
     ok, _ = _validate(no_save, AURA_OK)
     assert not ok, "a Failure branch was accepted for a source with no save"
+
+
+# ---------------------------------------------------------------------------
+# 8. The gate must accept genuine WotC 2024 text
+#
+# Checked against real XMM entries pulled from mimir.db. The gate was calibrated
+# for ONE shape -- a monster imposing a save on targets -- and rejected all three
+# WotC forms below. Rules content comes from Mimir, never from model memory, and
+# that applies to the VALIDATOR as much as to the model.
+# ---------------------------------------------------------------------------
+
+# Arcanaloth, Banishing Claw (XMM): attack, connective, then a save with NO
+# target clause -- the attack already named the target.
+ARC_SRC = ("Melee Attack Roll: +9, reach 5 ft. Hit: 10 (2d4 + 5) Slashing damage plus "
+           "19 (3d12) Psychic damage. On hit vs. creatures: DC 17 Cha save or trapped "
+           "in a demiplane.")
+ARC_OK = ("Melee Attack Roll: +9, reach 5 ft. Hit: 10 (2d4 + 5) Slashing damage plus "
+          "19 (3d12) Psychic damage. If the target is a creature, it is subjected to the "
+          "following effect. Cha Saving Throw: DC 17. Failure: The target is trapped in "
+          "a demiplane.")
+
+
+def test_attack_led_save_needs_no_target_clause():
+    """XMM writes 'Cha Saving Throw: DC 17. Failure:' with no 'each creature in'."""
+    ok, why = _validate(ARC_SRC, ARC_OK)
+    assert ok, why
+
+
+def test_attack_span_stops_at_the_damage_sentence():
+    """The span ran to the SAVE, swallowing the connective ('On hit vs. ...') --
+    text a correct rewrite must restructure. 'ft.' and 'vs.' are abbreviations,
+    not sentence ends."""
+    import sys
+    from pathlib import Path
+
+    scripts = str(Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    from rewrite_monster_saves_2024 import attack_span
+
+    span = attack_span(ARC_SRC)
+    assert span.endswith("Psychic damage."), f"span mis-cut: {span!r}"
+    assert "On hit" not in span
+    assert "vs." not in span
+
+
+@pytest.mark.parametrize("text,expected", [
+    # The monster's own survival save -- 2024 keeps these as prose (XMM Undead
+    # Fortitude), so there is nothing to convert.
+    ("Syndicate Mark. Drops to 1 HP instead of 0 on first death (DC 13 Con save).", True),
+    ("Undying Devotion. When reduced to 0 HP: DC 15 Con save to stay at 1 HP.", True),
+    # Saves the monster IMPOSES must never be mistaken for one.
+    ("Engulf. Target DC 15 Str save or engulfed: restrained.", False),
+    ("25-ft. radius. DC 17 Dex save: 52 (8d12) Fire on fail, half on success.", False),
+    ("Each: DC 17 Str save or engulfed: blinded, restrained.", False),
+])
+def test_self_save_detection(text, expected):
+    import sys
+    from pathlib import Path
+
+    scripts = str(Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    from rewrite_monster_saves_2024 import is_self_save
+
+    assert is_self_save(text) is expected
