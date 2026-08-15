@@ -1914,15 +1914,14 @@ def _build_world_lore() -> str:
 
     # --- Active tensions (from global_state — updated by lifecycle/events) ---
     try:
-        rows = _rq("SELECT state_value FROM global_state WHERE state_key = 'world_active_tensions'") or []
-        if rows:
-            import json as _j
-            tensions = rows[0]["state_value"]
-            if isinstance(tensions, str): tensions = _j.loads(tensions)
-            if tensions:
-                lines.append("ACTIVE TENSIONS:")
-                for t in tensions:
-                    lines.append(f"- {t}")
+        # Tensions are rows now (`world_tensions`); go through the accessor
+        # rather than decoding a global_state blob that no longer holds them.
+        from src.db_api import get_active_tensions as _tensions
+        tensions = _tensions()
+        if tensions:
+            lines.append("ACTIVE TENSIONS:")
+            for t in tensions:
+                lines.append(f"- {t}")
     except Exception:
         pass
 

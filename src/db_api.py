@@ -1849,35 +1849,107 @@ def set_global_state(key: str, value) -> None:
     )
 
 
+_TENSION_SCHEMA_READY = False
+
+
+def _ensure_tension_table() -> None:
+    """`world_tensions` -- one row per live thread in the world.
+
+    These were a 17KB JSON list of 85 strings in global_state, and every
+    add_tension() call read the entire list, appended, and wrote it all back. A
+    tension is a record: it starts, it is live, and it gets resolved. Uniqueness
+    is enforced by the index rather than by an `in` check on a decoded blob.
+    """
+    global _TENSION_SCHEMA_READY
+    if _TENSION_SCHEMA_READY:
+        return
+    try:
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS world_tensions (
+                id         INT AUTO_INCREMENT PRIMARY KEY,
+                tension    VARCHAR(400) NOT NULL,
+                active     TINYINT(1)   NOT NULL DEFAULT 1,
+                created_at DATETIME     NOT NULL,
+                resolved_at DATETIME    NULL,
+                UNIQUE KEY uniq_tension (tension(255)),
+                KEY idx_active (active)
+            )
+            """,
+            (),
+        )
+        _TENSION_SCHEMA_READY = True
+    except Exception as exc:
+        logger.error(f"world_tensions schema init failed: {exc}")
+
+
 def get_active_tensions() -> List[str]:
     """Return the current list of active world tensions."""
-    val = get_global_state("world_active_tensions")
-    return val if isinstance(val, list) else []
+    _ensure_tension_table()
+    try:
+        rows = raw_query(
+            "SELECT tension FROM world_tensions WHERE active = 1 ORDER BY id"
+        ) or []
+        return [r["tension"] for r in rows if r.get("tension")]
+    except Exception as exc:
+        logger.warning(f"get_active_tensions failed: {exc}")
+        return []
 
 
 def set_active_tensions(tensions: List[str]) -> None:
-    """Replace the active tensions list."""
-    set_global_state("world_active_tensions", tensions)
+    """Replace the active set. Rows are retired, never deleted -- what the world
+    was worried about last month is history, not garbage."""
+    _ensure_tension_table()
+    keep = [str(t).strip()[:400] for t in (tensions or []) if str(t).strip()]
+    now = datetime.now()
+    try:
+        db.execute(
+            "UPDATE world_tensions SET active = 0, resolved_at = %s WHERE active = 1",
+            (now,),
+        )
+        for t in keep:
+            db.execute(
+                "INSERT INTO world_tensions (tension, active, created_at) VALUES (%s,1,%s) "
+                "ON DUPLICATE KEY UPDATE active = 1, resolved_at = NULL",
+                (t, now),
+            )
+    except Exception as exc:
+        logger.error(f"set_active_tensions failed: {exc}")
 
 
 def add_tension(tension: str) -> None:
-    """Append a tension if it isn't already present."""
-    current = get_active_tensions()
-    if tension not in current:
-        current.append(tension)
-        set_active_tensions(current)
+    """Add a tension if it isn't already live. One INSERT, no read-modify-write."""
+    _ensure_tension_table()
+    t = str(tension or "").strip()[:400]
+    if not t:
+        return
+    try:
+        db.execute(
+            "INSERT INTO world_tensions (tension, active, created_at) VALUES (%s,1,%s) "
+            "ON DUPLICATE KEY UPDATE active = 1, resolved_at = NULL",
+            (t, datetime.now()),
+        )
+    except Exception as exc:
+        logger.error(f"add_tension failed: {exc}")
 
 
 def resolve_tension(keyword: str) -> bool:
-    """Remove the first tension whose text contains *keyword* (case-insensitive).
-    Returns True if something was removed."""
-    current = get_active_tensions()
-    kw = keyword.lower()
-    updated = [t for t in current if kw not in t.lower()]
-    if len(updated) < len(current):
-        set_active_tensions(updated)
-        return True
-    return False
+    """Retire every live tension whose text contains *keyword* (case-insensitive).
+    Returns True if something was retired."""
+    _ensure_tension_table()
+    kw = str(keyword or "").strip()
+    if not kw:
+        return False
+    try:
+        affected = db.execute(
+            "UPDATE world_tensions SET active = 0, resolved_at = %s "
+            "WHERE active = 1 AND LOWER(tension) LIKE %s",
+            (datetime.now(), f"%{kw.lower()}%"),
+        )
+        return bool(affected)
+    except Exception as exc:
+        logger.error(f"resolve_tension failed: {exc}")
+        return False
 
 
 # ---------------------------------------------------------------------------
