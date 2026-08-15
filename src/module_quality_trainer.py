@@ -137,11 +137,27 @@ def _load_quality_skill() -> str:
 
 # ── Ollama Helper ──────────────────────────────────────────────────────
 
+def _fit_ctx(prompt: str, reply_tokens: int = 900) -> int:
+    """Size the context window to the prompt + planned reply.
+
+    This grader sends ~9,500 characters (4k of module, 3k of reference, 2.5k of
+    criteria) and then asks for ten scored lines, an overall score, three gaps
+    and three patches -- roughly 900 reply tokens. Unsized, Ollama truncates the
+    REPLY, which is generated last, so the scores parse and everything after
+    OVERALL_SCORE is lost. Only raises; capped at 32k."""
+    needed = len(prompt) // 4 + reply_tokens + 768
+    for cand in (8192, 12288, 16384, 24576, 32768):
+        if cand >= needed:
+            return cand
+    return 32768
+
+
 async def _ask_ollama(
     prompt: str,
     system: str = "",
     timeout: int = 300,
     retries: int = 2,
+    reply_tokens: int = 900,
 ) -> str:
     """
     Send a prompt to Ollama and return the response text.
@@ -174,9 +190,20 @@ async def _ask_ollama(
                     "model": OLLAMA_MODEL,
                     "messages": messages,
                     "stream": False,
+                    "options": {
+                        "num_ctx": _fit_ctx(system + prompt, reply_tokens),
+                        "num_predict": reply_tokens,
+                    },
                 })
                 data = resp.json()
-                return data.get("message", {}).get("content", "").strip()
+                reply = data.get("message", {}).get("content", "").strip()
+                if len(reply) < 60 and len(prompt) > 2000:
+                    logger.warning(
+                        "module_quality_trainer: %d-char prompt returned only %d chars "
+                        "-- context overflow, not an empty critique",
+                        len(prompt), len(reply)
+                    )
+                return reply
                 
         except httpx.TimeoutException as e:
             last_error = f"Timeout after {timeout}s (attempt {attempt + 1}/{retries + 1})"
@@ -652,15 +679,31 @@ PROMPT PATCH SUGGESTIONS (add these exact sentences to the module generation pro
 Point to exact problems in the generated content. Suggest concrete fixes.
 Your goal is to help the generation system improve iteratively."""
 
-    response = await _ask_ollama(prompt, system=system, timeout=300)
+    # 2400 rather than the 900 default: qwen3 spends num_predict on THINKING
+    # tokens as well as visible output (guild_council._ollama_call carries the
+    # same note). At 900 the reply reliably died mid-format, cut off at
+    # "PROMPT PATCH SUGGESTIONS (add these exact sentences" -- after the scores
+    # but before the gaps, which is the half worth having.
+    response = await _ask_ollama(prompt, system=system, timeout=300, reply_tokens=2400)
     
     # Parse the response
+    # `overall_score` starts as None, NOT 5.
+    #
+    # It used to default to 5, and when the reply was truncated the parse simply
+    # failed and that 5 was written to the skill file as "LLM quality score:
+    # 5/10". Thirty-four consecutive nightly runs -- 2026-05-15 to 2026-08-15 --
+    # reported exactly 5/10 with "Content gaps: None identified", and every one
+    # of them was the default being mistaken for a verdict. Before that stretch
+    # the scores moved (0, 1, 2, 3, 4) and the gaps were real.
+    #
+    # A grader that cannot grade must say so.
     result = {
         "raw_response": response,
         "scores": {},
-        "overall_score": 5,
+        "overall_score": None,
         "gaps": [],
         "patches": [],
+        "critique_ok": False,
         "timestamp": datetime.now().isoformat(),
     }
     
@@ -689,7 +732,18 @@ Your goal is to help the generation system improve iteratively."""
         if patches_section:
             patch_matches = re.findall(r"\d+\.\s*(.+?)(?=\d+\.|$)", patches_section.group(0), re.DOTALL)
             result["patches"] = [p.strip() for p in patch_matches[:3] if p.strip()]
-    
+
+    # The critique only counts if the model actually reached the end of the
+    # format. OVERALL_SCORE sits after the ten criteria, so parsing it is the
+    # cheapest proof the reply was not cut off mid-way.
+    result["critique_ok"] = result["overall_score"] is not None
+    if not result["critique_ok"]:
+        logger.error(
+            "module_quality_trainer: critique unusable -- no OVERALL_SCORE in a "
+            "%d-char reply. NOT recording a score; the grader failed, the module "
+            "was not judged.", len(response or "")
+        )
+
     return result
 
 
@@ -803,7 +857,7 @@ def _save_test_module(mission: Dict[str, Any]):
 
 def _update_quality_skill_file(
     title: str,
-    score: int,
+    score: Optional[int],
     struct: Dict[str, Any],
     gaps: List[str],
 ) -> None:
@@ -819,6 +873,12 @@ def _update_quality_skill_file(
     try:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M")
         failures = struct.get("failures", [])
+        # Never print a number the grader did not produce. A dead grader
+        # reporting a default read as a real verdict for three months.
+        score_line = f"{score}/10" if score is not None else (
+            "NOT SCORED -- the LLM critique failed this run (see logs). "
+            "The structural counts below are still real."
+        )
         block = f"""
 
 ---
@@ -826,7 +886,7 @@ def _update_quality_skill_file(
 ## Self-Evaluation — {ts}
 
 **Module evaluated:** {title}
-**LLM quality score:** {score}/10
+**LLM quality score:** {score_line}
 
 **Structural counts (from real output):**
 - READ ALOUD blocks: {struct.get('read_aloud_blocks', 0)} (need ≥4 per 5-scene module)
