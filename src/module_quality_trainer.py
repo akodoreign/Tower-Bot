@@ -452,20 +452,122 @@ def _load_latest_real_module() -> Optional[tuple[str, str]]:
         text = _re.sub(r"<script[^>]*>.*?</script>", " ", text, flags=_re.DOTALL | _re.IGNORECASE)
         text = _re.sub(r"<[^>]+>", " ", text)
         text = _re.sub(r"\s+", " ", text).strip()
-        return latest.name, text
+        return latest.name, text, html_text, _mission_type_for_dir(latest.name)
     except Exception as e:
         logger.warning(f"Could not load latest module: {e}")
         return None
 
 
-def _structural_check(module_text: str) -> Dict[str, Any]:
+def _mission_type_for_dir(dirname: str) -> str:
+    """Recover the mission type from a module directory name.
+
+    Directories are named "<Title>_id<ID>_<timestamp>", so the id is right
+    there. Without this the caller labelled every module "real_module" and the
+    structural check had no idea whether it was grading a dungeon crawl or an
+    investigation.
+    """
+    import re as _re
+    m = _re.search(r"_id(\d+)_", dirname or "")
+    if not m:
+        return ""
+    try:
+        from src.mission_board import _load_mission_by_id
+        mission = _load_mission_by_id(int(m.group(1))) or {}
+        return str(mission.get("type") or "")
+    except Exception as exc:
+        logger.debug(f"module_quality_trainer: type lookup failed for {dirname}: {exc}")
+        return ""
+
+
+# How hard to insist on combat apparatus, per `mission_type_templates.combat_posture`.
+# That column already encodes the design intent, so the grader reads it rather
+# than inventing a taxonomy:
+#   EXPECTED    ambush, assault, battle, defense, infestation, rift
+#   PERMITTED   assassination, bounty, dungeon, escort, patrol, recovery, rescue...
+#   RISKY       discovery, heist, sabotage, smuggling, exploration...
+#   CONSEQUENCE delivery, investigation, negotiation, political, puzzle...
+_STATBLOCK_SEVERITY = {
+    "EXPECTED": "CRITICAL",
+    "PERMITTED": "LOW",
+    "RISKY": "LOW",
+    "CONSEQUENCE": None,   # combat is what happens if they FAIL -- not required apparatus
+}
+
+
+def _combat_posture(mission_type: str) -> str:
+    """Look up the posture for a mission type. Unknown types stay strict."""
+    if not mission_type:
+        return "PERMITTED"
+    try:
+        from src.db_api import raw_query as _rq
+        rows = _rq(
+            "SELECT combat_posture FROM mission_type_templates WHERE slug=%s LIMIT 1",
+            (str(mission_type).strip().lower(),),
+        ) or []
+        if rows and rows[0].get("combat_posture"):
+            return str(rows[0]["combat_posture"]).upper()
+    except Exception as exc:
+        logger.debug(f"module_quality_trainer: posture lookup failed: {exc}")
+    return "PERMITTED"
+
+
+def _component_check(raw_html: str) -> Dict[str, Any]:
+    """Did the module use the component library, or hand-roll its styling?
+
+    Type-independent and objective. `html_renderer.py` defines read-aloud,
+    gm-note, stat-block, scene-section and transition as real classes; a module
+    built through it carries them. A freshly built module on 2026-08-15 carried
+    ZERO of them across all eight files and 778 inline style attributes, which
+    is drift no rubric about scene content would ever surface.
+    """
+    import re
+    body = re.sub(r"<style[^>]*>.*?</style>", " ", raw_html or "", flags=re.DOTALL | re.IGNORECASE)
+    body = re.sub(r"<script[^>]*>.*?</script>", " ", body, flags=re.DOTALL | re.IGNORECASE)
+
+    components = ("read-aloud", "gm-note", "stat-block", "stat-line",
+                  "scene-section", "transition", "chapter-header")
+    used = {}
+    for cls in components:
+        used[cls] = len(re.findall(r"class=['\"][^'\"]*" + cls, body))
+    inline = len(re.findall(r"style=['\"]", body))
+
+    failures = []
+    total = sum(used.values())
+    if total == 0 and inline > 50:
+        failures.append(
+            f"CRITICAL: Module bypasses the component library entirely -- 0 renderer "
+            f"classes and {inline} inline style attributes. html_renderer.py defines "
+            f"read-aloud/gm-note/stat-block/transition; this document hand-rolls its "
+            f"styling, so none of the structural components exist to be graded."
+        )
+    elif total and inline > total * 20:
+        failures.append(
+            f"LOW: Mostly hand-rolled styling -- {total} renderer class(es) against "
+            f"{inline} inline style attributes."
+        )
+    return {"components": used, "component_total": total,
+            "inline_styles": inline, "failures": failures}
+
+
+def _structural_check(module_text: str, mission_type: str = "") -> Dict[str, Any]:
     """
     Fast structural checks against WotC format markers.
+
+    `mission_type` decides which apparatus is actually required. Without it the
+    grader applied a dungeon-crawl rubric to everything: a difficulty 8
+    INVESTIGATION module -- clue web, suspect board, witness timelines, and an
+    explicit "No Tactical Map" -- was failed CRITICAL for "No stat blocks --
+    enemies cannot be run in combat" and for lacking numbered areas. Both are
+    correct absences for that type.
+
     Returns a dict of counts and a list of specific failures.
     """
     import re
     checks = {}
     failures = []
+    posture = _combat_posture(mission_type)
+    checks["mission_type"] = mission_type or "(unknown)"
+    checks["combat_posture"] = posture
 
     def count(pattern, label, flags=re.IGNORECASE):
         n = len(re.findall(pattern, module_text, flags))
@@ -497,6 +599,20 @@ def _structural_check(module_text: str) -> Dict[str, Any]:
                 f"'N - Location Name' — DMs cannot scan locations at the table. "
                 f"Fix: BookToModuleAgent must output '1 - THE RUINED MARKET', not 'Scene 1: The Ruined Market'"
             )
+        elif posture == "CONSEQUENCE":
+            # Location-driven play is not how these run. Accept the structures
+            # they actually use, and only complain when NONE of them is present.
+            invest = count(
+                r"Clue Web|Suspect Board|Witness (?:List|Timeline)|Case Frame|"
+                r"Timeline|Interview|Evidence",
+                "investigation_structures",
+            )
+            if invest == 0:
+                failures.append(
+                    "CRITICAL: No numbered areas AND no investigation structures "
+                    "(clue web, suspect board, witness timeline) — the module has no "
+                    "navigable spine of any kind"
+                )
         else:
             failures.append("CRITICAL: No numbered areas (e.g. '1 - Front Desk') — locations are not scannable")
 
@@ -521,7 +637,14 @@ def _structural_check(module_text: str) -> Dict[str, Any]:
     # Stat blocks (AC / HP markers) — also check for appendix placement (violation)
     stat_blocks = count(r"Armor Class|Hit Points|AC \d+|HP \d+", "stat_blocks")
     if stat_blocks == 0:
-        failures.append("CRITICAL: No stat blocks — enemies cannot be run in combat")
+        sev = _STATBLOCK_SEVERITY.get(posture, "LOW")
+        if sev:
+            failures.append(
+                f"{sev}: No stat blocks — enemies cannot be run in combat "
+                f"(mission type '{checks['mission_type']}', combat posture {posture})"
+            )
+        # CONSEQUENCE types (investigation, negotiation, puzzle, political...)
+        # are not supposed to ship encounters. Absence is correct, not a defect.
     # Check if stat blocks are buried in appendix (WotC violation — must be inline)
     appendix_stats = len(re.findall(
         r"(?:Appendix|Stat Block Appendix|Reference).*?(?:AC \d+|HP \d+|Armor Class)",
@@ -586,7 +709,7 @@ def _structural_check(module_text: str) -> Dict[str, Any]:
 
     # Battlefield descriptions for combat scenes
     battlefield = count(r"[Bb]attlefield|[Cc]over|[Hh]azard|[Ee]levation|[Ll]ighting condition", "battlefield_elements")
-    if stat_blocks > 0 and battlefield == 0:
+    if stat_blocks > 0 and battlefield == 0 and posture in ("EXPECTED", "PERMITTED"):
         failures.append(
             "LOW: Has combat encounters (stat blocks found) but no battlefield description — "
             "DMs need terrain, cover, hazards, and lighting for each combat scene"
@@ -947,10 +1070,16 @@ async def study_module_quality() -> Optional[str]:
         logger.info("🎓 Step 1: Loading most recent real module for evaluation...")
         real_module = _load_latest_real_module()
 
+        raw_html = ""
+        mission_type = ""
         if real_module:
-            title, full_content = real_module
-            mission_meta = {"title": title, "mission_type": "real_module", "faction": "unknown"}
-            logger.info(f"🎓 Evaluating real module: {title} ({len(full_content)} chars)")
+            title, full_content, raw_html, mission_type = real_module
+            mission_meta = {"title": title, "mission_type": mission_type or "unknown",
+                            "faction": "unknown"}
+            logger.info(
+                f"🎓 Evaluating real module: {title} ({len(full_content)} chars, "
+                f"type={mission_type or 'unknown'})"
+            )
         else:
             # Fallback: generate a test mission if no real module exists yet
             logger.info("🎓 No real module found — generating test mission (sandbox mode)...")
@@ -975,7 +1104,12 @@ async def study_module_quality() -> Optional[str]:
 
         # Step 1b: Run structural check FIRST (fast, no LLM needed)
         logger.info("🎓 Step 1b: Running structural format check...")
-        struct = _structural_check(full_content)
+        struct = _structural_check(full_content, mission_type=mission_type)
+        # Type-independent: did it go through the component library at all?
+        if raw_html:
+            comp = _component_check(raw_html)
+            struct.update({k: v for k, v in comp.items() if k != "failures"})
+            struct.setdefault("failures", []).extend(comp["failures"])
 
         # Summary line
         logger.info(

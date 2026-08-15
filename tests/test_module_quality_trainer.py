@@ -64,3 +64,88 @@ def test_critique_gets_a_thinking_token_budget():
 def test_truncation_is_reported():
     src = inspect.getsource(mqt._ask_ollama)
     assert "context overflow" in src
+
+
+# ---------------------------------------------------------------------------
+# Type-aware rubric
+#
+# A difficulty 8 INVESTIGATION module -- clue web, suspect board, witness
+# timelines, and an explicit "No Tactical Map" -- was failed CRITICAL for "No
+# stat blocks: enemies cannot be run in combat" and for having no numbered
+# areas. Both absences are correct for that type. The rubric hardcoded one
+# shape: a dungeon crawl.
+#
+# `mission_type_templates.combat_posture` already encodes the design intent, so
+# the grader reads it rather than inventing a taxonomy.
+# ---------------------------------------------------------------------------
+
+def test_posture_drives_statblock_severity():
+    from src.module_quality_trainer import _STATBLOCK_SEVERITY
+
+    assert _STATBLOCK_SEVERITY["EXPECTED"] == "CRITICAL"
+    # Combat is what happens when these FAIL -- shipping encounters is not the job.
+    assert _STATBLOCK_SEVERITY["CONSEQUENCE"] is None
+    assert _STATBLOCK_SEVERITY["PERMITTED"] == "LOW"
+
+
+def test_investigation_not_failed_for_missing_stat_blocks():
+    text = ("Case Frame. Core Clue Web. Suspect Board. Witness Timeline. "
+            "DC 15 Investigation. On a failure the trail goes cold. "
+            "Read Aloud to Players: the shaft breathes cold air.")
+    struct = mqt._structural_check(text, mission_type="investigation")
+    joined = " ".join(struct["failures"])
+    assert "enemies cannot be run in combat" not in joined
+    assert struct["combat_posture"] == "CONSEQUENCE"
+
+
+def test_combat_type_still_requires_stat_blocks():
+    text = "1 - The Gate. Read Aloud to Players: horns. DC 15 Athletics. On a failure they fall."
+    struct = mqt._structural_check(text, mission_type="battle")
+    joined = " ".join(struct["failures"])
+    assert "CRITICAL: No stat blocks" in joined, "a battle module must still need stat blocks"
+
+
+def test_investigation_accepts_a_clue_web_instead_of_numbered_areas():
+    """Location-driven play is not how these run."""
+    text = ("Case Frame. Core Clue Web. Suspect Board. Witness Timeline - Elira Veyth. "
+            "Read Aloud to Players: dust. DC 12 Insight. On a failure she clams up.")
+    struct = mqt._structural_check(text, mission_type="investigation")
+    joined = " ".join(struct["failures"])
+    assert "no navigable spine" not in joined
+    assert "locations are not scannable" not in joined
+
+
+def test_investigation_with_no_spine_at_all_still_fails():
+    """The relaxation is not a free pass -- SOME structure has to exist."""
+    text = "Some prose about a mine. DC 12 Insight. Read Aloud to Players: dust."
+    struct = mqt._structural_check(text, mission_type="investigation")
+    assert any("no navigable spine" in f for f in struct["failures"])
+
+
+# ---------------------------------------------------------------------------
+# Component-library check (type-independent)
+# ---------------------------------------------------------------------------
+
+def test_component_check_flags_hand_rolled_styling():
+    """A module built 2026-08-15 carried ZERO renderer classes across all eight
+    files and 778 inline style attributes. No content rubric would surface that."""
+    html = "<div " + 'style="color:red" ' * 60 + ">text</div>"
+    comp = mqt._component_check(html)
+    assert comp["component_total"] == 0
+    assert any("bypasses the component library" in f for f in comp["failures"])
+
+
+def test_component_check_passes_a_module_that_uses_the_library():
+    html = ('<div class="scene-section"><div class="read-aloud">x</div>'
+            '<div class="gm-note">y</div><div class="stat-block">z</div>'
+            '<div class="transition">w</div></div>')
+    comp = mqt._component_check(html)
+    assert comp["component_total"] >= 5
+    assert comp["failures"] == []
+
+
+def test_component_check_ignores_css_selectors():
+    """The markers must count as USED, not merely defined in a stylesheet."""
+    html = "<style>.read-aloud{} .gm-note{} .stat-block{}</style><div>plain</div>"
+    comp = mqt._component_check(html)
+    assert comp["component_total"] == 0, "CSS selectors counted as usage"
