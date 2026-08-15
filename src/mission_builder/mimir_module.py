@@ -170,6 +170,13 @@ def _parse_5e_statblock(text: str) -> dict:
     return result
 
 
+# RETIRED 2026-08-15. Stat blocks come from the curated `monsters` table, never
+# from a model. This fabricated ability scores and traits for any creature that
+# was neither db_backed nor in the Mimir catalog -- which is how homebrew filled
+# with generic "soldiers / fighters". enrich_monsters() now substitutes a
+# CR-appropriate curated creature instead, and the last-resort branch ships the
+# pipeline's own computed numbers. Kept unreferenced rather than deleted so the
+# next person sees WHY there is no LLM in this path.
 async def _generate_statblock_llm(name: str, cr: str, creature_type: str, notes: str) -> dict:
     """Ask Ollama for a full D&D 2024 (5.5e) stat block; return parsed field dict."""
     try:
@@ -511,13 +518,36 @@ async def enrich_monsters(
                             _e=_enemy_snap, _c=_ctype_snap, _cr=_cr_snap,
                             _n=_notes_snap, _pb=_prebuilt
                         ):
-                            # Generate full 5.5e stat block for ability scores / traits
-                            sb = await _generate_statblock_llm(_e["name"], _cr, _c, _n)
-                            # Overlay pre-built hp/ac/actions from the pipeline (more accurate)
-                            if sb:
-                                sb.update({k: v for k, v in _pb.items() if v})
-                            else:
-                                sb = _pb
+                            # A one-off creature still gets its own homebrew
+                            # entry -- but its ability scores come from a
+                            # CR-matched creature in the curated `monsters`
+                            # table, never from a model. The LLM used to invent
+                            # them here, which is how homebrew filled with
+                            # generic "soldiers / fighters" that looked
+                            # authoritative and were not.
+                            sb = dict(_pb)
+                            try:
+                                from src.mission_builder.monster_roster import pick_monster_by_cr
+                                _ref = pick_monster_by_cr(
+                                    float(_parse_cr(str(_cr)) or 1.0),
+                                    creature_type=_c or "",
+                                )
+                                if _ref:
+                                    for _k_sb, _k_row in (
+                                        ("str_", "stat_str"), ("dex", "stat_dex"),
+                                        ("con", "stat_con"), ("int_", "stat_int"),
+                                        ("wis", "stat_wis"), ("cha", "stat_cha"),
+                                        ("passive_perc", "passive_perc"),
+                                        ("languages", "languages"),
+                                    ):
+                                        if _ref.get(_k_row):
+                                            sb.setdefault(_k_sb, _ref[_k_row])
+                                    logger.debug(
+                                        f"[MIMIR] {_e['name']!r} ability scores taken from "
+                                        f"curated {_ref.get('name')!r} (CR {_ref.get('cr')})"
+                                    )
+                            except Exception as _ref_err:
+                                logger.debug(f"[MIMIR] curated score lookup failed: {_ref_err}")
                             await _ddb_push(_e, statblock=sb)
                             logger.debug(f"[DDB_HB] Pushed infestation monster: {_e['name']!r} ({_c})")
 

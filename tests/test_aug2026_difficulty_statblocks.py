@@ -676,3 +676,56 @@ def test_self_save_detection(text, expected):
     from rewrite_monster_saves_2024 import is_self_save
 
     assert is_self_save(text) is expected
+
+
+# ---------------------------------------------------------------------------
+# 9. No stat block is ever invented by a model
+#
+# db_backed creatures short-circuit, but several pipelines build enemy dicts BY
+# HAND -- ambush guard members, battle glory fights -- so they arrived with no
+# stat block, missed the Mimir catalog by name, and fell through to homebrew
+# plus an LLM-generated stat block. That is the path that filled Mimir homebrew
+# with generic "soldiers / fighters".
+# ---------------------------------------------------------------------------
+
+def test_enrich_monsters_never_calls_the_llm_statblock_generator():
+    import inspect
+
+    src = inspect.getsource(mimir_module.enrich_monsters)
+    assert "_generate_statblock_llm(" not in src, "an LLM still writes stat blocks"
+
+
+def test_homebrew_ability_scores_come_from_the_curated_table():
+    """A one-off creature keeps its own homebrew entry -- the catalog search and
+    homebrew creation still run -- but its ability scores are taken from a
+    CR-matched curated creature rather than invented."""
+    import inspect
+
+    src = inspect.getsource(mimir_module.enrich_monsters)
+    assert "pick_monster_by_cr" in src
+    assert "stat_str" in src and "stat_cha" in src
+    assert "_generate_statblock_llm(" not in src
+
+
+def test_llm_statblock_generator_is_retired_with_the_reason():
+    import inspect
+
+    src = inspect.getsource(mimir_module)
+    idx = src.find("async def _generate_statblock_llm")
+    assert idx != -1
+    preamble = src[max(0, idx - 600):idx]
+    assert "RETIRED" in preamble, "no note explaining why this is unused"
+
+
+def test_curated_substitution_produces_real_ability_scores():
+    """The substitute must be a full stat block, not another stub."""
+    from src.mission_builder.monster_roster import pick_monster_by_cr, mission_enemy_entry
+
+    m = pick_monster_by_cr(3.0, creature_type="humanoid")
+    if not m:
+        pytest.skip("curated monsters table unavailable")
+    entry = mission_enemy_entry(m, count=2, notes="substituted")
+    assert entry["db_backed"] is True
+    sb = entry["statblock"]
+    for field in ("str_", "dex", "con", "int_", "wis", "cha", "ac", "hp"):
+        assert sb.get(field), f"curated substitute missing {field}"
