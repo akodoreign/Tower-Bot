@@ -433,20 +433,17 @@ _RECENT_WINDOW = 10
 async def get_next_ad() -> dict:
     """Return a random ad, mixing static AD_POOL with nightly-generated ads (40% generated when available)."""
     # Pull nightly-generated ads from DB
-    generated: list = []
-    try:
-        from src.db_api import get_global_state
-        import json
-        raw = get_global_state("generated_ads") or []
-        if isinstance(raw, str):
-            raw = json.loads(raw)
-        generated = [a for a in raw if isinstance(a, dict) and a.get("shop_name") and a.get("ad_text")]
-    except Exception:
-        pass
-
-    # 40% chance to pick a generated ad when the pool is non-empty
-    if generated and random.random() < 0.40:
-        return random.choice(generated)
+    # 40% chance to use a nightly-generated ad. The database does the filtering
+    # and the random pick -- this used to load a 34KB JSON blob and choose one
+    # entry in Python.
+    if random.random() < 0.40:
+        try:
+            from src.ad_registry import pick_ad
+            picked = pick_ad(require_shop=True)
+            if picked:
+                return picked
+        except Exception:
+            pass
 
     # Otherwise pick from static pool, avoiding recent repeats
     available = [i for i in range(len(AD_POOL)) if i not in _recent_ad_indices]

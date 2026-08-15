@@ -1704,11 +1704,13 @@ async def _study_ad_generation() -> str:
         "SELECT party_name FROM adventurer_parties ORDER BY RAND() LIMIT 8"
     ) or []
 
-    existing = get_global_state("generated_ads") or []
-    if isinstance(existing, str):
-        try: existing = json.loads(existing)
-        except: existing = []
-    recent_names = {ad.get("shop_name","") for ad in existing[-60:]}
+    # Recent shop names, so the generator does not repeat itself. Straight from
+    # the table now -- this used to decode a 34KB JSON list to read 60 names.
+    try:
+        from src.ad_registry import all_ads
+        recent_names = {a.get("shop_name") or "" for a in all_ads(limit=60)}
+    except Exception:
+        recent_names = set()
 
     place_lines = [
         f"  - {p['name']} ({p['district']}, {p['place_type']}): {str(p.get('description',''))[:80]}"
@@ -1764,9 +1766,14 @@ Output ONLY a valid JSON array, no commentary."""
         a for a in new_ads
         if isinstance(a, dict) and a.get("shop_name") and a.get("ad_text") and a.get("district")
     ]
-    existing.extend(valid)
-    existing = existing[-200:]
-    set_global_state("generated_ads", existing)
+    # One row per ad, tags in their own table. The blob capped itself at the
+    # last 200 entries purely because the whole history had to fit in a column.
+    try:
+        from src.ad_registry import add_ad
+        for a in valid:
+            add_ad(a)
+    except Exception as exc:
+        logger.error(f"ad generation: could not persist ads: {exc}")
 
     lines = [f"  [{a.get('ad_type','shop')}] {a.get('shop_name')} — {a.get('district')}" for a in valid]
     return "## Nightly Ad Generation\nGenerated {} new ads:\n{}".format(len(valid), "\n".join(lines))

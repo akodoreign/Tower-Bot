@@ -218,21 +218,32 @@ def record_ruling(topic: str, proposal: str, passed: bool, tiebreak: bool = Fals
     now = datetime.now()
     when = ruled_at or now
     try:
-        raw_execute(
-            "INSERT INTO council_rulings (ruled_at, topic, proposal, passed, tiebreak, "
-            "tiebreak_vote, votes_yes, votes_no, session_date, created_at) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-            (when, str(topic or "")[:200], str(proposal or ""), 1 if passed else 0,
-             1 if tiebreak else 0, (tiebreak_vote or "")[:8],
-             len(votes_yes), len(votes_no), when.date(), now),
-        )
-        rows = raw_query("SELECT LAST_INSERT_ID() AS id") or []
-        ruling_id = int(rows[0]["id"]) if rows else None
+        # db.insert() returns cursor.lastrowid from the SAME connection.
+        #
+        # This was "INSERT ...; SELECT LAST_INSERT_ID()", and the pool handed
+        # the SELECT a different connection: the id came back empty, the
+        # function returned None before reaching the vote loop, and 108 rulings
+        # migrated with their votes silently dropped. The parent row landing
+        # made it look like it had worked.
+        from src.db_api import db
+        ruling_id = db.insert("council_rulings", {
+            "ruled_at":      when,
+            "topic":         str(topic or "")[:200],
+            "proposal":      str(proposal or ""),
+            "passed":        1 if passed else 0,
+            "tiebreak":      1 if tiebreak else 0,
+            "tiebreak_vote": (tiebreak_vote or "")[:8],
+            "votes_yes":     len(votes_yes),
+            "votes_no":      len(votes_no),
+            "session_date":  when.date(),
+            "created_at":    now,
+        })
     except Exception as exc:
         logger.error(f"[council] could not record ruling: {exc}")
         return None
 
     if not ruling_id:
+        logger.error("[council] ruling insert returned no id -- votes would be lost")
         return None
 
     positions = positions or {}

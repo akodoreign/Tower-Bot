@@ -99,12 +99,9 @@ def pick_sponsor(party_profile: Optional[dict]) -> dict:
 
     # 2. Pull from nightly-generated shop/tourism ads
     try:
-        generated = get_global_state("generated_ads") or []
-        if isinstance(generated, str):
-            generated = json.loads(generated)
-        shops = [a for a in generated if a.get("ad_type") in ("shop", "tourism") and a.get("shop_name")]
-        if shops:
-            pick = random.choice(shops)
+        from src.ad_registry import pick_ad
+        pick = pick_ad(ad_types=("shop", "tourism"), require_shop=True)
+        if pick:
             return {
                 "shop_name":  pick["shop_name"],
                 "district":   pick.get("district", "the Undercity"),
