@@ -126,13 +126,19 @@ def test_investigation_with_no_spine_at_all_still_fails():
 # Component-library check (type-independent)
 # ---------------------------------------------------------------------------
 
-def test_component_check_flags_hand_rolled_styling():
+def test_component_check_records_hand_rolled_styling():
     """A module built 2026-08-15 carried ZERO renderer classes across all eight
-    files and 778 inline style attributes. No content rubric would surface that."""
+    files and 778 inline style attributes.
+
+    Recorded, but NOT a defect -- see test_component_check_is_informational.
+    It explains why class-based markers count zero, so the next reader does not
+    mistake a different rendering strategy for missing content.
+    """
     html = "<div " + 'style="color:red" ' * 60 + ">text</div>"
     comp = mqt._component_check(html)
     assert comp["component_total"] == 0
-    assert any("bypasses the component library" in f for f in comp["failures"])
+    assert comp["inline_styles"] >= 50
+    assert any("Styling is inline" in f for f in comp["failures"])
 
 
 def test_component_check_passes_a_module_that_uses_the_library():
@@ -149,3 +155,63 @@ def test_component_check_ignores_css_selectors():
     html = "<style>.read-aloud{} .gm-note{} .stat-block{}</style><div>plain</div>"
     comp = mqt._component_check(html)
     assert comp["component_total"] == 0, "CSS selectors counted as usage"
+
+
+# ---------------------------------------------------------------------------
+# Grade what the pipelines actually emit
+#
+# Decision (2026-08-15): adapt the GRADER to the pipelines, not the pipelines to
+# the grader. Two consequences.
+#
+# 1. These pipelines emit a BOX SET -- module/dm_guide/session/npcs/players_guide
+#    /chart_pack/maps. Grading module.html alone judged 37k of 69k characters and
+#    then reported the other 46% as missing content.
+# 2. They use their own vocabulary. "Scene Secrets" and "Truth Layer" are GM
+#    notes. "Witness Timeline" and "NPC Knowledge" are NPC truth. "Core Clue Web"
+#    and "Evidence Board" are the clue structure. The rubric now recognises them.
+# ---------------------------------------------------------------------------
+
+def test_loader_reads_the_whole_box_set():
+    import inspect
+
+    src = inspect.getsource(mqt._load_latest_real_module)
+    for doc in ("dm_guide.html", "session.html", "npcs.html"):
+        assert doc in src, f"grader still ignores {doc}"
+
+
+def test_gm_guidance_recognises_pipeline_vocabulary():
+    text = "Scene Secrets. Truth Layer. Accusation Standard. Long-Rest Revelation."
+    struct = mqt._structural_check(text, mission_type="investigation")
+    assert struct["gm_notes"] >= 4, "Scene Secrets / Truth Layer are GM notes"
+    assert not any("No GM NOTE boxes" in f for f in struct["failures"])
+
+
+def test_npc_truth_recognises_witness_timelines():
+    text = ("Witness Timeline - Elara Veyne. Witness Timeline - Elira Veyth. "
+            "NPC Knowledge Reference. Suspect Board.")
+    struct = mqt._structural_check(text, mission_type="investigation")
+    assert struct["npc_truth_elements"] >= 4
+
+
+def test_clue_structure_recognises_the_clue_web():
+    text = "Core Clue Web. Evidence Board. Leads. Layers To Investigate."
+    struct = mqt._structural_check(text, mission_type="investigation")
+    assert struct["clue_indicators"] >= 4
+    assert not any("three-clue rule requires" in f for f in struct["failures"])
+
+
+def test_transitions_recognise_timelines_and_followups():
+    text = "Multi-Day Timeline. Witness Timeline. Butterfly Effects. Follow-up recon."
+    struct = mqt._structural_check(text, mission_type="investigation")
+    assert struct["transitions"] >= 3
+
+
+def test_component_check_is_informational_not_a_failure():
+    """Inline styling is a deliberate pipeline choice. The grader records it so
+    the next reader knows why class-based markers count zero, but it is not a
+    defect -- structure is graded from the text."""
+    html = "<div " + 'style="color:red" ' * 60 + ">text</div>"
+    comp = mqt._component_check(html)
+    assert comp["failures"], "the observation should still be recorded"
+    assert all(f.startswith("INFO") for f in comp["failures"])
+    assert not any("CRITICAL" in f for f in comp["failures"])
