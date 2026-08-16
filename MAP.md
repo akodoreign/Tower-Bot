@@ -10,7 +10,7 @@ Discord bot running on Python 3.11 + discord.py. MySQL is authoritative for all 
 
 ## Where the campaign data actually lives
 
-MySQL (`tower_bot`) is authoritative — **65 tables** as of 2026-08-13. Read via
+MySQL (`tower_bot`) is authoritative — **74 tables** as of 2026-08-16. Read via
 `src/db_api.py` (`raw_query`, `raw_execute`, `get_global_state`, `set_global_state`).
 The full annotated table map lives in `CLAUDE.md` under "Live MySQL Schema Map".
 
@@ -32,6 +32,12 @@ Fast orientation to the tables you will actually touch:
 | who sits on the Council | `council_seats` | read via `guild_council.council_members()` / `council_president()`, never the literals |
 | what the Council decided | `council_rulings` + `council_ruling_votes` | replaced the global_state JSON blob |
 | a battle map | `battle_maps_library` (260) | via `battle_map_library.get_battle_map()` |
+| who sits on the Council | `council_seats` | via `guild_council.council_members()` / `council_president()`, never the literals |
+| what the Council decided | `council_rulings` + `council_ruling_votes` | `council_registry.recent_rulings()` |
+| an ad to post | `generated_ads` + `generated_ad_tags` | `ad_registry.pick_ad(ad_types=...)` — SQL does the filter and the random pick |
+| what the world is worried about | `world_tensions` | `db_api.get_active_tensions()`; resolved ones are retired, not deleted |
+| why a district got richer | `district_wealth_events` | `db_api.get_wealth_event_log(limit, district=...)` |
+| who bought what on TowerBay | `towerbay_npc_acquisitions` | indexed by winner and faction |
 | did the loops run | `loop_heartbeats` (15) | add an `EXPECTED` entry in `loop_health.py` for any new loop |
 | a past crew debrief | `party_interviews` | `archived_interviews()` / `interview_corpus_size()`; the old global_state blob is gone |
 
@@ -116,6 +122,7 @@ Add any new real column to those sets.
 | `news_feed.py` | World news bulletin generation. A rejected draft is REGENERATED (`_MAX_BULLETIN_ATTEMPTS`) then dropped — never posted half-written, never persisted before validation | ACTIVE |
 | `news_integration.py` | News feed integration layer. `post_editorial_bulletin()` is ~35% of all bulletins — validates completeness + canon via `_editorial_problem()` and regenerates before dropping | ACTIVE |
 | `tower_news_voices.py` | TTN voiced bulletins: `obituary` (spoken by the closest mourner), `interview`, `forum`, `union`. Carries `canon_anchor()` so the model cannot invent factions/places, and gates every draft through `canon_guard` | ACTIVE |
+| `ad_registry.py` | Generated ads as rows (`generated_ads` + `generated_ad_tags`). `pick_ad()` filters and randomises in SQL | ACTIVE |
 | `council_registry.py` | The Grand Council in MySQL: `council_seats` (seat_role/npc_id/agenda/bias/voice), `council_rulings` + `council_ruling_votes`. Replaced hardcoded dicts and a 64KB global_state JSON blob | ACTIVE |
 | `party_interview.py` | Post-mission sponsored Q&A. Context-sized, canon-gated, and archived onto its own table (`archived=1`) rather than a JSON blob | ACTIVE |
 | `canon_guard.py` | Stops generated prose from deposing people. `protected_block()` states each leader's real title (from `faction_reputation`) + the Unknown Party; `check(text, allow=[...])` rejects a protected name on the receiving end of a status verb (killed/arrested/suspended/demoted/"the late"/invented spouse). Gates `news_feed` + `tower_news_voices` | ACTIVE |

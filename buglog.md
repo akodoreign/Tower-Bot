@@ -2504,3 +2504,148 @@ Note this does NOT automatically relax the separate, narrower rule that pipeline
 copies of helper logic (`_fit_ctx`, canon extraction) rather than importing a shared module.
 That is a different claim, the code comments cite it by name ("no-shared-helpers rule"), and it
 has not been re-confirmed -- confirm before extracting a shared helper.
+
+## 2026-08-15 - DONE: the module quality grader had not graded anything since May
+
+User: "its trying to compare if a module is good or not (aka table playable), I don't even know
+if its working or not really." It was not, in three separate ways.
+
+**The LLM half was dead for 34 runs.** `campaign_docs/skills/module_quality.md` records 54 nightly
+self-evaluations. The first 20 have scores that MOVE -- 0, 1, 2, 3, 4 -- with gaps citing exact
+failing lines. All 34 after 2026-05-15 read exactly "5/10" with "Content gaps: None identified".
+5 was the hardcoded default in the result dict. The reply truncated before OVERALL_SCORE, the parse
+failed silently, and the default was written to the skill file where it reads as a verdict. Three
+months of a constant mistaken for a measurement -- the same failure class as the learning loop
+recording a truncated reply as "nothing worth learning today".
+
+Fixed: `overall_score` starts as None, a failed parse writes "NOT SCORED", `_fit_ctx` sizes the
+call (~9,500 chars in, and the OUTPUT is generated last so it was what got cut), and reply_tokens
+raised to 2400 because qwen3 spends num_predict on thinking tokens -- at 900 it died at
+"PROMPT PATCH SUGGESTIONS (add these exact sentences", right before the useful half.
+
+**It re-graded the same stale module nightly.** It reads the most recent module.html and no module
+is generated during the learning window, so it graded Veyra_Maws eight times, then
+The_Ring_of_Regeneration three times.
+
+**The rubric only understood dungeon crawls.** Built one module with the CURRENT pipeline to find
+out (mission 1506, difficulty 8, type=investigation). It scored 2/10 with three CRITICALs and two
+of them were WRONG: the module is an investigation -- Case Frame, Core Clue Web, Suspect Board, six
+Witness Timelines, Evidence Board, Butterfly Effects, and an explicit "No Tactical Map" -- and it
+was failed for "No stat blocks: enemies cannot be run in combat" and for having no numbered areas.
+Both absences are correct for that type.
+
+`mission_type_templates.combat_posture` already encodes the intent, so the grader reads it rather
+than inventing a taxonomy: EXPECTED -> missing stat blocks is CRITICAL; PERMITTED/RISKY -> LOW;
+CONSEQUENCE (investigation, negotiation, political, puzzle) -> not required at all, because combat
+is what happens when those FAIL. A CONSEQUENCE module may navigate by clue web instead of numbered
+areas -- but not by nothing, and a module with no spine at all still fails.
+
+**Then the user chose: adapt the GRADER to the pipelines, not the pipelines to the grader.** That
+exposed two more things. It was reading module.html ONLY -- 37k of 69k characters -- while
+npcs.html carries the NPC knowledge, session.html the leads and suspects, dm_guide.html the GM-only
+truth layer. And it did not speak the pipelines' language: "Scene Secrets" and "Truth Layer" ARE GM
+notes, "Witness Timeline" IS NPC truth, "Core Clue Web" IS the clue structure.
+
+Same module, before and after: GM guidance 0 -> 25, NPC truth 21 -> 72, clue indicators 12 -> 22,
+transitions 0 -> 25, failures 7 (3 CRITICAL) -> 4 (1 CRITICAL). What survives is real: no read-aloud
+blocks anywhere, 47 DCs against 11 failure consequences, unlabelled clues, no explicit
+Wants/Knows/Hides. The component-library check is INFO, not a failure -- inline vs html_renderer is
+a pipeline choice, and it is recorded only so the next reader knows why class markers count zero.
+
+## 2026-08-15 - DONE: stripping species emptied a GENERATED column
+
+My own mistake from the data_json purge. `npcs.species` is VIRTUAL GENERATED:
+
+    species = coalesce(data_json->'$.species', data_json->'$.race')
+
+The column is DERIVED FROM the blob. I classified species as "a mirror of a real column" and
+stripped it, which had the dependency exactly backwards: 250/250 populated -> 0/250, and every
+reader (rosters, dossiers, news, the Mimir bridge) saw a blank species.
+
+Restored both keys from the pre-strip backup; everything else stays stripped. Guards: species/race
+out of `_BLOB_EXCLUDE` with the reason written down, and the strip script now reads
+GENERATION_EXPRESSION from information_schema and refuses to touch any key a generated column
+references -- detected, not remembered.
+
+The audit then caught the SAME class before it did damage: `party_profiles.profile_json` must not
+be stripped either, because there the flow runs blob -> COLUMN (party_profiles.py reads
+employer/tier OUT of the blob to populate the columns).
+
+What I should have done first: ask what READS each key, not just whether a column of the same name
+exists. A column and a blob key sharing a name can mean "copy of" or "computed from".
+
+## 2026-08-15 - DONE: no stat block is ever written by a model
+
+`mimir_module._generate_statblock_llm` was still live. db_backed creatures short-circuit, but
+several pipelines build enemy dicts BY HAND -- ambush guard members, battle glory fights -- so those
+arrived with no stat block, missed the Mimir catalog by name, and fell through to homebrew plus an
+LLM-invented stat block. That is the path that filled Mimir homebrew with generic
+"soldiers / fighters".
+
+One-off creatures still get their own homebrew entry; their ability scores, passive Perception and
+languages now come from a CR-matched creature in the curated `monsters` table. hp/ac/speed/actions
+were already computed by the pipeline. Nothing is invented.
+
+My first attempt was too aggressive -- it substituted a curated creature BEFORE the catalog search,
+skipping it entirely -- and an existing test caught it. The test was right and the change was wrong.
+
+## 2026-08-15 - DONE: LAST_INSERT_ID across a connection pool silently ate child rows
+
+The worst bug of the session, and it was mine. Both new registries did:
+
+    raw_execute("INSERT ...")
+    rows = raw_query("SELECT LAST_INSERT_ID() AS id")
+
+The pool hands that SELECT a DIFFERENT connection, where LAST_INSERT_ID() is 0 or belongs to
+someone else. The parent row lands, the function returns no id, and every child row is silently
+dropped -- producing exactly the summary a working migration produces.
+
+  * council -- 110 rulings written and ZERO votes, in a migration I had reported as clean. 108 of
+    those rulings had votes.
+  * ads     -- 109 ads, 178 of ~316 tags, all 178 orphaned onto ad_id 0.
+
+Both now use `db.insert()`, which returns cursor.lastrowid from the SAME connection, and both
+refuse to continue when no id comes back. Repaired from the archives (intact): council votes
+0 -> 608 with counts matching the recorded totals, ad tags 178 -> 311 with the orphans deleted.
+
+The lesson is not "use db.insert". It is: **after a parent/child migration, count the children.**
+I trusted the parent count and reported success.
+
+## 2026-08-15/16 - DONE: the global_state JSON purge
+
+Seven blobs became eleven tables. Each was a JSON list decoded in full to read one entry and
+rewritten in full to add one, and several carried a self-imposed cap -- 100 acquisitions, 200 wealth
+events, 200 council rulings -- that existed ONLY because the history had to fit in one column.
+
+    council_rulings           -> council_rulings + council_ruling_votes   (116 / 608)
+    generated_ads             -> generated_ads + generated_ad_tags        (109 / 311)
+    world_active_tensions     -> world_tensions                           (85)
+    wealth_event_log          -> district_wealth_events                   (47)
+    used_parties              -> used_parties                             (134)
+    towerbay_npc_acquisitions -> towerbay_npc_acquisitions                (46)
+    interview_archive         -> deleted; it was a lossy copy of party_interviews
+
+Public accessors kept their signatures and historical key names, so callers did not change.
+Filtering that was impossible now works: `get_wealth_event_log(district=...)`, and TowerBay spend
+by faction (Adventurers Guild 17 items / 201,470,756 EC).
+
+NOT migrated, deliberately: `arena_venues` and `public_health_arcs` are nested reference/plot state
+read WHOLE -- the case the JSON reflex check explicitly allows -- and `rift_history` has 7 entries
+and NO readers anywhere, so a table for it would be motion rather than progress.
+
+~150KB archived under `<key>_archived_json` with live keys emptied. Nothing deleted.
+
+## 2026-08-15 - NOTE: heredocs mangled escapes three times in one session
+
+`\\n` became a real newline twice and `\\b` became a literal BACKSPACE byte (0x08) once, the last
+of which made a regex silently never match ("Leads" scored 3 instead of 4). The encoding rule in
+CLAUDE.md covers this and I ignored it twice after the first hit.
+
+Use the Edit tool for any content carrying escape sequences, and byte-sweep afterwards:
+
+    d = pathlib.Path(f).read_bytes(); d.count(b'\\x08')
+
+Related: four separate tests failed this session because they matched a WORD in a comment rather
+than a statement in code -- a docstring saying "never deleted" contains DELETE, and a comment
+explaining why not to use LAST_INSERT_ID contains LAST_INSERT_ID. Strip comment lines before
+asserting, or match the statement (`DELETE FROM`).
