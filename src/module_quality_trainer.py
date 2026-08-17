@@ -26,6 +26,10 @@ import httpx
 
 from src.log import logger
 from src.ollama_busy import is_available, mark_busy, mark_available, get_busy_reason
+
+# Single key used for BOTH the busy claim and the resource-cop request, so this
+# task is never blocked by its own flag. Keep the two in sync.
+_BUSY_HOLDER = "module_quality_trainer"
 from src.agents.learning_agents import (
     ProAuthorAgent,
     DNDExpertAgent,
@@ -181,7 +185,7 @@ async def _ask_ollama(
     for attempt in range(retries + 1):
         try:
             from src.resource_cop import wait_for_ollama_turn
-            decision = await wait_for_ollama_turn("module_quality_trainer", track="primary", max_wait_seconds=60)
+            decision = await wait_for_ollama_turn(_BUSY_HOLDER, track="primary", max_wait_seconds=60)
             if not decision.run_now:
                 logger.info(f"module_quality_trainer: Ollama deferred by resource cop: {decision.reason}")
                 return ""
@@ -1032,6 +1036,14 @@ def _update_quality_skill_file(
             "NOT SCORED -- the LLM critique failed this run (see logs). "
             "The structural counts below are still real."
         )
+        # "None identified" is a finding; a critique that never ran has made no
+        # finding at all. Saying so is the whole point of NOT SCORED above.
+        if gaps:
+            gaps_line = chr(10).join(f"- {g}" for g in gaps)
+        elif score is None:
+            gaps_line = "- Not assessed -- the LLM critique did not run this pass."
+        else:
+            gaps_line = "- None identified"
         block = f"""
 
 ---
@@ -1053,7 +1065,7 @@ def _update_quality_skill_file(
 {chr(10).join(f'- {f}' for f in failures) if failures else '- None detected'}
 
 **Content gaps (LLM critique):**
-{chr(10).join(f'- {g}' for g in gaps) if gaps else '- None identified'}
+{gaps_line}
 """
         with open(skill_file, "a", encoding="utf-8") as f:
             f.write(block)
@@ -1092,8 +1104,10 @@ async def study_module_quality() -> Optional[str]:
         logger.warning("🎓 Ollama still busy after 5 minutes, skipping module quality training")
         return None
     
-    # Mark Ollama as busy for this long-running task
-    mark_busy("module quality training", "qwen3")
+    # Mark Ollama as busy for this long-running task. The holder key MUST match the
+    # label _ask_ollama() gives the resource cop -- without it this task waits on its
+    # own flag, times out, and reports a 0-char critique as a failed grading.
+    mark_busy("module quality training", "qwen3", holder=_BUSY_HOLDER)
     
     try:
         # Step 1: Load the most recent real module (evaluate what was actually produced)
@@ -1248,7 +1262,7 @@ Review the quality_journal.jsonl for historical trends.
     
     finally:
         # Always mark Ollama as available when done
-        mark_available()
+        mark_available(holder=_BUSY_HOLDER)
 
 
 # ── Integration with Self-Learning Loop ────────────────────────────────

@@ -339,12 +339,19 @@ async def wait_for_a1111_turn(
     return last
 
 
-async def ask_ollama(label: str, *, track: Literal["primary", "quick"] = "primary") -> ResourceDecision:
-    """Return whether Ollama appears safe for a new generation request."""
-    try:
-        from src.ollama_busy import get_busy_reason, is_available
+async def ask_ollama(label: str, *, track: Literal["primary", "quick"] = "primary",
+                     holder: str | None = None) -> ResourceDecision:
+    """Return whether Ollama appears safe for a new generation request.
 
-        if not is_available():
+    `holder` is the key the caller passed to mark_busy(); it defaults to `label`.
+    A task holding the busy flag is never blocked by its own claim -- otherwise a
+    long task that marks busy and then asks permission deadlocks against itself.
+    """
+    holder_key = label if holder is None else holder
+    try:
+        from src.ollama_busy import get_busy_reason, is_available_for
+
+        if not is_available_for(holder_key):
             return ResourceDecision.wait(
                 "ollama",
                 label,
@@ -382,11 +389,16 @@ async def wait_for_ollama_turn(
     *,
     track: Literal["primary", "quick"] = "primary",
     max_wait_seconds: float | None = None,
+    holder: str | None = None,
 ) -> ResourceDecision:
-    """Poll `ask_ollama` until it allows a request or the wait budget is exhausted."""
+    """Poll `ask_ollama` until it allows a request or the wait budget is exhausted.
+
+    Pass `holder` when the surrounding task marked itself busy under a different
+    key than `label` -- it is what keeps the task from waiting on itself.
+    """
     max_wait = float(os.getenv("RESOURCE_COP_OLLAMA_MAX_WAIT", "300")) if max_wait_seconds is None else max_wait_seconds
     deadline = asyncio.get_running_loop().time() + max_wait
-    last = await ask_ollama(label, track=track)
+    last = await ask_ollama(label, track=track, holder=holder)
     while not last.run_now:
         now = asyncio.get_running_loop().time()
         if now >= deadline:
@@ -399,5 +411,5 @@ async def wait_for_ollama_turn(
             last.reason,
         )
         await asyncio.sleep(sleep_for)
-        last = await ask_ollama(label, track=track)
+        last = await ask_ollama(label, track=track, holder=holder)
     return last

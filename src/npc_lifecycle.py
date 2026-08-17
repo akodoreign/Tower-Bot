@@ -28,6 +28,12 @@ NPC_TXT_FILE      = DOCS_DIR / "npc_roster.txt"
 # _generate() calls bypass the Ollama busy check. Cleared in the finally block.
 _lifecycle_force: bool = False
 
+# Key this module claims the Ollama busy flag under. Anything running inside the
+# cycle that goes through the resource cop must pass holder=_BUSY_HOLDER so it is
+# not blocked by the cycle's own claim. _generate() needs no such treatment: it
+# checks is_priority_busy(), which mark_busy() does not set.
+_BUSY_HOLDER = "npc_lifecycle"
+
 # ---------------------------------------------------------------------------
 # Factions and ranks
 # ---------------------------------------------------------------------------
@@ -1516,7 +1522,10 @@ async def _backfill_npc_quotes(npcs: list, max_per_run: int = 3) -> int:
     logger.info(f"🗣️ Backfilling quotes for {min(len(missing), max_per_run)}/{len(missing)} NPCs without one")
     generated = 0
     for npc in missing[:max_per_run]:
-        decision = await wait_for_ollama_turn("npc_quote_backfill", track="quick")
+        # holder= is the lifecycle cycle's own claim: this runs INSIDE it, so
+        # without it the backfill waits on its own caller and stops at 0 forever.
+        decision = await wait_for_ollama_turn(
+            "npc_quote_backfill", track="quick", holder=_BUSY_HOLDER)
         if not decision.run_now:
             logger.info(f"🗣️ Ollama busy — stopping quote backfill at {generated} (will resume next cycle)")
             break
@@ -1546,7 +1555,9 @@ async def run_daily_lifecycle(channel) -> bool:
         logger.info(f"🧬 Ollama busy ({get_busy_reason()}) — skipping lifecycle cycle")
         return False
 
-    mark_busy("npc lifecycle cycle")
+    # Anything inside this cycle that asks the resource cop for a turn must pass
+    # holder=_BUSY_HOLDER, or it waits on the flag this line just set.
+    mark_busy("npc lifecycle cycle", holder=_BUSY_HOLDER)
     _lifecycle_force = True
     try:
         await _lifecycle_cycle(channel)
@@ -1554,7 +1565,7 @@ async def run_daily_lifecycle(channel) -> bool:
         logger.exception(f"🧬 Lifecycle cycle error — cleanup still running: {e}")
     finally:
         _lifecycle_force = False
-        mark_available()
+        mark_available(holder=_BUSY_HOLDER)
     return True
 
 

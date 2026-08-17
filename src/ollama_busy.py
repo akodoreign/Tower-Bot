@@ -41,6 +41,13 @@ _busy_since: str = ""
 _busy_model: str = ""         # Track which model/agent triggered the busy state
 _priority_busy: bool = False  # High-priority flag (mission building) "" lifecycle yields immediately
 
+# Who is holding the flag, counted per holder. The flag means "OTHER callers stay
+# out" -- a task must never be blocked by its own claim, so a holder that then
+# asks permission to call Ollama has to be exempt from itself. Without this a
+# task that marks busy and then goes through the resource cop deadlocks against
+# itself and silently produces nothing. See is_available_for().
+_busy_holders: dict[str, int] = {}
+
 # Cross-process DB cache — avoid hammering DB on every check
 _db_cache_ts: float = 0.0
 _db_cache_val: bool = False
@@ -77,6 +84,33 @@ def _db_priority_busy() -> bool:
 def is_available() -> bool:
     """Returns True if Ollama is free for requests."""
     return not _busy and not _db_priority_busy()
+
+
+def is_available_for(holder: str = "") -> bool:
+    """Availability from `holder`'s point of view -- its OWN claim never blocks it.
+
+    The busy flag is a "stay out" signal aimed at other callers. A long task that
+    marks busy and then asks the resource cop for a turn is asking about itself,
+    and must be told yes. Any claim held by someone else, or a priority claim from
+    another process, still blocks normally.
+
+    With no holder this is exactly is_available().
+    """
+    if is_available():
+        return True                       # nothing is busy -- the common path
+    mine = _busy_holders.get(holder, 0)
+    if not holder or not mine:
+        return False                      # not a holder: exactly the old behaviour
+    if _busy and (_busy_count - mine) > 0:
+        return False                      # somebody else is holding it too
+    if _db_priority_busy() and not _priority_busy:
+        return False                      # a cross-process claim we do not own
+    return True
+
+
+def busy_holders() -> dict[str, int]:
+    """Snapshot of current holders, for diagnostics."""
+    return dict(_busy_holders)
 
 
 def is_priority_busy() -> bool:
@@ -119,7 +153,8 @@ def get_busy_reason() -> str:
     return ""
 
 
-def mark_busy(reason: str = "long-running generation", model: str = "") -> None:
+def mark_busy(reason: str = "long-running generation", model: str = "",
+              holder: str = "") -> None:
     """
     Mark Ollama as busy. Other systems will skip their cycles.
     Reference-counted: mark_available() only clears the flag when all callers are done.
@@ -127,10 +162,16 @@ def mark_busy(reason: str = "long-running generation", model: str = "") -> None:
     Args:
         reason: Human-readable description of what's happening
         model: Optional model name (qwen, kimi, etc.) for debugging
+        holder: Stable key identifying the claimant. Pass this whenever the task
+            will itself call Ollama through the resource cop, and pass the SAME
+            key to the cop -- it is what exempts a task from its own flag.
+            Must be paired with mark_available(holder=...).
     """
     global _busy, _busy_count, _busy_reason, _busy_since, _busy_model
     _busy_count += 1
     _busy = True
+    if holder:
+        _busy_holders[holder] = _busy_holders.get(holder, 0) + 1
     if _busy_count == 1:
         # First caller sets the reason/timestamp
         _busy_reason = reason
@@ -138,30 +179,42 @@ def mark_busy(reason: str = "long-running generation", model: str = "") -> None:
         _busy_model = model
 
 
-def mark_available() -> None:
+def mark_available(holder: str = "") -> None:
     """
     Mark one caller as done. Clears the busy flag only when all callers have finished.
     Reference-counted to handle overlapping long-running tasks correctly.
+
+    Pass the same `holder` given to mark_busy(). Holders are cleared wholesale when
+    the reference count reaches zero, so a mismatched pair leaks nothing.
     """
     global _busy, _busy_count, _busy_reason, _busy_since, _busy_model
     _busy_count = max(0, _busy_count - 1)
+    if holder and _busy_holders.get(holder):
+        _busy_holders[holder] -= 1
+        if _busy_holders[holder] <= 0:
+            _busy_holders.pop(holder, None)
     if _busy_count == 0:
         _busy = False
         _busy_reason = ""
         _busy_since = ""
         _busy_model = ""
+        _busy_holders.clear()   # self-healing: nothing is busy, so nobody holds it
 
 
-def mark_priority_busy(reason: str = "mission building", model: str = "") -> None:
+def mark_priority_busy(reason: str = "mission building", model: str = "",
+                       holder: str = "") -> None:
     """
     Mark Ollama as busy with HIGH priority.
     Writes to DB so external scripts and separate bot processes all see the flag.
+
+    `holder` behaves exactly as in mark_busy(): it exempts the claimant from its
+    own flag when it later asks the resource cop for a turn.
     """
     global _priority_busy, _db_cache_val, _db_cache_ts
     _priority_busy = True
     _db_cache_val  = True
     _db_cache_ts   = 0.0   # force next read to hit DB
-    mark_busy(reason, model)
+    mark_busy(reason, model, holder=holder)
     try:
         from src.db_api import set_global_state as _ss
         import datetime as _dt
@@ -175,13 +228,13 @@ def mark_priority_busy(reason: str = "mission building", model: str = "") -> Non
         pass  # in-process flag still works; DB write best-effort
 
 
-def unmark_priority_busy() -> None:
+def unmark_priority_busy(holder: str = "") -> None:
     """Clear the high-priority busy flag in-process and in DB."""
     global _priority_busy, _db_cache_val, _db_cache_ts
     _priority_busy = False
     _db_cache_val  = False
     _db_cache_ts   = 0.0
-    mark_available()
+    mark_available(holder=holder)
     try:
         from src.db_api import set_global_state as _ss
         _ss("pipeline_busy", {"active": False, "reason": "", "since": ""})
