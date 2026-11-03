@@ -1,188 +1,105 @@
 # ============================================
-# TOWER OF LAST CHANCE — Full Stack Startup
+# TOWER OF LAST CHANCE - Full Stack Startup
 # Run as: .\start_tower.ps1
-# Or add to Task Scheduler for auto-start on boot
+#
+# Ollama (text) and ComfyUI (images) share the one GPU; the bot's GPU queue
+# decides which of them holds VRAM, so nothing is pre-loaded here.
+# ComfyUI runs headless from the "ComfyUI Headless" scheduled task.
+# The mission dashboard runs inside the bot (main.py) on DASHBOARD_PORT.
 # ============================================
 
-$BotDir   = "C:\Users\akodoreign\Desktop\chatGPT-discord-bot"
-$A1111Dir = "C:\AI\StabilityMatrix\Data\Packages\Stable Diffusion WebUI"
-$LogDir   = "$BotDir\logs"
+$BotDir    = $PSScriptRoot
+$Python    = "$BotDir\.venv\Scripts\python.exe"
+$LogDir    = "$BotDir\logs"
+$ComfyUrl  = "http://127.0.0.1:8188"
+$ComfyTask = "ComfyUI Headless"
 
-# Ensure logs directory exists
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
 
-Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  TOWER OF LAST CHANCE — Starting Up"  -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host ""
-
-# ------------------------------------------
-# 1. STOP EVERYTHING CLEANLY
-# ------------------------------------------
-Write-Host "[1/6] Stopping existing processes..." -ForegroundColor Yellow
-Get-Process -Name "python" -ErrorAction SilentlyContinue | Stop-Process -Force 2>$null
-taskkill /f /im ollama.exe 2>$null | Out-Null
-
-# Remove broken NSSM A1111 service if it exists
-$nssm = "$BotDir\nssm.exe"
-if (Test-Path $nssm) {
-    & $nssm stop A1111 2>$null | Out-Null
-    & $nssm remove A1111 confirm 2>$null | Out-Null
+function Get-BotProcess {
+    Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
+        Where-Object { $_.CommandLine -like "*main.py*" -and ($_.ExecutablePath -eq $Python -or $_.CommandLine -like "*chatGPT-discord-bot*") }
 }
-Start-Sleep 3
+
+function Test-Url($Url) {
+    try { Invoke-RestMethod -Uri $Url -TimeoutSec 5 | Out-Null; $true } catch { $false }
+}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "  TOWER OF LAST CHANCE - Starting Up"  -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# ------------------------------------------
+# 1. STOP A RUNNING BOT (only the bot - ComfyUI is Python too)
+# ------------------------------------------
+Write-Host "[1/5] Stopping a running bot..." -ForegroundColor Yellow
+Get-BotProcess | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+Start-Sleep 2
 Write-Host "  Done." -ForegroundColor Green
 
 # ------------------------------------------
-# 2. START OLLAMA
+# 2. OLLAMA
 # ------------------------------------------
-Write-Host "[2/6] Starting Ollama..." -ForegroundColor Yellow
-# OLLAMA_FLASH_ATTENTION and OLLAMA_KEEP_ALIVE are real Ollama server env vars.
-# OLLAMA_NUM_CTX / OLLAMA_NUM_GPU are passed per-request in options{}, not server env vars.
+Write-Host "[2/5] Ollama..." -ForegroundColor Yellow
 $env:OLLAMA_FLASH_ATTENTION = "1"
 $env:OLLAMA_KEEP_ALIVE = "30m"
-[System.Environment]::SetEnvironmentVariable("OLLAMA_FLASH_ATTENTION", "1", "User")
-[System.Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "30m", "User")
-Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
+if (-not (Test-Url "http://localhost:11434/api/tags")) {
+    Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
+    for ($i = 0; $i -lt 12 -and -not (Test-Url "http://localhost:11434/api/tags"); $i++) { Start-Sleep 1 }
+}
+if (Test-Url "http://localhost:11434/api/tags") {
+    Write-Host "  Ollama is up." -ForegroundColor Green
+} else {
+    Write-Host "  WARNING: Ollama not responding" -ForegroundColor Red
+}
+
+# ------------------------------------------
+# 3. COMFYUI (headless scheduled task)
+# ------------------------------------------
+Write-Host "[3/5] ComfyUI..." -ForegroundColor Yellow
+if (-not (Test-Url "$ComfyUrl/system_stats")) {
+    Start-ScheduledTask -TaskName $ComfyTask -ErrorAction SilentlyContinue
+    for ($i = 0; $i -lt 24 -and -not (Test-Url "$ComfyUrl/system_stats"); $i++) { Start-Sleep 5 }
+}
+if (Test-Url "$ComfyUrl/system_stats") {
+    Write-Host "  ComfyUI is up." -ForegroundColor Green
+} else {
+    Write-Host "  ComfyUI still starting - the bot waits for it on its own." -ForegroundColor Yellow
+}
+
+# ------------------------------------------
+# 4. CLOUDFLARE TUNNEL (public dashboard)
+# ------------------------------------------
+Write-Host "[4/5] Cloudflare tunnel..." -ForegroundColor Yellow
+if (Get-Service cloudflared -ErrorAction SilentlyContinue | Where-Object Status -eq Running) {
+    Write-Host "  Tunnel service running." -ForegroundColor Green
+} elseif (Get-Process cloudflared -ErrorAction SilentlyContinue) {
+    Write-Host "  Tunnel already running." -ForegroundColor Green
+} elseif (Get-Command cloudflared -ErrorAction SilentlyContinue) {
+    Start-Process "cloudflared" -ArgumentList "tunnel run" -WindowStyle Hidden
+    Write-Host "  Tunnel started." -ForegroundColor Green
+} else {
+    Write-Host "  cloudflared not installed - dashboard is local only." -ForegroundColor Yellow
+}
+
+# ------------------------------------------
+# 5. THE BOT (+ dashboard thread)
+# ------------------------------------------
+Write-Host "[5/5] Starting Tower Bot..." -ForegroundColor Yellow
+Start-Process $Python -ArgumentList "main.py" -WorkingDirectory $BotDir -WindowStyle Hidden `
+    -RedirectStandardError "$LogDir\bot_stderr.log"
 Start-Sleep 5
 
-# Verify
-try {
-    $response = Invoke-RestMethod -Uri "http://localhost:11434/api/tags" -TimeoutSec 10
-    $models = ($response.models | ForEach-Object { $_.name }) -join ", "
-    Write-Host "  Ollama is up. Models: $models" -ForegroundColor Green
-} catch {
-    Write-Host "  WARNING: Ollama not responding yet" -ForegroundColor Red
-}
-
-# ------------------------------------------
-# 3. WARM UP QWEN3 (force GPU load with 32K context, uses all VRAM via ZBAR)
-# ------------------------------------------
-Write-Host "[3/6] Loading qwen3:8b onto GPU (32K ctx, ZBAR extended VRAM)..." -ForegroundColor Yellow
-$body = @{
-    model="qwen3:8b"
-    messages=@(@{role="user"; content="hi"})
-    stream=$false
-    options=@{num_gpu=99; num_ctx=32768; num_predict=8}
-} | ConvertTo-Json -Depth 5
-try {
-    Invoke-RestMethod -Uri "http://localhost:11434/api/chat" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 120 | Out-Null
-    Write-Host "  qwen3:8b loaded onto GPU." -ForegroundColor Green
-} catch {
-    Write-Host "  Warmup timed out — will load on first use." -ForegroundColor Yellow
-}
-
-# Show GPU allocation
-Write-Host "  GPU status:" -ForegroundColor Cyan
-ollama ps
-
-# ------------------------------------------
-# 4. START A1111 (via scheduled task script)
-# ------------------------------------------
-Write-Host "[4/6] Starting A1111 (headless API)..." -ForegroundColor Yellow
-$A1111Script = "C:\AI\StabilityMatrix\Logs\start_a1111.ps1"
-
-# Check if A1111 is already running
-$a1111Already = $false
-try {
-    Invoke-RestMethod -Uri "http://127.0.0.1:7860/sdapi/v1/sd-models" -TimeoutSec 5 | Out-Null
-    Write-Host "  A1111 already running!" -ForegroundColor Green
-    $a1111Already = $true
-} catch {}
-
-if (-not $a1111Already) {
-    if (Test-Path $A1111Script) {
-        Start-Process "powershell.exe" -ArgumentList "-NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$A1111Script`"" -WindowStyle Hidden
-        Write-Host "  A1111 launch script started." -ForegroundColor Gray
-
-        # Wait for A1111 API to be ready (can take 30-90s to load model)
-        Write-Host "  Waiting for A1111 API..." -ForegroundColor Gray
-        $a1111Ready = $false
-        for ($i = 0; $i -lt 24; $i++) {
-            try {
-                Invoke-RestMethod -Uri "http://127.0.0.1:7860/sdapi/v1/sd-models" -TimeoutSec 5 | Out-Null
-                Write-Host "  A1111 API is ready!" -ForegroundColor Green
-                $a1111Ready = $true
-                break
-            } catch {
-                Write-Host "    Waiting... ($($i * 5)s)" -ForegroundColor Gray
-                Start-Sleep 5
-            }
-        }
-        if (-not $a1111Ready) {
-            Write-Host "  A1111 still loading — bot will retry on its own." -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "  A1111 script not found at $A1111Script" -ForegroundColor Red
-        Write-Host "  Start it manually or update the path in this script." -ForegroundColor Gray
-    }
-}
-
-# ------------------------------------------
-# 5. START THE BOT
-# ------------------------------------------
-Write-Host "[5/7] Starting Tower Bot..." -ForegroundColor Yellow
-Set-Location $BotDir
-Start-Process "python" -ArgumentList "main.py" -RedirectStandardError "$LogDir\bot_stderr.log"
-Start-Sleep 3
-
-# ------------------------------------------
-# 6. START DASHBOARD (Flask)
-# ------------------------------------------
-# Ensure firewall allows port 5000 inbound
-$fwRule = Get-NetFirewallRule -DisplayName "Tower Dashboard" -ErrorAction SilentlyContinue
-if (-not $fwRule) {
-    New-NetFirewallRule -DisplayName "Tower Dashboard" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5000 | Out-Null
-    Write-Host "  Firewall: port 5000 opened." -ForegroundColor Green
-}
-Write-Host "[6/7] Starting Mission Dashboard..." -ForegroundColor Yellow
-Start-Process "python" -ArgumentList "-m flask --app Webpage/app.py run --host 0.0.0.0 --port 5000" -WorkingDirectory $BotDir -RedirectStandardError "$LogDir\dashboard_stderr.log" -WindowStyle Hidden
-Start-Sleep 2
-try {
-    Invoke-RestMethod -Uri "http://localhost:5000/api/status" -TimeoutSec 5 | Out-Null
-    Write-Host "  Dashboard: RUNNING at http://localhost:5000" -ForegroundColor Green
-} catch {
-    Write-Host "  Dashboard: starting (check logs\dashboard_stderr.log)" -ForegroundColor Yellow
-}
-
-# ------------------------------------------
-# 7. VERIFY EVERYTHING
-# ------------------------------------------
-Write-Host "[7/7] Verifying..." -ForegroundColor Yellow
-
-# Ollama
-try {
-    Invoke-RestMethod -Uri "http://localhost:11434/api/tags" -TimeoutSec 5 | Out-Null
-    Write-Host "  Ollama:  RUNNING" -ForegroundColor Green
-} catch {
-    Write-Host "  Ollama:  DOWN" -ForegroundColor Red
-}
-
-# A1111
-try {
-    Invoke-RestMethod -Uri "http://127.0.0.1:7860/sdapi/v1/sd-models" -TimeoutSec 5 | Out-Null
-    Write-Host "  A1111:   RUNNING" -ForegroundColor Green
-} catch {
-    Write-Host "  A1111:   LOADING (check logs\a1111_stderr.log)" -ForegroundColor Yellow
-}
-
-# Bot
-Start-Sleep 2
-$botProc = Get-Process -Name "python" -ErrorAction SilentlyContinue
+$botProc = Get-BotProcess
 if ($botProc) {
-    Write-Host "  Bot:     RUNNING (PID $($botProc.Id))" -ForegroundColor Green
+    Write-Host "  Bot:     RUNNING (PID $($botProc.ProcessId -join ', '))" -ForegroundColor Green
 } else {
     Write-Host "  Bot:     NOT STARTED (check logs\bot_stderr.log)" -ForegroundColor Red
 }
 
 Write-Host ""
-Write-Host "========================================" -ForegroundColor Green
-Write-Host "  ALL SYSTEMS GO" -ForegroundColor Green
-Write-Host "========================================" -ForegroundColor Green
-Write-Host ""
 Write-Host "Watch bot logs:" -ForegroundColor Gray
 Write-Host "  Get-Content .\logs\bot_stderr.log -Tail 20 -Wait" -ForegroundColor White
-Write-Host ""
-Write-Host "Watch A1111 logs:" -ForegroundColor Gray
-Write-Host "  Get-Content .\logs\a1111_stderr.log -Tail 20 -Wait" -ForegroundColor White
 Write-Host ""

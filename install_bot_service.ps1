@@ -1,5 +1,5 @@
 $ServiceName = "TowerBotService"
-$BotDir = "C:\Users\akodoreign\Desktop\chatGPT-discord-bot"
+$BotDir = $PSScriptRoot
 $LogDir = $BotDir + "\logs"
 $NssmExe = $BotDir + "\nssm.exe"
 $MainScript = $BotDir + "\main.py"
@@ -42,10 +42,10 @@ if (-not (Test-Path $NssmExe)) {
 Write-Host "   OK: nssm.exe found" -ForegroundColor Green
 
 Write-Host ""
-Write-Host ">> Resolving Python 3.11 path" -ForegroundColor Cyan
-$PythonResolved = & py -3.11 -c "import sys; print(sys.executable)" 2>$null
-if (-not $PythonResolved -or -not (Test-Path $PythonResolved)) {
-    Write-Host "   FAIL: Python 3.11 not found" -ForegroundColor Red
+Write-Host ">> Resolving the bot's venv Python" -ForegroundColor Cyan
+$PythonResolved = $BotDir + "\.venv\Scripts\python.exe"
+if (-not (Test-Path $PythonResolved)) {
+    Write-Host "   FAIL: .venv not found (py -3.11 -m venv .venv; .venv\Scripts\pip install -r requirements.txt)" -ForegroundColor Red
     exit 1
 }
 Write-Host ("   OK: " + $PythonResolved) -ForegroundColor Green

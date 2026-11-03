@@ -1,24 +1,20 @@
 # ============================================
-# TOWER OF LAST CHANCE — Clean Shutdown
+# TOWER OF LAST CHANCE - Clean Shutdown
 # Run as: .\stop_tower.ps1
+#
+# Stops only the bot. Ollama and the headless ComfyUI are shared with other
+# tools on this PC, so they keep running.
 # ============================================
+
+$Python = "$PSScriptRoot\.venv\Scripts\python.exe"
 
 Write-Host ""
 Write-Host "Stopping Tower of Last Chance..." -ForegroundColor Yellow
-Write-Host ""
 
-# Stop bot
-Write-Host "  Stopping bot..." -ForegroundColor Gray
-Get-Process -Name "python" -ErrorAction SilentlyContinue | Stop-Process -Force 2>$null
-
-# Stop Ollama
-Write-Host "  Stopping Ollama..." -ForegroundColor Gray
-taskkill /f /im ollama.exe 2>$null | Out-Null
+Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
+    Where-Object { $_.CommandLine -like "*main.py*" -and ($_.ExecutablePath -eq $Python -or $_.CommandLine -like "*chatGPT-discord-bot*") } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 
 Start-Sleep 2
-
-Write-Host ""
-Write-Host "All services stopped." -ForegroundColor Green
-Write-Host "  A1111 still running (background process) — kill manually if needed:" -ForegroundColor Gray
-Write-Host "    Get-Process python | Where-Object {`$_.CommandLine -like '*launch.py*'} | Stop-Process" -ForegroundColor White
+Write-Host "Bot stopped. Ollama and ComfyUI are still running." -ForegroundColor Green
 Write-Host ""
