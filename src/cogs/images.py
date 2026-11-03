@@ -98,7 +98,7 @@ def setup(client):
         )
         if not decision.run_now:
             await interaction.followup.send(
-                "\u23f3 A1111 is busy with another image job. Please try again in a minute.",
+                "\u23f3 The image server (ComfyUI) is not reachable right now. Please try again in a minute.",
                 ephemeral=True,
             )
             return
@@ -300,17 +300,7 @@ def setup(client):
             "tiling":          False,
         }
 
-        if model:
-            try:
-                async with httpx.AsyncClient(timeout=30.0) as http:
-                    opts = (await http.get(f"{a1111_url}/sdapi/v1/options")).json()
-                if opts.get("sd_model_checkpoint", "") != model:
-                    async with httpx.AsyncClient(timeout=30.0) as http:
-                        await http.post(f"{a1111_url}/sdapi/v1/options", json={"sd_model_checkpoint": model})
-            except Exception:
-                pass
-
-        from src.news_feed import a1111_lock
+        from src import comfy_client
         from src.image_ref import (
             get_best_ref_for_scene, to_img2img_payload,
         )
@@ -319,40 +309,34 @@ def setup(client):
         ref_bytes, denoise, ref_source = get_best_ref_for_scene(prompt)
         if ref_bytes:
             api_payload = to_img2img_payload(payload, ref_bytes, denoise)
-            endpoint = f"{a1111_url}/sdapi/v1/img2img"
             logger.info(f"\U0001f3a8 /draw using img2img ref: {ref_source} (denoise={denoise})")
         else:
             api_payload = payload
-            endpoint = f"{a1111_url}/sdapi/v1/txt2img"
 
-        async with a1111_lock:
-            try:
-                async with httpx.AsyncClient(timeout=600.0) as http:
-                    resp = await http.post(endpoint, json=api_payload)
-                    resp.raise_for_status()
-                    data = resp.json()
+        try:
+            data = await comfy_client.generate(api_payload, label="draw", checkpoint=model or None,
+                                               timeout=600.0)
+            img_bytes = base64.b64decode(data["images"][0])
 
-                img_bytes = base64.b64decode(data["images"][0])
+            file = discord.File(io.BytesIO(img_bytes), filename="undercity.png")
 
-                file = discord.File(io.BytesIO(img_bytes), filename="undercity.png")
+            embed = discord.Embed(
+                title="\U0001f3a8 Undercity Vision",
+                color=discord.Color.dark_grey(),
+            )
+            if ref_source:
+                embed.set_footer(text=f"\U0001f504 Built on ref: {ref_source}")
+            embed.set_image(url="attachment://undercity.png")
 
-                embed = discord.Embed(
-                    title="\U0001f3a8 Undercity Vision",
-                    color=discord.Color.dark_grey(),
-                )
-                if ref_source:
-                    embed.set_footer(text=f"\U0001f504 Built on ref: {ref_source}")
-                embed.set_image(url="attachment://undercity.png")
+            await interaction.followup.send(embed=embed, file=file)
 
-                await interaction.followup.send(embed=embed, file=file)
-
-            except Exception as e:
-                import traceback
-                logger.error(f"draw command error: {type(e).__name__}: {e}\n{traceback.format_exc()}")
-                await interaction.followup.send(
-                    f"\u274c Image generation failed \u2014 is A1111 running? (`{type(e).__name__}: {e}`)",
-                    ephemeral=True
-                )
+        except Exception as e:
+            import traceback
+            logger.error(f"draw command error: {type(e).__name__}: {e}\n{traceback.format_exc()}")
+            await interaction.followup.send(
+                f"\u274c Image generation failed \u2014 is ComfyUI running? (`{type(e).__name__}: {e}`)",
+                ephemeral=True
+            )
 
     # ---- /drawscene (DM only) ----
 
@@ -405,7 +389,7 @@ def setup(client):
         )
         if not decision.run_now:
             await interaction.followup.send(
-                "\u23f3 A1111 is busy with another image job. Please try again in a minute.",
+                "\u23f3 The image server (ComfyUI) is not reachable right now. Please try again in a minute.",
                 ephemeral=True,
             )
             return
@@ -496,15 +480,11 @@ def setup(client):
                 "medieval castle, stone dungeon, fantasy castle interior, torch sconces"
             )
 
-        try:
-            async with _httpx.AsyncClient(timeout=30.0) as http:
-                r = await http.get(f"{A1111_URL}/sdapi/v1/options")
-                current = r.json().get("sd_model_checkpoint", "")
-                if A1111_MODEL not in current:
-                    await http.post(f"{A1111_URL}/sdapi/v1/options", json={"sd_model_checkpoint": A1111_MODEL})
-        except Exception as _me:
-            await interaction.followup.send(f"❌ A1111 not reachable: {_me}", ephemeral=True)
+        from src import comfy_client
+        if not await comfy_client.is_ready():
+            await interaction.followup.send("❌ ComfyUI is not reachable.", ephemeral=True)
             return
+        comfy_client.set_checkpoint(A1111_MODEL)
 
         payload = {
             "prompt": image_prompt,
@@ -535,7 +515,7 @@ def setup(client):
             await interaction.followup.send(
                 "⏳ Layered render: pass 1 environment, pass 2 characters (~90-120s)", ephemeral=True
             )
-            async with a1111_lock:
+            async with a1111_lock:  # keep both passes back to back on the GPU
                 try:
                     img_bytes, bg_bytes = await layered_generate(
                         background_prompt=bg_prompt,
@@ -552,41 +532,22 @@ def setup(client):
             ref_bytes, denoise, ref_source = get_best_ref_for_scene(scene)
             if ref_bytes:
                 api_payload = to_img2img_payload(payload, ref_bytes, denoise)
-                endpoint = f"{A1111_URL}/sdapi/v1/img2img"
                 ref_note = f" (img2img ref: {ref_source})"
                 logger.info(f"\U0001f3a8 /drawscene using img2img ref: {ref_source} (denoise={denoise})")
             else:
                 api_payload = payload
-                endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
                 ref_note = ""
 
             await interaction.followup.send(
                 f"⏳ Generating scene image...{ref_note} (this takes ~30-60s)", ephemeral=True
             )
 
-            async with a1111_lock:
-                try:
-                    async with _httpx.AsyncClient(timeout=900.0) as http:
-                        r = await http.post(endpoint, json=api_payload)
-                        r.raise_for_status()
-                        result = r.json()
-                    img_bytes = _base64.b64decode(result["images"][0])
-                except Exception as _ge:
-                    await interaction.followup.send(f"❌ Generation failed: {_ge}", ephemeral=True)
-                    return
-
-        # Crop A1111 info bar from bottom
-        try:
-            from PIL import Image as _PILImage
-            import io as _io2
-            _img = _PILImage.open(_io2.BytesIO(img_bytes))
-            _w, _h = _img.size
-            _img = _img.crop((0, 0, _w, _h - 52))
-            _buf = _io2.BytesIO()
-            _img.save(_buf, format="PNG")
-            img_bytes = _buf.getvalue()
-        except Exception:
-            pass
+            try:
+                result = await comfy_client.generate(api_payload, label="drawscene", timeout=900.0)
+                img_bytes = _base64.b64decode(result["images"][0])
+            except Exception as _ge:
+                await interaction.followup.send(f"❌ Generation failed: {_ge}", ephemeral=True)
+                return
 
         channel = client.get_channel(int(channel_id_str))
         if channel:

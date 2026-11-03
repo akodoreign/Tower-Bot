@@ -132,6 +132,9 @@ class DiscordClient(discord.Client):
             register_bot_loop(asyncio.get_running_loop())
         except Exception:
             pass
+        # Same for GPU work from worker threads (e.g. the pretty-map pass)
+        from src.gpu_queue import register_loop as register_gpu_loop
+        register_gpu_loop(asyncio.get_running_loop())
         if self._sync_guild_id:
             guild = discord.Object(id=self._sync_guild_id)
             self.tree.copy_global_to(guild=guild)
@@ -936,35 +939,16 @@ class DiscordClient(discord.Client):
 
         await self.wait_until_ready()
 
-        # Wait for A1111 to be fully ready — it can take a minute after Stability Matrix launches it
-        A1111_URL = os.getenv("A1111_URL", "http://127.0.0.1:7860")
-        import httpx
-        logger.info("🖼️ Waiting for A1111 to be ready...")
+        # Wait for ComfyUI (the "ComfyUI Headless" task starts it at logon)
+        from src.comfy_client import is_ready as _comfy_ready
+        logger.info("🖼️ Waiting for ComfyUI to be ready...")
         for _ in range(20):  # up to ~3 minutes
-            try:
-                async with httpx.AsyncClient(timeout=10.0) as client:
-                    r = await client.get(f"{A1111_URL}/sdapi/v1/sd-models")
-                    if r.status_code == 200:
-                        logger.info("🖼️ A1111 is ready — story image loop starting")
-                        break
-            except Exception:
-                pass
+            if await _comfy_ready():
+                logger.info("🖼️ ComfyUI is ready — story image loop starting")
+                break
             await asyncio.sleep(10)
         else:
-            logger.warning("🖼️ A1111 not reachable after 3 minutes — story image loop will try anyway")
-
-        # Disable A1111's built-in watermark stamp once at startup.
-        # Doing this here (not per-request via override_settings) avoids 500 errors
-        # on A1111 builds that don't support per-request setting overrides.
-        try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                await client.post(
-                    f"{A1111_URL}/sdapi/v1/options",
-                    json={"enable_watermark": False},
-                )
-            logger.info("🖼️ A1111 watermark disabled via /sdapi/v1/options")
-        except Exception as _we:
-            logger.warning(f"🖼️ Could not disable A1111 watermark: {_we}")
+            logger.warning("🖼️ ComfyUI not reachable after 3 minutes — story image loop will try anyway")
 
         # Wait for a few bulletins to post first so there's memory to draw from
         await asyncio.sleep(3 * 60)  # 3 minutes after startup

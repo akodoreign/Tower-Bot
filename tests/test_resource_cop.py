@@ -4,15 +4,46 @@ import src.resource_cop as resource_cop
 
 
 @pytest.mark.asyncio
-async def test_ask_a1111_waits_when_legacy_lock_busy(monkeypatch):
-    monkeypatch.setattr(resource_cop, "_existing_a1111_lock_busy", lambda: True)
+async def test_ask_a1111_waits_when_comfy_unreachable(monkeypatch):
+    monkeypatch.setenv("COMFY_URL", "http://127.0.0.1:9")  # nothing listens on the discard port
 
     decision = await resource_cop.ask_a1111("smoke")
 
     assert not decision.run_now
     assert decision.resource == "a1111"
     assert decision.wait_seconds == 10
-    assert "lock" in decision.reason
+    assert "not reachable" in decision.reason
+
+
+@pytest.mark.asyncio
+async def test_ask_a1111_allows_while_gpu_busy(monkeypatch):
+    # A busy GPU is not a reason to back off: generate() queues for its turn.
+    import src.gpu_queue as gpu_queue
+
+    class FakeResp:
+        def raise_for_status(self):
+            return None
+
+    class FakeClient:
+        def __init__(self, *a, **k):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def get(self, url):
+            assert url.endswith("/queue")
+            return FakeResp()
+
+    monkeypatch.setattr(resource_cop.httpx, "AsyncClient", FakeClient)
+    async with gpu_queue.turn("text", "smoke-holder"):
+        decision = await resource_cop.ask_a1111("smoke")
+
+    assert decision.run_now
+    assert decision.details["gpu_busy"] is True
 
 
 @pytest.mark.asyncio
@@ -49,14 +80,14 @@ async def test_wait_for_a1111_turn_stops_at_wait_budget(monkeypatch):
     assert decision.reason == "busy"
 
 
-def test_ask_a1111_sync_waits_when_legacy_lock_busy(monkeypatch):
-    monkeypatch.setattr(resource_cop, "_existing_a1111_lock_busy", lambda: True)
+def test_ask_a1111_sync_waits_when_comfy_unreachable(monkeypatch):
+    monkeypatch.setenv("COMFY_URL", "http://127.0.0.1:9")
 
     decision = resource_cop.ask_a1111_sync("pretty")
 
     assert not decision.run_now
     assert decision.resource == "a1111"
-    assert "lock" in decision.reason
+    assert "not reachable" in decision.reason
 
 
 @pytest.mark.asyncio

@@ -114,37 +114,25 @@ def missing_art_keys(limit: int = 6) -> list[dict]:
 
 
 async def _call_a1111(prompt: str, negative: str) -> Optional[bytes]:
-    from src.a1111_runtime import cool_down_a1111_after_generation, ensure_a1111_model
-    from src.news_feed import a1111_lock
+    from src.comfy_client import generate
     from src.resource_cop import wait_for_a1111_turn
 
-    url = os.getenv("A1111_URL", "http://127.0.0.1:7860").split()[0].rstrip("/")
     model = os.getenv("A1111_ITEM_MODEL", os.getenv("A1111_MODEL", ""))
     decision = await wait_for_a1111_turn("towerbot_item_art", model_hint=model, max_wait_seconds=90)
     if not decision.run_now:
-        logger.info("TowerBot item art skipped: A1111 busy (%s)", decision.reason)
+        logger.info("TowerBot item art skipped: ComfyUI unavailable (%s)", decision.reason)
         return None
 
-    async with a1111_lock:
-        await ensure_a1111_model(model, label="ITEM_ART", url=url)
-        payload = {
-            "prompt": prompt,
-            "negative_prompt": negative,
-            "steps": int(os.getenv("A1111_ITEM_STEPS", "24")),
-            "cfg_scale": float(os.getenv("A1111_ITEM_CFG", "6.0")),
-            "width": int(os.getenv("A1111_ITEM_WIDTH", "768")),
-            "height": int(os.getenv("A1111_ITEM_HEIGHT", "768")),
-            "sampler_name": os.getenv("A1111_ITEM_SAMPLER", "DPM++ 2M SDE Karras"),
-            "seed": random.randint(1, 999_999_999),
-            "batch_size": 1,
-            "n_iter": 1,
-        }
-        timeout = float(os.getenv("A1111_ITEM_TIMEOUT", "600"))
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(f"{url}/sdapi/v1/txt2img", json=payload)
-            resp.raise_for_status()
-            images = resp.json().get("images") or []
-        await cool_down_a1111_after_generation(cooldown=float(os.getenv("A1111_ITEM_COOLDOWN", "20")))
+    payload = {
+        "prompt": prompt,
+        "negative_prompt": negative,
+        "width": int(os.getenv("A1111_ITEM_WIDTH", "768")),
+        "height": int(os.getenv("A1111_ITEM_HEIGHT", "768")),
+        "seed": random.randint(1, 999_999_999),
+    }
+    data = await generate(payload, label="item_art", checkpoint=model,
+                          timeout=float(os.getenv("A1111_ITEM_TIMEOUT", "600")))
+    images = data.get("images") or []
     if not images:
         return None
     return base64.b64decode(images[0])

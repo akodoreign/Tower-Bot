@@ -17,6 +17,7 @@ Agents communicate via:
 - Optional autonomous code modifications (with safeguards)
 """
 
+from src.gpu_queue import text_post
 import os
 import json
 import asyncio
@@ -1671,7 +1672,7 @@ If the settings look correct for the scene type, say so — not everything needs
                 return ""
 
             async with httpx.AsyncClient(timeout=120.0) as client:
-                resp = await client.post(
+                resp = await text_post(client,
                     self.OLLAMA_URL,
                     json={
                         "model": self.VISION_MODEL,

@@ -13,6 +13,24 @@ import types
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def isolated_gpu_queue(monkeypatch):
+    """Every test gets a fresh GPU queue whose kind switches never reach the
+    real Ollama/ComfyUI (no unloading models or freeing VRAM on this machine).
+    State is reset too, so one test's queue never leaks into the next."""
+    import src.gpu_queue as gpu_queue
+
+    async def no_switch():
+        return None
+
+    monkeypatch.setattr(gpu_queue, "_busy", False)
+    monkeypatch.setattr(gpu_queue, "_waiters", [])
+    monkeypatch.setattr(gpu_queue, "_owner", None)
+    monkeypatch.setattr(gpu_queue, "_current_kind", None)
+    monkeypatch.setattr(gpu_queue, "_unload_ollama", no_switch)
+    monkeypatch.setattr(gpu_queue, "_free_comfy", no_switch)
+
+
 @pytest.fixture
 def fake_db(monkeypatch):
     """A stand-in src.db_api whose queries return canned rows and whose writes

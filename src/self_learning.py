@@ -11,6 +11,7 @@ window (default 1:00 AM – 2:00 AM local time) and uses Ollama to:
 All learning is logged to logs/journal.txt for DM review.
 """
 
+from src.gpu_queue import text_post
 import os
 import re
 import json
@@ -133,7 +134,7 @@ async def _ask_ollama(prompt: str, system: str = "", timeout: int = 120,
             return ""
         ctx = _fit_ctx(system + prompt, reply_tokens)
         async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(OLLAMA_URL, json={
+            resp = await text_post(client, OLLAMA_URL, json={
                 "model": OLLAMA_MODEL,
                 "messages": messages,
                 "stream": False,

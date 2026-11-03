@@ -14,6 +14,7 @@ The test mission is isolated — it does NOT:
 - Affect any production systems
 """
 
+from src.gpu_queue import text_post
 import os
 import json
 import asyncio
@@ -190,7 +191,7 @@ async def _ask_ollama(
                 logger.info(f"module_quality_trainer: Ollama deferred by resource cop: {decision.reason}")
                 return ""
             async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.post(OLLAMA_URL, json={
+                resp = await text_post(client, OLLAMA_URL, json={
                     "model": OLLAMA_MODEL,
                     "messages": messages,
                     "stream": False,

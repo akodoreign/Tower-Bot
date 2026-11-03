@@ -12,6 +12,7 @@ Set MODULE_USE_COUNCIL=true to enable. Falls back to single-pass on any failure.
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import asyncio
 import json
@@ -83,7 +84,7 @@ async def _call(system: str, user: str, tokens: int = 3200, temp: float = 0.82, 
             return ""
 
         async with httpx.AsyncClient(timeout=300.0) as c:
-            r = await c.post(OLLAMA_URL, json={
+            r = await text_post(c, OLLAMA_URL, json={
                 "model":    OLLAMA_MODEL,
                 "messages": [
                     {"role": "system", "content": system},

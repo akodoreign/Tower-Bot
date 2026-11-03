@@ -53,49 +53,9 @@ _PRETTY_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pretty-
 
 
 def wait_for_a1111_idle(timeout: float | None = None, cooldown: float | None = None) -> bool:
-    """
-    Wait for A1111 to finish the previous image job before requesting another.
-
-    A1111 often reports the HTTP request complete before the model/checkpoint
-    memory is ready for a reliable next run, so this combines progress polling
-    with a small cooldown.
-    """
-    import time
-
-    timeout = A1111_IDLE_TIMEOUT if timeout is None else timeout
-    cooldown = A1111_COOLDOWN_SECONDS if cooldown is None else cooldown
-    deadline = time.monotonic() + timeout
-    saw_busy = False
-    consecutive_errors = 0
-
-    while time.monotonic() < deadline:
-        try:
-            with httpx.Client(timeout=10.0) as client:
-                resp = client.get(f"{A1111_URL}/sdapi/v1/progress?skip_current_image=true")
-                resp.raise_for_status()
-                data = resp.json()
-            consecutive_errors = 0
-            progress = float(data.get("progress") or 0.0)
-            state = data.get("state") or {}
-            job_count = int(state.get("job_count") or 0)
-            job_no = int(state.get("job_no") or 0)
-            sampling_step = int(state.get("sampling_step") or 0)
-            sampling_steps = int(state.get("sampling_steps") or 0)
-            busy = progress > 0.0 or (job_count and job_no < job_count) or (sampling_steps and sampling_step < sampling_steps)
-            if not busy:
-                if saw_busy and cooldown > 0:
-                    time.sleep(cooldown)
-                return True
-            saw_busy = True
-        except Exception as exc:
-            consecutive_errors += 1
-            if consecutive_errors >= 3:
-                logger.warning("wait_for_a1111_idle: giving up after %d consecutive errors: %s", consecutive_errors, exc)
-                return False
-            logger.debug("wait_for_a1111_idle: transient error (%d/3), retrying: %s", consecutive_errors, exc)
-        time.sleep(A1111_POLL_SECONDS)
-
-    return False
+    """Kept for old callers. Image jobs now queue on the GPU queue inside
+    comfy_client.generate(), so there is nothing to poll or cool down."""
+    return True
 
 
 def _seed(text: str) -> int:
@@ -123,13 +83,8 @@ def _detect_kind(text: str) -> str:
 
 
 def _current_a1111_checkpoint() -> str:
-    try:
-        with httpx.Client(timeout=5.0) as client:
-            resp = client.get(f"{A1111_URL}/sdapi/v1/options")
-            resp.raise_for_status()
-            return _norm(resp.json().get("sd_model_checkpoint"))
-    except Exception:
-        return ""
+    from src.comfy_client import get_checkpoint
+    return _norm(get_checkpoint())
 
 
 def _is_flux_checkpoint(name: str) -> bool:
@@ -561,68 +516,26 @@ def stylize_pretty_battlemap(path: Path, context: Optional[dict] = None, force: 
         "resize_mode": 1,
     }
 
-    try:
-        with httpx.Client(timeout=PRETTY_TIMEOUT) as client:
-            try:
-                client.post(f"{A1111_URL}/sdapi/v1/refresh-loras", timeout=15.0)
-            except Exception:
-                pass
+    # One img2img pass on the Qwen-Image map recipe. The old Flux/SDXL/legacy
+    # strategy ladder existed to dodge A1111 checkpoint-swap failures; with a
+    # single tuned map recipe a second attempt only retries the same thing.
+    from src.comfy_client import generate_sync
 
-            images = []
-            attempts = _pretty_attempts(payload, context)
-            for idx, (strategy, attempt) in enumerate(attempts, start=1):
-                wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, A1111_MODEL_SWAP_COOLDOWN if idx > 1 else 0))
-                try:
-                    logger.info("Pretty map pass trying %s strategy for %s", strategy, path)
-                    endpoint = "img2img"
-                    if PRETTY_MAPCRAFT_TEXT2IMG and strategy in {"flux", "sdxl"}:
-                        endpoint = "txt2img"
-                        attempt = {
-                            k: v for k, v in attempt.items()
-                            if k not in {"init_images", "resize_mode", "denoising_strength"}
-                        }
-                    resp = client.post(f"{A1111_URL}/sdapi/v1/{endpoint}", json=attempt)
-                    resp.raise_for_status()
-                    images = resp.json().get("images", [])
-                    wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, 45))
-                    if images and not _decode_useful_pretty_image(images[0]):
-                        logger.warning("Pretty map pass %s strategy returned a blank/invalid image for %s", strategy, path)
-                        images = []
-                    if images:
-                        break
-                except Exception as exc:
-                    logger.warning("Pretty map pass %s strategy failed for %s: %s", strategy, path, exc)
-                    wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, A1111_MODEL_SWAP_COOLDOWN))
-            if not images:
-                fallback = {
-                    **payload,
-                    "prompt": _pretty_lora_prompt(context, "legacy")[0],
-                    "negative_prompt": _pretty_lora_prompt(context, "legacy")[1],
-                    "width": min(PRETTY_SIZE, 768),
-                    "height": min(PRETTY_SIZE, 768),
-                    "steps": min(int(payload["steps"]), 18),
-                    "denoising_strength": min(PRETTY_DENOISE, 0.24),
-                }
-                override = _pretty_override_settings("legacy")
-                if override:
-                    fallback["override_settings"] = override
-                    fallback["override_settings_restore_afterwards"] = True
-                try:
-                    logger.info("Pretty map pass trying reduced legacy strategy for %s", path)
-                    wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, A1111_MODEL_SWAP_COOLDOWN))
-                    resp = client.post(f"{A1111_URL}/sdapi/v1/img2img", json=fallback)
-                    resp.raise_for_status()
-                    images = resp.json().get("images", [])
-                    wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, 45))
-                    if images and not _decode_useful_pretty_image(images[0]):
-                        logger.warning("Pretty map pass reduced legacy strategy returned a blank/invalid image for %s", path)
-                        images = []
-                except Exception as exc:
-                    logger.warning("Pretty map pass reduced legacy strategy failed for %s: %s", path, exc)
-                    wait_for_a1111_idle(cooldown=max(A1111_COOLDOWN_SECONDS, A1111_MODEL_SWAP_COOLDOWN))
-    except Exception as exc:
-        logger.warning("Pretty map pass failed for %s: %s", path, exc)
-        return None
+    images = []
+    prompt, negative = _pretty_lora_prompt(context, "legacy")
+    attempt = {**payload, "prompt": prompt, "negative_prompt": negative}
+    for try_no in (1, 2):
+        try:
+            logger.info("Pretty map pass (attempt %d) for %s", try_no, path)
+            images = generate_sync(attempt, label="pretty_map", checkpoint="map",
+                                   timeout=PRETTY_TIMEOUT).get("images", [])
+            if images and not _decode_useful_pretty_image(images[0]):
+                logger.warning("Pretty map pass returned a blank/invalid image for %s", path)
+                images = []
+            if images:
+                break
+        except Exception as exc:
+            logger.warning("Pretty map pass failed for %s: %s", path, exc)
 
     if not images:
         logger.warning("Pretty map pass returned no images for %s", path)

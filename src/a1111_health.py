@@ -8,8 +8,6 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import httpx
-
 from src.log import logger
 
 _failure_counts: dict[str, int] = {}
@@ -28,10 +26,6 @@ def _buglog_enabled() -> bool:
     return os.getenv("A1111_NO_IMAGE_BUGLOG_ENABLED", "1").lower() not in {"0", "false", "no"}
 
 
-def _a1111_url(url: str | None = None) -> str:
-    return (url or os.getenv("A1111_URL", "http://127.0.0.1:7860")).split()[0].rstrip("/")
-
-
 def _append_buglog_alert(label: str, count: int, reason: str) -> None:
     if not _buglog_enabled():
         return
@@ -47,10 +41,10 @@ def _append_buglog_alert(label: str, count: int, reason: str) -> None:
         f"- Consecutive failures: `{count}`\n"
         f"- Last reason: `{reason}`\n\n"
         "Action taken:\n"
-        "- Bot logged this at ERROR level and attempted `/sdapi/v1/interrupt`.\n\n"
+        "- Bot logged this at ERROR level and sent ComfyUI an interrupt.\n\n"
         "Next action:\n"
-        "- Inspect A1111 logs and bot logs around this timestamp.\n"
-        "- If failures continue after interrupt, restart A1111 before changing prompts or VAE/model settings.\n"
+        "- Inspect the bot logs around this timestamp.\n"
+        "- If failures continue after interrupt, restart the \"ComfyUI Headless\" scheduled task before changing prompts or models.\n"
     )
     try:
         with buglog.open("a", encoding="utf-8") as fh:
@@ -60,16 +54,12 @@ def _append_buglog_alert(label: str, count: int, reason: str) -> None:
 
 
 async def _interrupt_a1111(label: str, url: str | None = None) -> None:
-    base = _a1111_url(url)
-    try:
-        async with httpx.AsyncClient(timeout=float(os.getenv("A1111_INTERRUPT_TIMEOUT", "10"))) as client:
-            response = await client.post(f"{base}/sdapi/v1/interrupt")
-        if response.status_code >= 400:
-            logger.error("[A1111_HEALTH] Interrupt for %s returned HTTP %s", label, response.status_code)
-        else:
-            logger.error("[A1111_HEALTH] Interrupt sent for %s after repeated no-image failures", label)
-    except Exception as exc:
-        logger.error("[A1111_HEALTH] Interrupt failed for %s: %r", label, exc)
+    from src.comfy_client import interrupt
+
+    if await interrupt():
+        logger.error("[A1111_HEALTH] Interrupt sent for %s after repeated no-image failures", label)
+    else:
+        logger.error("[A1111_HEALTH] Interrupt failed for %s", label)
 
 
 async def record_a1111_success(label: str) -> None:

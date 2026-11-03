@@ -341,7 +341,7 @@ class NewsEditorAgent(BaseAgent, FactCheckerMixin):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name="qwen3-8b-slim:latest",
+            model_name="qwen3.6:35b-a3b",
             model_type=ModelType.LOCAL,
             timeout=180.0,
             max_retries=2,
@@ -438,7 +438,7 @@ class GossipEditorAgent(BaseAgent, FactCheckerMixin):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name="qwen3-8b-slim:latest",
+            model_name="qwen3.6:35b-a3b",
             model_type=ModelType.LOCAL,
             timeout=180.0,
             max_retries=2,
@@ -537,7 +537,7 @@ class SportsColumnistAgent(BaseAgent, FactCheckerMixin):
     
     def _get_config(self) -> AgentConfig:
         return AgentConfig(
-            model_name="qwen3-8b-slim:latest",
+            model_name="qwen3.6:35b-a3b",
             model_type=ModelType.LOCAL,
             timeout=180.0,
             max_retries=2,

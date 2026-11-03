@@ -127,7 +127,6 @@ async def generate_single_tile(params: TileGenerationParams) -> Optional[Image.I
                 "height": params.height,
                 "batch_size": 1,
             }
-            endpoint = f"{A1111_URL}/sdapi/v1/img2img"
         else:
             # Use txt2img for new generation
             payload = {
@@ -141,30 +140,16 @@ async def generate_single_tile(params: TileGenerationParams) -> Optional[Image.I
                 "height": params.height,
                 "batch_size": 1,
             }
-            endpoint = f"{A1111_URL}/sdapi/v1/txt2img"
 
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            logger.debug(f"Generating tile via A1111: {params.prompt[:50]}...")
-            response = await client.post(endpoint, json=payload)
-            await _maybe_await(response.raise_for_status())
+        from src.comfy_client import generate
+        logger.debug(f"Generating tile via ComfyUI: {params.prompt[:50]}...")
+        data = await generate(payload, label="battle_tile", checkpoint="map", timeout=300.0)
+        img_bytes = base64.b64decode(data["images"][0])
+        img = Image.open(io.BytesIO(img_bytes))
 
-            data = await _maybe_await(response.json())
-            if "images" not in data or not data["images"]:
-                logger.error(f"A1111 returned no images")
-                return None
+        logger.info(f"✓ Generated tile: {img.size}")
+        return img
 
-            # Decode first image
-            img_base64 = data["images"][0]
-            img_bytes = base64.b64decode(img_base64)
-            img = Image.open(io.BytesIO(img_bytes))
-
-            logger.info(f"✓ Generated tile: {img.size}")
-            return img
-
-    except httpx.ConnectError:
-        logger.error(f"❌ Could not connect to A1111 at {A1111_URL}")
-        logger.error("   Make sure A1111 is running with --api flag")
-        return None
     except Exception as e:
         logger.error(f"❌ Tile generation failed: {e}")
         return None
@@ -667,69 +652,49 @@ async def generate_location_map(
             return None
 
         timeout = float(os.getenv("A1111_MAP_TIMEOUT", "900"))
-        async with httpx.AsyncClient(timeout=timeout) as http:
-            if init_image_bytes:
-                # Existing map from DB — paint new story details on top with low denoising
-                payload = {
-                    "prompt":             full_prompt,
-                    "negative_prompt":    negative,
-                    "init_images":        [_to_b64(init_image_bytes)],
-                    "denoising_strength": update_denoising,
-                    "steps":              28,
-                    "cfg_scale":          7.5,
-                    "width":              size,
-                    "height":             size,
-                    "sampler_name":       "DPM++ 2M SDE Karras",
-                    "seed":               -1,
-                    "batch_size":         1,
-                    "n_iter":             1,
-                }
-                endpoint = f"{a1111_url}/sdapi/v1/img2img"
-                logger.info(f"🗺️ Updating existing map: {location_name} (denoising={update_denoising})")
+        if init_image_bytes:
+            # Existing map from DB — paint new story details on top with low denoising
+            payload = {
+                "prompt":             full_prompt,
+                "negative_prompt":    negative,
+                "init_images":        [_to_b64(init_image_bytes)],
+                "denoising_strength": update_denoising,
+                "width":              size,
+                "height":             size,
+                "seed":               -1,
+            }
+            logger.info(f"🗺️ Updating existing map: {location_name} (denoising={update_denoising})")
 
-            elif ascii_grid and ascii_grid.strip():
-                # ASCII schematic — render to pixel grid and style with LoRA
-                grid_png = render_ascii_grid_to_png(ascii_grid.strip())
-                payload = {
-                    "prompt":             full_prompt,
-                    "negative_prompt":    negative,
-                    "init_images":        [_to_b64(grid_png)],
-                    "denoising_strength": 0.65,
-                    "steps":              30,
-                    "cfg_scale":          7.5,
-                    "width":              size,
-                    "height":             size,
-                    "sampler_name":       "DPM++ 2M SDE Karras",
-                    "seed":               -1,
-                    "batch_size":         1,
-                    "n_iter":             1,
-                }
-                endpoint = f"{a1111_url}/sdapi/v1/img2img"
-                logger.info(f"🗺️ Grid-guided map: {location_name}")
+        elif ascii_grid and ascii_grid.strip():
+            # ASCII schematic — render to pixel grid and restyle it
+            grid_png = render_ascii_grid_to_png(ascii_grid.strip())
+            payload = {
+                "prompt":             full_prompt,
+                "negative_prompt":    negative,
+                "init_images":        [_to_b64(grid_png)],
+                "denoising_strength": 0.65,
+                "width":              size,
+                "height":             size,
+                "seed":               -1,
+            }
+            logger.info(f"🗺️ Grid-guided map: {location_name}")
 
-            else:
-                # No reference — pure txt2img
-                payload = {
-                    "prompt":          full_prompt,
-                    "negative_prompt": negative,
-                    "steps":           28,
-                    "cfg_scale":       7.0,
-                    "width":           size,
-                    "height":          size,
-                    "sampler_name":    "DPM++ 2M SDE Karras",
-                    "seed":            -1,
-                    "batch_size":      1,
-                    "n_iter":          1,
-                }
-                endpoint = f"{a1111_url}/sdapi/v1/txt2img"
+        else:
+            # No reference — pure txt2img
+            payload = {
+                "prompt":          full_prompt,
+                "negative_prompt": negative,
+                "width":           size,
+                "height":          size,
+                "seed":            -1,
+            }
 
-            resp = await http.post(endpoint, json=payload)
-            resp.raise_for_status()
-            data = resp.json()
-            if data.get("images"):
-                img_bytes = base64.b64decode(data["images"][0])
-                logger.info(f"🗺️ Map generated: {location_name} ({len(img_bytes)//1024}KB)")
-                return img_bytes
+        from src.comfy_client import generate
+        data = await generate(payload, label="location_map", checkpoint="map", timeout=timeout)
+        if data.get("images"):
+            img_bytes = base64.b64decode(data["images"][0])
+            logger.info(f"🗺️ Map generated: {location_name} ({len(img_bytes)//1024}KB)")
+            return img_bytes
     except Exception as e:
         logger.warning(f"🗺️ Map generation failed for {location_name}: {e}")
     return None

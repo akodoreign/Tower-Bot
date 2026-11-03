@@ -129,13 +129,9 @@ def build_tile_prompt(room: RoomPosition, aesthetic: str = "ruined") -> tuple[st
 # ---------------------------------------------------------------------------
 
 async def _check_a1111_available() -> bool:
-    """Check if A1111 is running and responsive."""
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(f"{A1111_URL}/sdapi/v1/sd-models")
-            return resp.status_code == 200
-    except Exception:
-        return False
+    """Check if ComfyUI is running and responsive."""
+    from src.comfy_client import is_ready
+    return await is_ready()
 
 
 async def generate_room_tile(
@@ -175,27 +171,16 @@ async def generate_room_tile(
     }
     
     try:
-        # Import the A1111 lock from news_feed to respect queue
-        from src.news_feed import a1111_lock
+        from src.comfy_client import generate
         from src.resource_cop import wait_for_a1111_turn
 
         decision = await wait_for_a1111_turn("dungeon_tile", max_wait_seconds=60)
         if not decision.run_now:
-            logger.info(f"🗺️ A1111 busy, deferring tile {room.room_id}: {decision.reason}")
+            logger.info(f"🗺️ ComfyUI unavailable, deferring tile {room.room_id}: {decision.reason}")
             return None
 
-        if a1111_lock.locked():
-            logger.info(f"🗺️ A1111 busy, waiting for lock...")
-        
-        async with a1111_lock:
-            async with httpx.AsyncClient(timeout=A1111_TIMEOUT) as client:
-                resp = await client.post(
-                    f"{A1111_URL}/sdapi/v1/txt2img",
-                    json=payload,
-                )
-                resp.raise_for_status()
-                data = resp.json()
-        
+        data = await generate(payload, label="dungeon_tile", checkpoint="map", timeout=A1111_TIMEOUT)
+
         images = data.get("images", [])
         if not images:
             logger.error(f"🗺️ A1111 returned no images for {room.room_id}")
@@ -219,7 +204,7 @@ async def generate_room_tile(
         logger.info(f"🗺️ Tile generated for {room.room_id}: {len(img_bytes):,} bytes")
         return img_bytes
         
-    except httpx.TimeoutException:
+    except asyncio.TimeoutError:
         logger.error(f"🗺️ Tile generation timed out for {room.room_id}")
         return None
     except Exception as e:

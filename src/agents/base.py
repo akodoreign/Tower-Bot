@@ -271,6 +271,7 @@ class BaseAgent(ABC):
 
         from src.ollama_queue import _lock as _ollama_lock
         from src.ollama_busy import is_available, get_busy_reason
+        from src.gpu_queue import text_post
 
         agent_name = self.__class__.__name__
         prompt_words = sum(len(m.get("content", "").split()) for m in messages)
@@ -307,7 +308,7 @@ class BaseAgent(ABC):
                 logger.info(f"🤖 [{agent_name}] → sending to {url} (waiting for response...)")
                 _t0 = time.monotonic()
                 async with _ollama_lock:
-                    resp = await client.post(url, json=payload)
+                    resp = await text_post(client, url, json=payload)
                 _elapsed = time.monotonic() - _t0
                 resp.raise_for_status()
                 data = resp.json()
@@ -417,7 +418,7 @@ class BaseAgent(ABC):
 
 async def quick_complete(
     prompt: str,
-    model: str = "qwen3-8b-slim:latest",
+    model: str = "qwen3.6:35b-a3b",
     timeout: float = 90.0,
 ) -> str:
     """
@@ -443,9 +444,10 @@ async def quick_complete(
 
     try:
         from src.ollama_queue import _lock as _ollama_lock
+        from src.gpu_queue import text_post
         async with httpx.AsyncClient(timeout=timeout) as client:
             async with _ollama_lock:
-                resp = await client.post(url, json={
+                resp = await text_post(client, url, json={
                     "model": model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,

@@ -17,6 +17,7 @@ Exported:
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import asyncio
 import json
@@ -524,7 +525,7 @@ async def _ollama(prompt: str, tokens: int = 3500) -> str:
             return ""
 
         async with httpx.AsyncClient(timeout=240.0) as c:
-            r = await c.post(
+            r = await text_post(c,
                 OLLAMA_URL,
                 json={
                     "model": OLLAMA_MODEL,

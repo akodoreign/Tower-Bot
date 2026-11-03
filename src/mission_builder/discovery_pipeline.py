@@ -4,6 +4,7 @@ signals, impossible materials, living phenomena, and newly revealed truths.
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import asyncio
 import json
@@ -586,7 +587,7 @@ async def _ollama(prompt: str, tokens: int = 2200) -> str:
             return ""
 
         async with httpx.AsyncClient(timeout=220.0) as c:
-            r = await c.post(OLLAMA_URL, json={"model": OLLAMA_MODEL, "messages": [{"role": "user", "content": prompt}], "stream": False, "options": {"temperature": 0.85, "num_predict": tokens, "num_ctx": _fit_ctx(prompt, tokens)}})
+            r = await text_post(c, OLLAMA_URL, json={"model": OLLAMA_MODEL, "messages": [{"role": "user", "content": prompt}], "stream": False, "options": {"temperature": 0.85, "num_predict": tokens, "num_ctx": _fit_ctx(prompt, tokens)}})
             r.raise_for_status()
             return r.json()["message"]["content"].strip()
     except Exception as e:

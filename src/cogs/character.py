@@ -1,6 +1,7 @@
 """Character profile & appearance commands — /setcharprofile, /showcharprofile,
 /setcharappearance, /showcharappearance."""
 
+from src.gpu_queue import text_post
 import os
 import discord
 from discord import app_commands
@@ -176,7 +177,7 @@ def setup(client):
                 return
 
             async with httpx.AsyncClient(timeout=120.0) as http:
-                resp = await http.post(ollama_url, json={
+                resp = await text_post(http, ollama_url, json={
                     "model": "llava",
                     "messages": [{"role": "user", "content": prompt_text, "images": [img_b64]}],
                     "stream": False,

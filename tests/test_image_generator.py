@@ -7,7 +7,7 @@ Tests:
   - Image asset metadata creation
   - Image saving and directory management
   - Prompt engineering functions
-  - Mock A1111 API interactions
+  - Mock ComfyUI (src.comfy_client) interactions
 """
 
 import pytest
@@ -34,6 +34,14 @@ from src.mission_builder.image_generator import (
     MISSION_IMAGES_DIR,
 )
 from src.mission_builder.schemas import DungeonRoom
+
+
+def _comfy_up():
+    """Make the resource cop report ComfyUI as reachable without touching the network."""
+    from src.resource_cop import ResourceDecision
+
+    up = ResourceDecision.allow("a1111", "tile", "ComfyUI reachable")
+    return patch("src.resource_cop.wait_for_a1111_turn", AsyncMock(return_value=up))
 
 
 class TestTileGenerationParams:
@@ -133,17 +141,14 @@ class TestGenerateSingleTile:
         mock_img.save(img_buffer, format="PNG")
         img_base64 = __import__("base64").b64encode(img_buffer.getvalue()).decode()
 
-        with patch("httpx.AsyncClient") as mock_client:
-            mock_response = AsyncMock()
-            mock_response.json = AsyncMock(return_value={"images": [img_base64]})
-            mock_response.raise_for_status = AsyncMock()
-            
-            mock_post = AsyncMock(return_value=mock_response)
-            mock_client.return_value.__aenter__.return_value.post = mock_post
-
+        with _comfy_up(), patch("src.comfy_client.generate",
+                                AsyncMock(return_value={"images": [img_base64]})) as mock_gen:
             result = await generate_single_tile(params)
             assert result is not None
             assert result.size == (256, 256)
+            payload = mock_gen.call_args.args[0]
+            assert "init_images" not in payload
+            assert mock_gen.call_args.kwargs["checkpoint"] == "map"
 
     @pytest.mark.asyncio
     async def test_img2img_generation_with_reference(self):
@@ -159,31 +164,38 @@ class TestGenerateSingleTile:
             reference_base64=img_base64,
         )
 
-        with patch("httpx.AsyncClient") as mock_client:
-            mock_response = AsyncMock()
-            mock_response.json = AsyncMock(return_value={"images": [img_base64]})
-            mock_response.raise_for_status = AsyncMock()
-            
-            mock_post = AsyncMock(return_value=mock_response)
-            mock_client.return_value.__aenter__.return_value.post = mock_post
-
+        with _comfy_up(), patch("src.comfy_client.generate",
+                                AsyncMock(return_value={"images": [img_base64]})) as mock_gen:
             result = await generate_single_tile(params)
             assert result is not None
+            payload = mock_gen.call_args.args[0]
+            assert payload["init_images"] == [img_base64]
+            assert payload["denoising_strength"] == params.denoise_strength
 
     @pytest.mark.asyncio
     async def test_connection_error_handling(self):
-        """Test handling of A1111 connection errors."""
-        import httpx
+        """A ComfyUI failure returns None instead of raising."""
+        from src.comfy_client import ComfyError
 
         params = TileGenerationParams(prompt="test")
 
-        with patch("httpx.AsyncClient") as mock_client:
-            mock_client.return_value.__aenter__.return_value.post = AsyncMock(
-                side_effect=httpx.ConnectError("Connection failed")
-            )
-
+        with _comfy_up(), patch("src.comfy_client.generate",
+                                AsyncMock(side_effect=ComfyError("Connection failed"))):
             result = await generate_single_tile(params)
             assert result is None
+
+    @pytest.mark.asyncio
+    async def test_comfy_unreachable_defers(self):
+        """When ComfyUI is down the tile is deferred without trying to generate."""
+        from src.resource_cop import ResourceDecision
+
+        params = TileGenerationParams(prompt="test")
+        down = ResourceDecision.wait("a1111", "tile", 10, "ComfyUI is not reachable")
+        with patch("src.resource_cop.wait_for_a1111_turn", AsyncMock(return_value=down)), \
+             patch("src.comfy_client.generate", AsyncMock()) as mock_gen:
+            result = await generate_single_tile(params)
+            assert result is None
+            mock_gen.assert_not_called()
 
 
 class TestGenerateDungeonTiles:

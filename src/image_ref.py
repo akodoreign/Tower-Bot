@@ -475,17 +475,15 @@ async def layered_generate(
     Pass 2 (img2img): full prompt + chars, background as init → composited scene.
     Returns (final_bytes, background_bytes).
     """
-    import httpx
     import base64 as _b64
+    from src.comfy_client import generate
 
     p1 = dict(payload_base)
     p1["prompt"] = background_prompt
     p1["negative_prompt"] = negative_prompt
 
-    async with httpx.AsyncClient(timeout=900.0) as http:
-        r = await http.post(f"{a1111_url}/sdapi/v1/txt2img", json=p1)
-        r.raise_for_status()
-        bg_bytes = _b64.b64decode(r.json()["images"][0])
+    data = await generate(p1, label="layered_bg", timeout=900.0)
+    bg_bytes = _b64.b64decode(data["images"][0])
     logger.info(f"Layered pass 1 done ({len(bg_bytes):,} bytes) — compositing characters")
 
     p2 = to_img2img_payload(dict(payload_base), bg_bytes, char_denoise)
@@ -493,10 +491,8 @@ async def layered_generate(
     p2["negative_prompt"] = negative_prompt
 
     try:
-        async with httpx.AsyncClient(timeout=900.0) as http:
-            r = await http.post(f"{a1111_url}/sdapi/v1/img2img", json=p2)
-            r.raise_for_status()
-            final_bytes = _b64.b64decode(r.json()["images"][0])
+        data = await generate(p2, label="layered_chars", timeout=900.0)
+        final_bytes = _b64.b64decode(data["images"][0])
         logger.info(f"Layered pass 2 done ({len(final_bytes):,} bytes)")
     except Exception as _e:
         logger.warning(f"Layered pass 2 failed ({_e!r}); returning pass-1 background as result")

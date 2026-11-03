@@ -289,16 +289,12 @@ def build_area_prompt(area: Dict) -> Tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
-# A1111 call
+# Image call (ComfyUI "map" recipe via src.comfy_client)
 # ---------------------------------------------------------------------------
 
 async def _check_a1111() -> bool:
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as c:
-            r = await c.get(f"{A1111_URL}/sdapi/v1/sd-models")
-            return r.status_code == 200
-    except Exception:
-        return False
+    from src.comfy_client import is_ready
+    return await is_ready()
 
 
 async def _generate_one(area: Dict) -> Optional[Path]:
@@ -324,21 +320,15 @@ async def _generate_one(area: Dict) -> Optional[Path]:
 
     try:
         from src.resource_cop import wait_for_a1111_turn
-        from src.news_feed import a1111_lock, _a1111_lock
-        if _a1111_lock.locked():
-            logger.info(f"🗺️ area_map: A1111 busy, waiting (area={area['area_name']})…")
+        from src.comfy_client import generate
         decision = await wait_for_a1111_turn("area_map", max_wait_seconds=60)
         if not decision.run_now:
-            logger.info(f"area_map: A1111 busy, deferring {area['area_name']}: {decision.reason}")
+            logger.info(f"area_map: ComfyUI unavailable, deferring {area['area_name']}: {decision.reason}")
             return None
 
-        async with a1111_lock:
-            async with httpx.AsyncClient(timeout=A1111_TIMEOUT) as client:
-                resp = await client.post(f"{A1111_URL}/sdapi/v1/txt2img", json=payload)
-                resp.raise_for_status()
-                data = resp.json()
+        data = await generate(payload, label="area_map", checkpoint="map", timeout=A1111_TIMEOUT)
     except Exception as e:
-        logger.error(f"🗺️ area_map: A1111 request failed for {area['area_name']}: {e}")
+        logger.error(f"🗺️ area_map: image request failed for {area['area_name']}: {e}")
         return None
 
     images = data.get("images", [])

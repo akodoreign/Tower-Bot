@@ -30,6 +30,8 @@ import logging
 import os
 from typing import Any, Dict
 
+from src.gpu_queue import turn as gpu_turn
+
 logger = logging.getLogger(__name__)
 
 # Primary lock — heavy/pipeline tasks (Bob chapters, module building, DNDExpert).
@@ -39,8 +41,8 @@ _waiting: int = 0
 
 # Secondary lock — quick bot tasks (bulletins, events, NPC lifecycle, weather).
 # Separate queue so short tasks never wait 45 minutes behind a chapter write.
-# With OLLAMA_NUM_PARALLEL=2 set on the Ollama server, both locks can be active
-# simultaneously — primary uses dedicated VRAM, secondary uses the 16GB shared pool.
+# Both tracks still take a turn on the shared GPU queue (src/gpu_queue.py) for
+# each request, so a long pipeline yields the card between its own calls.
 _quick_lock = asyncio.Lock()
 _quick_waiting: int = 0
 
@@ -115,13 +117,14 @@ async def call_ollama(
             if "think" in opts:
                 payload["think"] = opts.pop("think")
 
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.post(
-                    os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat"),
-                    json=payload,
-                )
-                resp.raise_for_status()
-                return resp.json()
+            async with gpu_turn("text", caller or "ollama"):
+                async with httpx.AsyncClient(timeout=timeout) as client:
+                    resp = await client.post(
+                        os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat"),
+                        json=payload,
+                    )
+                    resp.raise_for_status()
+                    return resp.json()
 
     except OllamaBusyError:
         raise
@@ -185,13 +188,14 @@ async def call_ollama_quick(
                 payload["think"] = opts.pop("think")
 
             logger.info(f"🔀 Quick track {tag}sending (timeout={timeout}s)")
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.post(
-                    os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat"),
-                    json=payload,
-                )
-                resp.raise_for_status()
-                return resp.json()
+            async with gpu_turn("text", caller or "ollama_quick"):
+                async with httpx.AsyncClient(timeout=timeout) as client:
+                    resp = await client.post(
+                        os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat"),
+                        json=payload,
+                    )
+                    resp.raise_for_status()
+                    return resp.json()
 
     except OllamaBusyError:
         raise

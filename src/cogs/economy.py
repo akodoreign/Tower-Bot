@@ -1,5 +1,6 @@
 """Economy commands — /finances, /prices, /bid, /buynow, /mybids."""
 
+from src.gpu_queue import text_post
 import os
 import discord
 from discord import app_commands
@@ -144,7 +145,7 @@ RULES:
                 return
 
             async with httpx.AsyncClient(timeout=60.0) as http:
-                resp = await http.post(ollama_url, json={
+                resp = await text_post(http, ollama_url, json={
                     "model": ollama_model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,

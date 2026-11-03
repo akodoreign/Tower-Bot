@@ -201,22 +201,9 @@ def active_pipelines_sync() -> list[dict[str, Any]]:
     return [run.snapshot(now=now) for run in runs]
 
 
-def _a1111_url() -> str:
-    return os.getenv("A1111_URL", "http://127.0.0.1:7860").split()[0].rstrip("/")
-
-
 def _ollama_base_url() -> str:
     raw = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
     return raw.split("/api/")[0].split("/v1")[0].rstrip("/")
-
-
-def _existing_a1111_lock_busy() -> bool:
-    try:
-        from src.news_feed import a1111_lock
-
-        return bool(a1111_lock.locked())
-    except Exception:
-        return False
 
 
 def _ollama_queue_snapshot() -> dict[str, Any]:
@@ -238,78 +225,41 @@ def _ollama_queue_snapshot() -> dict[str, Any]:
         }
 
 
-async def ask_a1111(label: str, *, model_hint: str | None = None, url: str | None = None) -> ResourceDecision:
-    """Return whether A1111 appears safe for a new image/model-switch request."""
-    if _existing_a1111_lock_busy():
-        return ResourceDecision.wait("a1111", label, 10, "legacy A1111 lock is busy", model_hint=model_hint or "")
+def _comfy_url() -> str:
+    return os.getenv("COMFY_URL", "http://127.0.0.1:8188").split()[0].rstrip("/")
 
-    base = (url or _a1111_url()).rstrip("/")
+
+def _image_decision(label: str, model_hint: str | None, reachable: bool, error: str = "") -> ResourceDecision:
+    # Image jobs queue for the GPU inside comfy_client.generate(), so being busy
+    # is not a reason to back off; only an unreachable ComfyUI is.
+    from src import gpu_queue
+
+    details = {"model_hint": model_hint or "",
+               **{f"gpu_{k}": v for k, v in gpu_queue.snapshot().items()}}
+    if not reachable:
+        return ResourceDecision.wait("a1111", label, 10, "ComfyUI is not reachable", error=error, **details)
+    return ResourceDecision.allow("a1111", label, "ComfyUI reachable; GPU queue will order the job", **details)
+
+
+async def ask_a1111(label: str, *, model_hint: str | None = None, url: str | None = None) -> ResourceDecision:
+    """Return whether an image job can be submitted (ComfyUI is up)."""
     try:
         async with httpx.AsyncClient(timeout=float(os.getenv("RESOURCE_COP_A1111_TIMEOUT", "3"))) as client:
-            resp = await client.get(f"{base}/sdapi/v1/progress?skip_current_image=true")
+            resp = await client.get(f"{_comfy_url()}/queue")
             await _maybe_await(resp.raise_for_status())
-            data = await _maybe_await(resp.json())
+        return _image_decision(label, model_hint, True)
     except Exception as exc:
-        return ResourceDecision.wait("a1111", label, 10, "A1111 progress probe failed", error=repr(exc))
-
-    if not isinstance(data, dict):
-        return ResourceDecision.allow(
-            "a1111",
-            label,
-            "A1111 progress probe returned non-dict",
-            model_hint=model_hint or "",
-        )
-
-    progress = float(data.get("progress") or 0.0)
-    state = data.get("state") or {}
-    job_count = int(state.get("job_count") or 0)
-    job_no = int(state.get("job_no") or 0)
-    sampling_step = int(state.get("sampling_step") or 0)
-    busy = progress > 0.0 or sampling_step > 0 or (job_count > 0 and job_no < job_count)
-    details = {
-        "progress": progress,
-        "job_count": job_count,
-        "job_no": job_no,
-        "sampling_step": sampling_step,
-        "model_hint": model_hint or "",
-    }
-    if busy:
-        wait = float(os.getenv("RESOURCE_COP_A1111_WAIT", "10"))
-        return ResourceDecision.wait("a1111", label, wait, "A1111 reports active generation", **details)
-    return ResourceDecision.allow("a1111", label, "A1111 idle", **details)
+        return _image_decision(label, model_hint, False, repr(exc))
 
 
 def ask_a1111_sync(label: str, *, model_hint: str | None = None, url: str | None = None) -> ResourceDecision:
-    """Synchronous A1111 check for non-async paths such as pretty-map finalizers."""
-    if _existing_a1111_lock_busy():
-        return ResourceDecision.wait("a1111", label, 10, "legacy A1111 lock is busy", model_hint=model_hint or "")
-
-    base = (url or _a1111_url()).rstrip("/")
+    """Synchronous version for worker threads such as the pretty-map pass."""
     try:
         with httpx.Client(timeout=float(os.getenv("RESOURCE_COP_A1111_TIMEOUT", "3"))) as client:
-            resp = client.get(f"{base}/sdapi/v1/progress?skip_current_image=true")
-            resp.raise_for_status()
-            data = resp.json()
+            client.get(f"{_comfy_url()}/queue").raise_for_status()
+        return _image_decision(label, model_hint, True)
     except Exception as exc:
-        return ResourceDecision.wait("a1111", label, 10, "A1111 progress probe failed", error=repr(exc))
-
-    progress = float(data.get("progress") or 0.0)
-    state = data.get("state") or {}
-    job_count = int(state.get("job_count") or 0)
-    job_no = int(state.get("job_no") or 0)
-    sampling_step = int(state.get("sampling_step") or 0)
-    busy = progress > 0.0 or sampling_step > 0 or (job_count > 0 and job_no < job_count)
-    details = {
-        "progress": progress,
-        "job_count": job_count,
-        "job_no": job_no,
-        "sampling_step": sampling_step,
-        "model_hint": model_hint or "",
-    }
-    if busy:
-        wait = float(os.getenv("RESOURCE_COP_A1111_WAIT", "10"))
-        return ResourceDecision.wait("a1111", label, wait, "A1111 reports active generation", **details)
-    return ResourceDecision.allow("a1111", label, "A1111 idle", **details)
+        return _image_decision(label, model_hint, False, repr(exc))
 
 
 async def wait_for_a1111_turn(
@@ -329,7 +279,7 @@ async def wait_for_a1111_turn(
             return last
         sleep_for = min(last.wait_seconds, max(1.0, deadline - now))
         logger.info(
-            "[resource-cop] %s waiting %.0fs for A1111: %s",
+            "[resource-cop] %s waiting %.0fs for ComfyUI: %s",
             label,
             sleep_for,
             last.reason,

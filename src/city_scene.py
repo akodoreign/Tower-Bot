@@ -622,7 +622,7 @@ def _build_scene_prompt(
 
 
 # ---------------------------------------------------------------------------
-# A1111 helper
+# Image helper (ComfyUI via src.comfy_client; name kept for callers)
 # ---------------------------------------------------------------------------
 
 async def _call_a1111(
@@ -635,11 +635,9 @@ async def _call_a1111(
     width: int = 1216,
     height: int = 768,
 ) -> Optional[bytes]:
-    """Call A1111 txt2img and return PNG bytes."""
-    A1111_URL = os.getenv("A1111_URL", "http://127.0.0.1:7860")
-
-    from src.a1111_runtime import cool_down_a1111_after_generation, ensure_a1111_model
-    await ensure_a1111_model(model, label="SCENE", url=A1111_URL)
+    """Generate a scene image and return PNG bytes."""
+    from src import comfy_client
+    from src.a1111_health import record_a1111_failure, record_a1111_success
 
     payload = {
         "prompt":          prompt,
@@ -654,45 +652,18 @@ async def _call_a1111(
         "n_iter":          1,
     }
 
+    timeout = float(os.getenv("A1111_SCENE_TIMEOUT", "900"))
     try:
-        timeout = float(os.getenv("A1111_SCENE_TIMEOUT", "900"))
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(f"{A1111_URL}/sdapi/v1/txt2img", json=payload)
-            resp.raise_for_status()
-            data = resp.json()
-            images = data.get("images")
-            if images:
-                logger.info(f"🖼️ [SCENE] Got {len(images)} image(s) from A1111")
-                from src.a1111_health import record_a1111_success
-                await record_a1111_success("city_scene")
-                await cool_down_a1111_after_generation()
-                return base64.b64decode(images[0])
-            else:
-                logger.warning(f"🖼️ [SCENE] A1111 returned empty images list — response keys: {list(data.keys())}")
-                from src.a1111_health import record_a1111_failure
-                await record_a1111_failure("city_scene", "empty images list", url=A1111_URL)
-    except httpx.ConnectError as e:
-        logger.warning(f"🖼️ [SCENE] A1111 not reachable at {A1111_URL} — is it running? ({e!r})")
-        from src.a1111_health import record_a1111_failure
-        await record_a1111_failure("city_scene", f"connect error: {e!r}", url=A1111_URL)
-    except httpx.TimeoutException as e:
-        logger.warning(f"🖼️ [SCENE] A1111 timed out after {timeout:.0f}s — generation took too long")
-        from src.a1111_health import record_a1111_failure
-        await record_a1111_failure("city_scene", f"timeout after {timeout:.0f}s", url=A1111_URL)
-    except httpx.HTTPStatusError as e:
-        body = e.response.text[:300]
-        logger.warning(f"🖼️ [SCENE] A1111 HTTP {e.response.status_code}: {body}")
-        from src.a1111_health import record_a1111_failure
-        await record_a1111_failure("city_scene", f"HTTP {e.response.status_code}: {body[:120]}", url=A1111_URL)
-        if "AutoencoderKLInferenceWrapper" in body or "quant_conv" in body:
-            logger.warning(
-                f"🖼️ [SCENE] VAE mismatch detected for model '{model}'. "
-                f"Restart A1111 to clear the bad VAE state; the bot no longer sends VAE overrides."
-            )
+        data = await comfy_client.generate(payload, label="city_scene", checkpoint=model, timeout=timeout)
+        logger.info(f"🖼️ [SCENE] Got {len(data['images'])} image(s) from ComfyUI")
+        await record_a1111_success("city_scene")
+        return base64.b64decode(data["images"][0])
+    except asyncio.TimeoutError:
+        logger.warning(f"🖼️ [SCENE] ComfyUI timed out after {timeout:.0f}s")
+        await record_a1111_failure("city_scene", f"timeout after {timeout:.0f}s")
     except Exception as e:
-        logger.warning(f"🖼️ [SCENE] A1111 call failed: {e!r}")
-        from src.a1111_health import record_a1111_failure
-        await record_a1111_failure("city_scene", f"call failed: {e!r}", url=A1111_URL)
+        logger.warning(f"🖼️ [SCENE] ComfyUI call failed: {e!r}")
+        await record_a1111_failure("city_scene", f"call failed: {e!r}")
 
     return None
 

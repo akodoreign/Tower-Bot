@@ -11,6 +11,7 @@ Exported:
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import os
 import re
@@ -59,7 +60,7 @@ async def _ask(prompt: str, system: str = "", timeout: int = 120) -> str:
             return ""
 
         async with httpx.AsyncClient(timeout=timeout) as c:
-            r = await c.post(OLLAMA_URL, json={
+            r = await text_post(c, OLLAMA_URL, json={
                 "model":   OLLAMA_MODEL,
                 "messages": messages,
                 "stream":  False,

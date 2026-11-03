@@ -12,6 +12,7 @@ All functions are no-ops when Mimir is unavailable.
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import os
 import re
@@ -230,7 +231,7 @@ async def _generate_statblock_llm(name: str, cr: str, creature_type: str, notes:
             return {}
 
         async with httpx.AsyncClient(timeout=45) as client:
-            r = await client.post(_OLLAMA_URL, json={
+            r = await text_post(client, _OLLAMA_URL, json={
                 "model":    _OLLAMA_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream":   False,

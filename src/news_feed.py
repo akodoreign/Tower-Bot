@@ -24,59 +24,43 @@ from src.text_mojibake import repair_mojibake
 
 logger = logging.getLogger(__name__)
 
-# Global lock — A1111 can only handle one generation at a time
-# Uses a wrapper so the lock auto-releases if A1111 hangs for more than 10 minutes
-_a1111_lock = asyncio.Lock()
-_A1111_LOCK_TIMEOUT = 600  # 10 minutes
+# Image jobs hold an "image" turn on the shared GPU queue (src/gpu_queue.py) for
+# the whole model-pick + generate sequence. The name a1111_lock is kept because
+# a dozen modules import it; it no longer has anything to do with A1111.
+from src import gpu_queue as _gpu_queue
 
 
-class _TimedA1111Lock:
-    """Context manager that acquires _a1111_lock with a timeout.
-    If A1111 hangs and never releases, the lock auto-expires after _A1111_LOCK_TIMEOUT seconds."""
+class _ImageTurn:
+    """`async with a1111_lock:` holds an image turn on the GPU queue.
+
+    One shared instance is used by many tasks at once, so the per-entry
+    context managers are kept per task (as a stack, for nested use).
+    """
 
     def __init__(self):
-        self._acquired = False
-        self._lock_ref: asyncio.Lock = None  # exact lock object we acquired
+        self._cms: dict = {}
 
     async def __aenter__(self):
-        global _a1111_lock
-        import logging
-        logger = logging.getLogger(__name__)
-        self._lock_ref = _a1111_lock
-        try:
-            await asyncio.wait_for(self._lock_ref.acquire(), timeout=_A1111_LOCK_TIMEOUT)
-            self._acquired = True
-            logger.info("🖼️ A1111 lock acquired")
-        except asyncio.TimeoutError:
-            logger.error(
-                f"🖼️ A1111 lock timeout after {_A1111_LOCK_TIMEOUT}s — creating new lock and declaring old one dead"
-            )
-            # Replace the dead lock; update our reference so __aexit__ releases the right one
-            _a1111_lock = asyncio.Lock()
-            self._lock_ref = _a1111_lock
-            try:
-                await asyncio.wait_for(self._lock_ref.acquire(), timeout=10.0)
-                self._acquired = True
-                logger.warning("🖼️ Acquired fresh A1111 lock after timeout")
-            except Exception as e:
-                logger.error(f"🖼️ Could not acquire fresh A1111 lock: {e} — proceeding anyway (image will fail)")
-                self._acquired = False
+        cm = _gpu_queue.turn("image", "image_job")
+        await cm.__aenter__()
+        self._cms.setdefault(asyncio.current_task(), []).append(cm)
         return self
 
-    async def __aexit__(self, *args):
-        import logging
-        if self._acquired and self._lock_ref is not None:
-            try:
-                self._lock_ref.release()  # release the exact lock we acquired, not the current module-level one
-            except RuntimeError as e:
-                logging.getLogger(__name__).warning(f"🖼️ A1111 lock release error: {e}")
+    async def __aexit__(self, *exc):
+        task = asyncio.current_task()
+        stack = self._cms.get(task) or []
+        cm = stack.pop()
+        if not stack:
+            self._cms.pop(task, None)
+        return await cm.__aexit__(*exc)
 
     def locked(self) -> bool:
-        """Return True if A1111 is currently busy generating an image."""
-        return _a1111_lock.locked()
+        """True while any GPU job (image or text) is running."""
+        return _gpu_queue.locked()
 
 
-a1111_lock = _TimedA1111Lock()  # use this everywhere instead of _a1111_lock directly
+a1111_lock = _ImageTurn()
+_a1111_lock = a1111_lock  # old alias; only .locked() is used on it
 
 from src.tower_economy import (
     tick_towerbay, format_towerbay_bulletin,
@@ -4827,7 +4811,6 @@ async def _generate_npc_action_ref(
 
     try:
         from src.image_ref import to_img2img_payload, save_npc_action_ref
-        from src.a1111_runtime import cool_down_a1111_after_generation, ensure_a1111_model
 
         img2img_payload = to_img2img_payload(
             payload,
@@ -4835,25 +4818,15 @@ async def _generate_npc_action_ref(
             float(os.getenv("NPC_ACTION_REF_DENOISE", "0.72")),
         )
 
-        async with a1111_lock:
-            await ensure_a1111_model(a1111_model, label="NPC_ACTION_REF", url=a1111_url)
-            async with httpx.AsyncClient(timeout=float(os.getenv("NPC_ACTION_REF_TIMEOUT", "600"))) as client:
-                response = await client.post(f"{a1111_url}/sdapi/v1/img2img", json=img2img_payload)
-                response.raise_for_status()
-                action_bytes = base64.b64decode(response.json()["images"][0])
-            await cool_down_a1111_after_generation()
+        from src import comfy_client
 
-        try:
-            from PIL import Image as _PIL
-            image = _PIL.open(_io.BytesIO(action_bytes))
-            width, height = image.size
-            if height > 80:
-                image = image.crop((0, 0, width, height - 52))
-            buf = _io.BytesIO()
-            image.save(buf, format="PNG")
-            action_bytes = buf.getvalue()
-        except Exception:
-            pass
+        data = await comfy_client.generate(
+            img2img_payload,
+            label="NPC_ACTION_REF",
+            checkpoint=a1111_model,
+            timeout=float(os.getenv("NPC_ACTION_REF_TIMEOUT", "600")),
+        )
+        action_bytes = base64.b64decode(data["images"][0])
 
         save_npc_action_ref(
             npc_name,
@@ -5240,24 +5213,19 @@ async def generate_npc_portrait() -> tuple:
         await record_a1111_failure("npc_portrait", f"busy after traffic-cop wait: {_decision.reason}", url=A1111_URL)
         return None, None, None
     _last_a1111_error = ""
-    async with a1111_lock:
-        from src.a1111_runtime import cool_down_a1111_after_generation, ensure_a1111_model
-        await ensure_a1111_model(A1111_MODEL, label="PORTRAIT", url=A1111_URL)
-        for _att in range(2):
-            try:
-                async with httpx.AsyncClient(timeout=600.0) as _c:
-                    _r = await _c.post(f"{A1111_URL}/sdapi/v1/txt2img", json=_payload)
-                    _r.raise_for_status()
-                    img_bytes = base64.b64decode(_r.json()["images"][0])
-                    from src.a1111_health import record_a1111_success
-                    await record_a1111_success("npc_portrait")
-                    await cool_down_a1111_after_generation()
-                    break
-            except Exception as _ae:
-                _last_a1111_error = repr(_ae)
-                logger.warning(f"🎨 Portrait attempt {_att+1}/2: {_ae}")
-                if _att == 0:
-                    await asyncio.sleep(10)
+    from src import comfy_client
+    for _att in range(2):
+        try:
+            _data = await comfy_client.generate(_payload, label="npc_portrait", checkpoint=A1111_MODEL)
+            img_bytes = base64.b64decode(_data["images"][0])
+            from src.a1111_health import record_a1111_success
+            await record_a1111_success("npc_portrait")
+            break
+        except Exception as _ae:
+            _last_a1111_error = repr(_ae)
+            logger.warning(f"🎨 Portrait attempt {_att+1}/2: {_ae}")
+            if _att == 0:
+                await asyncio.sleep(10)
 
     if not img_bytes:
         from src.a1111_health import record_a1111_failure
@@ -5267,18 +5235,6 @@ async def generate_npc_portrait() -> tuple:
             url=A1111_URL,
         )
         return None, None, None
-
-    # Crop watermark strip
-    try:
-        from PIL import Image as _PIL
-        _img = _PIL.open(_io.BytesIO(img_bytes))
-        _w, _h = _img.size
-        _img = _img.crop((0, 0, _w, _h - 52))
-        _buf = _io.BytesIO()
-        _img.save(_buf, format="PNG")
-        img_bytes = _buf.getvalue()
-    except Exception:
-        pass
 
     npc_data = {
         "name": npc_name,
@@ -5331,13 +5287,6 @@ async def generate_npc_portrait() -> tuple:
         caption = f"[Alt Universe] {npc_name} — {npc_faction}"
     else:
         caption = f"{npc_name} — {npc_rank or npc_role}, {npc_faction}" if (npc_rank or npc_role) else f"{npc_name} — {npc_faction}"
-
-    # Free VRAM after portrait so Ollama can use the GPU
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as _uc:
-            await _uc.post(f"{A1111_URL}/sdapi/v1/unload-checkpoint")
-    except Exception:
-        pass
 
     logger.info(f"🎨 Portrait generated: {npc_name} ({npc_faction}){' [ALT UNIVERSE]' if _is_alt_universe else ''}")
     return img_bytes, npc_data, caption

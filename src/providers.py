@@ -1,4 +1,5 @@
 ﻿import os
+from src.gpu_queue import text_post
 import logging
 import re
 from typing import Dict, List, Optional, Any
@@ -178,7 +179,7 @@ class FreeProvider(BaseProvider):
                 return f"*Local model busy: {decision.reason}*"
 
             async with httpx.AsyncClient(timeout=120.0) as client:
-                resp = await client.post(
+                resp = await text_post(client,
                     "http://localhost:11434/api/chat",
                     json=payload,
                 )

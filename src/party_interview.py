@@ -21,6 +21,7 @@ Archival (called from self_learning._study_archive_interviews):
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import asyncio
 import json
@@ -166,7 +167,7 @@ async def _ask_ollama(prompt: str, system: str = "", timeout: int = 180,
             logger.info(f"party_interview: Ollama deferred by resource cop: {decision.reason}")
             return ""
         async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(OLLAMA_URL, json={
+            resp = await text_post(client, OLLAMA_URL, json={
                 "model": OLLAMA_MODEL,
                 "messages": messages,
                 "stream": False,

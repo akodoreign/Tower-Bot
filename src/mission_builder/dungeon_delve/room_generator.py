@@ -15,6 +15,7 @@ Exported:
 """
 
 from __future__ import annotations
+from src.gpu_queue import text_post
 
 import os
 import json
@@ -356,7 +357,7 @@ async def _generate_room_llm(
             logger.info(f"🏰 Ollama busy, deferring room {room.room_id}: {decision.reason}")
             return None
         async with httpx.AsyncClient(timeout=OLLAMA_TIMEOUT) as client:
-            resp = await client.post(
+            resp = await text_post(client,
                 OLLAMA_URL,
                 json={
                     "model": OLLAMA_MODEL,
