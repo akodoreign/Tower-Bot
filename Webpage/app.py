@@ -28,7 +28,7 @@ _ANSI_RE = re.compile(r'\x1b\[[0-9;]*[mKGHFJABCDnsr]')
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, g, jsonify, render_template, request, send_from_directory
 try:
     from flask_cors import CORS
     _cors_available = True
@@ -1371,6 +1371,33 @@ def _is_external():
     return bool(request.headers.get("CF-Ray") or request.headers.get("Cf-Ray"))
 
 
+_PIN_COOKIE = "tb_pin"
+
+
+def _pin_cookie_hours() -> float:
+    return float(os.getenv("DASHBOARD_PIN_COOKIE_HOURS", "7"))
+
+
+def _pin_cookie_sig(expected: str, issued: int) -> str:
+    """HMAC of the issue time, keyed from the PIN: changing the PIN voids every cookie."""
+    import hashlib
+    import hmac
+    key = hashlib.sha256(f"towerbot-pin-cookie:{expected}".encode()).digest()
+    return hmac.new(key, str(issued).encode(), hashlib.sha256).hexdigest()
+
+
+def _pin_cookie_ok(expected: str) -> bool:
+    import hmac
+    import time
+    issued, _, sig = request.cookies.get(_PIN_COOKIE, "").partition(".")
+    if not issued.isdigit():
+        return False
+    age = time.time() - int(issued)
+    if age < -60 or age > _pin_cookie_hours() * 3600:
+        return False
+    return hmac.compare_digest(sig, _pin_cookie_sig(expected, int(issued)))
+
+
 def _pin_ok(data: dict | None = None) -> bool:
     """Validate the dashboard action PIN for external (Cloudflare tunnel) requests.
 
@@ -1378,6 +1405,9 @@ def _pin_ok(data: dict | None = None) -> bool:
     DENIED. (The old code fell back to a hardcoded default that ended up in the
     public repo, and an empty PIN silently allowed every external action.)
     Local-network requests never reach here — _is_external() is False for them.
+
+    A correct PIN also sets a signed tb_pin cookie (DASHBOARD_PIN_COOKIE_HOURS, default
+    7) so players don't retype it; the cookie alone is accepted until it expires.
     """
     import hmac
     expected = os.getenv("DASHBOARD_EXTERNAL_PIN", "").strip()
@@ -1391,7 +1421,25 @@ def _pin_ok(data: dict | None = None) -> bool:
         or request.args.get("pin")
         or ""
     )
-    return hmac.compare_digest(str(supplied).strip(), expected)
+    if supplied and hmac.compare_digest(str(supplied).strip(), expected):
+        if not _pin_cookie_ok(expected):
+            g.issue_pin_cookie = expected
+        return True
+    return _pin_cookie_ok(expected)
+
+
+@app.after_request
+def _set_pin_cookie(response):
+    expected = g.pop("issue_pin_cookie", None)
+    if expected:
+        import time
+        issued = int(time.time())
+        response.set_cookie(
+            _PIN_COOKIE, f"{issued}.{_pin_cookie_sig(expected, issued)}",
+            max_age=int(_pin_cookie_hours() * 3600),
+            httponly=True, secure=True, samesite="Strict", path="/",
+        )
+    return response
 
 
 @app.route("/api/view-mode")

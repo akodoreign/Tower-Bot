@@ -2265,12 +2265,15 @@ let activeKebab = null;
 let VIEW_READONLY = false;
 let EXTERNAL_PIN = sessionStorage.getItem("towerbot_external_pin") || "";
 
+// A correct PIN makes the server set a 7-hour cookie, so try without asking first
+// and only prompt when the server answers pin_required.
 function externalPin() {
-  if (!VIEW_READONLY) return "";
-  if (!EXTERNAL_PIN) {
-    EXTERNAL_PIN = (prompt("Enter DM PIN to generate this mission module:") || "").trim();
-    if (EXTERNAL_PIN) sessionStorage.setItem("towerbot_external_pin", EXTERNAL_PIN);
-  }
+  return VIEW_READONLY ? EXTERNAL_PIN : "";
+}
+function askExternalPin() {
+  sessionStorage.removeItem("towerbot_external_pin");
+  EXTERNAL_PIN = (prompt("Enter DM PIN to generate this mission module:") || "").trim();
+  if (EXTERNAL_PIN) sessionStorage.setItem("towerbot_external_pin", EXTERNAL_PIN);
   return EXTERNAL_PIN;
 }
 function showKebab(el, missionId) {
@@ -2350,9 +2353,7 @@ async function claimMissionWithPin(btn) {
   try {
     let d = await postClaim(externalPin());
     if (d.pin_required) {
-      sessionStorage.removeItem("towerbot_external_pin");
-      EXTERNAL_PIN = "";
-      const pin = externalPin();
+      const pin = askExternalPin();
       if (!pin) throw new Error("PIN required");
       d = await postClaim(pin);
       if (d.pin_required) {
