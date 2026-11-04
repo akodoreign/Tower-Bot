@@ -157,6 +157,34 @@ async def test_cancelled_waiter_leaves_the_queue():
     assert not gpu_queue.locked()
 
 
+def test_think_in_options_is_promoted_to_top_level():
+    payload = {"messages": [], "options": {"num_predict": 300, "think": False}}
+    gpu_queue.normalize_ollama_payload(payload)
+    assert payload["think"] is False
+    assert "think" not in payload["options"]
+    assert payload["options"]["num_predict"] == 300
+
+
+def test_unspecified_think_defaults_off():
+    payload = {"messages": [], "options": {"num_predict": 300}}
+    assert gpu_queue.normalize_ollama_payload(payload)["think"] is False
+
+
+def test_thinking_gets_extra_token_room(monkeypatch):
+    monkeypatch.setenv("OLLAMA_THINK_TOKENS", "1000")
+    payload = {"messages": [], "options": {"num_predict": 200, "think": True}}
+    gpu_queue.normalize_ollama_payload(payload)
+    assert payload["think"] is True
+    assert payload["options"]["num_predict"] == 1200
+
+
+def test_top_level_think_wins_and_non_ollama_payloads_are_untouched():
+    payload = {"messages": [], "think": True, "options": {"think": False}}
+    assert gpu_queue.normalize_ollama_payload(payload)["think"] is True
+    other = {"model": "x", "keep_alive": 0}
+    assert gpu_queue.normalize_ollama_payload(other) == {"model": "x", "keep_alive": 0}
+
+
 @pytest.mark.asyncio
 async def test_wait_budget_raises_gpu_busy(monkeypatch):
     monkeypatch.setenv("GPU_TURN_MAX_WAIT", "0.05")

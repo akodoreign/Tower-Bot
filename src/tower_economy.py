@@ -824,7 +824,7 @@ RULES:
         }
 
     except Exception as e:
-        logger.error(f"TowerBay new listing error: {e}")
+        logger.error(f"TowerBay new listing error: {type(e).__name__}: {e}")
         return None
 
 

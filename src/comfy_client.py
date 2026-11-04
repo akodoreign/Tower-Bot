@@ -98,7 +98,8 @@ RECIPES: dict[str, dict[str, Any]] = {
 }
 
 _MAP_HINTS = ("flux", "map", "mapcraft", "epicrealism", "qwen", "redcraft", "battle", "tile")
-_ANIME_HINTS = ("illustrious", "wai", "anime", "animagine", "noob", "pony")
+# "furry": novaFurryXL (alt-universe NPC portraits, /draw nova) is an Illustrious finetune
+_ANIME_HINTS = ("illustrious", "wai", "anime", "animagine", "noob", "pony", "furry")
 
 _checkpoint: str = os.getenv("A1111_MODEL", "")
 

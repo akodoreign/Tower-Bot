@@ -43,11 +43,11 @@ Write-Host "  Done." -ForegroundColor Green
 # 2. OLLAMA
 # ------------------------------------------
 Write-Host "[2/5] Ollama..." -ForegroundColor Yellow
-$env:OLLAMA_FLASH_ATTENTION = "1"
-$env:OLLAMA_KEEP_ALIVE = "30m"
+# The "Ollama Headless" task (C:\AI\logwrap\start-ollama.ps1) sets keep-alive, turns flash
+# attention off (it crashes on the RTX 5070) and logs to C:\AI\logs\ollama.
 if (-not (Test-Url "http://localhost:11434/api/tags")) {
-    Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
-    for ($i = 0; $i -lt 12 -and -not (Test-Url "http://localhost:11434/api/tags"); $i++) { Start-Sleep 1 }
+    Start-ScheduledTask "Ollama Headless"
+    for ($i = 0; $i -lt 20 -and -not (Test-Url "http://localhost:11434/api/tags"); $i++) { Start-Sleep 1 }
 }
 if (Test-Url "http://localhost:11434/api/tags") {
     Write-Host "  Ollama is up." -ForegroundColor Green

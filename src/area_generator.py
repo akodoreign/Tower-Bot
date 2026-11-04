@@ -387,7 +387,7 @@ async def generate_area_profile(district: str, force: bool = False) -> Optional[
 
                 decision = await wait_for_a1111_turn("area_profile_map", max_wait_seconds=60)
                 if not decision.run_now:
-                    logger.info(f"[AreaGen] A1111 busy; deferring overview map for {district}: {decision.reason}")
+                    logger.info(f"[AreaGen] image GPU busy; deferring overview map for {district}: {decision.reason}")
                     img_bytes = None
                 else:
                     async with a1111_lock:

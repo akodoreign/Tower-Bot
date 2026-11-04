@@ -12,6 +12,8 @@ import src.comfy_client as comfy
     ("sd_waiIllustriousSDXL_v160", "anime"),
     ("flux1-dev-fp8.safetensors", "map"),
     ("sd/epicrealismXL_pureFix.safetensors", "map"),
+    ("sd_novaFurryXL_ilV160", "anime"),
+    ("novaFurryXL_iIV160", "anime"),
     ("map", "map"),
     ("anime", "anime"),
 ])

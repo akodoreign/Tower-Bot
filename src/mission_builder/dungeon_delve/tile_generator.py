@@ -151,7 +151,7 @@ async def generate_room_tile(
         PNG image bytes, or None on failure
     """
     if not await _check_a1111_available():
-        logger.warning("🗺️ A1111 not available for tile generation")
+        logger.warning("🗺️ ComfyUI not available for tile generation")
         return None
     
     positive, negative = build_tile_prompt(room, aesthetic)

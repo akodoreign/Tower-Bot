@@ -240,7 +240,35 @@ async def turn(kind: Kind, label: str = "") -> AsyncIterator[None]:
         _release()
 
 
+def _think_allowance() -> int:
+    return int(os.getenv("OLLAMA_THINK_TOKENS", "1536"))
+
+
+def normalize_ollama_payload(payload: Any) -> Any:
+    """Make the thinking switch mean what the caller wrote.
+
+    Ollama reads ``think`` only at the top level of a request; inside
+    ``options`` it is silently ignored and a thinking model (qwen3.6) thinks
+    anyway. Many callers put it in options, so promote it. A request that
+    says nothing gets ``think: false`` -- every prompt here was written for a
+    model that answered straight away. When thinking is on, num_predict is
+    raised by OLLAMA_THINK_TOKENS, because Ollama counts thinking against it
+    and a short budget would otherwise end before the answer starts.
+    """
+    if not isinstance(payload, dict) or "messages" not in payload and "prompt" not in payload:
+        return payload
+    opts = payload.get("options")
+    if isinstance(opts, dict) and "think" in opts:
+        payload.setdefault("think", opts.pop("think"))
+    payload.setdefault("think", False)
+    if payload["think"] and isinstance(opts, dict) and opts.get("num_predict", -1) > 0:
+        opts["num_predict"] += _think_allowance()
+    return payload
+
+
 async def text_post(client: httpx.AsyncClient, url: str, **kwargs: Any) -> httpx.Response:
     """Drop-in for ``client.post(url, ...)`` on Ollama requests: runs inside a text turn."""
+    if "json" in kwargs:
+        kwargs["json"] = normalize_ollama_payload(kwargs["json"])
     async with turn("text", "ollama"):
         return await client.post(url, **kwargs)

@@ -30,7 +30,7 @@ import logging
 import os
 from typing import Any, Dict
 
-from src.gpu_queue import turn as gpu_turn
+from src.gpu_queue import normalize_ollama_payload, turn as gpu_turn
 
 logger = logging.getLogger(__name__)
 
@@ -114,8 +114,7 @@ async def call_ollama(
                 opts["num_ctx"] = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
             # Ollama requires 'think' at the TOP LEVEL of the request body, not inside options.
             # Callers put it in options for convenience — promote it here so it actually works.
-            if "think" in opts:
-                payload["think"] = opts.pop("think")
+            normalize_ollama_payload(payload)
 
             async with gpu_turn("text", caller or "ollama"):
                 async with httpx.AsyncClient(timeout=timeout) as client:
@@ -184,8 +183,7 @@ async def call_ollama_quick(
                 opts["num_gpu"] = _env_gpu
             if "num_ctx" not in opts:
                 opts["num_ctx"] = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
-            if "think" in opts:
-                payload["think"] = opts.pop("think")
+            normalize_ollama_payload(payload)
 
             logger.info(f"🔀 Quick track {tag}sending (timeout={timeout}s)")
             async with gpu_turn("text", caller or "ollama_quick"):

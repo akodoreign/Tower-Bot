@@ -978,7 +978,7 @@ class DiscordClient(discord.Client):
                         )
                         embed.set_image(url="attachment://undercity_scene.png")
                         await channel.send(file=file, embed=embed)
-                        logger.info("🖼️ Story image posted via local A1111")
+                        logger.info("🖼️ Story image posted via ComfyUI")
                         self._beat("story_images")
                         interval = next_image_interval_seconds()
                         logger.info(f"🖼️ Next story image in {interval // 3600}h {(interval % 3600) // 60}m")
