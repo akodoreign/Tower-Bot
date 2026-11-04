@@ -370,7 +370,11 @@ def get_relevant_chunks(query: str, top_k: int = 8) -> List[str]:
     to be in the index, based on whether the query is an EXPLICIT rules
     question via _is_rules_question(query).
     """
-    include_rules = _is_rules_question(query)
+    return _rank_chunks(query, top_k, include_rules=_is_rules_question(query))
+
+
+def _rank_chunks(query: str, top_k: int, *, include_rules: bool) -> List[str]:
+    """TF-IDF ranking over the cached index for one rules-inclusion mode."""
     _ensure_index(include_rules=include_rules)
 
     cache = _caches.get(include_rules, {})
@@ -732,16 +736,4 @@ def search_docs(query: str, top_k: int = 5) -> List[str]:
     Always includes the PHB/rules docs (include_rules=True) since
     this is used for explicit price/rules lookups via /prices.
     """
-    _ensure_index(include_rules=True)
-    if not _chunks_cache or not _chunk_terms_cache or not _idf_cache:
-        return []
-    query_terms = _tokenize(query)
-    if not query_terms:
-        return []
-    scored = []
-    for idx, ch in enumerate(_chunks_cache):
-        s = _tfidf_score(query_terms, _chunk_terms_cache[idx], _idf_cache)
-        if s > 0:
-            scored.append((s, ch))
-    scored.sort(key=lambda x: x[0], reverse=True)
-    return [ch for _, ch in scored[:top_k]]
+    return _rank_chunks(query, top_k, include_rules=True)
