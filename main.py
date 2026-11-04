@@ -15,9 +15,24 @@ def _start_dashboard():
     try:
         from Webpage.app import app
         port = int(os.getenv("DASHBOARD_PORT", 5000))
-        # threaded=True: image-heavy dashboard pages request dozens of PNGs in
-        # parallel; the single-threaded default serialized every request.
-        app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False, threaded=True)
+        try:
+            # The dashboard is internet-facing (Cloudflare tunnel); Flask's own
+            # server is for development only. Image-heavy pages request dozens of
+            # PNGs in parallel, hence the thread count.
+            # waitress calls logging.basicConfig(), which gives the root logger a
+            # handler and prints every src.log line a second time. A root
+            # NullHandler makes that a no-op; waitress's own warnings get stderr.
+            import logging
+            import sys
+            logging.getLogger().addHandler(logging.NullHandler())
+            wlog = logging.getLogger("waitress")
+            wlog.addHandler(logging.StreamHandler(sys.stderr))
+            wlog.propagate = False
+            from waitress import serve
+            serve(app, host="0.0.0.0", port=port, threads=16, ident="towerbot")
+        except ImportError:
+            logger.warning("waitress not installed; dashboard on Flask's development server")
+            app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False, threaded=True)
     except Exception as e:
         logger.warning(f"Dashboard failed to start: {e}")
 

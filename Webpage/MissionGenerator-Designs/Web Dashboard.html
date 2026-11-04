@@ -2270,6 +2270,11 @@ let EXTERNAL_PIN = sessionStorage.getItem("towerbot_external_pin") || "";
 function externalPin() {
   return VIEW_READONLY ? EXTERNAL_PIN : "";
 }
+// GET requests carry the PIN in a header, never in the URL (URLs end up in logs).
+function pinHeaders() {
+  const pin = externalPin();
+  return pin ? { "X-Dashboard-Pin": pin } : {};
+}
 function askExternalPin() {
   sessionStorage.removeItem("towerbot_external_pin");
   EXTERNAL_PIN = (prompt("Enter DM PIN to generate this mission module:") || "").trim();
@@ -2776,8 +2781,7 @@ const _CLAIM_MESSAGES = [
 ];
 
 function _claimStatusUrl(id) {
-  const pin = VIEW_READONLY ? EXTERNAL_PIN : "";
-  return `${API}/claim-mission-status/${id}${pin ? `?pin=${encodeURIComponent(pin)}` : ""}`;
+  return `${API}/claim-mission-status/${id}`;
 }
 
 async function _pollClaimMission(id, btn) {
@@ -2794,7 +2798,7 @@ async function _pollClaimMission(id, btn) {
   const update = async () => {
     ticks += 1;
     try {
-      const r = await fetch(_claimStatusUrl(id));
+      const r = await fetch(_claimStatusUrl(id), { headers: pinHeaders() });
       const d = await r.json();
       if (!d.ok) {
         if (d.pin_required) return;
@@ -4361,11 +4365,15 @@ async function loadViewWorldShop() {
   const body = document.getElementById("worldshop-body");
   if (body) body.innerHTML = `<div style="padding:18px;font-family:var(--mono);font-size:12px;color:var(--sigil);">Loading TowerBot wares...</div>`;
   try {
-    const pinParam = (VIEW_READONLY && EXTERNAL_PIN) ? `?pin=${encodeURIComponent(EXTERNAL_PIN)}` : "";
     const [itemsRes, charsRes] = await Promise.all([
-      fetch(`${API}/towerbot-world-items${pinParam}`),
-      fetch(`${API}/characters${pinParam}`)
+      fetch(`${API}/towerbot-world-items`, { headers: pinHeaders() }),
+      fetch(`${API}/characters`, { headers: pinHeaders() })
     ]);
+    if (itemsRes.status === 429) {
+      const errData = await itemsRes.json().catch(() => ({}));
+      if (body) body.innerHTML = `<div style="padding:18px;color:var(--rust);">${errData.error || "Too many wrong PINs. Try again later."}</div>`;
+      return;
+    }
     if (itemsRes.status === 403) {
       const errData = await itemsRes.json().catch(() => ({}));
       if (errData.pin_required) {

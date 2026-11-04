@@ -17,6 +17,8 @@ import logging
 import os
 import re
 import sys
+import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -595,7 +597,7 @@ def api_claim_mission():
 @app.route("/api/claim-mission-status/<int:mission_id>")
 def api_claim_mission_status(mission_id: int):
     """Return dashboard-visible claim/module generation progress for one mission."""
-    if _is_external() and not _pin_ok(request.args):
+    if _is_external() and not _pin_ok():
         return jsonify({"error": "PIN required.", "pin_required": True}), 403
 
     try:
@@ -1415,17 +1417,83 @@ def _pin_ok(data: dict | None = None) -> bool:
         logger.warning("Dashboard external action denied: DASHBOARD_EXTERNAL_PIN not set")
         return False
     data = data or {}
-    supplied = (
-        data.get("pin")
-        or request.headers.get("X-Dashboard-Pin")
-        or request.args.get("pin")
-        or ""
-    )
-    if supplied and hmac.compare_digest(str(supplied).strip(), expected):
-        if not _pin_cookie_ok(expected):
-            g.issue_pin_cookie = expected
-        return True
+    # Body or header only. A ?pin= query string lands in access logs and history.
+    supplied = data.get("pin") or request.headers.get("X-Dashboard-Pin") or ""
+    if supplied:
+        ip, now = _client_ip(), time.time()
+        if _pin_locked(ip, now):
+            # A valid cookie still works; only fresh PIN guesses are refused.
+            g.pin_locked = True
+            logger.warning(f"Dashboard PIN attempt refused: {ip} is locked out")
+            return _pin_cookie_ok(expected)
+        if hmac.compare_digest(str(supplied).strip(), expected):
+            if not _pin_cookie_ok(expected):
+                g.issue_pin_cookie = expected
+            return True
+        _record_pin_failure(ip, now)
     return _pin_cookie_ok(expected)
+
+
+# PIN brute-force guard. The PIN is 6 digits and the dashboard is on the internet:
+# an address gets PIN_MAX_FAILS wrong guesses per PIN_FAIL_WINDOW, and all addresses
+# together PIN_GLOBAL_MAX per hour (stops guessing spread across many addresses).
+PIN_MAX_FAILS = 5
+PIN_FAIL_WINDOW = 15 * 60
+PIN_GLOBAL_MAX = 100
+_pin_fail_lock = threading.Lock()
+_pin_failures: dict[str, list[float]] = {}
+_pin_global_failures: list[float] = []
+
+
+def _client_ip() -> str:
+    """The visitor's address: Cloudflare's CF-Connecting-IP for tunnel requests."""
+    if _is_external():
+        return request.headers.get("CF-Connecting-IP") or request.remote_addr or "?"
+    return request.remote_addr or "?"
+
+
+def _pin_locked(ip: str, now: float) -> bool:
+    with _pin_fail_lock:
+        recent = [t for t in _pin_failures.get(ip, []) if now - t < PIN_FAIL_WINDOW]
+        if recent:
+            _pin_failures[ip] = recent
+        else:
+            _pin_failures.pop(ip, None)
+        _pin_global_failures[:] = [t for t in _pin_global_failures if now - t < 3600]
+        return len(recent) >= PIN_MAX_FAILS or len(_pin_global_failures) >= PIN_GLOBAL_MAX
+
+
+def _record_pin_failure(ip: str, now: float) -> None:
+    with _pin_fail_lock:
+        _pin_failures.setdefault(ip, []).append(now)
+        _pin_global_failures.append(now)
+        n = len(_pin_failures[ip])
+    logger.warning(f"Dashboard wrong PIN from {ip} ({n} in the last {PIN_FAIL_WINDOW // 60} min)")
+
+
+# after_request hooks run in reverse order of registration: _access_log is
+# registered first so it runs after _pin_lockout_response and logs the final status.
+@app.after_request
+def _access_log(response):
+    # waitress logs no requests. Same line format Flask's dev server used; the path
+    # only, never the query string.
+    sys.stderr.write(
+        f'{_client_ip()} - - [{datetime.now():%d/%b/%Y %H:%M:%S}] '
+        f'"{request.method} {request.path} HTTP/1.1" {response.status_code} -\n'
+    )
+    return response
+
+
+@app.after_request
+def _pin_lockout_response(response):
+    if g.pop("pin_locked", False) and response.status_code == 403:
+        response = jsonify({
+            "ok": False,
+            "error": f"Too many wrong PINs. Try again in {PIN_FAIL_WINDOW // 60} minutes.",
+            "pin_locked": True,
+        })
+        response.status_code = 429
+    return response
 
 
 @app.after_request
@@ -2232,7 +2300,7 @@ def api_parties():
 
 @app.route("/api/characters")
 def api_characters():
-    if _is_external() and not _pin_ok(request.args):
+    if _is_external() and not _pin_ok():
         return jsonify({"error": "PIN required.", "pin_required": True}), 403
     try:
         from src.towerbot_world_shop import list_player_characters_for_shop
@@ -2244,7 +2312,7 @@ def api_characters():
 
 @app.route("/api/towerbot-world-items")
 def api_towerbot_world_items():
-    if _is_external() and not _pin_ok(request.args):
+    if _is_external() and not _pin_ok():
         return jsonify({"error": "PIN required.", "pin_required": True}), 403
     try:
         from src.towerbot_world_shop import list_active_world_items

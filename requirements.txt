@@ -14,6 +14,7 @@ Pillow>=10.0.0
 mysql-connector-python==9.6.0  # matches the MySQL 9.6 server
 flask>=3.0
 flask-cors>=5.0
+waitress==3.0.2  # production server for the internet-facing dashboard
 websockets>=16,<17
 numpy
 lxml
