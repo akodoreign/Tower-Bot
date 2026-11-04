@@ -29,7 +29,7 @@ import zipfile
 import logging
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, List, Tuple
+from typing import Any, Optional, Dict, List, Tuple
 
 
 from src.log import logger

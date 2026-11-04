@@ -789,6 +789,37 @@ def _diff_word(mission: dict) -> str:
     return str(mission.get("tier", "standard")).title()
 
 
+# Kharma caps indexed by numeric difficulty 1-10
+_DIFF_KHARMA_CAPS = {
+    1: 0, 2: 0,          # Trivial/Easy — no Kharma
+    3: 40, 4: 40,        # Moderate/Standard — optional small
+    5: 55, 6: 55,        # Challenging/Hard
+    7: 110, 8: 110,      # Severe/Deadly
+    9: 285, 10: 285,     # Extreme/Legendary
+}
+
+
+def _clamp_kharma(reward: str, difficulty: int) -> str:
+    """Clamp runaway Kharma in a reward string to the difficulty's cap.
+
+    Where the cap is 0 the Kharma part is dropped, so easy missions read
+    "150 EC" rather than "150 EC + 0 Kharma".
+    """
+    hit = re.search(r"(\d[\d,]*)\s*Kharma", reward, re.IGNORECASE)
+    if not hit:
+        return reward
+    kval = int(hit.group(1).replace(",", ""))
+    cap = _DIFF_KHARMA_CAPS.get(difficulty, 600)
+    if kval <= cap:
+        return reward
+    logger.warning(f"⚠️ Reward clamped: {kval} Kharma → {cap} Kharma (difficulty={difficulty})")
+    if cap == 0:
+        stripped = re.sub(r"\s*(?:\+|&|,|\band\b)?\s*\d[\d,]*\s*Kharma\b", "", reward, flags=re.IGNORECASE)
+        stripped = stripped.strip(" +&,")
+        return stripped or "See posting"
+    return re.sub(r"\d[\d,]*\s*Kharma", f"{cap} Kharma", reward, flags=re.IGNORECASE)
+
+
 def _parse_difficulty(text: str) -> int:
     """Extract numeric difficulty (1-10) from LLM-generated mission text.
 
@@ -2535,26 +2566,7 @@ def _parse_mission(text: str) -> dict:
     # Extract reward and clamp any runaway Kharma values
     reward_match = re.search(r"[Rr]eward:\s*([^\n\|*]+)", text)
     reward = reward_match.group(1).strip() if reward_match else "See posting"
-    _kharma_hit = re.search(r"(\d[\d,]*)\s*Kharma", reward, re.IGNORECASE)
-    if _kharma_hit:
-        _kval = int(_kharma_hit.group(1).replace(",", ""))
-        # Kharma caps indexed by numeric difficulty 1-10
-        _diff_kharma_caps = {
-            1: 0, 2: 0,          # Trivial/Easy — no Kharma
-            3: 40, 4: 40,        # Moderate/Standard — optional small
-            5: 55, 6: 55,        # Challenging/Hard
-            7: 110, 8: 110,      # Severe/Deadly
-            9: 285, 10: 285,     # Extreme/Legendary
-        }
-        _cap = _diff_kharma_caps.get(difficulty, 600)
-        if _kval > _cap:
-            reward = re.sub(
-                r"\d[\d,]*\s*Kharma",
-                f"{_cap} Kharma",
-                reward,
-                flags=re.IGNORECASE,
-            )
-            logger.warning(f"⚠️ Reward clamped: {_kval} Kharma → {_cap} Kharma (difficulty={difficulty})")
+    reward = _clamp_kharma(reward, difficulty)
 
     # Extract opposing faction
     opposing_faction = ""

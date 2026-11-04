@@ -614,15 +614,6 @@ No JSON — just the contact's words."""
 # A1111 map
 # ---------------------------------------------------------------------------
 
-def _gather_map_style(location: str) -> str:
-    loc_low = location.lower()
-    for key, style in _GATHER_LOCATION_STYLES:
-        if key in loc_low:
-            return style
-    # Default — outdoor city street
-    return "Town Exterior Table Map, cobblestone road, building facades, lamp posts, vendor stalls, crowd flow paths"
-
-
 async def _generate_gather_map(
     gather_location: str,
     item: str,

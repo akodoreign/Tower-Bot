@@ -773,15 +773,6 @@ No JSON — just the speech text."""
 # A1111 map
 # ---------------------------------------------------------------------------
 
-def _location_map_style(location: str) -> str:
-    loc_low = location.lower()
-    for key, style in _LOCATION_MAP_STYLE.items():
-        if key in loc_low:
-            return style
-    # Default — outdoor street scene
-    return "Town Exterior Table Map, urban approach road, buildings flanking, alley side routes, clear chokepoint at center"
-
-
 async def _generate_defense_map(
     location: str,
     faction: str,

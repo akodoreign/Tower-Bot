@@ -750,14 +750,6 @@ Return JSON only:
 # A1111 map
 # ---------------------------------------------------------------------------
 
-def _position_map_style(position: str) -> str:
-    pos_low = position.lower()
-    for key, style in _POSITION_MAP_STYLES:
-        if key in pos_low:
-            return style
-    return "Interior Table Map, exterior approach, fortified entry, interior rooms, objective chamber at rear"
-
-
 async def _generate_assault_map(
     position: str,
     defending_faction: str,
