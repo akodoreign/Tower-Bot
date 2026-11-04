@@ -51,16 +51,57 @@ OUT_DIR  = ROOT / "campaign_docs" / "battle_maps" / "_downloaded"
 LOG_FILE = ROOT / "logs" / "battlemap_download.log"
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-def _reddit_headers() -> dict:
-    """Build request headers. Token-only auth — sending Cookie alongside Bearer breaks OAuth."""
-    token = os.getenv("REDDIT_TOKEN", "")
-    h = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "application/json",
-    }
-    if token:
-        h["Authorization"] = f"Bearer {token}"
-    return h
+# ---------------------------------------------------------------------------
+# Reddit auth — app-only OAuth from a "script" app (reddit.com/prefs/apps).
+# REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET in .env; each run gets its own token
+# (valid 1 h, renewed as needed). The old REDDIT_TOKEN was a browser session
+# token that expired after a day.
+# ---------------------------------------------------------------------------
+
+TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
+API_URL   = "https://oauth.reddit.com"
+
+_token: dict = {"value": "", "expires": 0.0}
+
+
+def _user_agent() -> str:
+    # Reddit asks for <platform>:<app id>:<version> (by /u/<username>)
+    return os.getenv(
+        "REDDIT_USER_AGENT",
+        "windows:towerbot-battlemaps:v2.0 (Tower of Last Chance campaign map library)",
+    )
+
+
+def reddit_credentials() -> tuple[str, str]:
+    return (os.getenv("REDDIT_CLIENT_ID", "").strip(),
+            os.getenv("REDDIT_CLIENT_SECRET", "").strip())
+
+
+def _client(**kwargs) -> httpx.AsyncClient:
+    """Every HTTP client comes from here (tests swap in a mock transport)."""
+    return httpx.AsyncClient(**kwargs)
+
+
+async def reddit_token(c: httpx.AsyncClient, *, force: bool = False) -> str:
+    """App-only OAuth token, reused until a minute before it expires."""
+    if not force and _token["value"] and time.time() < _token["expires"] - 60:
+        return _token["value"]
+    client_id, secret = reddit_credentials()
+    if not client_id or not secret:
+        raise RuntimeError("REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET are not set in .env")
+    r = await c.post(
+        TOKEN_URL,
+        auth=(client_id, secret),
+        data={"grant_type": "client_credentials"},
+        headers={"User-Agent": _user_agent()},
+    )
+    r.raise_for_status()
+    data = r.json()
+    if not data.get("access_token"):
+        raise RuntimeError(f"Reddit refused the token request: {data.get('error', 'no access_token')}")
+    _token["value"] = data["access_token"]
+    _token["expires"] = time.time() + float(data.get("expires_in", 3600))
+    return _token["value"]
 
 # ---------------------------------------------------------------------------
 # Map type keyword matching — post title → our map type
@@ -116,8 +157,13 @@ def log(msg: str) -> None:
     ts = datetime.now().strftime("%H:%M:%S")
     line = f"[{ts}] {msg}"
     print(line, flush=True)
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(line + "\n")
+    # A locked log file (another run, another account) must not kill the run —
+    # on the old PC a PermissionError here crashed every nightly run.
+    try:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except OSError:
+        pass
 
 
 def slugify(text: str) -> str:
@@ -264,14 +310,16 @@ async def fetch_posts(
     if after:
         params["after"] = after
 
-    # oauth.reddit.com is the only endpoint that works with Bearer token
-    url = "https://oauth.reddit.com/r/battlemaps/top"
+    url = f"{API_URL}/r/battlemaps/top"
 
     try:
-        async with httpx.AsyncClient(
-            headers=_reddit_headers(), timeout=30.0, follow_redirects=True
-        ) as c:
-            r = await c.get(url, params=params)
+        async with _client(timeout=30.0, follow_redirects=True) as c:
+            headers = {"User-Agent": _user_agent(), "Accept": "application/json"}
+            token = await reddit_token(c)
+            r = await c.get(url, params=params, headers={**headers, "Authorization": f"Bearer {token}"})
+            if r.status_code == 401:
+                token = await reddit_token(c, force=True)
+                r = await c.get(url, params=params, headers={**headers, "Authorization": f"Bearer {token}"})
             r.raise_for_status()
             data = r.json()
         children = data["data"]["children"]
@@ -285,9 +333,11 @@ async def fetch_posts(
 
 async def download_image(url: str, out_path: Path) -> bool:
     """Download a single image to out_path. Returns True on success."""
+    # No Authorization here: images live on i.redd.it, imgur and other hosts,
+    # and the Reddit token must only ever go to oauth.reddit.com.
     try:
-        async with httpx.AsyncClient(
-            headers={**_reddit_headers(), "Accept": "image/*"},
+        async with _client(
+            headers={"User-Agent": _user_agent(), "Accept": "image/*"},
             timeout=60.0,
             follow_redirects=True,
         ) as c:
@@ -434,6 +484,10 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_args()
+    if not all(reddit_credentials()):
+        log("REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET are not set in .env - "
+            "create a 'script' app at https://www.reddit.com/prefs/apps")
+        sys.exit(2)
     tf = [t.strip() for t in args.timeframe.split(",") if t.strip()] or None
     asyncio.run(run(
         min_score=args.min_score,
