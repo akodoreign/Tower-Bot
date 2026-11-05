@@ -38,6 +38,12 @@ SYNC_INTERVAL = int(os.getenv("MIMIR_SYNC_INTERVAL", "900"))   # seconds, defaul
 MIMIR_PULL_NPC_SLEEP = float(os.getenv("MIMIR_PULL_NPC_SLEEP", "0.10"))
 MIMIR_PULL_PROGRESS_EVERY = int(os.getenv("MIMIR_PULL_PROGRESS_EVERY", "100"))
 
+# One sync_npc() per NPC at a time: a new NPC fires several change hooks within
+# seconds, and two overlapping pushes each created a Mimir character.
+_npc_sync_locks: dict[int, asyncio.Lock] = {}
+# Mimir NPCs already reported as duplicates of a mapped MySQL NPC (warn once).
+_reported_dup_mimir_ids: set[str] = set()
+
 
 # ---------------------------------------------------------------------------
 # DB table — sync state tracking
@@ -1603,6 +1609,11 @@ class MimirSyncEngine:
 
     async def sync_npc(self, npc_id: int) -> bool:
         """Sync one NPC. Returns True if pushed. No-op if unavailable/unchanged."""
+        lock = _npc_sync_locks.setdefault(int(npc_id), asyncio.Lock())
+        async with lock:
+            return await self._sync_npc(npc_id)
+
+    async def _sync_npc(self, npc_id: int) -> bool:
         mimir = get_mimir()
         if not mimir.available:
             return False
@@ -1647,6 +1658,9 @@ class MimirSyncEngine:
                 "UPDATE npcs SET data_json = JSON_SET(IFNULL(data_json, '{}'), '$.mimir_id', %s) WHERE id=%s",
                 (mimir_id, npc_id),
             )
+            # Map it now (empty hash → the rest is retried next cycle) so a
+            # failure below can't leave an unmapped Mimir copy behind.
+            _upsert_sync("npc", str(npc_id), mimir_id, "")
 
         # Apply all editable fields: stats, race, role, location, faction
         edit_params = _bridge_to_mimir_edit(bridge)
@@ -1790,6 +1804,24 @@ class MimirSyncEngine:
                     continue
                 # New NPC — exists in Mimir but not in MySQL
                 ins = _mimir_char_to_npc_insert(char)
+                same_name = raw_query("SELECT id FROM npcs WHERE name=%s", (ins["name"],))
+                if same_name:
+                    # npcs.name is unique, so this is a bot NPC whose mapping
+                    # was never written (link it) or a second Mimir copy of a
+                    # mapped one (leave it for the DM to delete in Mimir).
+                    npc_id = same_name[0]["id"]
+                    mapped = (_get_sync_row("npc", str(npc_id)) or {}).get("mimir_id")
+                    if not mapped:
+                        _upsert_sync("npc", str(npc_id), char_id, "")
+                        count += 1
+                        logger.info(f"[MIMIR_SYNC] ← Linked Mimir NPC {ins['name']!r} to existing id={npc_id}")
+                    elif char_id not in _reported_dup_mimir_ids:
+                        _reported_dup_mimir_ids.add(char_id)
+                        logger.warning(
+                            f"[MIMIR_SYNC] Duplicate NPC in Mimir: {ins['name']!r} ({char_id}) — "
+                            f"id={npc_id} is already mapped to {mapped}; delete the extra copy in Mimir"
+                        )
+                    continue
                 try:
                     raw_execute(
                         "INSERT INTO npcs (name, faction, status, role, location, data_json) "
