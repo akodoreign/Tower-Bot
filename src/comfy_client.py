@@ -518,7 +518,11 @@ async def _studio_gate(poll_seconds: float) -> None:
                                 if (await client.get(f"{comfy_url()}/studio/held")).json().get("held"):
                                     queued = (await client.post(f"{comfy_url()}/studio/release")).json()
                                     ids |= set(queued.get("queued") or [])
-                                if await _studio_jobs_done(client, ids) or asyncio.get_running_loop().time() > deadline:
+                                if await _studio_jobs_done(client, ids):
+                                    break
+                                if asyncio.get_running_loop().time() > deadline:
+                                    logger.warning("🎨 Prompt Studio: giving up the GPU turn after 20 min "
+                                                   "with jobs still in ComfyUI")
                                     break
                                 await asyncio.sleep(poll_seconds)
                             logger.info("🎨 Prompt Studio: ran %d job(s) in a GPU turn", len(ids))

@@ -164,8 +164,47 @@ async def test_player_request_jumps_background_work_but_waits_for_running_job():
 @pytest.mark.asyncio
 async def test_player_facing_block_is_scoped():
     with gpu_queue.player_facing():
-        assert gpu_queue._player.get() is True
-    assert gpu_queue._player.get() is False
+        assert gpu_queue._is_player()
+    assert not gpu_queue._is_player()
+
+
+async def test_batch_spawned_by_a_command_loses_player_priority():
+    # /genmodule-style: the command marks itself, starts a long batch, returns.
+    seen = {}
+    release = asyncio.Event()
+
+    async def batch():
+        seen["while_command_runs"] = gpu_queue._is_player()
+        await release.wait()
+        seen["after_command_returned"] = gpu_queue._is_player()
+
+    async def command():
+        gpu_queue.mark_player_facing()
+        t = asyncio.create_task(batch())
+        await asyncio.sleep(0)             # batch starts while the command is alive
+        return t
+
+    t = await asyncio.create_task(command())
+    release.set()
+    await t
+    assert seen == {"while_command_runs": True, "after_command_returned": False}
+
+
+async def test_task_spawned_inside_player_block_loses_it_after_the_block():
+    release = asyncio.Event()
+    seen = []
+
+    async def child():
+        seen.append(gpu_queue._is_player())
+        await release.wait()
+        seen.append(gpu_queue._is_player())
+
+    with gpu_queue.player_facing():
+        t = asyncio.create_task(child())
+        await asyncio.sleep(0)
+    release.set()
+    await t
+    assert seen == [True, False]
 
 
 @pytest.mark.asyncio

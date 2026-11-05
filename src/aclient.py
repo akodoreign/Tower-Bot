@@ -155,6 +155,12 @@ class DiscordClient(discord.Client):
 
     async def process_messages(self):
         """Process queued messages in the background."""
+        # on_ready fires again when Discord can't resume a session; starting
+        # here twice would run every loop below twice.
+        if getattr(self, "_loops_started", False):
+            logger.info("🔁 on_ready again (new gateway session); background loops already running")
+            return
+        self._loops_started = True
         # Keep dashboard Discord status fresh independent of mission generation.
         loop = asyncio.get_running_loop()
         loop.create_task(self.discord_heartbeat_loop())

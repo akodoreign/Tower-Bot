@@ -66,7 +66,7 @@ _busy = False
 _waiters: list[_Waiter] = []
 _owner: Optional[object] = None          # token of the turn currently running
 _held = contextvars.ContextVar("gpu_turn_token", default=None)
-_player = contextvars.ContextVar("gpu_player_facing", default=False)
+_player = contextvars.ContextVar("gpu_player_facing", default=None)   # a _PlayerMark
 _current_kind: Optional[Kind] = None     # what is (probably) resident in VRAM
 _current_label = ""
 _turn_started = 0.0
@@ -100,19 +100,51 @@ def main_loop() -> Optional[asyncio.AbstractEventLoop]:
     return _loop if _loop is not None and _loop.is_running() else None
 
 
+class _PlayerMark:
+    """Player priority that lasts only while the player's request is running.
+
+    Context variables are copied into every task a task spawns, so a bare flag
+    leaked: /genmodule, /gearrun and friends answer the player and then start an
+    hour of batch work with create_task, and all of it jumped ahead of the
+    background loops. The mark stays live while its task (or with-block) does.
+    """
+
+    def __init__(self, task: Optional[asyncio.Task] = None):
+        self._task = task
+        self.open = True
+
+    def live(self) -> bool:
+        return self.open and (self._task is None or not self._task.done())
+
+
 def mark_player_facing() -> None:
-    """Mark the rest of the current task (and tasks it spawns) as answering a player."""
-    _player.set(True)
+    """Mark the rest of the current task as answering a player.
+
+    Tasks it spawns share the priority only while this task is still running
+    (an asyncio.gather inside a command does; a batch it leaves behind does not).
+    """
+    try:
+        task = asyncio.current_task()
+    except RuntimeError:
+        task = None
+    _player.set(_PlayerMark(task))
 
 
 @contextmanager
 def player_facing() -> Iterator[None]:
     """GPU turns taken inside this block go ahead of background work."""
-    token = _player.set(True)
+    mark = _PlayerMark()
+    token = _player.set(mark)
     try:
         yield
     finally:
+        mark.open = False                  # tasks spawned inside lose it too
         _player.reset(token)
+
+
+def _is_player() -> bool:
+    mark = _player.get()
+    return mark is not None and mark.live()
 
 
 def holds_turn() -> bool:
@@ -166,7 +198,7 @@ async def _acquire(kind: Kind, label: str) -> None:
     if not _busy and not _waiters:
         _busy = True
         return
-    player = _player.get()
+    player = _is_player()
     logger.info("🎛️ GPU: %s [%s]%s waiting behind %s [%s] (%d queued)",
                 kind, label, " (player)" if player else "", _current_kind, _current_label, len(_waiters))
     waiter = _Waiter(kind, label, time.monotonic(), asyncio.get_running_loop().create_future(), player)
