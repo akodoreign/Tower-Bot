@@ -31,27 +31,56 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from flask import Flask, g, jsonify, render_template, request, send_from_directory
-try:
-    from flask_cors import CORS
-    _cors_available = True
-except ImportError:
-    _cors_available = False
 
 app = Flask(
     __name__,
     template_folder="MissionGenerator-Designs",
     static_folder="MissionGenerator-Designs",
 )
-if _cors_available:
-    CORS(app)
+# No CORS: the dashboard page is same-origin and nothing else calls the API
+# from a browser. The old Access-Control-Allow-Origin: * let any website read it.
 
-# Add CORS headers manually if flask_cors not installed
-@app.after_request
-def _add_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
-    return response
+_UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+_LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "[::1]", "::1"}
+
+
+def _host_only(netloc: str) -> str:
+    """'example.com:5001' -> 'example.com'; '[::1]:5001' -> '[::1]'."""
+    netloc = (netloc or "").strip().lower()
+    if netloc.startswith("["):
+        return netloc.split("]")[0] + "]"
+    return netloc.rsplit(":", 1)[0] if netloc.count(":") == 1 else netloc
+
+
+def _allowed_origins() -> set[str]:
+    extra = os.getenv("DASHBOARD_ALLOWED_ORIGINS", "")
+    return {o.strip().rstrip("/").lower() for o in extra.split(",") if o.strip()}
+
+
+@app.before_request
+def _refuse_cross_site():
+    """Block other websites from driving the dashboard through a visitor's browser.
+
+    Writes parse JSON with force=True, so a cross-site text/plain POST needs no
+    CORS preflight; browsers mark it with Sec-Fetch-Site / Origin. Requests from
+    this PC must also name a loopback host, which stops DNS rebinding (a site
+    pointing its own name at 127.0.0.1). Non-browser callers send neither header.
+    """
+    if _is_loopback() and not _is_external():
+        if _host_only(request.host) not in _LOOPBACK_HOSTS:
+            return jsonify({"ok": False, "error": "unexpected Host"}), 403
+    if request.method not in _UNSAFE_METHODS:
+        return None
+    if request.headers.get("Sec-Fetch-Site", "").lower() == "cross-site":
+        return jsonify({"ok": False, "error": "cross-site request refused"}), 403
+    origin = (request.headers.get("Origin") or "").rstrip("/").lower()
+    if origin and origin != "null":
+        from urllib.parse import urlsplit
+        if urlsplit(origin).netloc != (request.host or "").lower() and origin not in _allowed_origins():
+            return jsonify({"ok": False, "error": "cross-site request refused"}), 403
+    elif origin == "null":
+        return jsonify({"ok": False, "error": "cross-site request refused"}), 403
+    return None
 
 DOCS_DIR = PROJECT_ROOT / "campaign_docs"
 
@@ -1368,9 +1397,35 @@ def api_bulletins():
 # /api/generate-mission — generate a mission via the mission builder
 # ---------------------------------------------------------------------------
 
+def _is_loopback() -> bool:
+    import ipaddress
+    try:
+        return ipaddress.ip_address(request.remote_addr or "").is_loopback
+    except ValueError:
+        return False
+
+
+def _trusted_lan() -> bool:
+    """DASHBOARD_TRUSTED_NETS (e.g. 192.168.1.0/24) lets LAN devices act without the PIN."""
+    import ipaddress
+    nets = [n.strip() for n in os.getenv("DASHBOARD_TRUSTED_NETS", "").split(",") if n.strip()]
+    try:
+        addr = ipaddress.ip_address(request.remote_addr or "")
+        return any(addr in ipaddress.ip_network(n, strict=False) for n in nets)
+    except ValueError:
+        return False
+
+
 def _is_external():
-    """True when request arrives via Cloudflare tunnel (has CF-Ray header)."""
-    return bool(request.headers.get("CF-Ray") or request.headers.get("Cf-Ray"))
+    """True unless the request comes straight from this PC (or a trusted LAN).
+
+    Cloudflare tunnel requests (CF-Ray) count as external even though cloudflared
+    connects from 127.0.0.1. So do other LAN devices: the server listens on
+    0.0.0.0, and anyone on the Wi-Fi used to get PIN-free write access.
+    """
+    if request.headers.get("CF-Ray") or request.headers.get("Cf-Ray"):
+        return True
+    return not (_is_loopback() or _trusted_lan())
 
 
 _PIN_COOKIE = "tb_pin"
@@ -1406,7 +1461,8 @@ def _pin_ok(data: dict | None = None) -> bool:
     Fail-CLOSED: if no DASHBOARD_EXTERNAL_PIN is configured, external actions are
     DENIED. (The old code fell back to a hardcoded default that ended up in the
     public repo, and an empty PIN silently allowed every external action.)
-    Local-network requests never reach here — _is_external() is False for them.
+    Requests from this PC (and DASHBOARD_TRUSTED_NETS) never reach here — _is_external()
+    is False for them; other LAN devices need the PIN like tunnel visitors.
 
     A correct PIN also sets a signed tb_pin cookie (DASHBOARD_PIN_COOKIE_HOURS, default
     7) so players don't retype it; the cookie alone is accepted until it expires.
@@ -1446,8 +1502,12 @@ _pin_global_failures: list[float] = []
 
 
 def _client_ip() -> str:
-    """The visitor's address: Cloudflare's CF-Connecting-IP for tunnel requests."""
-    if _is_external():
+    """The visitor's address: Cloudflare's CF-Connecting-IP for tunnel requests.
+
+    Only cloudflared (on this PC) may supply it; a LAN device could fake the header
+    to dodge the per-address PIN lockout.
+    """
+    if _is_loopback() and (request.headers.get("CF-Ray") or request.headers.get("Cf-Ray")):
         return request.headers.get("CF-Connecting-IP") or request.remote_addr or "?"
     return request.remote_addr or "?"
 

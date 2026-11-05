@@ -8,6 +8,8 @@ import Webpage.app as dash
 
 PIN = "135790"
 CF = {"CF-Ray": "x"}
+# Tunnel requests reach the dashboard from cloudflared on this PC.
+TUNNEL = {"REMOTE_ADDR": "127.0.0.1"}
 
 
 @pytest.fixture(autouse=True)
@@ -29,7 +31,7 @@ def _guess(pin: str, ip: str = "203.0.113.5", cookie: str = "") -> bool:
     headers = {**CF, "CF-Connecting-IP": ip, "X-Dashboard-Pin": pin}
     if cookie:
         headers["Cookie"] = f"tb_pin={cookie}"
-    with dash.app.test_request_context("/", headers=headers):
+    with dash.app.test_request_context("/", headers=headers, environ_base=TUNNEL):
         return dash._pin_ok()
 
 
