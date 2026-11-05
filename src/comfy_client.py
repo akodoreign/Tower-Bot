@@ -265,31 +265,59 @@ async def _run_graph(graph: dict, timeout: float) -> list[bytes]:
                     raise ComfyError(f"ComfyUI rejected the prompt ({resp.status}): {body[:500]}")
                 prompt_id = json.loads(body)["prompt_id"]
 
-            executing: Optional[str] = None
-            async for msg in ws:
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    data = json.loads(msg.data)
-                    kind, d = data.get("type"), data.get("data") or {}
-                    if d.get("prompt_id") not in (None, prompt_id):
-                        continue
-                    if kind == "executing":
-                        executing = d.get("node")
-                        if executing is None and d.get("prompt_id") == prompt_id:
-                            break
-                    elif kind == "execution_success":
-                        break
-                    elif kind == "execution_error":
-                        raise ComfyError(f"{d.get('node_type')}: {d.get('exception_message', '')[:500]}")
-                    elif kind == "execution_interrupted":
-                        raise ComfyError("generation was interrupted")
-                elif msg.type == aiohttp.WSMsgType.BINARY:
-                    if executing == OUT_NODE:
-                        img = _image_from_frame(msg.data)
-                        if img:
-                            images.append(img)
-                elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
-                    raise ComfyError("ComfyUI websocket closed mid-generation")
+            try:
+                await _collect(ws, prompt_id, images)
+            except _ComfyStopped:
+                raise
+            except BaseException:
+                # Timed out, cancelled or lost the socket: ComfyUI would keep
+                # rendering after we stop listening and hold the GPU past our turn.
+                await asyncio.shield(asyncio.ensure_future(_cancel_prompt(prompt_id)))
+                raise
     return images
+
+
+class _ComfyStopped(ComfyError):
+    """ComfyUI itself ended the job (error or interrupt); nothing left to cancel."""
+
+
+async def _cancel_prompt(prompt_id: str) -> None:
+    """Drop our job from ComfyUI's queue, or stop it if it is running (only ours)."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            await client.post(f"{comfy_url()}/queue", json={"delete": [prompt_id]})
+            await client.post(f"{comfy_url()}/interrupt", json={"prompt_id": prompt_id})
+        logger.warning("🖼️ ComfyUI job %s abandoned — removed/interrupted", prompt_id[:8])
+    except Exception as exc:
+        logger.error("ComfyUI cancel of %s failed: %r", prompt_id[:8], exc)
+
+
+async def _collect(ws, prompt_id: str, images: list[bytes]) -> None:
+    executing: Optional[str] = None
+    async for msg in ws:
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            data = json.loads(msg.data)
+            kind, d = data.get("type"), data.get("data") or {}
+            if d.get("prompt_id") not in (None, prompt_id):
+                continue
+            if kind == "executing":
+                executing = d.get("node")
+                if executing is None and d.get("prompt_id") == prompt_id:
+                    return
+            elif kind == "execution_success":
+                return
+            elif kind == "execution_error":
+                raise _ComfyStopped(f"{d.get('node_type')}: {d.get('exception_message', '')[:500]}")
+            elif kind == "execution_interrupted":
+                raise _ComfyStopped("generation was interrupted")
+        elif msg.type == aiohttp.WSMsgType.BINARY:
+            if executing == OUT_NODE:
+                img = _image_from_frame(msg.data)
+                if img:
+                    images.append(img)
+        elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
+            raise ComfyError("ComfyUI websocket closed mid-generation")
+    raise ComfyError("ComfyUI websocket closed mid-generation")
 
 
 def _fit_to_request(png: bytes, width: int, height: int) -> bytes:
