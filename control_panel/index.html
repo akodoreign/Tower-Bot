@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower Control</title>
+<style>
+  :root {
+    --bg: #14161a; --card: #1d2026; --line: #2c3038; --text: #e6e8eb; --muted: #9aa1ab;
+    --ok: #3ccf8e; --warn: #f0b341; --bad: #ef5d5d; --accent: #7aa7ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { font-size: 22px; margin: 4px 0 2px; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+          padding: 16px; margin-bottom: 14px; }
+  .big { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 600; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+  .note { color: var(--muted); font-size: 13px; margin-top: 6px; min-height: 18px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  button, select, a.btn { font: inherit; border-radius: 8px; border: 1px solid var(--line);
+          background: #262a31; color: var(--text); padding: 10px 14px; min-height: 44px; cursor: pointer;
+          text-decoration: none; display: inline-flex; align-items: center; }
+  button.primary { background: #1f6f4a; border-color: #2a8a5d; }
+  button.danger { background: #6b2525; border-color: #8a3030; }
+  button:disabled { opacity: .5; cursor: default; }
+  a.btn { background: #233150; border-color: #2f4472; }
+  a.btn.off { pointer-events: none; opacity: .45; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
+  dt { color: var(--muted); } dd { margin: 0; display: flex; align-items: center; gap: 8px; }
+  .meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .meter > div { height: 100%; background: var(--accent); width: 0; }
+  @media (max-width: 420px) { .row > * { flex: 1 1 100%; justify-content: center; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tower Control</h1>
+  <p class="sub">Start the bot for a session, stop it to save power. Home network only.</p>
+
+  <section class="card">
+    <div class="big"><span class="dot" id="bot-dot"></span><span id="bot-state">Checking…</span></div>
+    <div class="note" id="bot-note"></div>
+    <div class="row">
+      <select id="hours" aria-label="Session length">
+        <option value="0">Until I stop it</option>
+        <option value="4">For 4 hours</option>
+        <option value="6" selected>For 6 hours</option>
+        <option value="8">For 8 hours</option>
+        <option value="12">For 12 hours</option>
+      </select>
+      <button class="primary" id="start">Start bot</button>
+      <button id="restart">Restart</button>
+      <button class="danger" id="stop">Stop bot</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="margin-top:0">
+      <a class="btn" id="dash-link" href="#">Open dashboard</a>
+      <a class="btn" id="studio-link" href="/studio">Open Prompt Studio</a>
+    </div>
+    <div class="note">Prompt Studio works whether the bot is running or not.</div>
+  </section>
+
+  <section class="card">
+    <dl>
+      <dt>Tunnel</dt><dd><span class="dot" id="tunnel-dot"></span><span id="tunnel"></span></dd>
+      <dt>MySQL</dt><dd><span class="dot" id="mysql-dot"></span><span id="mysql"></span></dd>
+      <dt>ComfyUI</dt><dd><span class="dot" id="comfy-dot"></span><span id="comfy"></span></dd>
+      <dt>Ollama</dt><dd><span class="dot" id="ollama-dot"></span><span id="ollama"></span></dd>
+      <dt>GPU</dt><dd><span id="gpu"></span></dd>
+    </dl>
+    <div class="meter"><div id="vram"></div></div>
+    <div class="row">
+      <button id="free">Free GPU memory</button>
+    </div>
+    <div class="note" id="free-note"></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let busy = false;
+
+function dot(el, state) {
+  el.className = "dot " + (state === "running" || state === true ? "ok"
+    : state === "starting" || state === "stopping" ? "warn"
+    : state === "stopped" || state === false ? "" : "bad");
+}
+
+function fmtLeft(sec) {
+  if (sec <= 0) return "any moment";
+  const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
+  return h ? `${h} h ${m} min` : `${m} min`;
+}
+
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+                               body: JSON.stringify(body || {}) });
+  let data = {};
+  try { data = await r.json(); } catch (_) {}
+  if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+  return data;
+}
+
+async function refresh() {
+  let s;
+  try {
+    s = await (await fetch("/api/status", { cache: "no-store" })).json();
+  } catch (_) {
+    $("bot-state").textContent = "Tower Control is not answering";
+    dot($("bot-dot"), "error");
+    return;
+  }
+  const bot = s.services.TowerBotService;
+  busy = s.busy;
+  const label = { running: "Bot is running", stopped: "Bot is stopped",
+                  starting: "Bot is starting…", stopping: "Bot is stopping…" }[bot] || `Bot: ${bot}`;
+  $("bot-state").textContent = label;
+  dot($("bot-dot"), bot);
+
+  let note = "";
+  if (s.auto_stop_at && bot !== "stopped") note = `Stops itself in ${fmtLeft(s.auto_stop_at - s.now)}.`;
+  else if (bot === "running" && !s.dashboard) note = "Starting up — dashboard not answering yet.";
+  if (s.last_action.result === "timed out") note = `Last ${s.last_action.action} timed out — check the PC.`;
+  $("bot-note").textContent = note;
+
+  $("start").disabled = busy || bot === "running" || bot === "starting";
+  $("stop").disabled = busy || bot === "stopped" || bot === "stopping";
+  $("restart").disabled = busy || bot !== "running";
+
+  const dash = $("dash-link");
+  dash.href = `http://${location.hostname}:5001/`;
+  dash.classList.toggle("off", !s.dashboard);
+  $("studio-link").classList.toggle("off", !s.comfyui);
+
+  const svc = (key, id) => { $(id).textContent = s.services[key]; dot($(id + "-dot"), s.services[key]); };
+  svc("TowerTunnel", "tunnel");
+  svc("MySQL96", "mysql");
+  $("comfy").textContent = s.comfyui ? "up" : "down"; dot($("comfy-dot"), s.comfyui);
+  $("ollama").textContent = s.ollama ? "up" : "down"; dot($("ollama-dot"), s.ollama);
+  if (s.gpu && s.gpu.name) {
+    $("gpu").textContent = `${s.gpu.watts.toFixed(0)} W · ${(s.gpu.mem_used_mb / 1024).toFixed(1)} of ` +
+                           `${(s.gpu.mem_total_mb / 1024).toFixed(0)} GB · ${s.gpu.util}% busy`;
+    $("vram").style.width = `${Math.round(100 * s.gpu.mem_used_mb / s.gpu.mem_total_mb)}%`;
+  } else {
+    $("gpu").textContent = "no reading";
+  }
+}
+
+async function act(action) {
+  const body = action === "start" ? { hours: Number($("hours").value) } : {};
+  $("bot-note").textContent = action === "stop" ? "Stopping…" : action === "start" ? "Starting…" : "Restarting…";
+  try { await post(`/api/bot/${action}`, body); }
+  catch (e) { $("bot-note").textContent = e.message; }
+  setTimeout(refresh, 800);
+}
+
+$("start").onclick = () => act("start");
+$("restart").onclick = () => act("restart");
+$("stop").onclick = () => { if (confirm("Stop the bot? The dashboard and Discord features go offline.")) act("stop"); };
+$("free").onclick = async () => {
+  $("free-note").textContent = "Freeing…";
+  try {
+    const r = await post("/api/gpu/free");
+    $("free-note").textContent = r.freed.length ? `Freed: ${r.freed.join(", ")}` : "Nothing was loaded.";
+  } catch (e) { $("free-note").textContent = e.message; }
+  setTimeout(refresh, 1500);
+};
+
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

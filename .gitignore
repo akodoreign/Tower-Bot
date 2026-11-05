@@ -222,3 +222,6 @@ Webpage/thumb_cache/
 # Generated Ollama Modelfile — embeds verbatim MM/XMM statblock excerpts (copyrighted).
 # Rebuild with: python scripts/build_tower_2024_model.py --build
 Modelfile.tower-2024
+
+# Tower Control's auto-stop deadline (runtime state)
+control_panel/state.json
