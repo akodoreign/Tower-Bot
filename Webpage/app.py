@@ -968,8 +968,9 @@ def _serialize_npc(r: dict) -> dict:
         "equipment": gear,
         "motivation": motivation,
         "relationships": relationships,
-        "secret": secret,
-        "oracle_notes": oracle_notes,
+        # DM-only: blank for internet visitors (players).
+        "secret": "" if _is_external() else secret,
+        "oracle_notes": "" if _is_external() else oracle_notes,
         "statblock": {
             "speed":     stats.get("speed"),
             "skills":    stats.get("skills") or {},
@@ -2234,6 +2235,9 @@ def serve_project_media(filename: str):
         return "Access denied", 403
     if full.suffix.lower() not in _MEDIA_ALLOWED_EXTS:
         return "Access denied", 403
+    # Same module rule as /modules/: this route also reaches generated_modules.
+    if _is_external() and _path_within(full, PROJECT_ROOT / "generated_modules") and not _player_may_open(full):
+        return "DM only", 403
     if not full.exists() or not full.is_file():
         return "Media not found", 404
     # Ref images have timestamped filenames -> content-addressed, cache long.
@@ -2246,6 +2250,9 @@ def serve_project_media(filename: str):
 
 @app.route("/api/logs")
 def api_logs():
+    # DM only: the log holds visitors' IP addresses, Discord IDs and spoilers.
+    if _is_external():
+        return _dm_only_response()
     try:
         limit = min(int(request.args.get("limit", 200)), 1000)
         _HTTP_OK_RE = re.compile(r'"(?:GET|POST|PUT|DELETE|HEAD|OPTIONS) [^"]+" 2\d\d ')
@@ -2403,6 +2410,25 @@ def api_towerbot_world_item_buy(item_id: int):
 MODULES_DIR = PROJECT_ROOT / "generated_modules"
 
 
+# What internet visitors (players) may open in a module. Everything else is DM
+# material: dm_guide (the real situation, NPC secrets), module/session (decision
+# trees, clue web), chart_pack, npcs, novel chapters, and the .zip/.docx/.md/.json
+# exports that bundle them. This PC and DASHBOARD_TRUSTED_NETS see all of it.
+_PLAYER_MODULE_PAGES = {"index.html", "players_guide.html", "maps.html"}
+_PLAYER_MODULE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+
+
+def _player_may_open(module_file: Path) -> bool:
+    name = module_file.name.lower()
+    if name in _PLAYER_MODULE_PAGES or name == "maps_manifest.json" or name.endswith(".vtt.json"):
+        return True
+    return module_file.suffix.lower() in _PLAYER_MODULE_EXTS
+
+
+def _dm_only_response():
+    return jsonify({"ok": False, "error": "DM only.", "dm_only": True}), 403
+
+
 def _module_meta(module_dir: Path) -> dict:
     """Read index.html title + faction from a module directory, or fallback to dir name."""
     meta = {"slug": module_dir.name, "files": [], "title": module_dir.name, "faction": ""}
@@ -2417,6 +2443,7 @@ def _module_meta(module_dir: Path) -> dict:
         meta["files"] = sorted(
             p.name for p in module_dir.iterdir()
             if p.is_file() and p.suffix in (".html", ".md", ".json", ".png", ".zip")
+            and (not _is_external() or _player_may_open(p))
         )
         meta["has_maps"] = (module_dir / "maps").is_dir() and bool(
             list((module_dir / "maps").glob("*.png"))
@@ -2490,9 +2517,10 @@ def module_index(slug: str):
     if index.exists():
         return send_from_directory(str(module_dir), "index.html")
     # Infestation modules may only have module.html — serve it as the landing page
-    fallback = module_dir / "module.html"
+    # (players get their guide instead: module.html is DM material).
+    fallback = module_dir / ("players_guide.html" if _is_external() else "module.html")
     if fallback.exists():
-        return send_from_directory(str(module_dir), "module.html")
+        return send_from_directory(str(module_dir), fallback.name)
     return f"No index.html for module '{safe}'", 404
 
 
@@ -2507,6 +2535,8 @@ def module_file(slug: str, filename: str):
     full = (module_dir / filename).resolve()
     if not _path_within(full, module_dir):
         return "Access denied", 403
+    if _is_external() and not _player_may_open(full):
+        return "DM only", 403
     parent = full.parent
     return send_from_directory(str(parent), full.name)
 
@@ -2682,6 +2712,8 @@ def api_compendium_documents():
             return (raw or {}).get("documents", [])
 
         docs = _mimir_run(_list()) or []
+        if _is_external():                       # NPC DM notes are not for players
+            docs = [d for d in docs if d.get("doc_type") != "dm_notes"]
 
         # Build NPC name→faction lookup from MySQL for dm_notes enrichment
         npc_faction: dict = {}
@@ -2767,7 +2799,8 @@ def api_compendium_document(doc_id: str):
             return (raw or {}).get("document", raw)
 
         doc = _mimir_run(_read())
-        if not doc:
+        # Players get the same answer for a DM note as for a missing document.
+        if not doc or (_is_external() and isinstance(doc, dict) and doc.get("doc_type") == "dm_notes"):
             return jsonify({"error": "Document not found"}), 404
         return jsonify({"document": doc})
     except Exception as e:

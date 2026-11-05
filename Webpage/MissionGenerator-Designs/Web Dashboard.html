@@ -4981,6 +4981,11 @@ wireMobileTabs();
     const settingsPanel = document.getElementById("view-settings");
     if (settingsPanel) settingsPanel.style.display = "none";
 
+    // Hide the bot log: the server only serves it to the DM's PC
+    document.querySelectorAll('[data-view="logs"]').forEach(el => el.style.display = "none");
+    const logsPanel = document.getElementById("view-logs");
+    if (logsPanel) logsPanel.style.display = "none";
+
     // Hide topbar controls (settings button + username chip + backend indicator)
     const tweaks = document.getElementById("btn-tweaks");
     if (tweaks) tweaks.style.display = "none";
