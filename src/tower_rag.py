@@ -338,6 +338,110 @@ def _ensure_index(include_rules: bool) -> None:
             "chunk_terms": chunk_terms,
             "idf": idf,
         }
+        _start_semantic_build(include_rules)
+
+
+# ---------------------------------------------------------------------------
+# Semantic index (NPU embeddings, src/npu.py)
+# ---------------------------------------------------------------------------
+# TF-IDF only finds chunks that share words with the query ("cult leader" misses
+# "Serpent Choir high priest"). Each chunk also gets a bge-small embedding,
+# computed on the NPU in a background thread and cached on disk by content
+# hash; until a mode's vectors are ready, retrieval is TF-IDF alone.
+
+_semantic: Dict[bool, "object"] = {}       # include_rules -> np.ndarray [n_chunks, 384]
+_semantic_building: set = set()
+_embed_cache_lock = threading.Lock()
+RRF_K = 60                                 # reciprocal-rank fusion constant
+SEMANTIC_POOL = 50                         # candidates taken from each ranking
+
+
+def _embed_cache_path() -> Path:
+    from src.npu import models_dir
+    import os
+    return Path(os.getenv("RAG_EMBED_CACHE", str(models_dir() / "cache" / "rag_bge.npz")))
+
+
+def _load_embed_cache() -> Dict[str, "object"]:
+    import numpy as np
+    path = _embed_cache_path()
+    if not path.exists():
+        return {}
+    try:
+        data = np.load(path)
+        return {k: v for k, v in zip(data["keys"].astype(str), data["vecs"].astype(np.float32))}
+    except Exception as e:
+        logger.warning(f"Tower RAG: embedding cache unreadable, rebuilding: {e}")
+        return {}
+
+
+def _save_embed_cache(cache: Dict[str, "object"]) -> None:
+    import numpy as np
+    path = _embed_cache_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.stem + ".tmp.npz")
+    np.savez(tmp, keys=np.array(list(cache.keys())), vecs=np.stack(list(cache.values())).astype(np.float16))
+    tmp.replace(path)
+
+
+def _build_semantic(include_rules: bool) -> None:
+    import hashlib
+    import time
+    import numpy as np
+    from src.npu import get_embedder
+    try:
+        embedder = get_embedder()
+        if embedder is None:
+            return
+        chunks = _caches[include_rules]["chunks"]
+        with _embed_cache_lock:
+            cache = _load_embed_cache()
+            keys = [hashlib.sha1(c.encode("utf-8")).hexdigest() for c in chunks]
+            missing = [i for i, k in enumerate(keys) if k not in cache]
+            t0 = time.monotonic()
+            for n, i in enumerate(missing, 1):
+                cache[keys[i]] = embedder.embed(chunks[i])
+                if n % 500 == 0:
+                    _save_embed_cache(cache)
+            if missing:
+                _save_embed_cache(cache)
+                logger.info(f"🧠 Tower RAG: embedded {len(missing)} new chunks in {time.monotonic() - t0:.0f}s")
+        # Only publish vectors for the index they were built from.
+        if _caches.get(include_rules, {}).get("chunks") is chunks:
+            _semantic[include_rules] = np.stack([cache[k] for k in keys]).astype(np.float32)
+            logger.info(f"🧠 Tower RAG: semantic search ready ({len(keys)} chunks, rules={include_rules})")
+    except Exception as e:
+        logger.warning(f"Tower RAG: semantic index failed, staying on TF-IDF: {e}")
+    finally:
+        _semantic_building.discard(include_rules)
+
+
+def _start_semantic_build(include_rules: bool) -> None:
+    import os
+    if os.getenv("RAG_SEMANTIC", "1") == "0":
+        return
+    if include_rules in _semantic or include_rules in _semantic_building:
+        return
+    _semantic_building.add(include_rules)
+    threading.Thread(target=_build_semantic, args=(include_rules,),
+                     name=f"rag-embed-{include_rules}", daemon=True).start()
+
+
+def _semantic_ranks(query: str, include_rules: bool) -> List[int]:
+    """Chunk indexes by embedding similarity, best first; [] when not ready."""
+    vecs = _semantic.get(include_rules)
+    if vecs is None:
+        return []
+    from src.npu import get_embedder
+    embedder = get_embedder()          # already loaded by the build thread
+    if embedder is None:
+        return []
+    try:
+        sims = vecs @ embedder.embed(query, query=True)
+    except Exception as e:
+        logger.warning(f"Tower RAG: query embedding failed: {e}")
+        return []
+    return [int(i) for i in sims.argsort()[::-1][:SEMANTIC_POOL]]
 
 
 def _tfidf_score(query_terms: List[str], chunk_terms: Dict[str, int], idf: Dict[str, float]) -> float:
@@ -374,7 +478,8 @@ def get_relevant_chunks(query: str, top_k: int = 8) -> List[str]:
 
 
 def _rank_chunks(query: str, top_k: int, *, include_rules: bool) -> List[str]:
-    """TF-IDF ranking over the cached index for one rules-inclusion mode."""
+    """TF-IDF ranking over the cached index for one rules-inclusion mode,
+    fused with semantic similarity once the NPU embeddings are ready."""
     _ensure_index(include_rules=include_rules)
 
     cache = _caches.get(include_rules, {})
@@ -389,17 +494,25 @@ def _rank_chunks(query: str, top_k: int, *, include_rules: bool) -> List[str]:
         return []
 
     scored = []
-    for idx, ch in enumerate(chunks_cache):
-        chunk_terms = chunk_terms_cache[idx]
-        s = _tfidf_score(query_terms, chunk_terms, idf_cache)
+    for idx in range(len(chunks_cache)):
+        s = _tfidf_score(query_terms, chunk_terms_cache[idx], idf_cache)
         if s > 0:
-            scored.append((s, ch))
-
-    if not scored:
-        return []
-
+            scored.append((s, idx))
     scored.sort(key=lambda x: x[0], reverse=True)
-    return [c for _, c in scored[:top_k]]
+    lexical = [idx for _, idx in scored[:SEMANTIC_POOL]]
+
+    semantic = _semantic_ranks(query, include_rules)
+    if not semantic:
+        return [chunks_cache[idx] for idx in lexical[:top_k]]
+
+    # Reciprocal-rank fusion: rank positions, not raw scores, so the two
+    # scales never need calibrating against each other.
+    fused: Dict[int, float] = {}
+    for ranking in (lexical, semantic):
+        for rank, idx in enumerate(ranking):
+            fused[idx] = fused.get(idx, 0.0) + 1.0 / (RRF_K + rank + 1)
+    best = sorted(fused, key=fused.get, reverse=True)[:top_k]
+    return [chunks_cache[idx] for idx in best]
 
 
 # ---------------------------------------------------------------------------

@@ -40,9 +40,10 @@ from typing import Any, Optional
 import aiohttp
 import httpx
 
-from src import gpu_queue
+from src import gpu_queue, image_check
 
-logger = logging.getLogger(__name__)
+# A child of src.log so these lines reach the bot's log handler.
+logger = logging.getLogger("src.log.comfy_client")
 
 OUT_NODE = "99"
 
@@ -314,6 +315,22 @@ def _fit_to_request(png: bytes, width: int, height: int) -> bytes:
         return buf.getvalue()
 
 
+async def _check_image(png: bytes, payload: dict, recipe_name: str, label: str,
+                       attempt: int = 1) -> Optional["image_check.Verdict"]:
+    """CLIP check on the NPU (src/image_check.py); logs scores only, never the prompt."""
+    if not image_check.enabled():
+        return None
+    try:
+        verdict = await asyncio.to_thread(image_check.check, png, payload.get("prompt") or "", recipe_name)
+    except Exception as exc:
+        logger.warning("🔎 Image check failed for [%s]: %r", label, exc)
+        return None
+    if verdict is not None:
+        logger.info("🔎 Image check [%s]%s %s", label or recipe_name,
+                    " (re-roll)" if attempt > 1 else "", verdict.summary())
+    return verdict
+
+
 async def generate(payload: dict, *, label: str = "", checkpoint: str | None = None,
                    timeout: float | None = None) -> dict:
     """Run an A1111-style txt2img/img2img payload on ComfyUI.
@@ -332,10 +349,20 @@ async def generate(payload: dict, *, label: str = "", checkpoint: str | None = N
                     info["render_width"], info["render_height"],
                     f" img2img denoise={info['denoise']:.2f}" if "20" in graph else "")
         pngs = await _run_graph(graph, timeout)
+        if not pngs:
+            raise ComfyError("ComfyUI finished without returning an image")
+        pngs = [_fit_to_request(p, info["width"], info["height"]) for p in pngs]
 
-    if not pngs:
-        raise ComfyError("ComfyUI finished without returning an image")
-    pngs = [_fit_to_request(p, info["width"], info["height"]) for p in pngs]
+        # Inside the turn, so a re-roll does not queue again.
+        verdict = await _check_image(pngs[0], payload, recipe_name, label)
+        if verdict is not None and not verdict.ok and image_check.reroll_enabled():
+            graph2, info2 = build_graph({**payload, "seed": -1}, recipe_name)
+            retry = await _run_graph(graph2, timeout)
+            if retry:
+                retry = [_fit_to_request(p, info2["width"], info2["height"]) for p in retry]
+                second = await _check_image(retry[0], payload, recipe_name, label, attempt=2)
+                if second is None or second.ok or second.style_ok > verdict.style_ok:
+                    pngs, info = retry, info2
     return {
         "images": [base64.b64encode(p).decode("ascii") for p in pngs],
         "parameters": {k: v for k, v in payload.items() if k != "init_images"},
@@ -409,6 +436,71 @@ async def interrupt() -> bool:
     except Exception as exc:
         logger.error("ComfyUI interrupt failed: %r", exc)
         return False
+
+
+async def _studio_jobs_done(client: httpx.AsyncClient, ids: set[str]) -> bool:
+    q = (await client.get(f"{comfy_url()}/queue")).json()
+    live = {item[1] for item in (q.get("queue_running") or []) + (q.get("queue_pending") or [])}
+    return not (ids & live)
+
+
+async def studio_gate_loop(poll_seconds: float = 3.0) -> None:
+    """Give Prompt Studio jobs their place in the GPU queue.
+
+    The studio page parks jobs in its ComfyUI extension instead of queueing
+    them. When some are parked, take an image turn (ahead of loop work: a
+    person is waiting), have the extension queue them, and hold the turn
+    until ComfyUI has finished them, so Ollama never loads mid-render.
+    Prompts stay inside ComfyUI; nothing about them is logged here.
+    """
+    async def heartbeat():
+        # The extension stops waiting for the bot after ~20 s without a poll,
+        # so keep polling while this loop waits for its GPU turn.
+        async with httpx.AsyncClient(timeout=10.0) as hb:
+            while True:
+                try:
+                    await hb.get(f"{comfy_url()}/studio/held")
+                except Exception:
+                    pass
+                await asyncio.sleep(5)
+
+    beat = asyncio.get_running_loop().create_task(heartbeat())
+    try:
+        await _studio_gate(poll_seconds)
+    finally:
+        beat.cancel()
+
+
+async def _studio_gate(poll_seconds: float) -> None:
+    while True:
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(f"{comfy_url()}/studio/held")
+                if r.status_code in (404, 405):   # extension without the holding pen
+                    await asyncio.sleep(60)
+                    continue
+                if r.json().get("held"):
+                    with gpu_queue.player_facing():
+                        async with gpu_queue.turn("image", "prompt studio"):
+                            ids: set[str] = set()
+                            deadline = asyncio.get_running_loop().time() + 1200
+                            while True:
+                                # Release whatever is parked, including jobs added
+                                # while earlier ones render (the model stays loaded).
+                                if (await client.get(f"{comfy_url()}/studio/held")).json().get("held"):
+                                    queued = (await client.post(f"{comfy_url()}/studio/release")).json()
+                                    ids |= set(queued.get("queued") or [])
+                                if await _studio_jobs_done(client, ids) or asyncio.get_running_loop().time() > deadline:
+                                    break
+                                await asyncio.sleep(poll_seconds)
+                            logger.info("🎨 Prompt Studio: ran %d job(s) in a GPU turn", len(ids))
+        except gpu_queue.GpuBusyError:
+            pass                                    # parked jobs stay parked; try again
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            logger.debug("Prompt Studio gate: %r", exc)   # ComfyUI down or restarting
+        await asyncio.sleep(poll_seconds)
 
 
 async def free_vram() -> None:

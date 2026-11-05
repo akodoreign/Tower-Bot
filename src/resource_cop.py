@@ -22,7 +22,8 @@ from typing import Any, Literal
 import httpx
 
 ResourceName = Literal["a1111", "ollama"]
-logger = logging.getLogger(__name__)
+# A child of src.log so these lines reach the bot's log handler.
+logger = logging.getLogger("src.log.resource_cop")
 
 _pipeline_lock = threading.RLock()
 _active_pipelines: dict[str, "PipelineRun"] = {}
@@ -207,22 +208,10 @@ def _ollama_base_url() -> str:
 
 
 def _ollama_queue_snapshot() -> dict[str, Any]:
-    try:
-        import src.ollama_queue as oq
+    """GPU queue state, reported in decisions for visibility only."""
+    from src import gpu_queue
 
-        return {
-            "primary_locked": bool(oq._lock.locked()),
-            "quick_locked": bool(oq._quick_lock.locked()),
-            "primary_waiting": int(getattr(oq, "_waiting", 0)),
-            "quick_waiting": int(getattr(oq, "_quick_waiting", 0)),
-        }
-    except Exception:
-        return {
-            "primary_locked": False,
-            "quick_locked": False,
-            "primary_waiting": 0,
-            "quick_waiting": 0,
-        }
+    return {f"gpu_{k}": v for k, v in gpu_queue.snapshot().items()}
 
 
 def _comfy_url() -> str:
@@ -312,11 +301,10 @@ async def ask_ollama(label: str, *, track: Literal["primary", "quick"] = "primar
     except Exception:
         pass
 
+    # A busy GPU is not a reason to back off: every Ollama request waits for
+    # its turn on the GPU queue. (Refusing here made callers skip whenever one
+    # request was queued behind an image job.) `track` is kept for callers.
     queue = _ollama_queue_snapshot()
-    if track == "primary" and queue["primary_locked"]:
-        return ResourceDecision.wait("ollama", label, 10, "Ollama primary queue is busy", **queue)
-    if track == "quick" and queue["quick_waiting"] >= 3:
-        return ResourceDecision.wait("ollama", label, 20, "Ollama quick queue is backed up", **queue)
 
     base = _ollama_base_url()
     try:

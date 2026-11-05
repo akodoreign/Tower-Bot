@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 MYSQL_CONFIG = {
     "host":     os.getenv("MYSQL_HOST", "localhost"),
     "user":     os.getenv("MYSQL_USER", "Claude"),
-    "password": os.getenv("MYSQL_PASSWORD", "WXdCPJmeDfaQALaktzF6!"),
+    "password": os.getenv("MYSQL_PASSWORD", ""),  # set in .env; never default a real secret here
     "database": os.getenv("MYSQL_DB", "tower_bot"),
     "charset":  "utf8mb4",
     "collation": "utf8mb4_unicode_ci",
@@ -114,14 +114,16 @@ class DatabaseManager:
             raise ValueError(f"Unsafe SQL identifier rejected: {name!r}")
         return name
 
+    @classmethod
+    def _q(cls, name: str) -> str:
+        """Validated, backtick-quoted identifier (MySQL 8 reserves column names like `rank`)."""
+        return f"`{cls._validate_identifier(name)}`"
+
     def insert(self, table: str, data: Dict) -> int:
         """Insert a row and return the new ID."""
-        self._validate_identifier(table)
-        for k in data:
-            self._validate_identifier(k)
-        columns = ", ".join(data.keys())
+        columns = ", ".join(self._q(k) for k in data)
         placeholders = ", ".join(["%s"] * len(data))
-        query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+        query = f"INSERT INTO {self._q(table)} ({columns}) VALUES ({placeholders})"
 
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -133,12 +135,9 @@ class DatabaseManager:
 
     def update(self, table: str, data: Dict, where: Dict) -> int:
         """Update rows matching where conditions."""
-        self._validate_identifier(table)
-        for k in list(data) + list(where):
-            self._validate_identifier(k)
-        set_clause = ", ".join([f"{k} = %s" for k in data.keys()])
-        where_clause = " AND ".join([f"{k} = %s" for k in where.keys()])
-        query = f"UPDATE {table} SET {set_clause} WHERE {where_clause}"
+        set_clause = ", ".join([f"{self._q(k)} = %s" for k in data.keys()])
+        where_clause = " AND ".join([f"{self._q(k)} = %s" for k in where.keys()])
+        query = f"UPDATE {self._q(table)} SET {set_clause} WHERE {where_clause}"
 
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -150,11 +149,8 @@ class DatabaseManager:
 
     def delete(self, table: str, where: Dict) -> int:
         """Delete rows matching where conditions."""
-        self._validate_identifier(table)
-        for k in where:
-            self._validate_identifier(k)
-        where_clause = " AND ".join([f"{k} = %s" for k in where.keys()])
-        query = f"DELETE FROM {table} WHERE {where_clause}"
+        where_clause = " AND ".join([f"{self._q(k)} = %s" for k in where.keys()])
+        query = f"DELETE FROM {self._q(table)} WHERE {where_clause}"
 
         with self.get_connection() as conn:
             cursor = conn.cursor()

@@ -269,7 +269,6 @@ class BaseAgent(ABC):
 
         url = f"{self.config.base_url.rstrip('/')}/api/chat"
 
-        from src.ollama_queue import _lock as _ollama_lock
         from src.ollama_busy import is_available, get_busy_reason
         from src.gpu_queue import text_post
 
@@ -307,8 +306,8 @@ class BaseAgent(ABC):
                     logger.info(f"🤖 [{agent_name}] retry {attempt}/{self.config.max_retries} ...")
                 logger.info(f"🤖 [{agent_name}] → sending to {url} (waiting for response...)")
                 _t0 = time.monotonic()
-                async with _ollama_lock:
-                    resp = await text_post(client, url, json=payload)
+                # text_post waits for this request's turn on the GPU queue
+                resp = await text_post(client, url, json=payload)
                 _elapsed = time.monotonic() - _t0
                 resp.raise_for_status()
                 data = resp.json()
@@ -443,16 +442,14 @@ async def quick_complete(
     num_ctx = int(os.getenv("OLLAMA_AGENT_CTX", os.getenv("OLLAMA_NUM_CTX", "12288")))
 
     try:
-        from src.ollama_queue import _lock as _ollama_lock
         from src.gpu_queue import text_post
         async with httpx.AsyncClient(timeout=timeout) as client:
-            async with _ollama_lock:
-                resp = await text_post(client, url, json={
-                    "model": model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": False,
-                    "options": {"num_gpu": num_gpu, "num_ctx": num_ctx},
-                })
+            resp = await text_post(client, url, json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "options": {"num_gpu": num_gpu, "num_ctx": num_ctx},
+            })
             resp.raise_for_status()
             data = resp.json()
             if "message" in data:

@@ -47,20 +47,39 @@ async def test_ask_a1111_allows_while_gpu_busy(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_ask_ollama_waits_when_primary_queue_locked(monkeypatch):
+async def test_ask_ollama_allows_while_gpu_busy(monkeypatch):
+    # A busy GPU is not a reason to back off: the request waits for its turn.
+    # (Refusing here is what made agents skip with "Ollama primary queue is busy".)
+    import src.gpu_queue as gpu_queue
     import src.ollama_busy as ollama_busy
-    monkeypatch.setattr(ollama_busy, "is_available", lambda: True)
-    monkeypatch.setattr(
-        resource_cop,
-        "_ollama_queue_snapshot",
-        lambda: {"primary_locked": True, "quick_locked": False, "primary_waiting": 0, "quick_waiting": 0},
-    )
+    monkeypatch.setattr(ollama_busy, "is_available_for", lambda holder: True)
 
-    decision = await resource_cop.ask_ollama("smoke")
+    class FakeResp:
+        def raise_for_status(self):
+            return None
 
-    assert not decision.run_now
-    assert decision.resource == "ollama"
-    assert "primary" in decision.reason.lower()
+        def json(self):
+            return {"models": []}
+
+    class FakeClient:
+        def __init__(self, *a, **k):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def get(self, url):
+            return FakeResp()
+
+    monkeypatch.setattr(resource_cop.httpx, "AsyncClient", FakeClient)
+    async with gpu_queue.turn("image", "smoke-holder"):
+        for track in ("primary", "quick"):
+            decision = await resource_cop.ask_ollama("smoke", track=track)
+            assert decision.run_now, track
+            assert decision.details["gpu_busy"] is True
 
 
 @pytest.mark.asyncio

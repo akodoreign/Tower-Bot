@@ -1687,28 +1687,25 @@ RULES:
 - Rewards within hard limits. No Kharma over 1200.
 - No preamble. No sign-off. Mission post only."""
 
-        # Run async agent in a fresh event loop via thread executor to avoid Flask loop conflicts.
-        # IMPORTANT: src/ollama_queue.py creates asyncio.Lock objects at module level, so they
-        # are bound to whichever event loop was current at import time.  We must rebind them to
-        # the new loop before calling any code that uses them, otherwise asyncio raises
-        # "Lock is bound to a different event loop".
-        def _run_agent():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        # The agent must run on the bot's event loop: the GPU queue it waits in
+        # (src/gpu_queue.py) belongs to that loop and is not thread-safe. Only a
+        # dashboard started without the bot gets a private loop.
+        async def _agent_call():
+            from src.gpu_queue import mark_player_facing
+            mark_player_facing()               # someone is waiting on the dashboard
+            agent = KimiAgent()
             try:
-                import src.ollama_queue as _oq
-                _oq._lock       = asyncio.Lock()
-                _oq._quick_lock = asyncio.Lock()
-                agent = KimiAgent()
-                resp  = loop.run_until_complete(agent.complete(prompt=prompt, temperature=0.88))
-                loop.run_until_complete(agent.close())
-                return resp
+                return await agent.complete(prompt=prompt, temperature=0.88)
             finally:
-                loop.close()
+                await agent.close()
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-            future   = ex.submit(_run_agent)
-            response = future.result(timeout=600)
+        from src.gpu_queue import main_loop
+        bot_loop = main_loop()
+        if bot_loop is not None:
+            response = asyncio.run_coroutine_threadsafe(_agent_call(), bot_loop).result(timeout=600)
+        else:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                response = ex.submit(asyncio.run, _agent_call()).result(timeout=600)
 
         if not response.success:
             return jsonify({"error": response.error or "Agent returned no content"}), 500

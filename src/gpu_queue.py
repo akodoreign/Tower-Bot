@@ -12,6 +12,11 @@ turn ends the next one goes to the oldest waiter of the kind already loaded.
 Anyone who has waited longer than GPU_TURN_STARVE_SECONDS goes first, so the
 other kind is never starved.
 
+Requests made for a player who is waiting on the answer (slash commands,
+/chat, the dashboard) are marked with ``player_facing()`` and jump ahead of
+background loop work. They still wait for the job already running: a
+render or text call is never interrupted.
+
 Turns are re-entrant for the task that holds them (and for tasks it spawns
 while holding), so a pipeline that holds an image turn can still ask Ollama
 for a prompt without deadlocking on itself.
@@ -32,13 +37,14 @@ import contextvars
 import logging
 import os
 import time
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Literal, Optional
+from typing import Any, AsyncIterator, Iterator, Literal, Optional
 
 import httpx
 
-logger = logging.getLogger(__name__)
+# A child of src.log so these lines reach the bot's log handler.
+logger = logging.getLogger("src.log.gpu_queue")
 
 Kind = Literal["text", "image"]
 
@@ -53,12 +59,14 @@ class _Waiter:
     label: str
     since: float
     granted: asyncio.Future
+    player: bool = False
 
 
 _busy = False
 _waiters: list[_Waiter] = []
 _owner: Optional[object] = None          # token of the turn currently running
 _held = contextvars.ContextVar("gpu_turn_token", default=None)
+_player = contextvars.ContextVar("gpu_player_facing", default=False)
 _current_kind: Optional[Kind] = None     # what is (probably) resident in VRAM
 _current_label = ""
 _turn_started = 0.0
@@ -92,6 +100,21 @@ def main_loop() -> Optional[asyncio.AbstractEventLoop]:
     return _loop if _loop is not None and _loop.is_running() else None
 
 
+def mark_player_facing() -> None:
+    """Mark the rest of the current task (and tasks it spawns) as answering a player."""
+    _player.set(True)
+
+
+@contextmanager
+def player_facing() -> Iterator[None]:
+    """GPU turns taken inside this block go ahead of background work."""
+    token = _player.set(True)
+    try:
+        yield
+    finally:
+        _player.reset(token)
+
+
 def holds_turn() -> bool:
     token = _held.get()
     return token is not None and token is _owner
@@ -110,18 +133,21 @@ def snapshot() -> dict[str, Any]:
         "waiting": len(_waiters),
         "waiting_text": sum(1 for w in _waiters if w.kind == "text"),
         "waiting_image": sum(1 for w in _waiters if w.kind == "image"),
+        "waiting_player": sum(1 for w in _waiters if w.player),
     }
 
 
 def _pick_next() -> Optional[_Waiter]:
     if not _waiters:
         return None
+    # Players first; the same-kind and starvation rules order each group.
+    pool = [w for w in _waiters if w.player] or _waiters
     now = time.monotonic()
-    starving = [w for w in _waiters if now - w.since >= _starve_seconds()]
+    starving = [w for w in pool if now - w.since >= _starve_seconds()]
     if starving:
         return starving[0]
-    same_kind = [w for w in _waiters if w.kind == _current_kind]
-    return same_kind[0] if same_kind else _waiters[0]
+    same_kind = [w for w in pool if w.kind == _current_kind]
+    return same_kind[0] if same_kind else pool[0]
 
 
 def _release() -> None:
@@ -140,9 +166,10 @@ async def _acquire(kind: Kind, label: str) -> None:
     if not _busy and not _waiters:
         _busy = True
         return
-    logger.info("🎛️ GPU: %s [%s] waiting behind %s [%s] (%d queued)",
-                kind, label, _current_kind, _current_label, len(_waiters))
-    waiter = _Waiter(kind, label, time.monotonic(), asyncio.get_running_loop().create_future())
+    player = _player.get()
+    logger.info("🎛️ GPU: %s [%s]%s waiting behind %s [%s] (%d queued)",
+                kind, label, " (player)" if player else "", _current_kind, _current_label, len(_waiters))
+    waiter = _Waiter(kind, label, time.monotonic(), asyncio.get_running_loop().create_future(), player)
     _waiters.append(waiter)
     try:
         done, _ = await asyncio.wait({waiter.granted}, timeout=_max_wait())

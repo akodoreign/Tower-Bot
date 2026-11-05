@@ -4,7 +4,7 @@ import asyncio
 import random
 from typing import List, Dict, Optional
 
-from src import personas
+from src import gpu_queue, personas
 from src.log import logger
 from src.providers import ProviderManager, ProviderType, ModelInfo
 from utils.message_utils import send_split_message
@@ -69,6 +69,14 @@ def _peak_power_delay_seconds() -> int:
     return 0
 
 
+class _PlayerFirstTree(discord.app_commands.CommandTree):
+    """Slash commands run in their own task; mark it so its GPU turns go ahead of loop work."""
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        gpu_queue.mark_player_facing()
+        return True
+
+
 class DiscordClient(discord.Client):
     def __init__(self) -> None:
         intents = discord.Intents.default()
@@ -77,7 +85,7 @@ class DiscordClient(discord.Client):
         super().__init__(intents=intents)
 
         # Slash command tree — created here so setup_hook can sync it
-        self.tree = discord.app_commands.CommandTree(self)
+        self.tree = _PlayerFirstTree(self)
 
         # Initialize provider manager
         self.provider_manager = ProviderManager()
@@ -166,6 +174,9 @@ class DiscordClient(discord.Client):
         loop.create_task(self.ad_loop())
         loop.create_task(self.towerbot_world_shop_loop())
         loop.create_task(self.towerbot_item_art_loop())
+        from src.comfy_client import studio_gate_loop
+        loop.create_task(studio_gate_loop())
+        loop.run_in_executor(None, self._warm_up_npu)
 
         while True:
             if self.current_channel is not None:
@@ -173,12 +184,24 @@ class DiscordClient(discord.Client):
                     async with self.current_channel.typing():
                         message, user_message = await self.message_queue.get()
                         try:
-                            await self.send_message(message, user_message)
+                            with gpu_queue.player_facing():
+                                await self.send_message(message, user_message)
                         except Exception as e:
                             logger.exception(f"Error while processing message: {e}")
                         finally:
                             self.message_queue.task_done()
             await asyncio.sleep(1)
+
+    @staticmethod
+    def _warm_up_npu() -> None:
+        """Compile the NPU models and start the RAG embedding build off the event loop."""
+        try:
+            from src import image_check, tower_rag
+            image_check.warm_up()
+            for include_rules in (False, True):
+                tower_rag._ensure_index(include_rules)
+        except Exception as e:
+            logger.warning(f"NPU warm-up failed (search and image checks fall back): {e}")
 
     def _beat(self, name: str, ok: bool = True, note: str = "") -> None:
         """Record a background-loop heartbeat (see src/loop_health.py). Safe no-op

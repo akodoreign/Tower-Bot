@@ -26,3 +26,7 @@ imageio
 imageio-ffmpeg
 edge-tts>=7.0
 mcp>=1.27,<2  # mimir_client drives ClientSession by hand; 2.x hangs on initialize
+# Intel NPU models (src/npu.py); ONNX files live in C:\AI\models\npu, see npu.py
+openvino==2026.4.1
+tokenizers==0.23.3
+huggingface_hub==2.4.0  # only to fetch those models

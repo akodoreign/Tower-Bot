@@ -132,6 +132,43 @@ async def test_starving_waiter_jumps_the_kind_preference(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_player_request_jumps_background_work_but_waits_for_running_job():
+    order = []
+    release = asyncio.Event()
+
+    async def holder():
+        async with gpu_queue.turn("image", "story image"):
+            await release.wait()
+            order.append("story image")      # the running render is never interrupted
+
+    async def job(kind, name, player=False):
+        if player:
+            gpu_queue.mark_player_facing()   # what the slash-command tree does
+        async with gpu_queue.turn(kind, name):
+            order.append(name)
+
+    first = asyncio.create_task(holder())
+    await asyncio.sleep(0)
+    jobs = [asyncio.create_task(job("image", "portrait")),
+            asyncio.create_task(job("text", "bulletin")),
+            asyncio.create_task(job("text", "/chat", player=True))]
+    await asyncio.sleep(0)
+    assert gpu_queue.snapshot()["waiting_player"] == 1
+    release.set()
+    await asyncio.gather(first, *jobs)
+
+    # Image is loaded, but the player's text goes first; then text stays loaded.
+    assert order == ["story image", "/chat", "bulletin", "portrait"]
+
+
+@pytest.mark.asyncio
+async def test_player_facing_block_is_scoped():
+    with gpu_queue.player_facing():
+        assert gpu_queue._player.get() is True
+    assert gpu_queue._player.get() is False
+
+
+@pytest.mark.asyncio
 async def test_cancelled_waiter_leaves_the_queue():
     release = asyncio.Event()
 
