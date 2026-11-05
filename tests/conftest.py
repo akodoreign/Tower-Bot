@@ -14,6 +14,21 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
+def _skip_without_mysql(request):
+    """@pytest.mark.mysql tests read the real catalog (monsters, gazetteer...):
+    skip them, rather than fail, where MySQL can't be opened. db_api connects on
+    first use, so everything else imports and runs without a database."""
+    if request.node.get_closest_marker("mysql") is None:
+        return
+    import mysql.connector
+    from src.db_api import db
+    try:
+        db._get_pool()
+    except mysql.connector.Error as exc:
+        pytest.skip(f"MySQL unavailable: {exc.__class__.__name__}")
+
+
+@pytest.fixture(autouse=True)
 def isolated_gpu_queue(monkeypatch):
     """Every test gets a fresh GPU queue whose kind switches never reach the
     real Ollama/ComfyUI (no unloading models or freeing VRAM on this machine).

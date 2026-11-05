@@ -717,6 +717,7 @@ def test_llm_statblock_generator_is_retired_with_the_reason():
     assert "RETIRED" in preamble, "no note explaining why this is unused"
 
 
+@pytest.mark.mysql
 def test_curated_substitution_produces_real_ability_scores():
     """The substitute must be a full stat block, not another stub."""
     from src.mission_builder.monster_roster import pick_monster_by_cr, mission_enemy_entry

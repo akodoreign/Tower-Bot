@@ -66,8 +66,11 @@ def test_sabotage_normalize_plan_fills_partial_llm_json():
     assert plan["steps"] == ["enter quietly", "salt the gears"]
 
 
-def test_rescue_normalize_plan_fills_partial_llm_json():
-    roles = {"sponsor": "Patchwork Saints", "obstacle": "Tower Authority"}
+def test_rescue_normalize_plan_fills_partial_llm_json(monkeypatch):
+    # The fallback plan looks up a captor stat block in the monster catalog; this
+    # test is about filling the plan, so stand in "no catalog match".
+    monkeypatch.setattr(rp, "logical_enemy_roster_for_mission", lambda *a, **kw: [])
+    roles ={"sponsor": "Patchwork Saints", "obstacle": "Tower Authority"}
     target = {"name": "Eli Mar", "type": "civilian", "detail": "trapped under a collapsed stair"}
     location = {"name": "Old Transit Hall", "district": "Low Market"}
     mission = {"title": "Rescue Eli Mar from Old Transit Hall"}

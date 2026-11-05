@@ -5,6 +5,7 @@ Provides clean CRUD operations for all campaign data.
 import os
 import json
 import logging
+import threading
 import uuid
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -34,23 +35,28 @@ POOL_CONFIG = {
 
 
 class DatabaseManager:
-    """Manages MySQL connections and provides CRUD operations."""
-    
+    """Manages MySQL connections and provides CRUD operations.
+
+    The pool opens on first use, not at import: importing this module (which
+    most of src/ does) must not need a live MySQL login, so tests and tools can
+    load bot code without the database. A failed open is retried on the next use.
+    """
+
     _instance = None
     _pool = None
-    
+    _pool_lock = threading.Lock()
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(self):
         if self._initialized:
             return
         self._initialized = True
-        self._init_pool()
-    
+
     def _init_pool(self):
         """Initialize connection pool."""
         try:
@@ -59,13 +65,20 @@ class DatabaseManager:
         except mysql.connector.Error as e:
             logger.error(f"Failed to initialize connection pool: {e}")
             raise
-    
+
+    def _get_pool(self):
+        if self._pool is None:
+            with self._pool_lock:              # dashboard threads race the first query
+                if self._pool is None:
+                    self._init_pool()
+        return self._pool
+
     @contextmanager
     def get_connection(self):
         """Context manager for database connections."""
         conn = None
         try:
-            conn = self._pool.get_connection()
+            conn = self._get_pool().get_connection()
             yield conn
         except mysql.connector.Error as e:
             logger.error(f"Database error: {e}")
