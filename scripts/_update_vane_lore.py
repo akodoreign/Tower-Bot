@@ -2,9 +2,13 @@
 import mysql.connector, json, sys
 sys.path.insert(0, ".")
 
+import os
+from dotenv import load_dotenv
+load_dotenv()  # MYSQL_* from .env; never hardcode the password here
+
 db = mysql.connector.connect(
-    host="localhost", user="Claude",
-    password="WXdCPJmeDfaQALaktzF6!", database="tower_bot"
+    host=os.getenv("MYSQL_HOST", "localhost"), user=os.getenv("MYSQL_USER", "Claude"),
+    password=os.getenv("MYSQL_PASSWORD", ""), database=os.getenv("MYSQL_DB", "tower_bot"),
 )
 cur = db.cursor(dictionary=True)
 cur2 = db.cursor()
