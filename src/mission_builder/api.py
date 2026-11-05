@@ -16,7 +16,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -384,71 +384,6 @@ async def generate_mission_for_board(
     return mission_dir
 
 
-async def generate_dungeon_delve_mission(
-    location_name: Optional[str] = None,
-    faction: str = "Independent",
-    party_level: Optional[int] = None,
-    player_name: str = "Unclaimed",
-    reward: str = "500 EC + 100 Kharma",
-) -> Optional[Path]:
-    """
-    Generate a dungeon delve mission (if dungeon_delve module is available).
-    
-    Args:
-        location_name: Optional specific location
-        faction: Sponsoring faction
-        party_level: Target party level (auto-detected if None)
-        player_name: Claiming player/party
-        reward: Reward string
-    
-    Returns:
-        Path to mission output directory, or None if dungeon_delve not available
-    """
-    from src.resource_cop import (
-        wait_for_ollama_turn, start_pipeline, finish_pipeline, append_pipeline_failure,
-    )
-
-    decision = await wait_for_ollama_turn("dungeon_delve", track="primary")
-    if not decision.run_now:
-        logger.warning(f"🏰 Dungeon delve deferred by cop: {decision.reason}")
-        return None
-
-    run = await start_pipeline(
-        "dungeon_delve",
-        mission_type="dungeon-delve",
-        phase="generating",
-    )
-    try:
-        from .dungeon_delve import generate_dungeon_delve, save_dungeon_delve
-
-        logger.info("🏰 Generating dungeon delve mission...")
-
-        result = await generate_dungeon_delve(
-            location_name=location_name,
-            faction=faction,
-            party_level=party_level,
-            player_name=player_name,
-            reward=reward,
-        )
-
-        mission_dir = await save_dungeon_delve(result)
-        if mission_dir:
-            logger.info(f"🏰 Dungeon delve saved: {mission_dir}")
-
-        await finish_pipeline(run.run_id, status="finished")
-        return mission_dir
-
-    except ImportError:
-        await finish_pipeline(run.run_id, status="failed")
-        logger.warning("⚠️ Dungeon delve module not available")
-        return None
-    except Exception as e:
-        await append_pipeline_failure(run.run_id, e)
-        await finish_pipeline(run.run_id, status="failed")
-        logger.error(f"❌ Dungeon delve generation failed: {e}", exc_info=True)
-        return None
-
-
 # ─────────────────────────────────────────────────────────────────────────
 # Exports
 # ─────────────────────────────────────────────────────────────────────────
@@ -466,5 +401,4 @@ __all__ = [
     
     # Integration
     "generate_mission_for_board",
-    "generate_dungeon_delve_mission",
 ]

@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Iterable
 
 from src.mission_builder.html_renderer import render_component, _page
-from src.mission_builder.vtt_renderer import PRETTY_TIMEOUT, stylize_pretty_battlemap
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +32,9 @@ def write_maps_page(out_dir: Path, title: str, faction: str, image_paths: Iterab
     for p in tactical_paths:
         pretty = p.with_name(f"{p.stem}_pretty{p.suffix}")
         nice = p.with_name(f"{p.stem}_nice{p.suffix}")
-        # Pretty map generation is NOT done here — it runs earlier in the map pipeline
-        # and would block the async event loop for the full PRETTY_TIMEOUT if attempted
-        # synchronously. Display whatever exists; missing pretty maps show a placeholder.
+        # No pipeline makes pretty maps automatically; scripts/retry_map_pretty.py and
+        # scripts/backfill_infestation_room_maps.py make them by hand. Display whatever
+        # exists; missing pretty maps show a placeholder.
         preview = pretty if pretty.exists() else nice
         pretty_rel = preview.relative_to(out_dir).as_posix() if preview.exists() and preview.is_relative_to(out_dir) else ""
         rel = p.relative_to(out_dir).as_posix() if p.is_relative_to(out_dir) else p.name

@@ -24,7 +24,7 @@ class TestHighLevelAPI:
         path = get_mission_output_path("The Silent Vault")
         
         assert path.name.startswith("The_Silent_Vault_")
-        assert "20260" in path.name  # Year starting with 2026
+        assert f"_{datetime.now():%Y%m%d}_" in path.name  # today's date stamp
     
     def test_get_mission_output_path_with_timestamp(self):
         """Test generating mission output path with custom timestamp."""
