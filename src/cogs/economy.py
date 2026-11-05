@@ -1,6 +1,7 @@
 """Economy commands — /finances, /prices, /bid, /buynow, /mybids."""
 
 from src.gpu_queue import text_post
+import asyncio
 import os
 import discord
 from discord import app_commands
@@ -109,7 +110,7 @@ def setup(client):
 
         from src.tower_rag import search_docs
         try:
-            hits = search_docs(query, top_k=5)
+            hits = await asyncio.to_thread(search_docs, query, 5)
             context_block = "\n\n".join(hits) if hits else "(No matching entries found in campaign docs.)"
         except Exception as e:
             logger.warning(f"/prices RAG error: {e}")

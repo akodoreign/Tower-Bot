@@ -1636,8 +1636,9 @@ class DiscordClient(discord.Client):
         # Build strict Tower context using RAG over campaign_docs
         system_context = ""
         try:
-            system_context = build_context_from_messages(
-                self.conversation_history
+            # TF-IDF pass + NPU query embedding: off the event loop.
+            system_context = await asyncio.to_thread(
+                build_context_from_messages, list(self.conversation_history)
             )
         except Exception as e:
             logger.exception(f"tower_rag.build_context_from_messages failed: {e}")

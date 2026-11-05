@@ -14,6 +14,7 @@ Exported:
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -178,7 +179,7 @@ async def answer_rules_question(query: str) -> RulesAnswer:
 
     # Step 2: RAG retrieval — always include rules docs
     try:
-        hits = search_docs(query, top_k=6)
+        hits = await asyncio.to_thread(search_docs, query, 6)
         context_block = "\n\n---\n\n".join(hits) if hits else ""
     except Exception as e:
         logger.warning(f"rules_agent RAG error: {e}")
@@ -273,7 +274,7 @@ async def lookup_spell_or_feature(name: str) -> str:
     from src.tower_rag import search_docs
 
     try:
-        hits = search_docs(name, top_k=4)
+        hits = await asyncio.to_thread(search_docs, name, 4)
         context = "\n\n---\n\n".join(hits) if hits else "(Not found in loaded rulebook excerpts.)"
     except Exception:
         context = "(RAG unavailable.)"

@@ -439,6 +439,7 @@ _SEED_ITEMS = [
 
 def _load_towerbay() -> List[Dict]:
     """Load TowerBay listings from database."""
+    _ensure_bid_schema()
     try:
         rows = raw_query("SELECT * FROM towerbay_auctions ORDER BY id")
         listings = []
@@ -489,6 +490,7 @@ def _save_towerbay(listings: List[Dict]) -> None:
 
 def _save_towerbay_item(item: Dict) -> None:
     """Save a single TowerBay item to database."""
+    _ensure_bid_schema()
     try:
         item_id = item.get("id")
         name = item.get("name", "Unknown Item")
@@ -1446,8 +1448,8 @@ def format_towerbay_embeds():
 # Real-player bid engine
 # ---------------------------------------------------------------------------
 
-def _ensure_bid_columns() -> None:
-    """Idempotent: ensure towerbay_auctions has real-bidder columns."""
+def _ensure_bid_columns() -> bool:
+    """Idempotent: ensure towerbay_auctions has real-bidder columns. True on success."""
     try:
         cols = raw_query(
             "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
@@ -1475,15 +1477,24 @@ def _ensure_bid_columns() -> None:
                 INDEX idx_bidder  (bidder_id)
             )
         """)
+        return True
     except Exception as e:
         logger.warning(f"TowerBay bid column check: {e}")
+        return False
 
 
-# Run on import so the columns are always present
-try:
-    _ensure_bid_columns()
-except Exception as _e:
-    logger.warning("TowerBay bid column startup failed: %s", _e)
+_bid_schema_ready = False
+
+
+def _ensure_bid_schema() -> None:
+    """Run _ensure_bid_columns once per process, before the first TowerBay query.
+
+    It used to run on import, so merely importing this module (tests, tools,
+    the dashboard) altered the live schema. A failed check is retried next use.
+    """
+    global _bid_schema_ready
+    if not _bid_schema_ready:
+        _bid_schema_ready = _ensure_bid_columns()
 
 
 def _log_bid(
@@ -1495,6 +1506,7 @@ def _log_bid(
     successful: bool,
     proxy_max: Optional[int] = None,
 ) -> None:
+    _ensure_bid_schema()
     try:
         db.insert("towerbay_bids", {
             "listing_id":   str(listing_id),
@@ -1525,6 +1537,7 @@ def place_bid(
         new_price     int   — current bid after this action
         item_name     str
     """
+    _ensure_bid_schema()
     rows = raw_query(
         "SELECT * FROM towerbay_auctions WHERE id = %s AND status = 'active'", (listing_id,)
     )
@@ -1635,6 +1648,7 @@ def buy_now(listing_id: int, buyer_id: int, buyer_name: str) -> Dict:
     Immediately purchase a listing at its buy_now_price.
     Returns: {success, message, price, item_name}
     """
+    _ensure_bid_schema()
     rows = raw_query(
         "SELECT * FROM towerbay_auctions WHERE id = %s AND status = 'active'", (listing_id,)
     )
@@ -1678,6 +1692,7 @@ def buy_now(listing_id: int, buyer_id: int, buyer_name: str) -> Dict:
 
 def get_active_listings() -> List[Dict]:
     """Return active AI listings — used for autocomplete and /mybids."""
+    _ensure_bid_schema()
     try:
         rows = raw_query(
             "SELECT id, item_name, current_bid, buy_now_price, "
@@ -1692,6 +1707,7 @@ def get_active_listings() -> List[Dict]:
 
 def get_player_bids(player_id: int) -> List[Dict]:
     """Return all recent bids by a player across AI and player listings."""
+    _ensure_bid_schema()
     try:
         rows = raw_query(
             "SELECT tb.*, "
