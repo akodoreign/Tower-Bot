@@ -420,6 +420,27 @@ _MISSION_BLOB_EXCLUDE = frozenset({
 })
 
 
+_REWARD_EC_RE = re.compile(r"(\d[\d,]*)\s*EC\b")
+
+
+def _reward_ec_for(mission: dict) -> int:
+    """The EC part of a mission's reward, for the missions.reward_ec column.
+
+    reward_ec is excluded from the blob as a real column, but was never written to
+    the column either, so every mission since April 2026 stored 0 and the
+    dashboard showed no EC reward. Takes mission["reward_ec"] when set, else the
+    first "<n> EC" in the reward text ("250 EC + 40 Kharma" -> 250).
+    """
+    try:
+        value = int(mission.get("reward_ec") or 0)
+    except (TypeError, ValueError):
+        value = 0
+    if value > 0:
+        return value
+    m = _REWARD_EC_RE.search(str(mission.get("reward") or ""))
+    return int(m.group(1).replace(",", "")) if m else 0
+
+
 def _save_missions(missions: List[dict]) -> None:
     """Save all missions to database."""
     try:
@@ -485,6 +506,7 @@ def _save_mission(mission: dict) -> None:
                 expires_at = None
 
         claimed_by = mission.get("player_claimer", "") or mission.get("claim_party", "") or ""
+        reward_ec = _reward_ec_for(mission)
 
         if mission_id:
             # Check if exists
@@ -493,9 +515,9 @@ def _save_mission(mission: dict) -> None:
                 raw_execute(
                     "UPDATE missions SET title = %s, faction = %s, tier = %s, difficulty = %s, "
                     "status = %s, claimed_by = %s, message_id = %s, mission_json = %s, "
-                    "posted_at = %s, expires_at = %s WHERE id = %s",
+                    "posted_at = %s, expires_at = %s, reward_ec = %s WHERE id = %s",
                     (title, faction, tier, difficulty, status, claimed_by or None,
-                     message_id, mission_json, posted_at, expires_at, mission_id)
+                     message_id, mission_json, posted_at, expires_at, reward_ec, mission_id)
                 )
                 return
 
@@ -508,6 +530,7 @@ def _save_mission(mission: dict) -> None:
             "status":       status,
             "claimed_by":   claimed_by or None,
             "message_id":   message_id,
+            "reward_ec":    reward_ec,
             "mission_json": mission_json,
             "posted_at":    posted_at,
             "expires_at":   expires_at,
