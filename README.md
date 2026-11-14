@@ -1,170 +1,127 @@
-# ChatGPT Discord Bot
+# Tower Bot — The Tower of Last Chance
 
-> ### Build your own Discord bot with multiple AI providers
+A Discord bot that runs a living D&D 5e (2024) campaign world. The **Tower of Last Chance** watches over the
+Undercity: it posts the news, runs the mission board and the auction house, moves the weather and the markets, keeps
+track of NPCs and adventuring parties, and answers players in character — between sessions, around the clock.
+
+It runs on a local LLM stack (Ollama) with optional cloud providers, keeps all campaign data in MySQL, and can
+generate full mission modules (`.docx`, with maps and portraits) for the DM.
 
 ---
-> [!IMPORTANT]
->
-> **Major Refactor (2025/07):**
-> - **5 AI Providers**: Free (g4f), OpenAI, Claude, Gemini, Grok
-> - **No Cookie Authentication**: Removed unreliable cookie-based auth for free providers
 
-### Chat
+## What it does
 
-![image](https://user-images.githubusercontent.com/89479282/206497774-47d960cd-1aeb-4fba-9af5-1f9d6ff41f00.gif)
+**A world that keeps moving**
+- **News feed** — in-world bulletins on a schedule, with an optional DM approval step (`/newsdraft`).
+- **Weather** — a simulated dome with 44 weather types.
+- **Economy** — the EC/Kharma exchange rate, item prices and a stock-market sector index.
+- **TowerBay** — an auction house: players list items from their character sheets, bid and buy out.
+- **Factions** — reputation that shifts with events, plus a faction event calendar.
+- **NPCs and parties** — rival adventuring parties with records and reputations; an NPC roster with daily life events
+  (arrivals, departures, injuries, deaths), appearances and history.
+- **Rifts, the arena, bounties, missing persons** — recurring threads the world posts about on its own.
 
-# Setup
-## Prerequisites
-* **Python 3.9 or later**
-* **Rename the file `.env.example` to `.env`**
-* Running `pip3 install -r requirements.txt` to install the required dependencies
-* Optional: API keys for premium providers (OpenAI, Claude, Gemini, Grok)
----
-## Step 1: Create a Discord bot
+**For the table**
+- **Mission board** — new missions post to the board; NPC parties claim and complete them; players claim theirs, and
+  the DM resolves the outcome (`/resolvemission`).
+- **Mission modules** — a pipeline that turns a claimed mission into a DM-runnable module document with encounters,
+  maps and NPC portraits (`/genmodule`).
+- **In-character chat** — `/chat` talks to the Tower, with retrieval over the campaign so it remembers your world.
+- **Rules lookup** — `/rules` and `/spell` for D&D 5e 2024 rules, conditions and spells.
+- **Characters** — profiles and appearance notes per player character; style and clothing descriptions.
+- **Images** — scene, NPC and location art through a local Stable Diffusion (A1111) server.
 
-1. Go to https://discord.com/developers/applications create an application
-2. Build a Discord bot under the application
-3. Get the token from bot setting
+**Behind the scenes**
+- Multi-agent generation (orchestrator, guild council, news agents) with a nightly self-learning loop.
+- A web dashboard (Flask) with world state and loop-health monitoring.
+- Optional sync with a Mimir campaign server for characters and equipment.
 
-   ![image](https://user-images.githubusercontent.com/89479282/205949161-4b508c6d-19a7-49b6-b8ed-7525ddbef430.png)
-4. Store the token to `.env` under the `DISCORD_BOT_TOKEN`
-
-   <img height="190" width="390" alt="image" src="https://user-images.githubusercontent.com/89479282/222661803-a7537ca7-88ae-4e66-9bec-384f3e83e6bd.png">
-
-5. Turn MESSAGE CONTENT INTENT `ON`
-
-   ![image](https://user-images.githubusercontent.com/89479282/205949323-4354bd7d-9bb9-4f4b-a87e-deb9933a89b5.png)
-
-6. Invite your bot to your server via OAuth2 URL Generator
-
-   ![image](https://user-images.githubusercontent.com/89479282/205949600-0c7ddb40-7e82-47a0-b59a-b089f929d177.png)
-
-
-
-## Step 2: Run the bot on the desktop
-
-1. Open a terminal or command prompt
-
-2. Navigate to the directory where you installed the ChatGPT Discord bot
-
-3. Run `python3 main.py` or `python main.py` to run the bot
----
-## Step 2: Run the bot with Docker
-
-1. Build the Docker image & run the Docker container with `docker compose up -d`
-
-2. Inspect whether the bot works well `docker logs -t chatgpt-discord-bot`
-
-   ### Stop the bot:
-
-   * `docker ps` to see the list of running services
-   * `docker stop <BOT CONTAINER ID>` to stop the running bot
-
-### Have a good chat!
 ---
 
-## Provider Configuration
+## Requirements
 
-### Free Provider (unstable)
-Outdated model, close to GPT-3.5 or GPT-4 capabilities
+- **Python 3.11**
+- **MySQL** — the authoritative store for all campaign data (schema in `database_schema.sql`)
+- **[Ollama](https://ollama.com/)** — local LLM (the default model is set in `.env`, e.g. `qwen3-8b-slim`)
+- **A Discord bot token** with the *Message Content* intent enabled
+- Optional: **Stable Diffusion WebUI (A1111)** for images, API keys for OpenAI / Claude / Gemini / Grok, a Mimir server
 
-No configuration required
+## Setup
 
-### Premium Providers (Optional)
+1. Clone the repository and install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Copy `.env.example` to `.env` and fill it in: the Discord token and channel IDs (news, mission board, mission
+   results, maps), the MySQL connection, the Ollama URL and model, and any optional keys.
+3. Create the database from `database_schema.sql`.
+4. Create the bot at the [Discord Developer Portal](https://discord.com/developers/applications), turn on the
+   *Message Content* intent, and invite it to your server.
+5. Start it:
+   ```bash
+   python main.py
+   ```
+   The dashboard starts alongside the bot (port `DASHBOARD_PORT`, default 5000). On Windows, `start_tower.ps1`
+   starts the whole stack (Ollama, A1111 and the bot) in order. Docker files are included as well.
+6. In Discord, run `/sync` once so the slash commands register in your server.
 
-#### OpenAI
-1. Obtain your API key from https://platform.openai.com/api-keys
-2. Add to `.env`: `OPENAI_KEY=your_api_key_here`
-
-#### Claude (Anthropic)
-1. Get API key from https://console.anthropic.com/
-2. Add to `.env`: `CLAUDE_KEY=your_api_key_here`
-
-#### Gemini (Google)
-1. Get API key from https://ai.google.dev/
-2. Add to `.env`: `GEMINI_KEY=your_api_key_here`
-
-#### Grok (xAI)
-1. Get API key from https://x.ai/api
-2. Add to `.env`: `GROK_KEY=your_api_key_here`
-
-Use `/provider` command in Discord to switch between available providers
-
-## Image Generation
-
-<img src="https://i.imgur.com/Eo1ZzKk.png" width="300" alt="image">
-
-Image generation is now integrated with the provider system:
-
-### OpenAI DALL-E 3
-- Requires OpenAI API key
-- High-quality image generation
-- Use `/draw [prompt] openai`
-
-### Google Gemini
-- Requires Gemini API key  
-- Free tier available
-- Use `/draw [prompt] gemini`
-
-### Fallback Options
-- If premium providers are unavailable, the bot will attempt to use free alternatives
-- Image generation capabilities vary by provider availability
-
-## Optional: Setup system prompt
-
-* A system prompt would be invoked when the bot is first started or reset
-* You can set it up by modifying the content in `system_prompt.txt`
-* All the text in the file will be fired as a prompt to the bot
-* Get the first message from ChatGPT in your discord channel!
-* Go Discord setting turn `developer mode` on
-
-   1. Right-click the channel you want to recieve the message, `Copy  ID`
-
-        ![channel-id](https://user-images.githubusercontent.com/89479282/207697217-e03357b3-3b3d-44d0-b880-163217ed4a49.PNG)
-
-   2. paste it into `.env` under `DISCORD_CHANNEL_ID`
-
-## Optional: Disable logging
-
-* Set the value of `LOGGING` in the `.env` to False
+---
 
 ## Commands
 
-### Core Commands
-* `/chat [message]` - Chat with the current AI provider
-* `/provider` - Switch between AI providers (Free, OpenAI, Claude, Gemini, Grok)
-* `/draw [prompt] [model]` - Generate images with specified provider
-* `/reset` - Clear conversation history
-* `/help` - Display all available commands
+| Command | What it does |
+|---|---|
+| `/chat` | Talk to the Tower in character |
+| `/reset` | Reset your chat history |
+| `/rules`, `/spell` | Look up D&D 5e 2024 rules, conditions, spells and class features |
+| `/setcharprofile`, `/showcharprofile` | Tell the Tower who your character is; see what it remembers |
+| `/showcharappearance` | Show your character's saved appearance |
+| `/style` | Clothing and style for a character or faction |
+| `/finances`, `/prices` | The exchange rate, and item / spell / gear prices |
+| `/towerbay`, `/myauctions` | List an item for auction; check your listings |
+| `/bid`, `/buynow`, `/mybids` | Bid on, buy out, and track TowerBay lots |
+| `/factionrep`, `/partyrep` | Faction standings; rival parties' records |
+| `/skills` | The Tower's learned skills and knowledge |
+| `/draw` | Generate an image of the Undercity |
+| `/provider`, `/switchpersona` | Switch the AI provider or persona |
+| `/private`, `/replyall`, `/help` | Reply settings and help |
 
-### Persona Commands
-* `/switchpersona [persona]` - Switch AI personality (admin-only for jailbreaks)
-   * `standard` - Standard helpful assistant
-   * `creative` - More creative and imaginative responses  
-   * `technical` - Technical and precise responses
-   * `casual` - Casual and friendly tone
-   * `jailbreak-v1` - BYPASS mode (admin only)
-   * `jailbreak-v2` - SAM mode (admin only)
-   * `jailbreak-v3` - Developer Mode Plus (admin only)
+**DM tools** (restricted): `/newsdraft`, `/resolvemission`, `/postmission`, `/postsubcontract`, `/genmodule`,
+`/clearboard`, `/riftlist`, `/sealrift`, `/archive`, `/newareas`, `/generateareas`, `/drawscene`, `/pin`, `/refstats`,
+`/backfill`, `/setcharappearance`, `/towerbay_restock`, `/npcgearrun`, `/standard`, `/epic`, `/sync`.
 
-### Bot Behavior
-* `/private` - Bot replies only visible to command user
-* `/public` - Bot replies visible to everyone (default)
-* `/replyall` - Bot responds to all messages in channel (toggle)
-## Security Features
+---
 
-### Admin-Only Jailbreak Access
-Jailbreak personas require admin privileges for enhanced security:
+## Project layout
 
-1. Set `ADMIN_USER_IDS` in `.env` with comma-separated Discord user IDs
-2. Only admin users can access jailbreak personas
-3. Regular users see only safe personas in `/switchpersona`
+```
+main.py                 entry point (bot + dashboard)
+src/bot.py              loads the command modules
+src/aclient.py          the Discord client and its background loops
+src/cogs/               slash commands (chat, characters, missions, economy, images, world, admin...)
+src/agents/             LLM agents and orchestration
+src/mission_builder/    mission and module generation pipelines
+src/db_api.py           MySQL access (the source of truth)
+src/news_feed.py        bulletins and world events
+Webpage/                the dashboard
+skills/                 the Tower's skill library
+tests/                  test suite
+```
 
-> **Warning**
-> Jailbreak personas may generate content that bypasses normal AI safety measures. Admin access required.
+`MAP.md` has the full module-by-module map.
 
-### Environment Security
-- No cookie-based authentication (removed for reliability)
-- Secure API key management via environment variables
-- Docker security hardening with non-root user
-- Read-only filesystem for container security
+---
+
+## Credits and license
+
+Tower Bot began as a fork of [Zero6992/chatGPT-discord-bot](https://github.com/Zero6992/chatGPT-discord-bot) and has
+grown into its own project. It is released under the **GNU General Public License v2.0** (see `LICENSE`).
+
+D&D and Dungeons & Dragons are trademarks of Wizards of the Coast. This is an unofficial fan project.
+
+---
+
+## Support
+
+This project is free and always will be. If you enjoy it and want to support me, you can
+[buy me a coffee](https://buymeacoffee.com/akodoreign) — no strings attached, and thank you either way.
